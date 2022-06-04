@@ -1,0 +1,7 @@
+/home/akito/asuswrt-modx-next/tools/lede-toolchain-mediatek-mt7622_gcc-5.4.0_glibc-2.24.Linux-x86_64.tar.bz2 filter=lfs diff=lfs merge=lfs -text
+/home/akito/asuswrt-modx-next/tools/buildroot-gcc342.tar.bz2 filter=lfs diff=lfs merge=lfs -text
+/home/akito/asuswrt-modx-next/tools/lede-toolchain-mediatek-mt7629_gcc-5.4.0_musl-1.1.24_eabi.Linux-x86_64.tar.bz2 filter=lfs diff=lfs merge=lfs -text
+/home/akito/asuswrt-modx-next/tools/openwrt-gcc520_musl.aarch64.tar.bz2 filter=lfs diff=lfs merge=lfs -text
+/home/akito/asuswrt-modx-next/tools/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24.tgz filter=lfs diff=lfs merge=lfs -text
+*.tgz filter=lfs diff=lfs merge=lfs -text
+*.bz2 filter=lfs diff=lfs merge=lfs -text
