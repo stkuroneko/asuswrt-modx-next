@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -33,14 +35,12 @@
 #define OS "plan9"
 #define PACKAGE "curl"
 #define PACKAGE_NAME "curl"
-#define PACKAGE_BUGREPORT "a suitable mailing list: https://curl.haxx.se/mail/"
+#define PACKAGE_BUGREPORT "a suitable mailing list: https://curl.se/mail/"
 #define PACKAGE_STRING "curl -"
 #define PACKAGE_TARNAME "curl"
 #define PACKAGE_VERSION "-"
 #define RANDOM_FILE "/dev/random"
 #define VERSION "0.0.0" /* TODO */
-
-#define RETSIGTYPE void
 
 #define STDC_HEADERS 1
 
@@ -55,13 +55,6 @@
 #define SIZEOF_SIZE_T 4
 #define SIZEOF_TIME_T 4
 #endif
-
-#define HAVE_GETNAMEINFO 1
-#define GETNAMEINFO_QUAL_ARG1 const
-#define GETNAMEINFO_TYPE_ARG1 struct sockaddr *
-#define GETNAMEINFO_TYPE_ARG2 int
-#define GETNAMEINFO_TYPE_ARG46 long
-#define GETNAMEINFO_TYPE_ARG7 int
 
 #define HAVE_RECV 1
 #define RECV_TYPE_ARG1 int
@@ -102,17 +95,13 @@
 #define HAVE_BASENAME 1
 #define HAVE_BOOL_T 1
 #define HAVE_CRYPTO_CLEANUP_ALL_EX_DATA 1
-#define HAVE_ENGINE_LOAD_BUILTIN_ENGINES 1
 #define HAVE_ERRNO_H 1
 #define HAVE_FCNTL 1
 #define HAVE_FCNTL_H 1
-#define HAVE_FDOPEN 1
-#define HAVE_FORK 1
 #define HAVE_FREEADDRINFO 1
 #define HAVE_FTRUNCATE 1
 #define HAVE_GETADDRINFO 1
 #define HAVE_GETEUID 1
-#define HAVE_GETHOSTBYADDR 1
 #define HAVE_GETHOSTBYNAME 1
 #define HAVE_GETHOSTNAME 1
 #define HAVE_GETPPID 1
@@ -139,7 +128,6 @@
 
 #define USE_OPENSSL 1
 #define HAVE_OPENSSL_CRYPTO_H 1
-#define HAVE_OPENSSL_ENGINE_H 1
 #define HAVE_OPENSSL_ERR_H 1
 #define HAVE_OPENSSL_PEM_H 1
 #define HAVE_OPENSSL_PKCS12_H 1
@@ -147,7 +135,6 @@
 #define HAVE_OPENSSL_SSL_H 1
 #define HAVE_OPENSSL_X509_H 1
 
-#define HAVE_PERROR 1
 #define HAVE_PIPE 1
 #define HAVE_POLL 1
 #define HAVE_POLL_FINE 1
@@ -164,7 +151,6 @@
 #define HAVE_SIGNAL 1
 #define HAVE_SIGNAL_H 1
 #define HAVE_SIGSETJMP 1
-#define HAVE_SIG_ATOMIC_T 1
 #define HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 1
 #define HAVE_SOCKET 1
 #define HAVE_SSL_GET_SHUTDOWN 1
@@ -175,7 +161,6 @@
 #define HAVE_STRCASECMP 1
 #define HAVE_STRDUP 1
 #define HAVE_STRING_H 1
-#define HAVE_STRNCASECMP 1
 #define HAVE_STRSTR 1
 #define HAVE_STRTOK_R 1
 #define HAVE_STRTOLL 1
@@ -204,7 +189,6 @@
 #define STRERROR_R_TYPE_ARG3 int
 
 #define TIME_WITH_SYS_TIME 1
-#define USE_BLOCKING_SOCKETS 1
 #define USE_MANUAL 1
 
 #define __attribute__(x)

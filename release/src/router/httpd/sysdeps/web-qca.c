@@ -101,6 +101,7 @@ typedef struct _WPS_CONFIGURED_VALUE {
 extern u_int ieee80211_mhz2ieee(u_int freq);
 extern int get_channel_list_via_driver(int unit, char *buffer, int len);
 extern int get_channel_list_via_country(int unit, const char *country_code, char *buffer, int len);
+extern int get_channel(const char *ifname);
 
 #define WL_A		(1U << 0)
 #define WL_B		(1U << 1)
@@ -463,7 +464,7 @@ unsigned int getAPChannel(int unit)
 	case WL_2G_BAND:	/* fall-through */
 	case WL_5G_BAND:	/* fall-through */
 	case WL_5G_2_BAND:
-		r = getAPChannelbyIface(get_wifname(unit));
+		r = get_channel(get_wifname(unit));
 		break;
 	case WL_60G_BAND:
 		/* FIXME */
@@ -1221,7 +1222,7 @@ static int getSTAInfo(int unit, WIFI_STA_TABLE *sta_info)
 	if (!unit_name)
 		return ret;
 #if defined(RTCONFIG_AMAS_WGN)  
-        wl_ifnames = strdup(get_all_lan_ifnames());
+        wl_ifnames = get_all_lan_ifnames();
 #else
 	wl_ifnames = strdup(nvram_safe_get("lan_ifnames"));
 #endif	
@@ -1295,11 +1296,12 @@ show_wliface_info(webs_t wp, int unit, char *ifname, char *op_mode)
 #if defined(GTAXY16000)
 	unsigned int edmg_channel;
 #endif
-	int ret = 0, cac = 0;
+	int i, ret = 0, cac = 0, radar_cnt = 0, radar_list[32];
+	uint64_t m = 0;
 	FILE *fp;
 	unsigned char mac_addr[ETHER_ADDR_LEN];
 	char tmpstr[1024], cmd[] = "iwconfig staXYYYYYY";
-	char *p, ap_bssid[] = "00:00:00:00:00:00XXX";
+	char *p, ap_bssid[] = "00:00:00:00:00:00XXX", vphy[IFNAMSIZ];
 
 	if (unit < 0 || !ifname || !op_mode)
 		return 0;
@@ -1344,13 +1346,22 @@ show_wliface_info(webs_t wp, int unit, char *ifname, char *op_mode)
 	getVAPBitRate(unit, ifname, tmpstr, sizeof(tmpstr));
 	if (unit == WL_5G_BAND || unit == WL_5G_2_BAND) {
 		cac = safe_atoi(iwpriv_get(ifname, "get_cac_state"));
+		strcpy(vphy, get_vphyifname(swap_5g_band(unit)));
+		radar_cnt = get_radar_channel_list(vphy, radar_list, ARRAY_SIZE(radar_list));
+		for (i = 0; i < radar_cnt; ++i) {
+			m |= ch5g2bitmask(radar_list[i]);
+		}
 	}
 	ret += websWrite(wp, "Bit Rate	: %s%s", tmpstr, cac? " (CAC scan)" : "");
 	getVAPBandwidth(unit, ifname, tmpstr, sizeof(tmpstr));
 	if (*tmpstr != '\0')
 		ret += websWrite(wp, ", %sMHz", tmpstr);
 	ret += websWrite(wp, "\n");
-	ret += websWrite(wp, "Channel		: %u\n", getAPChannel(unit));
+	ret += websWrite(wp, "Channel		: %u", getAPChannel(unit));
+	if (radar_cnt > 0) {
+		ret += websWrite(wp, " (Radar: %s)", bitmask2chlist5g(m, ","));
+	}
+	ret += websWrite(wp, "\n");
 #if defined(GTAXY16000)
 	if (unit == WL_60G_BAND) {
 		edmg_channel = getEDMGChannel();
@@ -2287,8 +2298,14 @@ ej_wl_channel_list_60g(int eid, webs_t wp, int argc, char_t **argv)
 
 static int ej_wl_rate(int eid, webs_t wp, int argc, char_t **argv, int unit)
 {
+#if defined(RTCONFIG_SOC_IPQ40XX)
+	FILE *fp = NULL;
+	char *pt1 = NULL, *pt2 = NULL;
+	int len;
+#else
 #define ASUS_IOCTL_GET_STA_DATARATE (SIOCDEVPRIVATE+15) /* from qca-wifi/os/linux/include/ieee80211_ioctl.h */
         struct iwreq wrq;
+#endif
 	int retval = 0;
 	char tmp[256], prefix[sizeof("wlXXXXXXXXXX_")];
 	char *name;
@@ -2324,7 +2341,24 @@ static int ej_wl_rate(int eid, webs_t wp, int argc, char_t **argv, int unit)
 	snprintf(prefix, sizeof(prefix), "wl%d.1_", unit);
 	name = nvram_safe_get(strlcat_r(prefix, "ifname", tmp, sizeof(tmp)));
 #endif
-
+#if defined(RTCONFIG_SOC_IPQ40XX)
+	snprintf(tmp, sizeof(tmp), "iwconfig %s | grep Rate", name);
+	fp = PS_popen(tmp, "r");
+	if (fp) {
+		memset(tmp, 0, sizeof(tmp));
+		len = fread(tmp, 1, sizeof(tmp), fp);
+		PS_pclose(fp);
+		if (len > 1) {
+			tmp[len-1] = '\0';
+			pt1 = strstr(tmp, "Bit Rate:");
+			if (pt1) {
+				pt2 = pt1 + strlen("Bit Rate:");
+				pt1 = strtok(pt2, " ");
+				snprintf(rate_buf, sizeof(rate_buf), "%s Mbps", pt1);
+			}
+		}
+	}
+#else
 	wrq.u.data.pointer = rate;
 	wrq.u.data.length = sizeof(rate);
 
@@ -2338,7 +2372,7 @@ static int ej_wl_rate(int eid, webs_t wp, int argc, char_t **argv, int unit)
 		snprintf(rate_buf, sizeof(rate_buf), "%d Mbps", rate[0]);
 	else
 		snprintf(rate_buf, sizeof(rate_buf), "%d Mbps", rate[1]);
-
+#endif
 ERROR:
 	if(from_app == 0)
 		retval += websWrite(wp, "%s", rate_buf);
@@ -2373,6 +2407,12 @@ ej_wl_rate_5g_2(int eid, webs_t wp, int argc, char_t **argv)
 		return ej_wl_rate(eid, wp, argc, argv, 2);
 	else
 		return 0;
+}
+
+int
+ej_wl_rate_6g(int eid, webs_t wp, int argc, char_t **argv)
+{
+   	return 0;
 }
 
 /* Check necessary kernel module only. */
@@ -2469,8 +2509,12 @@ const char *syslog_msg_filter[] = {
 	"net_ratelimit",
 #if defined(RTCONFIG_SOC_IPQ8074)
 	"[AUTH] vap", "[MLME] vap", "[ASSOC] vap", "[INACT] vap", "LBDR ", "npu_corner", "apc_corner", "Sync active EEPROM set",
-	"wlan_send_mgmt", "hapdevent_proc_event",
+	"wlan_send_mgmt", "hapdevent_proc_event", "HAPD:", "WSUP:", "APSTATS:", "THERMAL:", "skb recycler",
+#elif defined(RTCONFIG_SOC_IPQ8064)
+	"[AUTH] vap", "[MLME] vap", "[ASSOC] vap", "[INACT] vap",
 #endif
-	"exist in UDB, can't", "is used by someone else, can't use it", "not mesh client, can't update it",
+	"exist in UDB, can't", "is used by someone else, can't use it", "not mesh client, can't update it", "not mesh client, can't delete it",
+	"ERROR: [send_redir_page",
 	NULL
 };
+

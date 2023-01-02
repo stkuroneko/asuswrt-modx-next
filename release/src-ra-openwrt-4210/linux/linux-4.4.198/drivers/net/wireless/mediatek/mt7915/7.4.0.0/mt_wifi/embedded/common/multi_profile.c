@@ -2840,6 +2840,8 @@ static INT multi_profile_merge_ft(
 {
 	/*merge FtMdId*/
 	multi_profile_merge_increase(data, 1, "FtMdId", buf1, buf2, final);
+	/*merge FtR0khId*/
+	multi_profile_merge_increase(data, 1, "FtR0khId", buf1, buf2, final);
 	/*merge FtSupport */
 	multi_profile_merge_separate("FtSupport", buf1, buf2, final);
 	/*merge FtOnly */
@@ -2861,6 +2863,19 @@ static INT multi_profile_merge_rrm(
 {
 	/*merge FtSupport */
 	multi_profile_merge_separate("RRMEnable", buf1, buf2, final);
+	return NDIS_STATUS_SUCCESS;
+}
+#endif
+
+#ifdef CONFIG_DOT11V_WNM
+static INT multi_profile_merge_wnm(
+	struct mpf_data *data,
+	CHAR *buf1,
+	CHAR *buf2,
+	CHAR *final)
+{
+	/*merge WNMEnable */
+	multi_profile_merge_separate("WNMEnable", buf1, buf2, final);
 	return NDIS_STATUS_SUCCESS;
 }
 #endif
@@ -3130,6 +3145,11 @@ static INT multi_profile_merge(
 
 #ifdef DOT11K_RRM_SUPPORT
 	if (multi_profile_merge_rrm(data, buf1, buf2, final) != NDIS_STATUS_SUCCESS)
+		return retval;
+#endif
+
+#ifdef CONFIG_DOT11V_WNM
+	if (multi_profile_merge_wnm(data, buf1, buf2, final) != NDIS_STATUS_SUCCESS)
 		return retval;
 #endif
 

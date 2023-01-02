@@ -1,36 +1,46 @@
 # Items to be removed from future curl releases
 
 If any of these deprecated features is a cause for concern for you, please
-email the curl-library mailing list as soon as possible and explain to us why
-this is a problem for you and how your use case can't be satisfied properly
-using a work around.
+email the
+[curl-library mailing list](https://lists.haxx.se/listinfo/curl-library)
+as soon as possible and explain to us why this is a problem for you and
+how your use case cannot be satisfied properly using a workaround.
 
-## PolarSSL
+## NSS
 
-The polarssl TLS library has not had an update in over three years. The last
-release was done on [January 7
-2016](https://tls.mbed.org/tech-updates/releases). This library has been
-superseded by the mbedTLS library, which is the current incarnation of
-PolarSSL. curl has supported mbedTLS since 2015.
+We remove support for building curl with the NSS TLS library in August 2022.
 
-It seems unlikely that this library is a good choice for users to get proper
-TLS security and support today and at the same time there are plenty of good
-and updated alternatives.
+- There are very few users left who use curl+NSS
+- NSS has very few users outside of curl as well (primarily Firefox)
+- NSS is harder than ever to find documentation for
+- NSS was always "best" used with Red Hat Linux when they provided additional
+  features on top of the regular NSS that is not shipped by the vanilla library
 
-I consider it likely that the existing users of curl + polarssl out there are
-stuck on old curl versions and when they eventually manage to update curl they
-should also be able to update their TLS library.
+Starting in 7.82.0, building curl to use NSS configure requires the additional
+flag --with-nss-deprecated in an attempt to highlight these plans.
 
-### State
+## NPN
 
-In the curl 7.65.2 release (July 17, 2019) the ability to build with this TLS
-backend is removed from the configure script. The code remains and can be
-built and used going forward, but it has to be manually enabled in a build (or
-the configure removal reverted).
+We make selecting NPN a no-op starting in August 2022.
 
-### Removal
+**Next Protocol Negotiation** is a TLS extension that was created and used for
+agreeing to use the SPDY protocol (the precursor to HTTP/2) for HTTPS. In the
+early days of HTTP/2, before the spec was finalized and shipped, the protocol
+could be enabled using this extension with some servers.
 
-The support for PolarSSL and all code for it will be completely removed from
-the curl code base six months after it ships disabled in configure in a
-release. In the release on or near February 27, 2020. (possibly called curl
-7.70.0).
+curl supports the NPN extension with some TLS backends since then, with a
+command line option `--npn` and in libcurl with `CURLOPT_SSL_ENABLE_NPN`.
+
+HTTP/2 proper is made to use the ALPN (Application-Layer Protocol Negotiation)
+extension and the NPN extension has no purposes anymore. The HTTP/2 spec was
+published in May 2015.
+
+Today, use of NPN in the wild should be extremely rare and most likely totally
+extinct. Chrome removed NPN support in Chrome 51, shipped in
+June 2016. Removed in Firefox 53, April 2017.
+
+## past removals
+
+ - Pipelining
+ - axTLS
+ - PolarSSL

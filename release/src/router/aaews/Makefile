@@ -3,7 +3,6 @@ WSLIB=libws.so
 DOG=mastiff
 
 include ../common.mak
-include $(TOP)/.config
 
 CURL_DIR=$(TOP)/curl-7.21.7
 XML2_DIR=$(TOP)/libxml2
@@ -33,7 +32,7 @@ OBJS=$(patsubst %.c, %.o, $(SRC))
 OBJS_MAIN=$(filter-out $(DOG).o, $(OBJS))
 WSLIB_OBJS := $(WS_SOURCES:%.c=$(OUTPUT)/%.o)
 
-ifeq ($(wildcard $(TOP)/aaews/*.c),)
+ifneq ($(wildcard prebuild/$(BUILD_NAME)/aaews),)
 all:
 	-cp -f $(TOP)/aaews/prebuild/$(BUILD_NAME)/aaews aaews
 	-cp -f $(TOP)/aaews/prebuild/$(BUILD_NAME)/mastiff mastiff
@@ -51,6 +50,10 @@ ROUTER_LDFLAGS=-L$(NVRAM_DIR) -L$(SHARED_DIR) -L$(QCSAPI_DIR)
 else
 ROUTER_LIBS=-lnvram -lshared
 ROUTER_LDFLAGS=-L$(NVRAM_DIR) -L$(SHARED_DIR)
+ifeq ($(RTCONFIG_BCM_502L07P2),y)
+ROUTER_LIBS += -lethctl
+ROUTER_LDFLAGS += -L$(TOP_PLATFORM)/ethctl_lib
+endif
 endif
 ifeq ($(RTCONFIG_NOTIFICATION_CENTER),y)
 ROUTER_LIBS += -lsqlite3
@@ -110,7 +113,7 @@ ifeq ($(RTCONFIG_SW_HW_AUTH),y)
 CFLAGS += -I$(SW_HW_AUTH_DIR) -DSW_HW_AUTH
 endif
 
-ifeq ($(wildcard $(TOP)/aaews/*.c),)
+ifneq ($(wildcard prebuild/$(BUILD_NAME)/mastiff),)
 $(DOG):
 	-cp -f $(TOP)/aaews/prebuild/$(BUILD_NAME)/mastiff mastiff
 else
@@ -120,7 +123,7 @@ $(DOG): $(DOG).o nat_nvram.o  ws_caller.o nw_util.o natapi.o $(WSLIB_OBJS) info_
 endif
 aicam:$(TARGET)
 
-ifeq ($(wildcard $(TOP)/aaews/*.c),)
+ifneq ($(wildcard prebuild/$(BUILD_NAME)/aaews),)
 router:
 	-cp -f $(TOP)/aaews/prebuild/$(BUILD_NAME)/aaews aaews
 else

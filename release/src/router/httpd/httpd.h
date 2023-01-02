@@ -35,6 +35,7 @@
 #if defined(DEBUG) && defined(DMALLOC)
 #include <dmalloc.h>
 #endif
+#include <json.h>
 #include <rtconfig.h>
 #include "swrt.h"
 
@@ -89,6 +90,7 @@ extern struct AiMesh_whitelist AiMesh_whitelists[];
 struct stb_port {
         char *value;
         char *name;
+        char *comboport_value_list;
 };
 
 struct model_stb_port {
@@ -197,12 +199,12 @@ struct wl_sync_nvram {
 enum {
 	HTTP_OK = 200,
 	HTTP_FAIL = 400,
-    HTTP_CHPASS_FAIL,
-    HTTP_CHPASS_FAIL_MAX,
+	HTTP_CHPASS_FAIL,
+	HTTP_CHPASS_FAIL_MAX,
 	HTTP_RULE_ADD_SUCCESS = 2001,
 	HTTP_RULE_DEL_SUCCESS,
 	HTTP_NORULE_DEL,
-    HTTP_RULE_MODIFY_SUCCESS,
+	HTTP_RULE_MODIFY_SUCCESS,
 	HTTP_OVER_MAX_RULE_LIMIT = 4000,
 	HTTP_INVALID_ACTION,
 	HTTP_INVALID_MAC,
@@ -213,7 +215,7 @@ enum {
 	HTTP_INVALID_IPADDR,
 	HTTP_INVALID_TS,
 	HTTP_INVALID_FILE,
-    HTTP_INVALID_SUPPORT,
+	HTTP_INVALID_SUPPORT,
 	HTTP_SHMGET_FAIL = 5000,
 	HTTP_FB_SVR_FAIL
 };
@@ -349,7 +351,7 @@ extern struct ej_handler ej_handlers[];
 #define LOCK_LOGIN_LAN 	0x01
 #define LOCK_LOGIN_WAN 	0x02
 
-#if defined(RTAX82U) || defined(DSL_AX82U) || defined(GSAX3000) || defined(GSAX5400) || defined(TUFAX5400)
+#if defined(RTAX82U) || defined(DSL_AX82U) || defined(GSAX3000) || defined(GSAX5400) || defined(TUFAX5400) || defined(GTAX6000) || defined(GTAXE16000) || defined(GTAX11000_PRO)
 enum {
         LEDG_QIS_RUN = 1,
         LEDG_QIS_FINISH
@@ -414,6 +416,9 @@ extern void send_content_page( int status, char* title, char* extra_header, char
 extern char *get_referrer(char *referer, char *auth_referer, size_t length);
 extern int save_ui_support_to_file(void);
 extern int save_iptvSettings_to_file(void);
+#ifdef RTCONFIG_JFFS2USERICON
+extern int renew_upload_icon(void);
+#endif
 
 struct usockaddr;
 typedef struct usockaddr usockaddr;
@@ -482,6 +487,8 @@ extern char cookies_buf[4096];
 extern unsigned int login_ip_tmp; /* IPv6 compat */
 extern uaddr login_uip_tmp;
 extern time_t login_timestamp_cache;
+extern int hook_get_json;
+extern char wl_band_list[8][8];
 extern int check_user_agent(char* user_agent);
 #if defined(RTCONFIG_IFTTT) || defined(RTCONFIG_ALEXA) || defined(RTCONFIG_GOOGLE_ASST)
 extern void add_ifttt_flag(void);
@@ -555,7 +562,7 @@ extern void do_get_eptoken_cgi(char *url, FILE *stream);
 extern unsigned int login_fail_num;
 extern int is_captcha_match(char *catpch);
 #endif
-#if defined(RTAX82U) || defined(DSL_AX82U) || defined(GSAX3000) || defined(GSAX5400) || defined(TUFAX5400)
+#if defined(RTAX82U) || defined(DSL_AX82U) || defined(GSAX3000) || defined(GSAX5400) || defined(TUFAX5400) || defined(GTAX6000) || defined(GTAXE16000) || defined(GTAX11000_PRO)
 extern void switch_ledg(int action);
 #endif
 #ifdef RTCONFIG_SAVE_WL_NVRAM_BOTH
@@ -568,6 +575,8 @@ extern int filter_ban_ip();
 extern void slowloris_check();
 extern void slow_post_read_check();
 extern int check_chpass_auth(char *cur_username, char *cur_passwd);
+extern int save_changed_param(json_object *cfg_root, char *param);
 extern void reg_default_final_token();
+extern int get_wl_nband_list();
 #endif /* _httpd_h_ */
 

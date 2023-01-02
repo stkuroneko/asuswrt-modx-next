@@ -5,11 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 #include "tool_setup.h"
@@ -28,10 +30,8 @@
 #include "curlx.h"
 
 #include "tool_cfgable.h"
-#include "tool_convert.h"
 #include "tool_doswin.h"
 #include "tool_operhlp.h"
-#include "tool_metalink.h"
 
 #include "memdebug.h" /* keep this as LAST include */
 
@@ -85,7 +85,7 @@ char *add_file_name_to_url(char *url, const char *filename)
   else
     ptr = url;
   ptr = strrchr(ptr, '/');
-  if(!ptr || !strlen(++ptr)) {
+  if(!ptr || !*++ptr) {
     /* The URL has no file name part, add the local file name. In order
        to be able to do so, we have to create a new URL in another
        buffer.*/
@@ -115,16 +115,17 @@ char *add_file_name_to_url(char *url, const char *filename)
         urlbuffer = aprintf("%s/%s", url, encfile);
 
       curl_free(encfile);
+
+      if(!urlbuffer) {
+        url = NULL;
+        goto end;
+      }
+
       Curl_safefree(url);
-
-      if(!urlbuffer)
-        return NULL;
-
       url = urlbuffer; /* use our new URL instead! */
     }
-    else
-      Curl_safefree(url);
   }
+  end:
   curl_easy_cleanup(curl);
   return url;
 }

@@ -187,7 +187,7 @@
 				reg = <0x180000 0x40000>;
 			};
 
-			partition@600000 {
+			partition@200000 {
 				label = "Kernel";
 				reg = <0x200000 0x2800000>;
 			};
