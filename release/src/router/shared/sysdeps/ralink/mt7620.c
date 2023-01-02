@@ -204,30 +204,7 @@ enum {
 	P7_PORT=7,
 };
 #define MT7621_GSW
-#elif defined(RTMIR3G)
-enum {
-	WAN_PORT=1,
-	LAN1_PORT=3,
-	LAN2_PORT=2,
-	LAN3_PORT=4, //unused
-	LAN4_PORT=0, //unused
-	P5_PORT=5,
-	CPU_PORT=6,
-	P7_PORT=7,
-};
-#define MT7621_GSW
-#elif defined(JCGQ10PRO)
-enum {
-	WAN_PORT=0,
-	LAN1_PORT=1,
-	LAN2_PORT=4,
-	LAN3_PORT=2,
-	LAN4_PORT=3,
-	P5_PORT=5,
-	CPU_PORT=6,
-	P7_PORT=7,
-};
-#elif defined(RTCMCCA9)
+#elif defined(JCGQ10PRO) || defined(RTCMCCA9)
 enum {
 	WAN_PORT=0,
 	LAN1_PORT=1,
@@ -246,6 +223,18 @@ enum {
 	LAN2_PORT=2,
 	LAN3_PORT=1,
 	LAN4_PORT=0,
+	P5_PORT=5,
+	CPU_PORT=6,
+	P7_PORT=7,
+};
+#define MT7621_GSW
+#elif defined(XD4S)
+enum {
+	WAN_PORT=4,
+	LAN1_PORT=2,
+	LAN2_PORT=0, //not used
+	LAN3_PORT=1, //not used
+	LAN4_PORT=3, //not used
 	P5_PORT=5,
 	CPU_PORT=6,
 	P7_PORT=7,
@@ -821,13 +810,13 @@ int mt7621_vlan_unset(int vid)
  * 	0:	success
  */
 #if defined(RTCONFIG_RALINK_MT7620)             
-int __mt7620_wan_bytecount(int unit, unsigned long *tx, unsigned long *rx)
+int __mt7620_wan_bytecount(int unit, unsigned long long *tx, unsigned long long *rx)
 #elif defined(RTCONFIG_RALINK_MT7621)             
-int __mt7621_wan_bytecount(int unit, unsigned long *tx, unsigned long *rx)
+int __mt7621_wan_bytecount(int unit, unsigned long long *tx, unsigned long long *rx)
 #endif   
 {
 	int dir, i;
-	unsigned long count[2];
+	unsigned long long count[2];
 	unsigned int m, v, addr;
 
 	if (unit < 0 || unit >= WAN_UNIT_MAX || !tx || !rx) {
@@ -963,6 +952,119 @@ static void build_wan_lan_mask(int stb)
 	nvram_set_int("lanports_mask", lan_mask);
 }
 
+/* bit 0:1
+b00 : admit all frames
+b01 : admit only vlan-tagged frames
+b10 : admit only untagged or priority-tagged frames
+b11 : reserved
+*/
+void set_acceptable_frame_type(int port, int type)
+{
+	unsigned int value;
+	unsigned int reg;
+
+	reg = REG_ESW_PORT_PVC_P0 + 0x100*port;
+
+	if (switch_init() < 0)
+		return;
+
+#if defined(RTCONFIG_RALINK_MT7620)
+	mt7620_reg_read(reg, &value);
+#elif defined(RTCONFIG_RALINK_MT7621)
+	mt7621_reg_read(reg, &value);
+#endif
+
+	value &= 0xfffffffc;
+	value |= type;
+#if defined(RTCONFIG_RALINK_MT7620)
+	mt7620_reg_write(reg, value);
+#elif defined(RTCONFIG_RALINK_MT7621)
+	mt7621_reg_write(reg, value);
+#endif
+	switch_fini();
+}
+
+void set_admit_all_frames()
+{
+	unsigned int value;
+	for (int i = 0; i <= 6; i++)
+		set_acceptable_frame_type(i, 0);
+}
+
+void set_admit_untag_frames()
+{
+	unsigned int value;
+	for (int i = 0; i <= 6; i++)
+		set_acceptable_frame_type(i, 2);
+}
+
+/*
+type
+0: user port
+1: statck port
+2: translation port
+3: transparent port
+*/
+void set_switch_vlan_port_attribute(int port, int type)
+{
+	unsigned int value;
+	unsigned int reg;
+
+	reg = REG_ESW_PORT_PVC_P0 + 0x100*port;
+
+	if (switch_init() < 0)
+		return;
+
+#if defined(RTCONFIG_RALINK_MT7620)
+	mt7620_reg_read(reg, &value);
+#elif defined(RTCONFIG_RALINK_MT7621)
+	mt7621_reg_read(reg, &value);
+#endif
+
+	value &= (0xffffff3f);
+	value |= (type << 6);
+#if defined(RTCONFIG_RALINK_MT7620)
+	mt7620_reg_write(reg, value);
+#elif defined(RTCONFIG_RALINK_MT7621)
+	mt7621_reg_write(reg, value);
+#endif
+	switch_fini();
+}
+
+/*
+eg_tag
+0: untagged
+1: swap
+2: tagged
+3: stack
+*/
+void set_switch_vlan_egresstag(int port, int eg_tag)
+{
+	unsigned int value;
+	unsigned int reg;
+
+	reg = REG_ESW_PORT_PCR_P0 + 0x100*port;
+
+	if (switch_init() < 0)
+		return;
+
+#if defined(RTCONFIG_RALINK_MT7620)
+	mt7620_reg_read(reg, &value);
+#elif defined(RTCONFIG_RALINK_MT7621)
+	mt7621_reg_read(reg, &value);
+#endif
+
+	value &= (~REG_PCR_EG_TAG_MASK);
+	value |= 0xff0003;
+	value |= ((unsigned int)eg_tag << REG_PCR_EG_TAG_OFFT);
+#if defined(RTCONFIG_RALINK_MT7620)
+	mt7620_reg_write(reg, value);
+#elif defined(RTCONFIG_RALINK_MT7621)
+	mt7621_reg_write(reg, value);
+#endif
+	switch_fini();
+}
+
 /**
  * Configure LAN/WAN partition base on generic IPTV type.
  * @type:
@@ -988,9 +1090,6 @@ static void config_mt7621_esw_LANWANPartition(int type)
 	int sw_mode = sw_mode();
 	unsigned int m;
 
-	if (switch_init() < 0)
-		return;
-
 	if (sw_mode == SW_MODE_AP || sw_mode == SW_MODE_REPEATER)
 		wanscap_lan = 0;
 
@@ -1003,38 +1102,30 @@ static void config_mt7621_esw_LANWANPartition(int type)
 	if (wanscap_lan && !(get_wans_dualwan() & WANSCAP_WAN))
 		wans_lan_vid = 2;
 
-	//LAN/WAN ports as security mode
-	for (i = 0; i < 6; i++)
-#if defined(RTCONFIG_RALINK_MT7620)
-		mt7620_reg_write((REG_ESW_PORT_PCR_P0 + 0x100*i), 0xff0003);
-#elif defined(RTCONFIG_RALINK_MT7621)
-		mt7621_reg_write((REG_ESW_PORT_PCR_P0 + 0x100*i), 0xff0003);
-#endif		
-	//LAN/WAN ports as transparent port
-	for (i = 0; i < 6; i++)
-#if defined(RTCONFIG_RALINK_MT7620)
-		mt7620_reg_write((REG_ESW_PORT_PVC_P0 + 0x100*i), 0x810000c2);	//transparent port, admit untagged frames
-#elif defined(RTCONFIG_RALINK_MT7621)
-		mt7621_reg_write((REG_ESW_PORT_PVC_P0 + 0x100*i), 0x810000c2);	//transparent port, admit untagged frames
-#endif		
-	//set CPU/P7 port as user port
-#if defined(RTCONFIG_RALINK_MT7620)
-	mt7620_reg_write((REG_ESW_PORT_PVC_P0 + 0x100*CPU_PORT), 0x81000000);	//port6, user port, admit all frames
-	mt7620_reg_write((REG_ESW_PORT_PVC_P0 + 0x100*P7_PORT), 0x81000000);	//port7, user port, admit all frames
-
-	mt7620_reg_write((REG_ESW_PORT_PCR_P0 + 0x100*CPU_PORT), 0x20ff0003);	//port6, Egress VLAN Tag Attribution=tagged
-	mt7620_reg_write((REG_ESW_PORT_PCR_P0 + 0x100*P7_PORT), 0x20ff0003);	//port7, Egress VLAN Tag Attribution=tagged
-#elif defined(RTCONFIG_RALINK_MT7621)
-	mt7621_reg_write((REG_ESW_PORT_PVC_P0 + 0x100*CPU_PORT), 0x81000000);	//port6, user port, admit all frames
-	mt7621_reg_write((REG_ESW_PORT_PVC_P0 + 0x100*P7_PORT), 0x81000000);	//port7, user port, admit all frames
-
-	mt7621_reg_write((REG_ESW_PORT_PCR_P0 + 0x100*CPU_PORT), 0x20ff0003);	//port6, Egress VLAN Tag Attribution=tagged
-	mt7621_reg_write((REG_ESW_PORT_PCR_P0 + 0x100*P7_PORT), 0x20ff0003);	//port7, Egress VLAN Tag Attribution=tagged
-#endif
-
 	build_wan_lan_mask(type);
 	_dprintf("%s: LAN/WAN/WANS_LAN portmask %08x/%08x/%08x\n", __func__, lan_mask, wan_mask, wans_lan_mask);
 
+	//LAN/WAN ports as security mode
+	for (i = 0; i < 6; i++)
+		set_switch_vlan_egresstag(i, 0);
+
+	//LAN/WAN ports as transparent port
+	for (i = 0; i < 6; i++)
+	{
+		set_switch_vlan_port_attribute(i, 3); //transparent port
+		set_acceptable_frame_type(i, 2); //admit untagged frames
+	}
+
+	//set CPU/P7 port as user port
+	set_switch_vlan_port_attribute(CPU_PORT, 0); //user port
+	set_switch_vlan_port_attribute(P7_PORT, 0); //user port
+	set_acceptable_frame_type(CPU_PORT, 0); //admit all frames
+	set_acceptable_frame_type(P7_PORT, 0); //admit all frames
+	set_switch_vlan_egresstag(CPU_PORT, 2); //Egress VLAN Tag Attribution=tagged
+	set_switch_vlan_egresstag(P7_PORT, 2); //Egress VLAN Tag Attribution=tagged
+
+	if (switch_init() < 0)
+		return;
 	//set PVID
 	//for MT7621, port 5 is the part of wan-ports. we should set its PVID. 
 	for (i = 0, m = 1; i < (NR_WANLAN_PORT+1); ++i, m <<= 1) {
@@ -1068,7 +1159,7 @@ static void config_mt7621_esw_LANWANPartition(int type)
 	mt7621_vlan_set(0, 1, portmap, 0);
 #endif	
 	if (sw_mode == SW_MODE_ROUTER
-#ifdef RTCONFIG_AMAS
+#if defined(RTCONFIG_AMAS) || defined(RTCONFIG_EASYMESH)
 		|| (sw_mode == SW_MODE_AP && nvram_match("re_mode", "1"))
 #endif
 	) {
@@ -1115,9 +1206,70 @@ static void config_mt7621_esw_LANWANPartition(int type)
 			_dprintf("%s: Unknown WANSCAP %x\n", __func__, wanscap_wanlan);
 		}
 	}
-
 	switch_fini();
 }
+
+#ifdef RTCONFIG_AMAS_WGN
+void __wgn_sysdep_swtich_set(int vid)
+{
+	char portmap[16];
+	build_wan_lan_mask(0);
+
+	for(int i=0; i<7; i++)
+	{
+		if(lan_mask & (1<<i))
+		{
+			set_switch_vlan_port_attribute(i, 0);// user port
+			set_switch_vlan_egresstag(i, 2);// eg tag
+		}
+	}
+
+	if (switch_init() < 0)
+		return;
+
+	if (sw_mode() == SW_MODE_ROUTER
+	|| (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1")))
+	{
+		//VLAN member port: LAN
+		//LAN: P7, P6, lan_mask
+		__create_port_map(0xC0 | lan_mask, portmap);
+#if defined(RTCONFIG_RALINK_MT7620)
+		mt7620_vlan_set(0, vid, portmap, 0);
+#elif defined(RTCONFIG_RALINK_MT7621)
+		mt7621_vlan_set(0, vid, portmap, 0);
+#endif
+		//modify vlan1 for lan port per port egress untag
+		__create_port_map(0xC0 | lan_mask, portmap);
+		mt762x_vlan_set(-1, 1, portmap, 0, lan_mask);
+	}
+	switch_fini();
+	set_admit_all_frames();
+}
+
+void __wgn_sysdep_swtich_unset(int vid)
+{
+	build_wan_lan_mask(0);
+
+	for(int i=0; i<7; i++)
+	{
+		if(lan_mask & (1<<i))
+		{
+			set_switch_vlan_port_attribute(i, 3);// transparent port
+			set_switch_vlan_egresstag(i, 0);// eg untag
+		}
+	}
+	if (switch_init() < 0)
+		return;
+#if defined(RTCONFIG_RALINK_MT7620)
+	mt7620_vlan_unset(vid);
+#elif defined(RTCONFIG_RALINK_MT7621)
+	mt7621_vlan_unset(vid);
+#endif
+	switch_fini();
+	set_admit_untag_frames();
+}
+#endif
+
 #if defined(RTCONFIG_RALINK_MT7620)
 static void get_mt7620_esw_WAN_Speed(unsigned int *speed)
 #elif defined(RTCONFIG_RALINK_MT7621)
@@ -1405,7 +1557,7 @@ static void initialize_Vlan(int stb_bitmask)
 	switch_fini();
 }
 
-#if defined(RTN14U) || defined(RTAC52U) || defined(RTAC51U) || defined(RTN11P) || defined(RTN300) || defined(RTN54U) || defined(RTAC1200HP) || defined(RTN56UB1) || defined(RTN56UB2) || defined(RTAC54U) || defined(RTAC1200GA1) || defined(RTAC1200GU) || defined(RPAC87) || defined(RTAC85U) || defined(RTAC85P) || defined(RTN800HP) || defined(RTACRH26) || defined(TUFAC1750) || defined(RMAC2100) || defined(RTMIR3G) || defined(R6800)
+#if defined(RTN14U) || defined(RTAC52U) || defined(RTAC51U) || defined(RTN11P) || defined(RTN300) || defined(RTN54U) || defined(RTAC1200HP) || defined(RTN56UB1) || defined(RTN56UB2) || defined(RTAC54U) || defined(RTAC1200GA1) || defined(RTAC1200GU) || defined(RPAC87) || defined(RTAC85U) || defined(RTAC85P) || defined(RTN800HP) || defined(RTACRH26) || defined(TUFAC1750) || defined(RMAC2100) || defined(R6800)
 static void fix_up_hwnat_for_wifi(void)
 {
 	int i, j, m, r, v, isp_profile_hwnat_not_safe = 0;
@@ -1413,7 +1565,7 @@ static void fix_up_hwnat_for_wifi(void)
 	char bss[] = "wl0.1_bss_enabledXXXXXX";
 	char mode_x[] = "wl0_mode_xXXXXXX";
 	struct wifi_if_vid_s w = {
-#if defined(RTAC52U) || defined(RTAC51U) || defined(RTN54U) || defined(RTAC1200HP) || defined(RTN56UB1) || defined(RTN56UB2) || defined(RTAC54U) || defined(RTAC1200GA1) || defined(RTAC1200GU) || defined(RPAC87) || defined(RTAC85U) || defined(RTAC85P) || defined(RTN800HP) || defined(RTACRH26) || defined(TUFAC1750) || defined(RMAC2100) || defined(RTMIR3G) || defined(R6800)
+#if defined(RTAC52U) || defined(RTAC51U) || defined(RTN54U) || defined(RTAC1200HP) || defined(RTN56UB1) || defined(RTN56UB2) || defined(RTAC54U) || defined(RTAC1200GA1) || defined(RTAC1200GU) || defined(RPAC87) || defined(RTAC85U) || defined(RTAC85P) || defined(RTN800HP) || defined(RTACRH26) || defined(TUFAC1750) || defined(RMAC2100) || defined(R6800)
 		.wl_vid = { 21, 43 },		/* DP_RA0  ~ DP_RA3:  21, 22, 23, 24;	DP_RAI0  ~ DP_RAI3:  43, 44, 45, 46 */
 		.wl_wds_vid = { 37, 59 },	/* DP_WDS0 ~ DP_WDS3: 37, 38, 39, 40;	DP_WDSI0 ~ DP_WDSI3: 59, 60, 61, 62 */
 #elif defined(RTN14U) || defined(RTN11P) || defined(RTN300)
@@ -2354,6 +2506,11 @@ void ATE_mt7621_esw_port_status(void)
 		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
 		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
 		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X');
+
+#elif defined(XD4S)
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X');
 #else
 	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;L3=%C;L4=%C;",
 		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
@@ -2486,3 +2643,4 @@ void usage(char *cmd)
 	exit(0);
 }
 #endif
+

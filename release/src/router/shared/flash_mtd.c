@@ -25,7 +25,8 @@
 #endif	// !MUSL_LIBC
 #include <mtd/mtd-user.h>
 #else
-#include <linux/mtd/mtd.h>
+//#include <linux/mtd/mtd.h>
+#include <mtd/mtd-user.h>
 #endif
 #ifndef RTCONFIG_REALTEK
 #include "mtd-abi.h"
@@ -174,19 +175,25 @@ int flash_mtd_init_info(void)
 
 int flash_mtd_open(int num, int flags)
 {
-	char dev[10];
+	char dev[12];//musl bug, strlen + 2
 	snprintf(dev, sizeof(dev), "/dev/mtd%d", num);
+#ifdef DEBUG
+	printf("-----------------%s:%s,%o\n", __func__, dev, flags);
+#endif
 	return open(dev, flags);
 }
 
 int flash_mtd_open_name(const char *dev_name, int flags)
 {
-	char dev[10];
+	char dev[12];//musl bug, strlen + 2
 
 	if (!dev_name || *dev_name == '\0')
 		return -1;
 
 	snprintf(dev, sizeof(dev), "/dev/%s", dev_name);
+#ifdef DEBUG
+	printf("-----------------%s:%s,%o\n", __func__, dev, flags);
+#endif
 	return open(dev, flags);
 }
 

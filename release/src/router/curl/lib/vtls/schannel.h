@@ -8,11 +8,11 @@
  *                             \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2012, Marc Hoersken, <info@marc-hoersken.de>, et al.
- * Copyright (C) 2012 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,6 +20,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 #include "curl_setup.h"
@@ -53,13 +55,13 @@
 
 extern const struct Curl_ssl Curl_ssl_schannel;
 
-CURLcode Curl_verify_certificate(struct connectdata *conn, int sockindex);
+CURLcode Curl_verify_certificate(struct Curl_easy *data,
+                                 struct connectdata *conn, int sockindex);
 
 /* structs to expose only in schannel.c and schannel_verify.c */
 #ifdef EXPOSE_SCHANNEL_INTERNAL_STRUCTS
 
 #ifdef __MINGW32__
-#include <_mingw.h>
 #ifdef __MINGW64_VERSION_MAJOR
 #define HAS_MANUAL_VERIFY_API
 #endif
@@ -70,20 +72,21 @@ CURLcode Curl_verify_certificate(struct connectdata *conn, int sockindex);
 #endif
 #endif
 
-struct curl_schannel_cred {
+struct Curl_schannel_cred {
   CredHandle cred_handle;
   TimeStamp time_stamp;
+  TCHAR *sni_hostname;
   int refcount;
 };
 
-struct curl_schannel_ctxt {
+struct Curl_schannel_ctxt {
   CtxtHandle ctxt_handle;
   TimeStamp time_stamp;
 };
 
 struct ssl_backend_data {
-  struct curl_schannel_cred *cred;
-  struct curl_schannel_ctxt *ctxt;
+  struct Curl_schannel_cred *cred;
+  struct Curl_schannel_ctxt *ctxt;
   SecPkgContext_StreamSizes stream_sizes;
   size_t encdata_length, decdata_length;
   size_t encdata_offset, decdata_offset;

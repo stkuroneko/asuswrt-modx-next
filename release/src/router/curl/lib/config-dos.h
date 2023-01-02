@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -31,8 +33,6 @@
   #define OS  "MSDOS/djgpp"
 #elif defined(__HIGHC__)
   #define OS  "MSDOS/HighC"
-#elif defined(__WATCOMC__)
-  #define OS  "MSDOS/Watcom"
 #else
   #define OS  "MSDOS/?"
 #endif
@@ -45,7 +45,6 @@
 #define HAVE_FCNTL_H           1
 #define HAVE_FREEADDRINFO      1
 #define HAVE_GETADDRINFO       1
-#define HAVE_GETNAMEINFO       1
 #define HAVE_GETPROTOBYNAME    1
 #define HAVE_GETTIMEOFDAY      1
 #define HAVE_IO_H              1
@@ -84,7 +83,6 @@
 
 #define NEED_MALLOC_H          1
 
-#define RETSIGTYPE             void
 #define SIZEOF_INT             4
 #define SIZEOF_LONG            4
 #define SIZEOF_LONG_DOUBLE     16
@@ -94,7 +92,7 @@
 #define STDC_HEADERS           1
 #define TIME_WITH_SYS_TIME     1
 
-/* Qualifiers for send(), recv(), recvfrom() and getnameinfo(). */
+/* Qualifiers for send(), recv(), and recvfrom() */
 
 #define SEND_TYPE_ARG1         int
 #define SEND_QUAL_ARG2         const
@@ -118,12 +116,6 @@
 #define RECVFROM_TYPE_RETV     int
 #define RECVFROM_TYPE_ARG2_IS_VOID 1
 
-#define GETNAMEINFO_QUAL_ARG1  const
-#define GETNAMEINFO_TYPE_ARG1  struct sockaddr *
-#define GETNAMEINFO_TYPE_ARG2  int
-#define GETNAMEINFO_TYPE_ARG46 int
-#define GETNAMEINFO_TYPE_ARG7  int
-
 #define BSD
 
 /* CURLDEBUG definition enables memory tracking */
@@ -138,7 +130,6 @@
 /* USE_OPENSSL on cmd-line */
 #ifdef USE_OPENSSL
   #define HAVE_CRYPTO_CLEANUP_ALL_EX_DATA 1
-  #define HAVE_OPENSSL_ENGINE_H  1
   #define OPENSSL_NO_KRB5        1
 #endif
 
@@ -152,8 +143,6 @@
   #define ssize_t  int
 #endif
 
-#define CURL_CA_BUNDLE  getenv("CURL_CA_BUNDLE")
-
 /* Target HAVE_x section */
 
 #if defined(DJGPP)
@@ -164,9 +153,6 @@
   #define HAVE_SYS_TIME_H 1
   #define HAVE_TERMIOS_H  1
   #define HAVE_VARIADIC_MACROS_GCC 1
-
-#elif defined(__WATCOMC__)
-  #define HAVE_STRCASECMP 1
 
 #elif defined(__HIGHC__)
   #define HAVE_SYS_TIME_H 1

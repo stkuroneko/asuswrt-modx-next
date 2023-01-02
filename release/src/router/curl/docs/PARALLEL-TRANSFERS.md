@@ -18,7 +18,7 @@ completely different than the regular one used for each single transfer.
 
  o percent download (if known, which means *all* transfers need to have a
    known size)
- o precent upload (if known, with the same caveat as for download)
+ o percent upload (if known, with the same caveat as for download)
  o total amount of downloaded data
  o total amount of uploaded data
  o number of transfers to perform
@@ -40,7 +40,7 @@ Example:
 Connections are shared fine between different easy handles, but the
 "authentication contexts" are not. So for example doing HTTP Digest auth with
 one handle for a particular transfer and then continue on with another handle
-that reuses the same connection, the second handle can't send the necessary
+that reuses the same connection, the second handle cannot send the necessary
 Authorization header at once since the context is only kept in the original
 easy handle.
 
@@ -49,7 +49,7 @@ share API as well, as a context per origin + path (realm?) basically.
 
 Visible in test 153, 1412 and more.
 
-## Feedback!
+## Feedback
 
 This is early days for parallel transfer support. Keep your eyes open for
 unintended side effects or downright bugs.

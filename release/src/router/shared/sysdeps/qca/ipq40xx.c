@@ -31,46 +31,7 @@
 #include <qca.h>
 
 #define NR_WANLAN_PORT	5
-#define MAX_WANLAN_PORT	5
 
-enum {
-#if defined(RTAC58U) || defined(RTAC95U)
-	CPU_PORT=0,
-	LAN1_PORT=4,
-	LAN2_PORT=3,
-	LAN3_PORT=2,
-	LAN4_PORT=1,
-	WAN_PORT=5,
-	P6_PORT=5,
-#elif defined(RT4GAC53U)
-	CPU_PORT=0,
-	LAN1_PORT=3,
-	LAN2_PORT=4,
-	LAN3_PORT=2,	/* unused */
-	LAN4_PORT=1,	/* unused */
-	WAN_PORT=5,	/* unused */
-	P6_PORT=5,
-#elif defined(RTAC82U)
-	CPU_PORT=0,
-	LAN1_PORT=1,
-	LAN2_PORT=2,
-	LAN3_PORT=3,
-	LAN4_PORT=4,
-	WAN_PORT=5,
-	P6_PORT=5,
-#elif defined(MAPAC1300) || defined(MAPAC2200) || defined(VZWAC1300) || defined(SHAC1300)
-	CPU_PORT=0,
-	LAN1_PORT=1,
-	LAN2_PORT=2,
-	LAN3_PORT=3,
-	LAN4_PORT=4,
-	WAN_PORT=5,
-	P6_PORT=5,
-#else
-#error Define WAN/LAN ports!
-#endif
-
-};
 
 //0:WAN, 1:LAN, lan_wan_partition[][0] is port0
 static const int lan_wan_partition[9][NR_WANLAN_PORT] = {
@@ -1831,4 +1792,37 @@ rtkswitch_Port_phyLinkRate(unsigned int port_mask)
 	get_ipq40xx_Port_Speed(port_mask, &speed);
 
 	return speed;
+}
+
+char* get_all_lan_ifnames(void)
+{
+	char *wgn_ifnames = NULL, *lan_ifnames=NULL;
+        char word[64], *next = NULL;
+        char ath[64], *tmp = NULL;
+	char br[20],result[200];
+        if (!(wgn_ifnames = nvram_safe_get("wgn_ifnames")))
+                return NULL;
+	memset(result,0,sizeof(result));
+	strlcat(result,nvram_safe_get("lan_ifnames"),sizeof(result));
+	strlcat(result," ",sizeof(result));
+        foreach (word, wgn_ifnames, next)
+        {
+		memset(br,0,sizeof(br));
+		snprintf(br, sizeof(br), "%s_ifnames", word);
+		if((lan_ifnames = nvram_safe_get(br)) != NULL)
+		{
+        		foreach (ath, lan_ifnames, tmp)
+			{
+				if(strstr(ath,"ath"))
+				{		
+				 	if(!strncmp(ath, "ath0.", 5) || !strncmp(ath, "ath1.", 5) || !strncmp(ath, "ath2.", 5))
+						continue;
+					strlcat(result,ath,sizeof(result));
+					strlcat(result," ",sizeof(result));
+				}	
+			}	
+		}	
+        }
+	result[strlen(result)-1] = '\0';
+	return strdup(result);
 }

@@ -5,11 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -18,8 +18,17 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 #include "tool_setup.h"
+
+#ifdef HAVE_FCNTL_H
+/* for open() */
+#include <fcntl.h>
+#endif
+
+#include <sys/stat.h>
 
 #define ENABLE_CURLX_PRINTF
 /* use our own printf() functions */
@@ -32,35 +41,104 @@
 
 #include "memdebug.h" /* keep this as LAST include */
 
-/* create a local file for writing, return TRUE on success */
-bool tool_create_output_file(struct OutStruct *outs)
-{
-  struct GlobalConfig *global = outs->config->global;
-  FILE *file;
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+#ifdef WIN32
+#define OPENMODE S_IREAD | S_IWRITE
+#else
+#define OPENMODE S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
+#endif
 
-  if(!outs->filename || !*outs->filename) {
+/* create/open a local file for writing, return TRUE on success */
+bool tool_create_output_file(struct OutStruct *outs,
+                             struct OperationConfig *config)
+{
+  struct GlobalConfig *global;
+  FILE *file = NULL;
+  char *fname = outs->filename;
+  char *aname = NULL;
+  DEBUGASSERT(outs);
+  DEBUGASSERT(config);
+  global = config->global;
+  if(!fname || !*fname) {
     warnf(global, "Remote filename has no length!\n");
     return FALSE;
   }
 
-  if(outs->is_cd_filename) {
-    /* don't overwrite existing files */
-    file = fopen(outs->filename, "rb");
-    if(file) {
-      fclose(file);
-      warnf(global, "Refusing to overwrite %s: %s\n", outs->filename,
-            strerror(EEXIST));
+  if(config->output_dir && outs->is_cd_filename) {
+    aname = aprintf("%s/%s", config->output_dir, fname);
+    if(!aname) {
+      errorf(global, "out of memory\n");
       return FALSE;
+    }
+    fname = aname;
+  }
+
+  if(config->file_clobber_mode == CLOBBER_ALWAYS ||
+     (config->file_clobber_mode == CLOBBER_DEFAULT &&
+      !outs->is_cd_filename)) {
+    /* open file for writing */
+    file = fopen(fname, "wb");
+  }
+  else {
+    int fd;
+    do {
+      fd = open(fname, O_CREAT | O_WRONLY | O_EXCL | O_BINARY, OPENMODE);
+      /* Keep retrying in the hope that it isn't interrupted sometime */
+    } while(fd == -1 && errno == EINTR);
+    if(config->file_clobber_mode == CLOBBER_NEVER && fd == -1) {
+      int next_num = 1;
+      size_t len = strlen(fname);
+      size_t newlen = len + 13; /* nul + 1-11 digits + dot */
+      char *newname;
+      /* Guard against wraparound in new filename */
+      if(newlen < len) {
+        free(aname);
+        errorf(global, "overflow in filename generation\n");
+        return FALSE;
+      }
+      newname = malloc(newlen);
+      if(!newname) {
+        errorf(global, "out of memory\n");
+        free(aname);
+        return FALSE;
+      }
+      memcpy(newname, fname, len);
+      newname[len] = '.';
+      while(fd == -1 && /* haven't successfully opened a file */
+            (errno == EEXIST || errno == EISDIR) &&
+            /* because we keep having files that already exist */
+            next_num < 100 /* and we haven't reached the retry limit */ ) {
+        curlx_msnprintf(newname + len + 1, 12, "%d", next_num);
+        next_num++;
+        do {
+          fd = open(newname, O_CREAT | O_WRONLY | O_EXCL | O_BINARY, OPENMODE);
+          /* Keep retrying in the hope that it isn't interrupted sometime */
+        } while(fd == -1 && errno == EINTR);
+      }
+      outs->filename = newname; /* remember the new one */
+      outs->alloc_filename = TRUE;
+    }
+    /* An else statement to not overwrite existing files and not retry with
+       new numbered names (which would cover
+       config->file_clobber_mode == CLOBBER_DEFAULT && outs->is_cd_filename)
+       is not needed because we would have failed earlier, in the while loop
+       and `fd` would now be -1 */
+    if(fd != -1) {
+      file = fdopen(fd, "wb");
+      if(!file)
+        close(fd);
     }
   }
 
-  /* open file for writing */
-  file = fopen(outs->filename, "wb");
   if(!file) {
-    warnf(global, "Failed to create the file %s: %s\n", outs->filename,
+    warnf(global, "Failed to open the file %s: %s\n", fname,
           strerror(errno));
+    free(aname);
     return FALSE;
   }
+  free(aname);
   outs->s_isreg = TRUE;
   outs->fopened = TRUE;
   outs->stream = file;
@@ -78,7 +156,7 @@ size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
   size_t rc;
   struct per_transfer *per = userdata;
   struct OutStruct *outs = &per->outs;
-  struct OperationConfig *config = outs->config;
+  struct OperationConfig *config = per->config;
   size_t bytes = sz * nmemb;
   bool is_tty = config->global->isatty;
 #ifdef WIN32
@@ -147,7 +225,7 @@ size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
   }
 #endif
 
-  if(!outs->stream && !tool_create_output_file(outs))
+  if(!outs->stream && !tool_create_output_file(outs, per->config))
     return failure;
 
   if(is_tty && (outs->bytes < 2000) && !config->terminal_binary_ok) {

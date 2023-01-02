@@ -5,11 +5,11 @@
 .\" *                            | (__| |_| |  _ <| |___
 .\" *                             \___|\___/|_| \_\_____|
 .\" *
-.\" * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
 .\" *
 .\" * This software is licensed as described in the file COPYING, which
 .\" * you should have received as part of this distribution. The terms
-.\" * are also available at https://curl.haxx.se/docs/copyright.html.
+.\" * are also available at https://curl.se/docs/copyright.html.
 .\" *
 .\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
 .\" * copies of the Software, and permit persons to whom the Software is
@@ -18,8 +18,10 @@
 .\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
 .\" * KIND, either express or implied.
 .\" *
+.\" * SPDX-License-Identifier: curl
+.\" *
 .\" **************************************************************************
-.TH curl_multi_wait 3 "October 31, 2019" "libcurl 7.67.0" "libcurl Manual"
+.TH curl_multi_wait 3 "May 17, 2022" "libcurl 7.84.0" "libcurl Manual"
 
 .SH NAME
 curl_multi_wait - polls on all easy handles in a multi handle
@@ -35,7 +37,7 @@ CURLMcode curl_multi_wait(CURLM *multi_handle,
 .ad
 .SH DESCRIPTION
 \fIcurl_multi_wait(3)\fP polls all file descriptors used by the curl easy
-handles contained in the given multi handle set.  It will block until activity
+handles contained in the given multi handle set. It will block until activity
 is detected on at least one of the handles or \fItimeout_ms\fP has passed.
 Alternatively, if the multi handle has a pending internal timeout that has a
 shorter expiry time than \fItimeout_ms\fP, that shorter time will be used
@@ -50,7 +52,8 @@ number can include both libcurl internal descriptors as well as descriptors
 provided in \fIextra_fds\fP.
 
 If no extra file descriptors are provided and libcurl has no file descriptor
-to offer to wait for, this function will return immediately.
+to offer to wait for, this function will return immediately. (Try
+\fIcurl_multi_poll(3)\fP instead if you rather avoid this behavior.)
 
 This function is encouraged to be used instead of select(3) when using the
 multi interface to allow applications to easier circumvent the common problem
@@ -114,10 +117,10 @@ do {
 
 curl_multi_remove_handle(multi_handle, easy_handle);
 .fi
+.SH AVAILABILITY
+This function was added in libcurl 7.28.0.
 .SH RETURN VALUE
 CURLMcode type, general libcurl multi interface error code. See
 \fIlibcurl-errors(3)\fP
-.SH AVAILABILITY
-This function was added in libcurl 7.28.0.
 .SH "SEE ALSO"
-.BR curl_multi_fdset "(3), " curl_multi_perform "(3)"
+.BR curl_multi_fdset "(3), " curl_multi_perform "(3)", curl_multi_poll "(3) ",

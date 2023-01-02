@@ -26,6 +26,9 @@
 #include <shared.h>
 #include <ralink.h>
 #include <flash_mtd.h>
+#if defined(RTCONFIG_EASYMESH)
+#include <swrtmesh.h>
+#endif
 
 void init_devs(void)
 {
@@ -33,7 +36,7 @@ void init_devs(void)
 	MKNOD("/dev/video0", S_IFCHR | 0666, makedev(81, 0));
 	MKNOD("/dev/spiS0", S_IFCHR | 0666, makedev(217, 0));
 	MKNOD("/dev/i2cM0", S_IFCHR | 0666, makedev(218, 0));
-#if defined(RTCONFIG_RALINK_MT7621)
+#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_EN7561)
 	MKNOD("/dev/rdm0", S_IFCHR | 0x666, makedev(253, 0));
 #else
 	MKNOD("/dev/rdm0", S_IFCHR | 0666, makedev(254, 0));
@@ -67,7 +70,7 @@ void init_others(void)
 	eval("mii_mgr", "-s", "-p", "0", "-r", "14", "-v", "0x25");
 	eval("mii_mgr", "-s", "-p", "0", "-r", "13", "-v", "0x401f");
 	eval("mii_mgr", "-s", "-p", "0", "-r", "14", "-v", "0x3f");
-#elif defined(RTAC85U) || defined(RTAC85P) || defined(R6800) || defined(RMAC2100) || defined(RTMIR3G)
+#elif defined(RTAC85U) || defined(RTAC85P) || defined(R6800) || defined(RMAC2100)
 //fix me
 #endif
 }
@@ -117,7 +120,6 @@ void generate_switch_para(void)
 		case MODEL_RTAC85U:
 		case MODEL_RTAC85P:
 		case MODEL_RMAC2100:
-		case MODEL_RTMIR3G:
 		case MODEL_R6800:
 		case MODEL_TUFAC1750:
 		case MODEL_RTAX53U:
@@ -277,7 +279,6 @@ void config_switch()
 	case MODEL_RTAC85U:
 	case MODEL_RTAC85P:
 	case MODEL_RMAC2100:
-	case MODEL_RTMIR3G:
 	case MODEL_R6800:
 	case MODEL_TUFAC1750:
 	case MODEL_RTAX53U:
@@ -451,7 +452,7 @@ void config_switch()
 				else if (!strcmp(nvram_safe_get("switch_wantag"), "starhub")) {
 					//skip setting any lan port to IPTV port.
 					system("rtkswitch 38 0");
-#if defined(RTCONFIG_RALINK_MT7620) || defined(RTCONFIG_RALINK_MT7621)
+#if defined(RTCONFIG_RALINK_MT7620) || defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_EN7561)
 					__setup_vlan(2, 0, 0x02100210);
 #endif
 				}
@@ -516,7 +517,7 @@ void config_switch()
 
 						__setup_vlan(vlan_val, prio_val, 0x02000210);
 					}
-#if defined(RTCONFIG_RALINK_MT7621)
+#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_EN7561)
 					else {
 						/* Internet: untag: P4, P9; port: P4, P9 */
 						__setup_vlan(2, 0, 0x02100210);
@@ -771,6 +772,10 @@ void init_wl(void)
 	if (!module_loaded("mt_wifi_7615E"))
 		//modprobe("mt_wifi_7615E", tmpStr1, tmpStr2, tmpStr3);
 		modprobe("mt_wifi_7615E");
+#if !defined(RTCONFIG_RALINK_MT7621)
+	if (!module_loaded("mt_whnat"))
+		modprobe("mt_whnat");
+#endif
 #endif
 #if defined(RTCONFIG_WLMODULE_MT7915D_AP)
 	int mtd_part = 0, mtd_size = 0;
@@ -784,6 +789,10 @@ void init_wl(void)
 		//modprobe("mt_wifi", tmpStr1, tmpStr2, tmpStr3);
 	if (!module_loaded("mt_wifi"))
 		modprobe("mt_wifi");
+#if !defined(RTCONFIG_RALINK_MT7621)
+	if (!module_loaded("mt_whnat"))
+		modprobe("mt_whnat");
+#endif
 	snprintf(cmd, sizeof(cmd), "iwpriv %s set RuntimePara_%s\n", get_wifname(0), tmpStr1);
 	system(cmd);
 	snprintf(cmd, sizeof(cmd), "iwpriv %s set RuntimePara_%s\n", get_wifname(0), tmpStr2);
@@ -791,26 +800,53 @@ void init_wl(void)
 	snprintf(cmd, sizeof(cmd), "iwpriv %s set RuntimePara_%s\n", get_wifname(0), tmpStr3);
 	system(cmd);
 #endif
+#if defined(RTCONFIG_MT798X)
+	int mtd_part = 0, mtd_size = 0;
+	if (mtd_getinfo("Factory", &mtd_part, &mtd_size)){
+		snprintf(cmd, sizeof(cmd), "dd if=/dev/mtdblock%d of=/lib/firmware/e2p bs=655360 skip=0 count=1", mtd_part);
+		system(cmd);
+		system("ln -sf /rom/etc/wireless/mediatek /etc/wireless/");
+		doSystem("cp -s /rom/firmware/* /lib/firmware/");
+	}else
+		printf("init_devs: can't find Factory MTD partition\n");
+	if (!module_loaded("conninfra"))
+		modprobe("conninfra");
+	if (!module_loaded("mt_wifi"))
+		modprobe("mt_wifi");
+	if (!module_loaded("mtk_warp"))
+		modprobe("mtk_warp");
+	if (!module_loaded("mtk_warp_proxy"))
+		modprobe("mtk_warp_proxy");
+#endif
 	sleep(1);
 }
 
 void fini_wl(void)
 {
-#if 0 //3.10.x
-	if (module_loaded("hw_nat")) {
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP)
-		doSystem("iwpriv %s set hw_nat_register=%d", get_wifname(0), 0);
-#ifdef RTCONFIG_HAS_5G
-		doSystem("iwpriv %s set hw_nat_register=%d", get_wifname(1), 0);
+#if defined(RTCONFIG_EASYMESH)
+	if (module_loaded("mapfilter"))
+		modprobe_r("mapfilter");
 #endif
-#endif
-		modprobe_r("hw_nat");
-	}
-#else //4.4.x
 	if (module_loaded("mtkhnat"))
 		modprobe_r("mtkhnat");
+#if defined (RTCONFIG_WLMODULE_MT7615E_AP)
+	if (module_loaded("mt_wifi_7615E"))
+		modprobe_r("mt_wifi_7615E");
 #endif
-
+#if defined(RTCONFIG_WLMODULE_MT7915D_AP)
+	if (module_loaded("mt_wifi"))
+		modprobe_r("mt_wifi");
+#endif
+#if defined(RTCONFIG_MT798X)
+	if (module_loaded("mtk_warp_proxy"))
+		modprobe_r("mtk_warp_proxy");
+	if (module_loaded("mtk_warp"))
+		modprobe_r("mtk_warp");
+	if (module_loaded("mt_wifi"))
+		modprobe_r("mt_wifi");
+	if (module_loaded("conninfra"))
+		modprobe_r("conninfra");
+#endif
 #if defined (RTCONFIG_WLMODULE_MT7610_AP)
 	if (module_loaded("MT7610_ap"))
 		modprobe_r("MT7610_ap");
@@ -892,6 +928,10 @@ void init_syspara(void)
 	int i;
 	char macaddr[]="00:11:22:33:44:55";
 	char macaddr2[]="00:11:22:33:44:58";
+#if defined(RTCONFIG_EASYMESH)
+	char macaddrbh1[]="00:11:22:33:44:55";
+	char macaddrbh2[]="00:11:22:33:44:58";
+#endif
 	char country_code[3];
 	char pin[9];
 	char productid[13];
@@ -935,7 +975,7 @@ void init_syspara(void)
 	{
 		if (buffer[0]!=0xff)
 			ether_etoa(buffer, macaddr2);
-#if defined(JCGQ10PRO) || defined(H3CTX1801) || defined(RTCMCCA9)
+#if defined(JCGQ10PRO) || defined(H3CTX1801) || defined(PGBM1)|| defined(RTCMCCA9)
 		ether_cal_b(buffer, macaddr, 4);
 #endif
 	}
@@ -963,17 +1003,20 @@ void init_syspara(void)
 	else
 	   nvram_set("JP_CS","0");
 
-	if (!mssid_mac_validate(macaddr) || !mssid_mac_validate(macaddr2))
-		nvram_set("wl_mssid", "0");
-	else
+//	if (!mssid_mac_validate(macaddr) || !mssid_mac_validate(macaddr2))
+//		nvram_set("wl_mssid", "0");
+//	else
 		nvram_set("wl_mssid", "1");
-#if defined(R6800) || defined(RMAC2100) || defined(RTMIR3G) || defined(JCGQ10PRO) || defined(RTCMCCA9) || defined(H3CTX1801)
-	nvram_set("wl_mssid", "1");//fix guest wifi
-#endif
 
 	//TODO: separate for different chipset solution
 	nvram_set("et0macaddr", macaddr);
 	nvram_set("et1macaddr", macaddr2);
+#if defined(RTCONFIG_EASYMESH)
+	ether_cal(macaddr, macaddrbh1, 14);
+	ether_cal(macaddr2, macaddrbh2, 14);
+	nvram_set("bh0macaddr", macaddr);
+	nvram_set("bh1macaddr", macaddr2);
+#endif
 
 	if (FRead(dst, OFFSET_MAC_GMAC0, bytes)<0)
 		dbg("READ MAC address GMAC0: Out of scope\n");
@@ -985,15 +1028,23 @@ void init_syspara(void)
 				FWrite(ea, OFFSET_MAC_GMAC0, 6);
 		}
 	}
-
+#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_EN7561)
 	if (FRead(dst, OFFSET_MAC_GMAC2, bytes)<0)
 		dbg("READ MAC address GMAC2: Out of scope\n");
+#elif defined(RTCONFIG_MT798X)
+	if (FRead(dst, OFFSET_MAC_GMAC1, bytes)<0)
+		dbg("READ MAC address GMAC1: Out of scope\n");
+#endif
 	else
 	{
 		if (buffer[0]==0xff)
 		{
 			if (ether_atoe(macaddr2, ea))
+#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_EN7561)
 				FWrite(ea, OFFSET_MAC_GMAC2, 6);
+#elif defined(RTCONFIG_MT798X)
+				FWrite(ea, OFFSET_MAC_GMAC1, 6);
+#endif
 		}
 	}
 	{
@@ -1092,7 +1143,7 @@ void init_syspara(void)
 		dst[i] = 0;
 		nvram_set("wl_reg_5g", dst);
 		nvram_set("wl1_IEEE80211H", "0");
-		if      (strcmp(dst, "5G_BAND1") == 0)
+		if (strcmp(dst, "5G_BAND1") == 0)
 			nvram_set("wl1_country_code", "GB");
 		else if (strcmp(dst, "5G_BAND123") == 0)
 		{
@@ -1162,7 +1213,9 @@ void init_syspara(void)
 		else
 			nvram_set("secret_code", "12345670");
 	}
-
+#if defined(RTCONFIG_MT798X)
+	strlcpy(productid, rt_buildname, sizeof(productid));
+#else
 	dst = buffer;
 	bytes = 16;
 	if (linuxRead(dst, 0x20, bytes)<0)	/* The "linux" MTD partition, offset 0x20. */
@@ -1179,7 +1232,7 @@ void init_syspara(void)
 		nvram_set("productid", trim_r(productid));
 		nvram_set("firmver", trim_r(fwver));
 	}
-
+#endif
 #if defined(RTCONFIG_TCODE)
 	/* Territory code */
 	memset(buffer, 0, sizeof(buffer));
@@ -1231,7 +1284,7 @@ void init_syspara(void)
 	_dprintf("bootloader version: %s\n", nvram_safe_get("blver"));
 	_dprintf("firmware version: %s\n", nvram_safe_get("firmver"));
 
-#if defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#if defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
 	dst = txbf_para;
 	int count_0xff = 0;
 	if (FRead(dst, OFFSET_TXBF_PARA, 33) < 0)
@@ -1523,7 +1576,6 @@ void set_wan_tag(char *interface) {
 	case MODEL_RTAC85U:
 	case MODEL_RTAC85P:
 	case MODEL_RMAC2100:
-	case MODEL_RTMIR3G:
 	case MODEL_R6800:
 	case MODEL_TUFAC1750:
 	case MODEL_RTAX53U:
@@ -1640,10 +1692,14 @@ void reset_ra_sku(const char *location, const char *country, const char *reg_spe
 
 void setup_smp(int which)
 {
+#if defined(RTCONFIG_MT798X)
+	eval("/sbin/smp.sh");
+#else
 	if(which == 1)
 		eval("/sbin/smp.sh", "usb0", NULL);
 	else
 		eval("/sbin/smp.sh", "wifi", NULL);
+#endif
 	//nas or auto
 	//doSystem("pbr-optimizer -m 1 -o &");
 	//nat
@@ -1658,8 +1714,13 @@ void gen_wapp_config(void)
 	FILE *fp = NULL;
 	if(!f_exists("/etc/wapp_ap_ra0.conf"))
 		system("cp /etc/wappd/wapp_ap_ra0_default.conf /etc/wapp_ap_ra0.conf");
+#if defined(RTCONFIG_MT798X)
+	if(!f_exists("/etc/wapp_ap_rax0.conf"))
+		system("cp /etc/wappd/wapp_ap_rax0_default.conf /etc/wapp_ap_rax0.conf");
+#else
 	if(!f_exists("/etc/wapp_ap_rai0.conf"))
 		system("cp /etc/wappd/wapp_ap_rai0_default.conf /etc/wapp_ap_rai0.conf");
+#endif
 	system("rm -rf /tmp/wapp*");
 	if((fp = fopen("/etc/wapp_ap.conf", "w")))
 	{
@@ -1679,7 +1740,7 @@ void gen_wapp_config(void)
 			fprintf(fp, "wapp_ap_%s.conf;", WIF_2G);
 		if(nvram_match("wl1_radio", "1"))
 			fprintf(fp, "wapp_ap_%s.conf;", WIF_5G);
-			fprintf(fp, "\n");
+		fprintf(fp, "\n");
 		fclose(fp);
 	}else
 		_dprintf("Can't open /etc/wapp_main_inf.conf\n");
@@ -1687,19 +1748,39 @@ void gen_wapp_config(void)
 
 void start_wapp(void)
 {
-	char *wapp_argv[] = { "wapp", "d1", "v2", NULL, NULL, NULL };
+	char *wapp_argv[] = { "wapp", "-d1", "-v2", NULL, NULL, NULL };
 	pid_t pid;
 	int if_index = 3;
 
+	if (getpid() != 1) {
+		notify_rc("start_wapp");
+		return;
+	}
+
 	gen_wapp_config();
 	if(nvram_match("wl0_radio", "1"))
-		wapp_argv[if_index++] = "cra0";
+		wapp_argv[if_index++] = "-cra0";
 	if(nvram_match("wl1_radio", "1"))
-		wapp_argv[if_index++] = "crai0";
+#if defined(RTCONFIG_MT798X)
+		wapp_argv[if_index++] = "-crax0";
+#else
+		wapp_argv[if_index++] = "-crai0";
+#endif
 	if(pids("wapp"))
 		killall_tk("wapp");
 	_eval(wapp_argv, NULL, 0, &pid);
 	_dprintf("###wapp start:%d\n", pid);
+}
+
+void stop_wapp(void)
+{
+	if (getpid() != 1) {
+		notify_rc("stop_wapp");
+		return;
+	}
+
+	if (pids("wapp"))
+		killall_tk("wapp");
 }
 #endif
 #if defined(RTCONFIG_EASYMESH)
@@ -1710,24 +1791,26 @@ void start_wapp(void)
 #define MAP_CERT_MODE		4
 void gen_1905d_config(void)
 {
+	int sw_mode = sw_mode();
 	FILE *fp = NULL;
 	system("mkdir -p /etc/map");
 	if((fp = fopen("/etc/map/1905d.cfg", "w")))
 	{
-		if(nvram_get_int("easymesh_role") == EASYMESH_ROLE_MASTER){
-// Has MAP agent on this device
-			fprintf(fp, "map_agent=0\n");
+		if(nvram_get_int("easymesh_role") == EASYMESH_ROLE_MASTER && !mesh_re_node()){
 // This device is a MAP root
 			fprintf(fp, "map_root=1\n");
+// Has MAP agent on this device
+			fprintf(fp, "map_agent=0\n");
 		}else{
-			fprintf(fp, "map_agent=1\n");
 			fprintf(fp, "map_root=0\n");
+			fprintf(fp, "map_agent=1\n");
 		}
 // Controller's ALID
 		fprintf(fp, "map_controller_alid=%s\n", get_lan_hwaddr());
 // Agent's ALID
 		fprintf(fp, "map_agent_alid=%s\n", get_lan_hwaddr());
 // Default Backhault Type
+//		fprintf(fp, "bh_type=wifi\n");
 		fprintf(fp, "bh_type=eth\n");
 //Config Band setting of each Radio
 #if defined(RTCONFIG_HAS_5G_2)
@@ -1739,7 +1822,11 @@ void gen_1905d_config(void)
 		fprintf(fp, "br_inf=br0\n");
 //lan interface
 		if(nvram_match("easymesh_perportpervlan", "1")){
-			char *lan_ifname = "vlan1"; //nvram_get("lan_ifname");
+#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_EN7561)
+			char *lan_ifname = "vlan1";
+#else
+			char *lan_ifname = "eth0";
+#endif
 			char lan1[9], lan2[9], lan3[9], lan4[9];
 			snprintf(lan1, sizeof(lan1), "%s.1", lan_ifname);
 			snprintf(lan2, sizeof(lan2), "%s.2", lan_ifname);
@@ -1751,27 +1838,38 @@ void gen_1905d_config(void)
 			fprintf(fp, "lan=%s\n", lan4);
 			fprintf(fp, "lan_vid=1;2;3;4;\n");
 			fprintf(fp, "wan_vid=5;\n");
+			fprintf(fp, "wan=%s\n", nvram_safe_get("wan0_ifname"));
 		}else{
-//			fprintf(fp, "lan=eth0\n");
+#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_EN7561)
 			fprintf(fp, "lan=vlan1\n");
+#else
+			fprintf(fp, "lan=lan1\n");
+			fprintf(fp, "lan=lan2\n");
+			fprintf(fp, "lan=lan3\n");
+#if !defined(RMAX6000)
+			fprintf(fp, "lan=lan4\n");//1G
+#if 0
+			fprintf(fp, "lan=lan5\n");//2.5G
+#endif
+#endif
+#endif
 			fprintf(fp, "lan_vid=1;\n");
 			fprintf(fp, "wan_vid=2;\n");
+			fprintf(fp, "wan=%s\n", nvram_safe_get("wan0_ifname"));
 		}
-//wan interface
-		fprintf(fp, "wan=%s\n", nvram_safe_get("wan0_ifname"));
 //		fprintf(fp, "veth=xxx\n");
-		fprintf(fp, "map_ver=R2\n");
+		fprintf(fp, "map_ver=%s\n", get_easymesh_ver_str(get_easymesh_max_ver()));
 //fixed al_mac of al_inf(only wifi inf) mac
 //		fprintf(fp, "al_inf=ra0\n");
 		fprintf(fp, "bss_config_priority=");
 #if defined(RTCONFIG_HAS_5G_2)
-		if(nvram_match("wl2_radio", "1"))
-			fprintf(fp, "%s;%s;", WIF_5G2, APCLI_5G2);
+		fprintf(fp, "%s;", WIF_5G2);
 #endif
-		if(nvram_match("wl1_radio", "1"))
-			fprintf(fp, "%s;%s;", WIF_5G, APCLI_5G);
-		if(nvram_match("wl0_radio", "1"))
-			fprintf(fp, "%s;%s;", WIF_2G, APCLI_2G);
+		fprintf(fp, "%s;%s;", WIF_5G, WIF_2G);
+#if defined(RTCONFIG_HAS_5G_2)
+//		fprintf(fp, "%s;", APCLI_5G2);
+#endif
+//		fprintf(fp, "%s;%s;", APCLI_2G, APCLI_5G);
 		fprintf(fp, "\n");
 		fprintf(fp, "config_agent_port=9008\n");
 //ethernet device name used to read the switch table
@@ -1780,9 +1878,54 @@ void gen_1905d_config(void)
 //		if(is_router_mode())
 //			fprintf(fp, "transparent_vids=\n");
 //		fprintf(fp, "discovery_cnt=\n");
+		if(get_easymesh_max_ver() > 2){
+			fprintf(fp, "decrypt_fail_threshold=10\n");
+			fprintf(fp, "gtk_rekey_interval=3600\n");
+//Enable Ethernet Onboarding on WAN PORT only
+			fprintf(fp, "ob_wan_only=0\n");
+		}
 		fclose(fp);
 	}else
 		_dprintf("Can't open /etc/map/1905d.cfg\n");
+	if((fp = fopen("/etc/map/ethernet_cfg.txt", "w")))
+	{
+#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_EN7561)
+//set the vid of the LAN group, the range is 1-4094, and not repeat with wan_vid
+		fprintf(fp, "lan_vid=1;\n");
+		fprintf(fp, "lan=vlan1;\n");
+//set the vid of the WAN group, the range is 1-4094, and not repeat with lan_vid
+		fprintf(fp, "wan_vid=2;\n");
+#else
+		fprintf(fp, "lan=lan1");
+		fprintf(fp, " lan2");
+		fprintf(fp, " lan3");
+#if !defined(RMAX6000)
+		fprintf(fp, " lan4");//1G
+#if 0
+		fprintf(fp, " lan5");//2.5G
+#endif
+#endif
+		fprintf(fp, "\n");
+		fprintf(fp, "br_lan=br0\n");
+#endif
+//set the CPU port number, where the switch and CPU are connected.
+//The witch-7530 can be selected as 5 or 6.
+//The switch-7531 can only set one of 5 and 6, or you can set them at the same time
+//		fprintf(fp, "cpu_port=6;\n");
+#if defined(RTCONFIG_MT798X)
+//specify external phy port, used as lan port while bridge mode
+//panther with one 2.5G phy port, ext_phy_port=6
+//panther with two 2.5G phy port, ext_phy_port=5 6
+#if 0
+		fprintf(fp, "ext_phy_port=5 6\n");
+#else
+		fprintf(fp, "ext_phy_port=\n");
+#endif
+#endif
+		fclose(fp);
+		symlink("/etc/map/ethernet_cfg.txt", "/etc/ethernet_cfg.txt");
+	}else
+		_dprintf("Can't open /etc/map/ethernet_cfg.txt\n");
 }
 
 void gen_mapd_strng(void)
@@ -1818,27 +1961,58 @@ void gen_mapd_strng(void)
 
 void gen_mapd_config(void)
 {
+	int sw_mode = sw_mode();
+	char chList[256];
+	char *channel = NULL;
 	FILE *fp = NULL;
-	system("mkdir -p /etc/map");
 	if((fp = fopen("/etc/map/mapd_default.cfg", "w")))
 	{
-		fprintf(fp, "lan_interface=vlan1\n");
-		fprintf(fp, "wan_interface=%s\n", nvram_safe_get("wan0_ifname"));
+		if(get_easymesh_max_ver() > 2){
+			if(sw_mode == SW_MODE_ROUTER)
+				fprintf(fp, "mode=1\n");
+			else
+				fprintf(fp, "mode=2\n");
+		}
+		fprintf(fp, "lan_interface=br0\n");
+		if(sw_mode != SW_MODE_ROUTER)
+			fprintf(fp, "wan_interface=\n");
+		else
+			fprintf(fp, "wan_interface=%s\n", nvram_safe_get("wan0_ifname"));
 		if(nvram_get_int("easymesh_role") == EASYMESH_ROLE_AGENT)
 			fprintf(fp, "DeviceRole=2\n");
 		else if(nvram_get_int("easymesh_role") == EASYMESH_ROLE_MASTER)
 			fprintf(fp, "DeviceRole=1\n");
-		else
+		else//auto
 			fprintf(fp, "DeviceRole=0\n");
 		fprintf(fp, "APSteerRssiTh=-54\n");
-		fprintf(fp, "BhPriority2G=1\n");
+#if defined(RTCONFIG_WIFI6E)
+		fprintf(fp, "BhPriority6G=1\n");
+		fprintf(fp, "BhPriority2G=4\n");
+		fprintf(fp, "BhPriority5GL=2\n");
+		fprintf(fp, "BhPriority5GH=2\n");
+#else
+		fprintf(fp, "BhPriority2G=3\n");
 		fprintf(fp, "BhPriority5GL=1\n");
 		fprintf(fp, "BhPriority5GH=1\n");
+#endif
 		fprintf(fp, "ChPlanningIdleByteCount=\n");
 		fprintf(fp, "ChPlanningIdleTime=\n");
-		fprintf(fp, "ChPlanningUserPreferredChannel5G=\n");
-		fprintf(fp, "ChPlanningUserPreferredChannel5GH=\n");
-		fprintf(fp, "ChPlanningUserPreferredChannel2G=\n");
+		if(!nvram_match("wl1_channel", "0")){
+			if(nvram_get_int("wl1_channel") < 100){
+				fprintf(fp, "ChPlanningUserPreferredChannel5G=%s\n", nvram_get("wl1_channel"));
+				fprintf(fp, "ChPlanningUserPreferredChannel5GH=\n");
+			}else{
+				fprintf(fp, "ChPlanningUserPreferredChannel5G=\n");
+				fprintf(fp, "ChPlanningUserPreferredChannel5GH=%s\n", nvram_get("wl1_channel"));
+			}
+		}else{
+			fprintf(fp, "ChPlanningUserPreferredChannel5G=\n");
+			fprintf(fp, "ChPlanningUserPreferredChannel5GH=\n");
+		}
+		if(!nvram_match("wl0_channel", "0"))
+			fprintf(fp, "ChPlanningUserPreferredChannel2G=%s\n", nvram_get("wl0_channel"));
+		else
+			fprintf(fp, "ChPlanningUserPreferredChannel2G=\n");
 		fprintf(fp, "ChPlanningInitTimeout=120\n");
 		fprintf(fp, "NtwrkOptBootupWaitTime=45\n");
 		fprintf(fp, "NtwrkOptConnectWaitTime=45\n");
@@ -1848,6 +2022,9 @@ void gen_mapd_config(void)
 		fprintf(fp, "BandSwitchTime=\n");
 		fprintf(fp, "ScanThreshold2g=-75\n");
 		fprintf(fp, "ScanThreshold5g=-75\n");
+#if defined(RTCONFIG_WIFI6E)
+		fprintf(fp, "ScanThreshold6g=-75\n");
+#endif
 		fprintf(fp, "LowRSSIAPSteerEdge_RE=40\n");
 		fprintf(fp, "CUOverloadTh_2G=70\n");
 		fprintf(fp, "CUOverloadTh_5G_L=80\n");
@@ -1882,18 +2059,21 @@ void gen_mapd_config(void)
 		fprintf(fp, "bss_config_priority=");
 #if defined(RTCONFIG_HAS_5G_2)
 		if(nvram_match("wl2_radio", "1"))
-			fprintf(fp, "%s;%s;", WIF_5G2, APCLI_5G2);
+			fprintf(fp, "%s;", WIF_5G2);
 #endif
 		if(nvram_match("wl1_radio", "1"))
-			fprintf(fp, "%s;%s;", WIF_5G, APCLI_5G);
+			fprintf(fp, "%s;", WIF_5G);
 		if(nvram_match("wl0_radio", "1"))
-			fprintf(fp, "%s;%s;", WIF_2G, APCLI_2G);
+			fprintf(fp, "%s;", WIF_2G);
 		fprintf(fp, "\n");
 		fprintf(fp, "DualBH=\n");
 		fprintf(fp, "MetricRepIntv=60\n");
 		fprintf(fp, "MaxAllowedScan=\n");
 		fprintf(fp, "BHSteerTimeout=120\n");
-		fprintf(fp, "NtwrkOptPostCACTriggerTime=25\n");
+		if(get_easymesh_max_ver() > 2)
+			fprintf(fp, "NtwrkOptPostCACTriggerTime=30\n");
+		else
+			fprintf(fp, "NtwrkOptPostCACTriggerTime=25\n");
 		fprintf(fp, "role_detection_external=0\n");
 		fprintf(fp, "NetworkOptPrefer5Gover2G=0\n");
 		fprintf(fp, "NetworkOptPrefer5Gover2GRetryCnt=0\n");
@@ -1902,16 +2082,32 @@ void gen_mapd_config(void)
 		fprintf(fp, "DivergentChPlanning=0\n");
 		fprintf(fp, "LastMapMode=%s\n", nvram_get("easymesh_lastmode") ? : nvram_get("easymesh_mode"));
 		fprintf(fp, "NtwrkOptDataCollectionTime=300\n");
+		if(get_easymesh_max_ver() > 2){
+			fprintf(fp, "ChPlanningScanValidTime=14400\n");
+			fprintf(fp, "NetOptUserSetPriority=0\n");
+			fprintf(fp, "DESerialNumber=v3.0\n");
+			fprintf(fp, "DESoftwareVersion=v3.0\n");
+			fprintf(fp, "DEExecutionEnv=SWRT\n");
+			fprintf(fp, "DEChipsetVendor=MediaTek\n");
+			fprintf(fp, "DEStaConEventPath=\n");
+			fprintf(fp, "MaxVHT_BW5G==1\n");//20/40/80
+			fprintf(fp, "MaxHT_BW5G==1\n");//40
+			fprintf(fp, "MaxHT_BW2G==1\n");//40
+		}
 		fclose(fp);
-		system("ln -sf /etc/map/mapd_default.cfg /etc/map/mapd_cfg");
+		symlink("/etc/map/mapd_default.cfg", "/etc/map/mapd_cfg");
 	}else
 		_dprintf("Can't open /etc/map/mapd_default.cfg\n");
-	if((fp = fopen("/etc/map/mapd_user.cfg", "w")))
-	{
-		fprintf(fp, "###!UserConfigs!!!\n");
-		fclose(fp);
-	}else
-		_dprintf("Can't open /etc/map/mapd_user.cfg\n");
+	if(!f_exists("/jffs/swrtmesh/mapd_user.cfg")){
+		eval("mkdir", "-p", "/jffs/swrtmesh");
+		if((fp = fopen("/jffs/swrtmesh/mapd_user.cfg", "w"))){
+			fprintf(fp, "###!UserConfigs!!!\n");
+			fclose(fp);
+		}
+	}
+	symlink("/jffs/swrtmesh/mapd_user.cfg", "/etc/map/mapd_user.cfg");
+	if(!f_exists("/jffs/swrtmesh/client_db.txt"))
+		doSystem("touch /jffs/swrtmesh/client_db.txt");
 	gen_mapd_strng();
 }
 
@@ -1963,15 +2159,180 @@ static inline void perportpervlan_conf(void)
 	eval("brctl", "addif", bridge_name, lan4);
 }
 
+int getauthmode(int band)
+{
+	char prefix[] = "wlx_xxxxxxxxxxxxxxxx";
+	char *authmode = NULL;
+	if(band > WL_60G_BAND)
+		snprintf(prefix, sizeof(prefix), "wl%d.4_auth_mode_x", band == WL_2GBH_BAND ? 0 : 1);
+	else
+		snprintf(prefix, sizeof(prefix), "wl%d_auth_mode_x", band);
+	authmode = nvram_safe_get(prefix);
+	if(!strcmp(authmode, "open"))
+		return 0x1;
+	else if(!strcmp(authmode, "psk"))
+		return 0x2;
+	else if(!strcmp(authmode, "psk2"))
+		return 0x20;
+	else if(!strcmp(authmode, "pskpsk2"))
+		return 0x22;
+	else if(!strcmp(authmode, "sae"))
+		return 0x40;
+	else if(!strcmp(authmode, "psk2sae"))
+		return 0x60;
+#if defined(RTCONFIG_EASYMESH_R3)
+	else if(!strcmp(authmode, "dpp"))//dpp only
+		return 0x80;
+	else if(!strcmp(authmode, "dpppsk2"))//dpp + psk2
+		return 0xA0;
+	else if(!strcmp(authmode, "dppsae"))//dpp + sae
+		return 0xC0;
+	else if(!strcmp(authmode, "dpppsk2sae"))//dpp + psk2sae
+		return 0xE0;
+#endif
+	else//bug
+		return 0x20;
+}
+
+int getencrypttype(int band)
+{
+	char prefix[] = "wlx_xxxxxxxxxxxxxxxx";
+	char *authmode = NULL, *wep = NULL, *crypto = NULL;
+	if(band > WL_60G_BAND)
+		snprintf(prefix, sizeof(prefix), "wl%d.4_auth_mode_x", band == WL_2GBH_BAND ? 0 : 1);
+	else
+		snprintf(prefix, sizeof(prefix), "wl%d_auth_mode_x", band);
+	authmode = nvram_safe_get(prefix);
+	if(band > WL_60G_BAND)
+		snprintf(prefix, sizeof(prefix), "wl%d.4_wep_x", band == WL_2GBH_BAND ? 0 : 1);
+	else
+		snprintf(prefix, sizeof(prefix), "wl%d_wep_x", band);
+	wep = nvram_safe_get(prefix);
+	if(band > WL_60G_BAND)
+		snprintf(prefix, sizeof(prefix), "wl%d.4_crypto", band == WL_2GBH_BAND ? 0 : 1);
+	else
+		snprintf(prefix, sizeof(prefix), "wl%d_crypto", band);
+	crypto = nvram_safe_get(prefix);
+	if(!strcmp(authmode, "open") && nvram_match(wep, "0"))
+		return 0x1;
+	else if(!strcmp(authmode, "sae") || !strcmp(authmode, "psk2sae") || !strcmp(crypto, "aes"))
+		return 0x8;
+#if !defined(RTCONFIG_EASYMESH_R3)
+	else if(!strcmp(authmode, "psk") && !strcmp(crypto, "tkip"))
+		return 0x4;
+	else if(!strcmp(crypto, "tkip+aes"))
+		return 0xc;
+#else
+	else if(!strcmp(authmode, "dpp") || !strcmp(authmode, "dpppsk2") || !strcmp(authmode, "dppsae") || !strcmp(authmode, "dpppsk2sae"))
+		return 0x8;
+#endif
+	else//bug
+		return 8;
+}
+
+char *getpsk(int band)
+{
+	char prefix[] = "wlx_xxxxxxxxxxxxxxxx";
+	if(band > WL_60G_BAND)
+		snprintf(prefix, sizeof(prefix), "wl%d.4_wpa_psk", band == WL_2GBH_BAND ? 0 : 1);
+	else
+		snprintf(prefix, sizeof(prefix), "wl%d_wpa_psk", band);
+	return nvram_safe_get(prefix);
+
+}
+
+void gen_bhwifi_conf()
+{
+	int index = 1;
+	FILE *fp = NULL;
+	char ssid[128] = {0};
+	if((fp = fopen("/etc/map/wts_bss_info_config", "w"))){
+		fprintf(fp, "#ucc_bss_info\n");
+		snprintf(ssid, sizeof(ssid), "%s", nvram_safe_get("wl0_ssid"));
+		fprintf(fp, "%d,ff:ff:ff:ff:ff:ff 8x %s 0x%04x 0x%04x %s 0 1 hidden-N\n", index, mesh_format_ssid(ssid, sizeof(ssid)), getauthmode(WL_2G_BAND), getencrypttype(WL_2G_BAND), getpsk(WL_2G_BAND));
+		index++;
+		fprintf(fp, "%d,ff:ff:ff:ff:ff:ff 8x %s 0x%04x 0x%04x %s 1 0 hidden-Y\n", index, nvram_safe_get("wl0.4_ssid"), getauthmode(WL_2GBH_BAND), getencrypttype(WL_2GBH_BAND), getpsk(WL_2GBH_BAND));
+		index++;
+		snprintf(ssid, sizeof(ssid), "%s", nvram_safe_get("wl1_ssid"));
+		fprintf(fp, "%d,ff:ff:ff:ff:ff:ff 11x %s 0x%04x 0x%04x %s 0 1 hidden-N\n", index, mesh_format_ssid(ssid, sizeof(ssid)), getauthmode(WL_5G_BAND), getencrypttype(WL_5G_BAND), getpsk(WL_5G_BAND));
+		index++;
+		fprintf(fp, "%d,ff:ff:ff:ff:ff:ff 12x %s 0x%04x 0x%04x %s 0 1 hidden-N\n", index, mesh_format_ssid(ssid, sizeof(ssid)), getauthmode(WL_5G_BAND), getencrypttype(WL_5G_BAND), getpsk(WL_5G_BAND));
+		index++;
+		fprintf(fp, "%d,ff:ff:ff:ff:ff:ff 11x %s 0x%04x 0x%04x %s 1 0 hidden-Y\n", index, nvram_safe_get("wl1.4_ssid"), getauthmode(WL_5GBH_BAND), getencrypttype(WL_5GBH_BAND), getpsk(WL_5GBH_BAND));
+		index++;
+		fprintf(fp, "%d,ff:ff:ff:ff:ff:ff 12x %s 0x%04x 0x%04x %s 1 0 hidden-Y\n", index, nvram_safe_get("wl1.4_ssid"), getauthmode(WL_5GBH_BAND), getencrypttype(WL_5GBH_BAND), getpsk(WL_5GBH_BAND));
+		fclose(fp);
+	}else
+		printf("failed to open %s\n", "/etc/map/wts_bss_info_config");
+}
+
+static void setup_wifi_vlan(void){
+	int i;
+	char ifname[16];
+	char path[256];
+	for(i = 0; i < MAX_NO_MSSID; i++){
+		snprintf(ifname, sizeof(ifname), "ra%d", i);
+		snprintf(path, sizeof(path), "/sys/class/net/ra%d/ifindex", i);
+		if(f_exists(path)){
+			eval("iwpriv", ifname, "set", "VLANTag=1");
+			eval("iwpriv", ifname, "set", "VLANPolicy=0:4");
+			eval("iwpriv", ifname, "set", "VLANPolicy=1:2");
+		}
+#if defined(RTCONFIG_MT798X)
+		snprintf(ifname, sizeof(ifname), "rax%d", i);
+		snprintf(path, sizeof(path), "/sys/class/net/rax%d/ifindex", i);
+#else
+		snprintf(ifname, sizeof(ifname), "rai%d", i);
+		snprintf(path, sizeof(path), "/sys/class/net/rai%d/ifindex", i);
+#endif
+		if(f_exists(path)){
+			eval("iwpriv", ifname, "set", "VLANTag=1");
+			eval("iwpriv", ifname, "set", "VLANPolicy=0:4");
+			eval("iwpriv", ifname, "set", "VLANPolicy=1:2");
+		}
+	}
+	eval("iwpriv", (char*) APCLI_2G, "set", "VLANTag=1");
+	eval("iwpriv", (char*) APCLI_5G, "set", "VLANTag=1");
+	eval("iwpriv", (char*) APCLI_2G, "set", "VLANPolicy=0:4");
+	eval("iwpriv", (char*) APCLI_5G, "set", "VLANPolicy=0:4");
+	eval("iwpriv", (char*) APCLI_2G, "set", "VLANPolicy=1:2");
+	eval("iwpriv", (char*) APCLI_5G, "set", "VLANPolicy=1:2");
+}
+
 void start_mapd(void)
 {
+	int sw_mode = nvram_get_int("sw_mode");
 	int enable = nvram_get_int("easymesh_enable");
 	int mode = nvram_get_int("easymesh_mode");
 	int role = nvram_get_int("easymesh_role"); /* GW:1, AP:1/2, RP:1 */
 	int lastmode = nvram_get_int("easymesh_lastmode");
 	int dhcpctl = nvram_get_int("easymesh_dhcpctl"); /* AP/RP:1, GW:0 */
 	int tpcon = nvram_get_int("easymesh_tpcon"); /* AP/RP:1, GW:0 */
+	char *bh2gifname = get_mesh_bh_ifname(WL_2G_BAND);
+	char *bh5gifname = get_mesh_bh_ifname(WL_5G_BAND);
+	char *ap2gifname = get_wififname(WL_2G_BAND);
+	char *ap5gifname = get_wififname(WL_5G_BAND);
+	char *apcli2gifname = get_staifname(WL_2G_BAND);
+	char *apcli5gifname = get_staifname(WL_5G_BAND);
 
+	pid_t pid;
+	char *mapd_argv[] = { "/usr/sbin/mapd", "-I", "/etc/map/mapd_cfg", "-O", "/etc/mapd_strng.conf", "-c", "/jffs/swrtmesh/client_db.txt", NULL, NULL };
+	char *p1905_argv[] = { "/usr/sbin/p1905_managerd", "-r0", "-f", "/etc/map/1905d.cfg", "-F", "/etc/map/wts_bss_info_config", NULL };
+#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_EN7561)
+	char *fwdd_argv[] = { "/usr/sbin/fwdd", "-p", ap2gifname, apcli2gifname, "-p", ap5gifname, apcli5gifname, "-e", "vlan1", "5G", NULL };
+#else
+	char *fwdd_argv[] = { "/usr/sbin/fwdd", "-d1", "-e", "eth0", "5G", "-e", "lan1", "5G", "-e", "lan2", "5G", "-e", "lan3", "5G",
+#if !defined(RMAX6000)
+		"-e", "lan4", "5G",
+#if 0
+		"-e", "lan5", "5G",
+		"-e", "lan6", "5G",
+#endif
+#endif
+		NULL };
+#endif
+
+	mkdir("/etc/map", 0777);
 	if(enable == 0){
 		eval("iwpriv", (char*) WIF_2G, "set", "mapEnable=0");
 		eval("iwpriv", (char*) WIF_5G, "set", "mapEnable=0");
@@ -1989,10 +2350,7 @@ void start_mapd(void)
 			modprobe("mtfwd");
 		if(pids("fwdd"))
 			killall_tk("fwdd");
-		if(sw_mode() == SW_MODE_ROUTER)
-			doSystem("fwdd -p %s %s -p %s %s -e %s 5G &", get_wififname(WL_2G_BAND), get_staifname(WL_2G_BAND), get_wififname(WL_5G_BAND), get_staifname(WL_5G_BAND), nvram_safe_get("wan0_ifname"));
-		else
-			doSystem("fwdd -p %s %s -p %s %s -e %s 5G &", get_wififname(WL_2G_BAND), get_staifname(WL_2G_BAND), get_wififname(WL_5G_BAND), get_staifname(WL_5G_BAND), "vlan1");
+		_eval(fwdd_argv, NULL, 0, &pid);
 		return;
 	}else{
 		doSystem("rm -rf /tmp/wapp_ctrl");
@@ -2006,16 +2364,39 @@ void start_mapd(void)
 			killall_tk("bs20");
 		if(module_loaded("mapfilter"))
 			modprobe_r("mapfilter");
+#if defined(RTCONFIG_EASYMESH_R3)
+		eval("iwpriv", (char*) WIF_2G, "set", "mapR3Enable=0");
+		eval("iwpriv", (char*) WIF_2G, "set", "DppEnable=0");
+		eval("iwpriv", (char*) WIF_2G, "set", "mapTSEnable=0");
+		eval("iwpriv", (char*) WIF_5G, "set", "mapR3Enable=0");
+		eval("iwpriv", (char*) WIF_5G, "set", "DppEnable=0");
+		eval("iwpriv", (char*) WIF_5G, "set", "mapTSEnable=0");
+		eval("iwpriv", bh2gifname, "set", "mapR3Enable=0");
+		eval("iwpriv", bh5gifname, "set", "mapR3Enable=0");
+		eval("iwpriv", bh2gifname, "set", "DppEnable=0");
+		eval("iwpriv", bh5gifname, "set", "DppEnable=0");
+		eval("iwpriv", bh2gifname, "set", "mapTSEnable=0");
+		eval("iwpriv", bh5gifname, "set", "mapTSEnable=0");
+#else
 		eval("iwpriv", (char*) WIF_2G, "set", "mapR2Enable=0");
 		eval("iwpriv", (char*) WIF_2G, "set", "mapTSEnable=0");
 		eval("iwpriv", (char*) WIF_5G, "set", "mapR2Enable=0");
 		eval("iwpriv", (char*) WIF_5G, "set", "mapTSEnable=0");
+		eval("iwpriv", bh2gifname, "set", "mapR2Enable=0");
+		eval("iwpriv", bh5gifname, "set", "mapR2Enable=0");
+		eval("iwpriv", bh2gifname, "set", "mapTSEnable=0");
+		eval("iwpriv", bh5gifname, "set", "mapTSEnable=0");
+#endif
 		gen_1905d_config();
 		gen_mapd_config();
 		eval("iwpriv", (char*) WIF_2G, "set", "mapEnable=1");
 		eval("iwpriv", (char*) WIF_5G, "set", "mapEnable=1");
 		eval("iwpriv", (char*) WIF_2G, "set", "mapTurnKey=1");
 		eval("iwpriv", (char*) WIF_5G, "set", "mapTurnKey=1");
+		eval("iwpriv", bh2gifname, "set", "mapEnable=1");
+		eval("iwpriv", bh5gifname, "set", "mapEnable=1");
+		eval("iwpriv", bh2gifname, "set", "mapTurnKey=1");
+		eval("iwpriv", bh5gifname, "set", "mapTurnKey=1");
 	}
 
 	if(mode == MAP_DISABLED){
@@ -2040,24 +2421,43 @@ void start_mapd(void)
 				modprobe("mtfwd");
 			if(pids("fwdd"))
 				killall_tk("fwdd");
-			doSystem("fwdd -p %s %s -p %s %s -e %s 5G &", get_wififname(WL_2G_BAND), get_staifname(WL_2G_BAND), get_wififname(WL_5G_BAND), get_staifname(WL_5G_BAND), nvram_safe_get("wan0_ifname"));
+			_eval(fwdd_argv, NULL, 0, &pid);
 		}
 	} else if(mode == MAP_TURNKEY){
+#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_EN7561)
 		char *lanifname = "vlan1"; //nvram_get("lan_ifname");
+#else
+		char *lanifname = "eth0"; //nvram_get("lan_ifname");
+#endif
 		_dprintf("TurnKey mode");
+		gen_bhwifi_conf();
 		if(pids("fwdd"))
-				killall_tk("fwdd");
+			killall_tk("fwdd");
 		if(module_loaded("mtfwd"))
 			modprobe_r("mtfwd");
 		if(!module_loaded("mapfilter"))
 			modprobe("mapfilter");
 		doSystem("ifconfig %s up", get_staifname(WL_2G_BAND));
 		doSystem("ifconfig %s up", get_staifname(WL_5G_BAND));
+		doSystem("ifconfig %s up", bh2gifname);
+		doSystem("ifconfig %s up", bh5gifname);
 		eval("iwpriv", (char*) WIF_2G, "set", "ApCliEnable=0");
 		eval("iwpriv", (char*) WIF_5G, "set", "ApCliEnable=0");
 		eval("iwpriv", (char*) WIF_2G, "set", "mapEnable=1");
 		eval("iwpriv", (char*) WIF_5G, "set", "mapEnable=1");
-#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_MT7622)
+		eval("iwpriv", bh2gifname, "set", "ApCliEnable=0");
+		eval("iwpriv", bh5gifname, "set", "ApCliEnable=0");
+		eval("iwpriv", bh2gifname, "set", "mapEnable=1");
+		eval("iwpriv", bh5gifname, "set", "mapEnable=1");
+#if defined(RTCONFIG_EASYMESH_R3)
+		eval("iwpriv", (char*) WIF_2G, "set", "QoSR1Enable=0");
+		eval("iwpriv", (char*) WIF_5G, "set", "QoSR1Enable=0");
+		eval("iwpriv", bh2gifname, "set", "QoSR1Enable=0");
+		eval("iwpriv", bh5gifname, "set", "QoSR1Enable=0");
+#endif
+		eval("brctl", "addif", "br0", bh2gifname);
+		eval("brctl", "addif", "br0", bh5gifname);
+#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_MT7622) || defined(RTCONFIG_RALINK_EN7561)
 //Rule 1:  P5 1905 multicast forwarding to WAN port(P4)
 //step 1: enable port 5 ACL function
 		doSystem("switch reg w 2504 ff0403");
@@ -2137,10 +2537,31 @@ void start_mapd(void)
 			f_write_string("/sys/kernel/debug/hnat/hnat_ppd_if", tmp, 0, 0);
 			perportpervlan_conf();
 		}
+#if defined(RTCONFIG_EASYMESH_R3)
+		eval("iwpriv", (char*) WIF_2G, "set", "mapR3Enable=1");
+		eval("iwpriv", (char*) WIF_2G, "set", "DppEnable=1");
+		eval("iwpriv", (char*) WIF_2G, "set", "mapTSEnable=1");
+		eval("iwpriv", (char*) WIF_2G, "set", "cp_support=1");
+		eval("iwpriv", (char*) WIF_5G, "set", "mapR3Enable=1");
+		eval("iwpriv", (char*) WIF_5G, "set", "DppEnable=1");
+		eval("iwpriv", (char*) WIF_5G, "set", "mapTSEnable=1");
+		eval("iwpriv", (char*) WIF_5G, "set", "cp_support=1");
+		eval("iwpriv", bh2gifname, "set", "mapR3Enable=1");
+		eval("iwpriv", bh5gifname, "set", "mapR3Enable=1");
+		eval("iwpriv", bh2gifname, "set", "mapTSEnable=1");
+		eval("iwpriv", bh5gifname, "set", "mapTSEnable=1");
+		eval("iwpriv", bh2gifname, "set", "cp_support=1");
+		eval("iwpriv", bh5gifname, "set", "cp_support=1");
+#else
 		eval("iwpriv", (char*) WIF_2G, "set", "mapR2Enable=1");
 		eval("iwpriv", (char*) WIF_2G, "set", "mapTSEnable=1");
 		eval("iwpriv", (char*) WIF_5G, "set", "mapR2Enable=1");
 		eval("iwpriv", (char*) WIF_5G, "set", "mapTSEnable=1");
+		eval("iwpriv", bh2gifname, "set", "mapR2Enable=1");
+		eval("iwpriv", bh5gifname, "set", "mapR2Enable=1");
+		eval("iwpriv", bh2gifname, "set", "mapTSEnable=1");
+		eval("iwpriv", bh5gifname, "set", "mapTSEnable=1");
+#endif
 		doSystem("ulimit -c unlimited");
 //Controller
 		_dprintf("dhcp starting...\n");
@@ -2157,28 +2578,25 @@ void start_mapd(void)
 				start_dnsmasq();
 			}
 		}
-		eval("iwpriv", (char*) WIF_2G, "set", "VLANTag=1");
-		eval("iwpriv", (char*) WIF_5G, "set", "VLANTag=1");
-		eval("iwpriv", (char*) WIF_2G, "set", "VLANPolicy=0:4");
-		eval("iwpriv", (char*) WIF_5G, "set", "VLANPolicy=0:4");
-		eval("iwpriv", (char*) WIF_2G, "set", "VLANPolicy=1:2");
-		eval("iwpriv", (char*) WIF_5G, "set", "VLANPolicy=1:2");
-		eval("iwpriv", (char*) APCLI_2G, "set", "VLANTag=1");
-		eval("iwpriv", (char*) APCLI_5G, "set", "VLANTag=1");
-		eval("iwpriv", (char*) APCLI_2G, "set", "VLANPolicy=0:4");
-		eval("iwpriv", (char*) APCLI_5G, "set", "VLANPolicy=0:4");
-		eval("iwpriv", (char*) APCLI_2G, "set", "VLANPolicy=1:2");
-		eval("iwpriv", (char*) APCLI_5G, "set", "VLANPolicy=1:2");
+		setup_wifi_vlan();
 		start_wapp();
 		if(role == EASYMESH_ROLE_MASTER)
-			doSystem("p1905_managerd -r0 -f /etc/map/1905d.cfg -F /etc/map/wts_bss_info_config > /dev/console&");
-		else
-			doSystem("p1905_managerd -r1 -f /etc/map/1905d.cfg -F /etc/map/wts_bss_info_config > /dev/console&");
-		doSystem("mapd -I /etc/map/mapd_cfg -O /etc/mapd_strng.conf > /tmp/log/log.mapd&");
-#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_MT7622)
+			_eval(p1905_argv, "/var/log/1905.log", 0, &pid);
+		else{
+			p1905_argv[1] = "-r1";
+			_eval(p1905_argv, "/var/log/1905.log", 0, &pid);
+		}
+		sleep(1);
+		if(nvram_match("easymesh_debug", "1")){
+			mapd_argv[7] = "-dddd";
+			_eval(mapd_argv, "/var/log/log.mapd", 0, &pid);
+		}else
+			_eval(mapd_argv, NULL, 0, &pid);
+#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_MT7622) || defined(RTCONFIG_RALINK_EN7561)
 		doSystem("switch reg w 10 ffffffe0");
 		doSystem("switch reg w 34 8160816");
 #endif
+		nvram_set("easymesh_lastmode", "1");
 	} else if(mode == MAP_BS_2_0){
 		if(module_loaded("mapfilter"))
 			modprobe_r("mapfilter");
@@ -2195,7 +2613,7 @@ void start_mapd(void)
 			modprobe("mtfwd");
 		if(pids("fwdd"))
 			killall_tk("fwdd");
-		doSystem("fwdd -p %s %s -p %s %s -e %s 5G &", get_wififname(WL_2G_BAND), get_staifname(WL_2G_BAND), get_wififname(WL_5G_BAND), get_staifname(WL_5G_BAND), nvram_safe_get("wan0_ifname"));
+		_eval(fwdd_argv, NULL, 0, &pid);
 	} else if(mode == MAP_API_MODE){
 		_dprintf("unsupport mode\n");
 	} else if(mode == MAP_CERT_MODE){
@@ -2208,7 +2626,7 @@ void start_mapd(void)
 		_dprintf("Certification\n");
 // GMAC1 need to config swith vlan
 // platform mt7621(only for certification mode use)
-#if defined(RTCONFIG_RALINK_MT7621)
+#if defined(RTCONFIG_RALINK_MT7621) || defined(RTCONFIG_RALINK_EN7561)
 		_dprintf("mapmode is certification mode, config switch\n");
 		//init_switch();
 		doSystem("switch reg w 34 8160816");
@@ -2219,16 +2637,29 @@ void start_mapd(void)
 			modprobe("mapfilter");
 		doSystem("ifconfig %s up", get_staifname(WL_2G_BAND));
 		doSystem("ifconfig %s up", get_staifname(WL_5G_BAND));
-		eval("iwpriv", (char*) WIF_2G, "set", "ApCliEnable=0");
-		eval("iwpriv", (char*) WIF_5G, "set", "ApCliEnable=0");
+		eval("iwpriv", (char*) APCLI_2G, "set", "mapEnable=4");
+		eval("iwpriv", (char*) APCLI_5G, "set", "mapEnable=4");
+		eval("iwpriv", (char*) APCLI_2G, "set", "ApCliEnable=0");
+		eval("iwpriv", (char*) APCLI_5G, "set", "ApCliEnable=0");
 		_eval(agent_argv, NULL, 0, &pid);
 		doSystem("echo 458752 > /proc/sys/net/core/rmem_max");
 		eval("iwpriv", (char*) WIF_2G, "set", "VLANEn=0");
 		eval("iwpriv", (char*) WIF_5G, "set", "VLANEn=0");
+#if defined(RTCONFIG_EASYMESH_R3)
+		eval("iwpriv", (char*) WIF_2G, "set", "mapR3Enable=1");
+		eval("iwpriv", (char*) WIF_2G, "set", "DppEnable=1");
+		eval("iwpriv", (char*) WIF_2G, "set", "mapTSEnable=1");
+		eval("iwpriv", (char*) WIF_2G, "set", "cp_support=1");
+		eval("iwpriv", (char*) WIF_5G, "set", "mapR3Enable=1");
+		eval("iwpriv", (char*) WIF_5G, "set", "DppEnable=1");
+		eval("iwpriv", (char*) WIF_5G, "set", "mapTSEnable=1");
+		eval("iwpriv", (char*) WIF_5G, "set", "cp_support=1");
+#else
 		eval("iwpriv", (char*) WIF_2G, "set", "mapR2Enable=1");
 		eval("iwpriv", (char*) WIF_2G, "set", "mapTSEnable=1");
 		eval("iwpriv", (char*) WIF_5G, "set", "mapR2Enable=1");
 		eval("iwpriv", (char*) WIF_5G, "set", "mapTSEnable=1");
+#endif
 	}
 }
 
@@ -2236,10 +2667,32 @@ int start_easymesh(void)
 {
 	pid_t pid;
 	char *agent_argv[] = { "easymesh_agent", NULL };
+	if (getpid() != 1) {
+		notify_rc("start_easymesh");
+		return 0;
+	}
+	swrtmesh_autoconf();
 	start_mapd();
 	if(nvram_match("easymesh_enable", "1") && nvram_get_int("easymesh_role") == EASYMESH_ROLE_AGENT)
 		_eval(agent_argv, NULL, 0, &pid);
 	return 0;
+}
+
+void stop_easymesh(void)
+{
+	if (getpid() != 1) {
+		notify_rc("stop_easymesh");
+		return;
+	}
+
+	if (pids("mapd"))
+		killall_tk("mapd");
+	if (pids("p1905_managerd"))
+		killall_tk("p1905_managerd");
+	doSystem("ifconfig %s down", get_staifname(WL_2G_BAND));
+	doSystem("ifconfig %s down", get_staifname(WL_5G_BAND));
+	doSystem("ifconfig %s down", get_mesh_bh_ifname(WL_2G_BAND));
+	doSystem("ifconfig %s down", get_mesh_bh_ifname(WL_5G_BAND));
 }
 
 void easymesh_agent(void)

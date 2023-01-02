@@ -4,6 +4,8 @@ curl release procedure - how to do a release
 in the source code repo
 -----------------------
 
+- run `./scripts/copyright.pl` and correct possible omissions
+
 - edit `RELEASE-NOTES` to be accurate
 
 - update `docs/THANKS`
@@ -40,9 +42,9 @@ in the curl-www repo
 
 - make sure all relevant changes are committed and pushed on the master branch
 
-  (the web site then updates its contents automatically)
+  (the website then updates its contents automatically)
 
-on github
+on GitHub
 ---------
 
 - edit the newly made release tag so that it is listed as the latest release
@@ -61,12 +63,12 @@ celebrate
 curl release scheduling
 =======================
 
-Basics
-------
+Release Cycle
+-------------
 
 We do releases every 8 weeks on Wednesdays. If critical problems arise, we can
 insert releases outside of the schedule or we can move the release date - but
-this is very rare.
+this is rare.
 
 Each 8 week release cycle is split in two 4-week periods.
 
@@ -78,21 +80,27 @@ Each 8 week release cycle is split in two 4-week periods.
   then only focus on fixing bugs and polishing things to make a solid coming
   release.
 
+- After a regular procedure-following release (made on Wednesdays), the
+  feature window remains closed until the following Monday in case of special
+  actions or patch releases etc.
+
+If a future release date happens to end up on a "bad date", like in the middle
+of common public holidays or when the lead release manager is away traveling,
+the release date can be moved forwards or backwards a full week. This is then
+advertised well in advance.
+
 Coming dates
 ------------
 
 Based on the description above, here are some planned release dates (at the
 time of this writing):
 
-- May 22, 2019
-- July 17, 2019
-- September 11, 2019
-- November 6, 2019
-- January 8, 2020 (moved)
-- February 27, 2020
-- April 22, 2020
-- June 17, 2020
-
-The above (and more) curl-related dates are published in
-[iCalendar format](https://calendar.google.com/calendar/ical/c9u5d64odop9js55oltfarjk6g%40group.calendar.google.com/public/basic.ics)
-as well.
+- May 11, 2022 (7.83.1)
+- July 1, 2022
+- August 31, 2022
+- October 25, 2022
+- December 21, 2022
+- February 15, 2023 (last version 7 release, no feature window after)
+- March 20, 2023 (8.0.0 - curl 25 years)
+- April 17, 2023
+- July 12, 2023

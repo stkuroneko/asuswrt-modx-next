@@ -5,11 +5,11 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 2016, Evgeny Grin (Karlson2k), <k2k@narod.ru>.
+# Copyright (C) 2016 - 2022, Evgeny Grin (Karlson2k), <k2k@narod.ru>.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at https://curl.haxx.se/docs/copyright.html.
+# are also available at https://curl.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -17,6 +17,8 @@
 #
 # This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
 # KIND, either express or implied.
+#
+# SPDX-License-Identifier: curl
 #
 ###########################################################################
 
@@ -372,7 +374,15 @@ sub sys_native_abs_path {
         # Path is in relative form. Resolve relative directories in Unix form
         # *BEFORE* converting to Win32 form otherwise paths like
         # '../../../cygdrive/c/windows' will not be resolved.
-        my $cur_dir = `pwd -L`;
+
+        my $cur_dir;
+        # MSys shell has built-in command.
+        if($^O eq 'msys') {
+            $cur_dir = `bash -c 'pwd -L'`;
+        }
+        else {
+            $cur_dir = `pwd -L`;
+        }
         if($? != 0) {
             warn "Can't determine current working directory.\n";
             return undef;
@@ -440,7 +450,13 @@ sub build_sys_abs_path {
         # Path is empty string. Return current directory.
         # Empty string processed correctly by 'cygpath'.
 
-        chomp($path = `pwd -L`);
+        # MSys shell has built-in command.
+        if($^O eq 'msys') {
+            chomp($path = `bash -c 'pwd -L'`);
+        }
+        else {
+            chomp($path = `pwd -L`);
+        }
         if($? != 0) {
             warn "Can't determine Unix-style current working directory.\n";
             return undef;
@@ -510,7 +526,15 @@ sub build_sys_abs_path {
         # Path in relative form. Resolve relative directories in Unix form
         # *BEFORE* converting to Win32 form otherwise paths like
         # '../../../cygdrive/c/windows' will not be resolved.
-        my $cur_dir = `pwd -L`;
+
+        my $cur_dir;
+        # MSys shell has built-in command.
+        if($^O eq 'msys') {
+            $cur_dir = `bash -c 'pwd -L'`;
+        }
+        else {
+            $cur_dir = `pwd -L`;
+        }
         if($? != 0) {
             warn "Can't determine current working directory.\n";
             return undef;

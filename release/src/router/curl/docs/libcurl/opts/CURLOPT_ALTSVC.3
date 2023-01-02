@@ -5,11 +5,11 @@
 .\" *                            | (__| |_| |  _ <| |___
 .\" *                             \___|\___/|_| \_\_____|
 .\" *
-.\" * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
 .\" *
 .\" * This software is licensed as described in the file COPYING, which
 .\" * you should have received as part of this distribution. The terms
-.\" * are also available at https://curl.haxx.se/docs/copyright.html.
+.\" * are also available at https://curl.se/docs/copyright.html.
 .\" *
 .\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
 .\" * copies of the Software, and permit persons to whom the Software is
@@ -18,23 +18,20 @@
 .\" * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
 .\" * KIND, either express or implied.
 .\" *
+.\" * SPDX-License-Identifier: curl
+.\" *
 .\" **************************************************************************
 .\"
-.TH CURLOPT_ALTSVC 3 "August 14, 2019" "libcurl 7.67.0" "curl_easy_setopt options"
+.TH CURLOPT_ALTSVC 3 "June 21, 2022" "libcurl 7.84.0" "curl_easy_setopt options"
 
 .SH NAME
-CURLOPT_ALTSVC \- set alt-svc cache file name
+CURLOPT_ALTSVC \- alt-svc cache file name
 .SH SYNOPSIS
 .nf
 #include <curl/curl.h>
 
 CURLcode curl_easy_setopt(CURL *handle, CURLOPT_ALTSVC, char *filename);
 .fi
-.SH EXPERIMENTAL
-Warning: this feature is early code and is marked as experimental. It can only
-be enabled by explicitly telling configure with \fB--enable-alt-svc\fP. You are
-advised to not ship this in production before the experimental label is
-removed.
 .SH DESCRIPTION
 Pass in a pointer to a \fIfilename\fP to instruct libcurl to use that file as
 the Alt-Svc cache to read existing cache contents from and possibly also write
@@ -55,6 +52,35 @@ if(curl) {
   curl_easy_perform(curl);
 }
 .fi
+.SH "FILE FORMAT"
+A text based file with one line per alt-svc entry and each line consists of
+nine space-separated fields.
+
+An example line could look like
+
+ h2 www.example 8443 h3 quic.example 443 "20190808 06:18:37" 1 0
+
+The fields of that line are:
+
+.IP h2
+ALPN id for the source origin
+.IP www.example
+Host name for the source origin
+.IP 8443
+Port number for the source origin
+.IP h3
+ALPN id for the destination host
+.IP quic.example
+Host name for the destination host
+.IP 443
+Port number for the destination host
+.IP 2019*
+Expiration date and time of this entry within double quotes. The date format
+is "YYYYMMDD HH:MM:SS" and the time zone is GMT.
+.IP 1
+Boolean (1 or 0) if "persist" was set for this entry
+.IP 0
+Integer priority value (not currently used)
 .SH AVAILABILITY
 Added in 7.64.1
 .SH RETURN VALUE
