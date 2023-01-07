@@ -8,7 +8,7 @@
 	model = "RT-AC85P";
 
 	chosen {
-		bootargs = "console=ttyS0,115200";
+		bootargs = "console=ttyS0,115200  ROOT=/dev/mtdblock6";
 	};
 
 	gpio-keys-polled {
@@ -19,7 +19,7 @@
 
 		reset {
 			label = "reset";
-			gpios = <&gpio0 3 0>;
+			gpios = <&gpio0 18 0>;
 			linux,code = <KEY_RESTART>;
 		};
 	};
@@ -187,57 +187,47 @@
 
 			partition@0 {
 				label = "Bootloader";
-				reg = <0x00000 0xe0000>;
+				reg = <0x00000 0x40000>;
 			};
 
-			partition@E0000 {
+			partition@40000 {
 				label = "nvram";
-				reg = <0xE0000 0x100000>;
+				reg = <0x40000 0x40000>;
 			};
 
-			factory: partition@1E00000 {
+			partition@80000 {
+				label = "Bdata";
+				reg = <0x80000 0x40000>;
+			};
+
+			factory: partition@C00000 {
 				label = "Factory";
-				reg = <0x1E0000 0x100000>;
+				reg = <0xC0000 0x40000>;
 			};
 
-			factory2: partition@2E0000  {
+			factory2: partition@100000  {
 				label = "Factory2";
-				reg = <0x2E0000 0x100000>;
+				reg = <0x100000 0x40000>;
 			};
 
-//			partition@3E0000 {
-//				label = "Kernel";
-//				reg = <0x3E0000 0x3200000>;
-//			};
-
-//			partition@35E0000 {
-//				label = "Kernel2";
-//				reg = <0x35E0000 0x3200000>;
-//			};
-
-//			partition@67E0000 {
-//				label = "jffs2";
-//				reg = <0x67E0000 0x1020000>;
-//			};
-
-			partition@3E0000 {
-				label = "Kernel";
-				reg = <0x3E0000 0x2300000>;
-			};
-
-			jffsconcat0: partition@26E0000 {
+			jffsconcat0: partition@140000 {
 				label = "jffsconcat0";
-				reg = <0x26E0000 0xF00000>;
+				reg = <0x140000 0xC0000>;
 			};
 
-			partition@35E0000 {
+			partition@200000 {
+				label = "Kernel";
+				reg = <0x200000 0x2300000>;
+			};
+
+			partition@2500000 {
 				label = "Kernel2";
-				reg = <0x35E0000 0x2300000>;
+				reg = <0x2500000 0x2300000>;
 			};
 
-			jffsconcat1: partition@58E0000 {
+			jffsconcat1: partition@4800000 {
 				label = "jffsconcat1";
-				reg = <0x58E0000 0x2700000>;
+				reg = <0x4800000 0xB780000>;
 			};
 		};
 	};

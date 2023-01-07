@@ -40,6 +40,10 @@ config  MODEL_RTAC85P
         bool "RT-AC85P"
         default n
 
+config  MODEL_RTMIR3P
+        bool "RT-MIR3P"
+        default n
+
 config  MODEL_R6800
         bool "R6800"
         default n

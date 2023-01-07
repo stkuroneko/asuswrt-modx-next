@@ -93,7 +93,7 @@ void mt753x_irq_worker(struct work_struct *work)
 	u32 sts, physts, laststs;
 	int i;
 #if defined(ASUS_EXT)
-#if defined(CONFIG_MODEL_RTAX54) || defined(CONFIG_MODEL_RTAC85P)
+#if defined(CONFIG_MODEL_RTAX54) || defined(CONFIG_MODEL_RTAC85P) || defined(CONFIG_MODEL_RTMIR3P)
 	int led_en, led_iomode, led_gpio_mode, led_gpio_oe, led_value;
 #endif
 #endif
@@ -103,7 +103,7 @@ void mt753x_irq_worker(struct work_struct *work)
 	sts = mt753x_reg_read(gsw, SYS_INT_STS);
 
 #if defined(ASUS_EXT)
-#if defined(CONFIG_MODEL_RTAX54) || defined(CONFIG_MODEL_RTAC85P)
+#if defined(CONFIG_MODEL_RTAX54) || defined(CONFIG_MODEL_RTAC85P) || defined(CONFIG_MODEL_RTMIR3P)
 	led_en = mt753x_reg_read(gsw, 0x7d00);	//LED_EN: 1=enable 0=disable (default: 77777)
 	led_iomode = mt753x_reg_read(gsw, 0x7d04);	//LED_IO_MODE: 0=GPIO 1=PHY mode (default: 77777)
 	led_gpio_mode = mt753x_reg_read(gsw, 0x7d10); //GPIOMODE:1=output 0=input (default: 77777)
@@ -128,14 +128,14 @@ void mt753x_irq_worker(struct work_struct *work)
 		if (physts ^ laststs) {
 			gsw->phy_link_sts ^= BIT(i);
 			display_port_link_status(gsw, i);
-#if defined(CONFIG_MODEL_RTAC85P) && defined(ASUS_EXT)
+#if defined(CONFIG_MODEL_RTAC85P) && defined(CONFIG_MODEL_RTMIR3P) && defined(ASUS_EXT)
 			if(i == 3)
 				led_value |= (0x1 << (i * 4));
 			else
 				led_value &= ~(0x1 << (i * 4));
 #endif
 		}
-#if defined(CONFIG_MODEL_RTAC85P) && defined(ASUS_EXT)
+#if defined(CONFIG_MODEL_RTAC85P) && defined(CONFIG_MODEL_RTMIR3P) && defined(ASUS_EXT)
 		else{
 			if(i == 3)
 				led_value &= ~(0x1 << (i * 4));
@@ -146,7 +146,7 @@ void mt753x_irq_worker(struct work_struct *work)
 	}
 
 #if defined(ASUS_EXT)
-#if defined(CONFIG_MODEL_RTAX54) || defined(CONFIG_MODEL_RTAC85P)
+#if defined(CONFIG_MODEL_RTAX54) || defined(CONFIG_MODEL_RTAC85P) || defined(CONFIG_MODEL_RTMIR3P)
 #if defined(CONFIG_MODEL_RTAX54)
 	if(gsw->phy_link_sts & 0xF)
 		led_value &= ~(0x1 << 4);

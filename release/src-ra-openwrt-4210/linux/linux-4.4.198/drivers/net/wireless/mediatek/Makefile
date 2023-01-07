@@ -11,6 +11,7 @@ endif
 obj-$(CONFIG_MODEL_RTAX53U) += mt7915/7.4.0.0/mt_wifi_ap/
 obj-$(CONFIG_MODEL_RTAC85U) += mt7615/5.1.0.0/mt_wifi_ap/
 obj-$(CONFIG_MODEL_RTAC85P) += mt7615/5.1.0.0/mt_wifi_ap/
+obj-$(CONFIG_MODEL_RTMIR3P) += mt7615/5.1.0.0/mt_wifi_ap/
 obj-$(CONFIG_MODEL_R6800) += mt7615/5.1.0.0/mt_wifi_ap/
 obj-$(CONFIG_MODEL_RMAC2100) += mt7615/5.1.0.0/mt_wifi_ap/
 obj-$(CONFIG_MODEL_RMAC2100) += mt7603/4.1.2.1/mt7603_wifi_ap/
