@@ -6304,13 +6304,15 @@ int init_nvram(void)
 #endif
 			set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "vlan1", NULL, "vlan3", 0);
 
-		nvram_set_int("btn_rst_gpio",  3|GPIO_ACTIVE_LOW);
-		nvram_set_int("btn_wps_gpio",  6|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_pwr_gpio",  4|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_wps_gpio",  4|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_5g_gpio", 8|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_2g_gpio", 10|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_rst_gpio",  18|GPIO_ACTIVE_LOW);
+//		nvram_set_int("btn_wps_gpio",  6|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_pwr_gpio",  8|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_wps_gpio",  10|GPIO_ACTIVE_LOW);
+//		nvram_set_int("led_5g_gpio", 8|GPIO_ACTIVE_LOW);
+//		nvram_set_int("led_2g_gpio", 10|GPIO_ACTIVE_LOW);
 //		nvram_set_int("led_all_gpio", 10|GPIO_ACTIVE_LOW);
+
+		nvram_set_int("led_wan_gpio", 14|GPIO_ACTIVE_LOW);
 
 		eval("rtkswitch", "11");
 
@@ -6329,6 +6331,7 @@ int init_nvram(void)
 		add_rc_support("switchctrl");
 		add_rc_support("manual_stb");
 		add_rc_support("11AC");
+                add_rc_support("loclist");
 		add_rc_support("app");
 		//add_rc_support("pwrctrl");
 		// the following values is model dep. so move it from default.c to here

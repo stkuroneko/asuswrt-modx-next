@@ -1286,6 +1286,21 @@ void init_syspara(void)
 	_dprintf("bootloader version: %s\n", nvram_safe_get("blver"));
 	_dprintf("firmware version: %s\n", nvram_safe_get("firmver"));
 
+	// set country from location_code
+	char *loc_code[] = {"DB", "EU", "RU", "US", "CN", 0};
+	char **curr_loc_code = loc_code;
+	for (; *curr_loc_code; *curr_loc_code++)
+		if (nvram_match("location_code", *curr_loc_code)) {
+			nvram_set("wl_country_code", *curr_loc_code);
+			nvram_set("wl0_country_code", *curr_loc_code);
+			nvram_set("wl1_country_code", *curr_loc_code);
+#ifdef RTCONFIG_RALINK_DFS
+			if (!strcmp(*curr_loc_code, "EU"))
+				nvram_set("wl1_IEEE80211H", "1");
+#endif
+			break;
+		}
+
 #if defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
 	dst = txbf_para;
 	int count_0xff = 0;

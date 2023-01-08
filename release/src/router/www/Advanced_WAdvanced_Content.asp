@@ -821,8 +821,8 @@ function generate_country_selection(){
 	var matched = false;
 	
 	code += '<select class="input_option" name="location_code">';
-	for(i=0; i<country_array.length; i++){
-		var index = country_array[i];
+	for(i=0; i<country_selection_list.length; i++){
+		var index = country_selection_list[i][0];
 		if(index == "NZ")
 			index = "AU";
 		var country = country_selection_array[index];
