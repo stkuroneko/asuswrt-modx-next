@@ -408,7 +408,7 @@ function initial(){
 			document.getElementById("wl_plcphdr_field").style.display = "none";
 		}
 
-		if(based_modelid == "RT-AC66U" || based_modelid == "RT-AC85U" || based_modelid == "RT-AC65U" || based_modelid == "RT-AC85P" || based_modelid == "RT-MIR3P" || based_modelid == "RT-ACRH26" || based_modelid == "RT-AC1200_V2" || based_modelid == "RT-ACRH18" || based_modelid == "4G-AC86U"){
+		if(based_modelid == "RT-AC66U" || based_modelid == "RT-AC85U" || based_modelid == "RT-AC65U" || based_modelid == "RT-AC85P" || based_modelid == "RT-MIR3P" || based_modelid == "RT-A040WQ" || based_modelid == "RT-MSG1500" || based_modelid == "RT-ACRH26" || based_modelid == "RT-AC1200_V2" || based_modelid == "RT-ACRH18" || based_modelid == "4G-AC86U"){
 			document.getElementById('wl_txbf_desc').innerHTML = "<#WLANConfig11b_x_acBeam#>";
 			inputCtrl(document.form.wl_txbf, 1);	
 		}
@@ -574,7 +574,7 @@ function initial(){
 			document.getElementById("wl_MU_MIMO_field").style.display = "none";
 			document.form.wl_mumimo.disabled = true;
 		}
-		else if((based_modelid == "RT-AC85U" || based_modelid == "RT-AC85P" || based_modelid == "RT-MIR3P" || based_modelid == "RT-ACRH26" || based_modelid == "RT-AC65U" || based_modelid == "RT-ACRH18") && wl_unit_value == '0'){
+		else if((based_modelid == "RT-AC85U" || based_modelid == "RT-AC85P" || based_modelid == "RT-MIR3P" || based_modelid == "RT-A040WQ" || based_modelid == "RT-MSG1500" || based_modelid == "RT-ACRH26" || based_modelid == "RT-AC65U" || based_modelid == "RT-ACRH18") && wl_unit_value == '0'){
 			document.getElementById("wl_MU_MIMO_field").style.display = "none";
 		}
 		else if(based_modelid == "RT-AX92U" && (wl_unit_value == '0' || wl_unit_value == '1')){

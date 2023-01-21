@@ -71,6 +71,8 @@ static struct time_mapping_s time_mapping_list[] = {
 	{ "GT-AX11000",	50,     120,     60},
 	{ "RT-AC85P",	120,	60,	60},
 	{ "RT-MIR3P",	120,	60,	60},
+	{ "RT-A040WQ",	120,	60,	60},
+	{ "RT-MSG1500",	120,	60,	60},
 	{ "GT-AXY16000",80,    120,     60},
 	{ "GT-AXE11000", 50,    120,     60},
 	{ "RT-AX86U",    50,   120,     60},

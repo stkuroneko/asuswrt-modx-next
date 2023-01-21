@@ -234,6 +234,10 @@ void swrt_init_pre()
 		nvram_set("modelname", "RTAC85P");
 #elif defined(RTMIR3P)
 		nvram_set("modelname", "RTMIR3P");
+#elif defined(RTA040WQ)
+		nvram_set("modelname", "RTA040WQ");
+#elif defined(RTMSG1500)
+		nvram_set("modelname", "RTMSG1500");
 #elif defined(RMAC2100)
 		nvram_set("modelname", "RMAC2100");
 #elif defined(R6800)

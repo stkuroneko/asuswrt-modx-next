@@ -9,7 +9,6 @@ INDEX0_ext_ifname=rai;ra
 INDEX0_wds_ifname=wdsi;wds
 INDEX0_apcli_ifname=apclii;apcli
 INDEX0_mesh_ifname=meshi;mesh
-INDEX0_nvram_zone=dev2;dev1
+INDEX0_nvram_zone=RT2860
 INDEX0_single_sku_path=/ra_SKU/SingleSKU_mt7615e-sku.dat
 INDEX0_bf_sku_path=/ra_SKU/SingleSKU_mt7615e-sku-bf.dat
-

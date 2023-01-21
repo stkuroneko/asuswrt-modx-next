@@ -583,7 +583,7 @@ COUNTRY_CODE_TO_COUNTRY_REGION allCountry[] = {
 	{"RU", A_BAND_REGION_6, G_BAND_REGION_1},
 #else
 	{"RO", A_BAND_REGION_0, G_BAND_REGION_1},
-#if defined(RTAC85P) || defined(RTMIR3P)
+#if defined(RTAC85P) 
 	{"RU", A_BAND_REGION_24, G_BAND_REGION_1},
 	{"IL", A_BAND_REGION_25, G_BAND_REGION_1},
 #else

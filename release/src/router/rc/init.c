@@ -1684,6 +1684,8 @@ misc_defaults(int restore_defaults)
 		case MODEL_RTAC85U:
 		case MODEL_RTAC85P:
 		case MODEL_RTMIR3P:
+		case MODEL_RTA040WQ:
+		case MODEL_RTMSG1500:
 		case MODEL_RTACRH26:
 		case MODEL_TUFAC1750:
 		case MODEL_R6800:
@@ -6287,7 +6289,6 @@ int init_nvram(void)
 		break;
 #endif /*  RTAC85P  */
 
-
 #if defined(RTMIR3P)
 	case MODEL_RTMIR3P:
 		nvram_set("boardflags", "0x100"); // although it is not used in ralink driver, set for vlan
@@ -6356,6 +6357,140 @@ int init_nvram(void)
 #endif
 		break;
 #endif /*  RTMIR3P  */
+
+
+#if defined(RTA040WQ)
+	case MODEL_RTA040WQ:
+		nvram_set("boardflags", "0x100"); // although it is not used in ralink driver, set for vlan
+		nvram_set("vlan1hwname", "et0");  // vlan. used to get "%smacaddr" for compare and find parent interface.
+		nvram_set("vlan2hwname", "et0");  // vlan. used to get "%smacaddr" for compare and find parent interface.
+		nvram_set("lan_ifname", "br0");
+		wan_ifaces[WAN_IFACE_ID] = "eth1";
+		wl_ifaces[WL_2G_BAND] = "ra0";
+		wl_ifaces[WL_5G_BAND] = "rai0";
+#if defined(RTCONFIG_AMAS) || defined(RTCONFIG_EASYMESH)
+		if(nvram_match("re_mode", "1")) //RE mode.
+			set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "eth1 vlan1", NULL, "vlan3", 0);
+		else
+#endif
+			set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "vlan1", NULL, "vlan3", 0);
+
+		nvram_set_int("btn_rst_gpio",  15|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wps_gpio",  18|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wifi_gpio", 7|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_5g_gpio", 3|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_2g_gpio", 4|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_usb_gpio", 13|GPIO_ACTIVE_LOW);
+
+		eval("rtkswitch", "11");
+
+		/* enable bled */
+		config_netdev_bled("led_2g_gpio", "ra0");
+		config_netdev_bled("led_5g_gpio", "rai0");
+
+		nvram_set("ehci_ports", "1-2");
+		nvram_set("ohci_ports", "2-2");
+		nvram_set("ct_max", "300000"); // force
+
+		if (nvram_get("wl_mssid") && nvram_match("wl_mssid", "1"))
+			add_rc_support("mssid");
+		add_rc_support("2.4G 5G update usbX1");
+		add_rc_support("rawifi");
+		add_rc_support("switchctrl");
+		add_rc_support("manual_stb");
+		add_rc_support("11AC");
+                add_rc_support("loclist");
+		add_rc_support("app");
+		//add_rc_support("pwrctrl");
+		// the following values is model dep. so move it from default.c to here
+		nvram_set("wl0_HT_TxStream", "2");
+		nvram_set("wl0_HT_RxStream", "2");
+		nvram_set("wl1_HT_TxStream", "2");
+		nvram_set("wl1_HT_RxStream", "2");
+#if defined(RTCONFIG_AMAS) || defined(RTCONFIG_EASYMESH)
+		if (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1")) {
+			_dprintf("[%s][%d] sw mode = %d, repeater=%d, ap= %d ",
+						__func__, __LINE__,
+						sw_mode(),SW_MODE_REPEATER,SW_MODE_AP);
+			add_lan_phy((char *)APCLI_2G);
+			add_lan_phy((char *)APCLI_5G);
+			nvram_set("eth_ifnames", "eth1");
+			nvram_set("sta_phy_ifnames", "apcli0 apclii0");
+			nvram_set("sta_ifnames", "apcli0 apclii0");
+		}
+#endif
+#if defined(RTCONFIG_AMAS) || defined(RTCONFIG_CFGSYNC) || defined(RTCONFIG_EASYMESH)
+		nvram_set("wired_ifnames", "vlan1");
+#endif
+		break;
+#endif /*  RTA040WQ  */
+
+
+#if defined(RTMSG1500)
+	case MODEL_RTMSG1500:
+		nvram_set("boardflags", "0x100"); // although it is not used in ralink driver, set for vlan
+		nvram_set("vlan1hwname", "et0");  // vlan. used to get "%smacaddr" for compare and find parent interface.
+		nvram_set("vlan2hwname", "et0");  // vlan. used to get "%smacaddr" for compare and find parent interface.
+		nvram_set("lan_ifname", "br0");
+		wan_ifaces[WAN_IFACE_ID] = "eth1";
+		wl_ifaces[WL_2G_BAND] = "ra0";
+		wl_ifaces[WL_5G_BAND] = "rai0";
+#if defined(RTCONFIG_AMAS) || defined(RTCONFIG_EASYMESH)
+		if(nvram_match("re_mode", "1")) //RE mode.
+			set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "eth1 vlan1", NULL, "vlan3", 0);
+		else
+#endif
+			set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "vlan1", NULL, "vlan3", 0);
+
+		nvram_set_int("btn_rst_gpio",  15|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wps_gpio",  18|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wifi_gpio", 7|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_5g_gpio", 3|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_2g_gpio", 4|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_usb_gpio", 13|GPIO_ACTIVE_LOW);
+
+		eval("rtkswitch", "11");
+
+		/* enable bled */
+		config_netdev_bled("led_2g_gpio", "ra0");
+		config_netdev_bled("led_5g_gpio", "rai0");
+
+		nvram_set("ehci_ports", "1-2");
+		nvram_set("ohci_ports", "2-2");
+		nvram_set("ct_max", "300000"); // force
+
+		if (nvram_get("wl_mssid") && nvram_match("wl_mssid", "1"))
+			add_rc_support("mssid");
+		add_rc_support("2.4G 5G update usbX1");
+		add_rc_support("rawifi");
+		add_rc_support("switchctrl");
+		add_rc_support("manual_stb");
+		add_rc_support("11AC");
+                add_rc_support("loclist");
+		add_rc_support("app");
+		//add_rc_support("pwrctrl");
+		// the following values is model dep. so move it from default.c to here
+		nvram_set("wl0_HT_TxStream", "2");
+		nvram_set("wl0_HT_RxStream", "2");
+		nvram_set("wl1_HT_TxStream", "2");
+		nvram_set("wl1_HT_RxStream", "2");
+#if defined(RTCONFIG_AMAS) || defined(RTCONFIG_EASYMESH)
+		if (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1")) {
+			_dprintf("[%s][%d] sw mode = %d, repeater=%d, ap= %d ",
+						__func__, __LINE__,
+						sw_mode(),SW_MODE_REPEATER,SW_MODE_AP);
+			add_lan_phy((char *)APCLI_2G);
+			add_lan_phy((char *)APCLI_5G);
+			nvram_set("eth_ifnames", "eth1");
+			nvram_set("sta_phy_ifnames", "apcli0 apclii0");
+			nvram_set("sta_ifnames", "apcli0 apclii0");
+		}
+#endif
+#if defined(RTCONFIG_AMAS) || defined(RTCONFIG_CFGSYNC) || defined(RTCONFIG_EASYMESH)
+		nvram_set("wired_ifnames", "vlan1");
+#endif
+		break;
+#endif /*  RTMSG1500  */
 
 #if defined(RMAC2100)
 	case MODEL_RMAC2100:
@@ -17962,13 +18097,15 @@ int init_nvram2(void)
 		nvram_commit();
 	}
 
-#if defined(RTAC85U) || defined(RTAC85P) || defined(RTMIR3P) || defined(RTACRH26) || defined(TUFAC1750) || defined(RPAX56) || defined(RPAX58)
+#if defined(RTAC85U) || defined(RTAC85P) || defined(RTMIR3P) || defined(RTA040WQ) || defined(RTMSG1500) || defined(RTACRH26) || defined(TUFAC1750) || defined(RPAX56) || defined(RPAX58)
 	int model = get_model();
 	switch(model)
 	{
 	case MODEL_RTAC85U:
 	case MODEL_RTAC85P:
 	case MODEL_RTMIR3P:
+	case MODEL_RTA040WQ:
+	case MODEL_RTMSG1500:
 	case MODEL_RTACRH26:
 	case MODEL_TUFAC1750:
 #ifdef RTCONFIG_USB_SWAP
@@ -19149,7 +19286,7 @@ static void sysinit(void)
 #if defined(RTCONFIG_NTFS3)
 	modprobe("ntfs3");
 #endif
-#if defined(R6800) || defined(RTAC85P) || defined(RTMIR3P)
+#if defined(R6800) || defined(RTAC85P) || defined(RTMIR3P) || defined(RTA040WQ) || defined(RTMSG1500)
 	modprobe("jffs_concat");
 #endif
 #if defined(RTCONFIG_SWRT_I2CLED) || defined(RTCONFIG_SWRT_LEDDRV)
@@ -19975,6 +20112,11 @@ int init_main(int argc, char *argv[])
 		_eval(argv, NULL, 0, &pid);
 	}
 #endif
+
+#if defined(RTA040WQ) || defined(RTMSG1500)
+                restart_wireless();
+#endif
+
 	for (;;) {
 //		TRACE_PT("main loop signal/state=%d\n", state);
 

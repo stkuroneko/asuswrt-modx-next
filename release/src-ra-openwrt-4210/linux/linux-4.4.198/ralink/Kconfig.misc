@@ -44,6 +44,14 @@ config  MODEL_RTMIR3P
         bool "RT-MIR3P"
         default n
 
+config  MODEL_RTA040WQ
+        bool "RT-A040WQ"
+        default n
+
+config  MODEL_RTMSG1500
+        bool "RT-MSG1500"
+        default n
+
 config  MODEL_R6800
         bool "R6800"
         default n

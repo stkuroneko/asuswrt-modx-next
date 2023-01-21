@@ -70,7 +70,7 @@ void init_others(void)
 	eval("mii_mgr", "-s", "-p", "0", "-r", "14", "-v", "0x25");
 	eval("mii_mgr", "-s", "-p", "0", "-r", "13", "-v", "0x401f");
 	eval("mii_mgr", "-s", "-p", "0", "-r", "14", "-v", "0x3f");
-#elif defined(RTAC85U) || defined(RTAC85P) || defined(RTMIR3P) || defined(R6800) || defined(RMAC2100)
+#elif defined(RTAC85U) || defined(RTAC85P) || defined(RTMIR3P) || defined(RTA040WQ) || defined(RTMSG1500) || defined(R6800) || defined(RMAC2100)
 //fix me
 #endif
 }
@@ -120,6 +120,8 @@ void generate_switch_para(void)
 		case MODEL_RTAC85U:
 		case MODEL_RTAC85P:
 		case MODEL_RTMIR3P:
+		case MODEL_RTA040WQ:
+		case MODEL_RTMSG1500:
 		case MODEL_RMAC2100:
 		case MODEL_R6800:
 		case MODEL_TUFAC1750:
@@ -280,6 +282,8 @@ void config_switch()
 	case MODEL_RTAC85U:
 	case MODEL_RTAC85P:
 	case MODEL_RTMIR3P:
+	case MODEL_RTA040WQ:
+	case MODEL_RTMSG1500:
 	case MODEL_RMAC2100:
 	case MODEL_R6800:
 	case MODEL_TUFAC1750:
@@ -1173,7 +1177,7 @@ void init_syspara(void)
 		}
 #endif
 		else if (strcmp(dst, "5G_ALL") == 0)	{
-#if defined(RTAC85P)|| defined(RTMIR3P)
+#if defined(RTAC85P)
 			nvram_set("wl1_country_code", "RU");
 #else
 			nvram_set("wl1_country_code", "DB");
@@ -1593,6 +1597,8 @@ void set_wan_tag(char *interface) {
 	case MODEL_RTAC85U:
 	case MODEL_RTAC85P:
 	case MODEL_RTMIR3P:
+	case MODEL_RTA040WQ:
+	case MODEL_RTMSG1500:
 	case MODEL_RMAC2100:
 	case MODEL_R6800:
 	case MODEL_TUFAC1750:

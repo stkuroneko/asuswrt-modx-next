@@ -1536,7 +1536,7 @@ function showMenuTree(menuList, menuExclude){
 						menu_code += '" id="';
 						menu_code += curMenu.tab[firstEntry].url.split(".")[0];
 						menu_code += '_menu"><table><tr><td><div class="menu_Icon ';
-						if((based_modelid == "RT-AC85U" || based_modelid == "RT-AC85P" || based_modelid == "RT-MIR3P") && curMenu.index == 'menu_QoS')	//MODELDEP : RT-AC85U change icon
+						if((based_modelid == "RT-AC85U" || based_modelid == "RT-AC85P" || based_modelid == "RT-MIR3P" || based_modelid == "RT-A040WQ" || based_modelid == "RT-MSG1500") && curMenu.index == 'menu_QoS')	//MODELDEP : RT-AC85U change icon
 							menu_code += 'menu_BandwidthMonitor';
 						else
 							menu_code += curMenu.index;
@@ -2796,7 +2796,7 @@ function refreshStatus(xhr){
 		document.getElementById("bwdpi_status").onmouseover = function(){overHint("A");}
 		document.getElementById("bwdpi_status").onmouseout = function(){nd();}
 		
-		if(based_modelid == "RT-AC85U" || based_modelid == "RT-AC85P" || based_modelid == "RT-MIR3P" || based_modelid == "RT-AC68A" || based_modelid == "RT-AC65U"){	//MODELDEP : Spec special fine tune
+		if(based_modelid == "RT-AC85U" || based_modelid == "RT-AC85P" || based_modelid == "RT-MIR3P" || based_modelid == "RT-A040WQ" || based_modelid == "RT-MSG1500" || based_modelid == "RT-AC68A" || based_modelid == "RT-AC65U"){	//MODELDEP : Spec special fine tune
 			document.getElementById("bwdpi_status").style.display = "none";
 		}	
 	}
