@@ -216,7 +216,7 @@ enum {
 	P7_PORT=7,
 };
 #define MT7621_GSW
-#elif defined(H3CTX1801) || defined(RTTX1801)
+#elif defined(H3CTX1801) || defined(RTTX1801) || defined(RTAX18T)
 enum {
 	WAN_PORT=4,
 	LAN1_PORT=3,
