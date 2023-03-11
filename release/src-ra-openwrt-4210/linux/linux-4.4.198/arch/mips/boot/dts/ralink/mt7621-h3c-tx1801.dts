@@ -8,7 +8,7 @@
 	model = "H3C-TX1801 PLUS";
 
 	chosen {
-		bootargs = "console=ttyS0,115200";
+		bootargs = "console=ttyS0,115200  ROOT=/dev/mtdblock5";
 	};
 
 	gpio-keys-polled {
@@ -23,72 +23,6 @@
 			linux,code = <KEY_RESTART>;
 		};
 	};
-
-	nmbm {
-		compatible = "generic,nmbm";
-
-		#address-cells = <1>;
-		#size-cells = <1>;
-
-		lower-mtd-device = <&nandflash>;
-		forced-create;
-
-		partitions {
-			compatible = "fixed-partitions";
-			#address-cells = <1>;
-			#size-cells = <1>;
-
-			partition@0 {
-				label = "Bootloader";
-				reg = <0x00000 0x80000>;
-				read-only;
-			};
-
-			partition@80000 {
-				label = "u-boot-env";
-				reg = <0x80000 0x80000>;
-				read-only;
-			};
-
-			partition@100000 {
-				label = "boarddata";
-				reg = <0x100000 0x80000>;
-			};
-
-			partition@180000 {
-				label = "Factory";
-				reg = <0x180000 0x80000>;
-			};
-
-			partition@200000 {
-				label = "Kernel";
-				reg = <0x200000 0x2300000>;
-			};
-
-			partition@2500000 {
-				label = "Kernel2";
-				reg = <0x2500000 0x2300000>;
-			};
-
-			partition@4800000 {
-				label = "jffs2";
-				reg = <0x4800000 0x2F40000>;
-			};
-
-			partition@7740000  {
-				label = "Factory2";
-				reg = <0x7740000 0x80000>;
-			};
-
-			partition@77C0000  {
-				label = "nvram";
-				reg = <0x77C0000 0x40000>;
-			};
-/*
-			0x7800000-0x8000000 nmbm
-*/
-		};
-	};
 };
 
 &bch {
@@ -97,8 +31,6 @@
 
 &eth {
         status = "okay";
-		pinctrl-names = "default";
-		pinctrl-0 = <&rgmii1_pins &rgmii2_pins &mdio_pins>;
 
         gmac0: mac@0 {
                 compatible = "mediatek,eth-mac";
@@ -177,20 +109,6 @@
         status = "okay";
 };
 
-&nand {
-	status = "okay";
-
-	nandflash: flash@0 {
-		reg = <0>;
-		nand-ecc-mode = "hw";
-		partitions {
-			compatible = "fixed-partitions";
-			#address-cells = <1>;
-			#size-cells = <1>;
-		};
-	};
-};
-
 &pinctrl {
 	state_default: pinctrl0 {
 		gpio {
@@ -232,3 +150,52 @@
 	status = "okay";
 };
 
+
+&nand {
+	status = "okay";
+
+	nandflash: flash@0 {
+		reg = <0>;
+		nand-ecc-mode = "hw";
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "Bootloader";
+				reg = <0x00000 0xC0000>;
+			};
+
+			partition@C0000 {
+				label = "Bdata";
+				reg = <0xC0000 0x40000>;
+			};
+
+			partition@140000 {
+				label = "nvram";
+				reg = <0x140000 0x40000>;
+			};
+
+			factory: partition@100000 {
+				label = "Factory";
+				reg = <0x100000 0x40000>;
+			};
+
+			factory2: partition@180000  {
+				label = "Factory2";
+				reg = <0x180000 0x40000>;
+			};
+
+			partition@200000 {
+				label = "Kernel";
+				reg = <0x200000 0x2800000>;
+			};
+
+			partition@2E00000 {
+				label = "jffs2";
+				reg = <0x2E00000 0x5100000>;
+			};
+		};
+	};
+};

@@ -60,6 +60,11 @@ config  MODEL_RMAC2100
         bool "RMAC2100"
         default n
 
+
+config  MODEL_RTTX1801
+        bool "RTTX1801"
+        default n
+
 config  MODEL_RTMIR3G
         bool "RT-MIR3G"
         default n
