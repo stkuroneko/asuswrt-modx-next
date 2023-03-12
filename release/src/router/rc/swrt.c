@@ -244,6 +244,8 @@ void swrt_init_pre()
 		nvram_set("modelname", "RTTX1801");
 #elif defined(RTAX18T)
 		nvram_set("modelname", "RTAX18T");
+#elif defined(RTCR660X)
+		nvram_set("modelname", "RTCR660X");
 #elif defined(R6800)
 		nvram_set("modelname", "R6800");
 #elif defined(PGBM1)

@@ -125,6 +125,7 @@ void generate_switch_para(void)
 		case MODEL_RMAC2100:
 		case MODEL_RTTX1801:
 		case MODEL_RTAX18T:
+		case MODEL_RTCR660X:
 		case MODEL_R6800:
 		case MODEL_TUFAC1750:
 		case MODEL_RTAX53U:
@@ -289,6 +290,7 @@ void config_switch()
 	case MODEL_RMAC2100:
 	case MODEL_RTTX1801:
 	case MODEL_RTAX18T:
+	case MODEL_RTCR660X:
 	case MODEL_R6800:
 	case MODEL_TUFAC1750:
 	case MODEL_RTAX53U:
@@ -985,7 +987,7 @@ void init_syspara(void)
 	{
 		if (buffer[0]!=0xff)
 			ether_etoa(buffer, macaddr2);
-#if defined(JCGQ10PRO) || defined(H3CTX1801) || defined(PGBM1)|| defined(RTCMCCA9)|| defined(RTTX1801)|| defined(RTAX18T)
+#if defined(JCGQ10PRO) || defined(H3CTX1801) || defined(PGBM1)|| defined(RTCMCCA9)|| defined(RTTX1801)|| defined(RTAX18T)|| defined(RTCR660X)
 		ether_cal_b(buffer, macaddr, 4);
 #endif
 	}
@@ -1606,6 +1608,7 @@ void set_wan_tag(char *interface) {
 	case MODEL_RMAC2100:
 	case MODEL_RTTX1801:
 	case MODEL_RTAX18T:
+	case MODEL_RTCR660X:
 	case MODEL_R6800:
 	case MODEL_TUFAC1750:
 	case MODEL_RTAX53U:
