@@ -68,6 +68,10 @@ config  MODEL_RTAX18T
         bool "RT-AX18T"
         default n
 
+config  MODEL_RTHAR
+        bool "RT-HAR"
+        default n
+
 config  MODEL_RTCR660X
         bool "RT-CR660X"
         default n
