@@ -256,6 +256,8 @@ void swrt_init_pre()
 		nvram_set("modelname", "JCGQ10PRO");
 #elif defined(RTCMCCA9)
 		nvram_set("modelname", "RTCMCCA9");
+#elif defined(RTQ20)
+		nvram_set("modelname", "RTQ20");
 #elif defined(H3CTX1801)
 		nvram_set("modelname", "H3CTX1801");
 #elif defined(TUFAC1750)

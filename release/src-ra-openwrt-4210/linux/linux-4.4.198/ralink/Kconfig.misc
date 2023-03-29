@@ -92,6 +92,10 @@ config  MODEL_RTCMCCA9
         bool "RT-CMCCA9"
         default n
 
+config  MODEL_RTQ20
+        bool "RT-Q20"
+        default n
+
 config  MODEL_H3CTX1801
         bool "H3C-TX1801"
         default n

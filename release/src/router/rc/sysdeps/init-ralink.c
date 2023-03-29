@@ -134,6 +134,7 @@ void generate_switch_para(void)
 		case MODEL_PGBM1:
 		case MODEL_JCGQ10PRO:
 		case MODEL_RTCMCCA9:
+		case MODEL_RTQ20:
 		case MODEL_H3CTX1801:
 			nvram_unset("vlan3hwname");
 			if ((wans_cap && wanslan_cap) ||
@@ -300,6 +301,7 @@ void config_switch()
 	case MODEL_PGBM1:
 	case MODEL_JCGQ10PRO:
 	case MODEL_RTCMCCA9:
+	case MODEL_RTQ20:
 	case MODEL_H3CTX1801:
 		merge_wan_port_into_lan_ports = 1;
 		break;
@@ -989,7 +991,7 @@ void init_syspara(void)
 	{
 		if (buffer[0]!=0xff)
 			ether_etoa(buffer, macaddr2);
-#if defined(JCGQ10PRO) || defined(H3CTX1801) || defined(PGBM1)|| defined(RTCMCCA9)|| defined(RTTX1801)|| defined(RTAX18T)|| defined(RTHAR)|| defined(RTCR660X)
+#if defined(JCGQ10PRO) || defined(H3CTX1801) || defined(PGBM1)|| defined(RTCMCCA9)|| defined(RTQ20)|| defined(RTTX1801)|| defined(RTAX18T)|| defined(RTHAR)|| defined(RTCR660X)
 		ether_cal_b(buffer, macaddr, 4);
 #endif
 	}
@@ -1619,6 +1621,7 @@ void set_wan_tag(char *interface) {
 	case MODEL_PGBM1:
 	case MODEL_JCGQ10PRO:
 	case MODEL_RTCMCCA9:
+	case MODEL_RTQ20:
 	case MODEL_H3CTX1801:
 		ifconfig(interface, IFUP, 0, 0);
 		if(wan_vid) { /* config wan port */

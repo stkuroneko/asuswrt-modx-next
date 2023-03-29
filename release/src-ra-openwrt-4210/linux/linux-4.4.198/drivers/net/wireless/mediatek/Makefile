@@ -22,6 +22,7 @@ obj-$(CONFIG_MODEL_RTMIR3G) += mt7603/4.1.2.1/mt7603_wifi_ap/
 obj-$(CONFIG_MODEL_PGBM1) += mt7915/7.4.0.0/mt_wifi_ap/
 obj-$(CONFIG_MODEL_JCGQ10PRO) += mt7915/7.4.0.0/mt_wifi_ap/
 obj-$(CONFIG_MODEL_RTCMCCA9) += mt7915/7.4.0.0/mt_wifi_ap/
+obj-$(CONFIG_MODEL_RTQ20) += mt7915/7.4.0.0/mt_wifi_ap/
 obj-$(CONFIG_MODEL_H3CTX1801) += mt7915/7.4.0.0/mt_wifi_ap/
 obj-$(CONFIG_MODEL_RTTX1801) += mt7915/7.4.0.0/mt_wifi_ap/
 obj-$(CONFIG_MODEL_RTAX18T) += mt7915/7.4.0.0/mt_wifi_ap/
