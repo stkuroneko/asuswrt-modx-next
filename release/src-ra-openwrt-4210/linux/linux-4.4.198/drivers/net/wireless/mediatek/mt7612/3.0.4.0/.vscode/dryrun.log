@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/akito/asuswrt-modx-next-build/release/src-ra-openwrt-4210/linux/linux-4.4.198/drivers/net/wireless/mediatek/mt7612/3.0.4.0'
+make: Leaving directory '/home/akito/asuswrt-modx-next-build/release/src-ra-openwrt-4210/linux/linux-4.4.198/drivers/net/wireless/mediatek/mt7612/3.0.4.0'
+ 
+make: *** No targets specified and no makefile found.  Stop.
+
