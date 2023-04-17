@@ -87,11 +87,12 @@ void
 stop_nas(void)
 {
 #ifdef RTCONFIG_BRCM_HOSTAPD
-        if (!nvram_match("hapd_enable", "0")) {
+	if (!nvram_match("hapd_enable", "0")) {
 		stop_hapd_wpasupp();
-        } else
+	} else
 #endif
-	killall_tk("nas");
+	if(pids("nas"))
+		killall_tk("nas");
 }
 
 #ifdef REMOVE
@@ -226,14 +227,23 @@ int wlcscan_main(void)
 #endif
 	{	
 		SKIP_ABSENT_BAND_AND_INC_UNIT(i);
-#ifdef __CONFIG_DHDAP__
+#if defined(__CONFIG_DHDAP__)
 		is_dhd = !dhd_probe(word);
 		snprintf(prefix, sizeof(prefix), "wl%d_", i);
 		if (is_dhd && !nvram_match(strcat_r(prefix, "mode", tmp), "wds"))
 			wlcscan_core_escan(APSCAN_INFO, word);
 		else
 #endif
+#if defined(RTAC68U)
+			wlcscan_core_wl(APSCAN_INFO, word);
+#elif defined(R7000P)
+			if(!strcmp(word, "eth1"))
+				wlcscan_core_wl(APSCAN_INFO, word);
+			else
+				wlcscan_core(APSCAN_INFO, word);
+#else
 			wlcscan_core(APSCAN_INFO, word);
+#endif
 
 		// suppose only two or less interface handled
 		nvram_set_int("wlc_scan_state", WLCSCAN_STATE_2G+i);

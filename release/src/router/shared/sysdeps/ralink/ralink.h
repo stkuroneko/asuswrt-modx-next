@@ -381,7 +381,7 @@ typedef struct _SITE_SURVEY
 	char nt[3];
 	char wps[4];
 	char dpid[5];
-//	char owe[10];
+	char newline;
 } SITE_SURVEY;
 
 typedef struct _SITE_SURVEY_ARRAY
@@ -464,6 +464,8 @@ enum ASUS_IOCTL_SUBCMD {
     ASUS_SUBCMD_DFS_STATUS,
     ASUS_SUBCMD_RRM_BCN_RESP,
     ASUS_SUBCMD_GET_RCLASS,
+    ASUS_SUBCMD_DFS_CH_STATUS,				//24
+    ASUS_SUBCMD_GET_CH_BW,				//25
 	ASUS_SUBCMD_MAX
 };
 
@@ -832,6 +834,7 @@ struct GNU_PACKED wnm_command {
 #endif
 
 #if defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#define OFFSET_EISN		0x6ff70	// 32 bytes
 #define OFFSET_TERRITORY_CODE	0x6ff90	/* 5 bytes, e.g., US/01, US/02, TW/01, etc. */
 #define OFFSET_DEV_FLAGS	0x6ffa0 //device dependent flags
 #define OFFSET_ODMPID		0x6ffb0 //the shown model name (for Bestbuy and others)
@@ -846,7 +849,11 @@ struct GNU_PACKED wnm_command {
 #define OFFSET_HW_BOM	0x6FE0C	// 32 bytes
 #define OFFSET_HW_DATE_CODE	0x6FE3E	// 8 bytes
 #define OFFSET_HW_COBRAND       0x6FE46 // 1 byte
+#ifdef RTCONFIG_32BYTES_ODMPID  
+#define OFFSET_32BYTES_ODMPID   0x6FE47 // 32 bytes
+#endif
 #elif defined(RT4GAC86U)
+#define OFFSET_EISN		0x5ff70	// 32 bytes
 #define OFFSET_TERRITORY_CODE	0x5ff90	/* 5 bytes, e.g., US/01, US/02, TW/01, etc. */
 #define OFFSET_DEV_FLAGS	0x5ffa0 //device dependent flags
 #define OFFSET_ODMPID		0x5ffb0 //the shown model name (for Bestbuy and others)
@@ -861,6 +868,7 @@ struct GNU_PACKED wnm_command {
 #define OFFSET_HW_BOM	0x5FE0C	// 32 bytes
 #define OFFSET_HW_DATE_CODE	0x5FE3E	// 8 bytes
 #else
+#define OFFSET_EISN		(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xff70)	// 32 bytes
 #define OFFSET_TERRITORY_CODE	(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xff90)	/* 5 bytes, e.g., US/01, US/02, TW/01, etc. */
 #define OFFSET_DEV_FLAGS	(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xffa0) //device dependent flags
 #define OFFSET_ODMPID		(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xffb0) //the shown model name (for Bestbuy and others)
@@ -877,7 +885,7 @@ struct GNU_PACKED wnm_command {
 #define OFFSET_HW_COBRAND	(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xFE46)	// 1 bytes
 #endif
 
-#ifdef RTCONFIG_AMAS
+#if defined(RTCONFIG_AMAS) || defined(RTCONFIG_EASYMESH) || defined(RTCONFIG_SWRT)
 #if defined(RTCONFIG_MT798X)
 #define OFFSET_AMAS_BUNDLE_FLAG		(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xfd20)
 #define OFFSET_AMAS_BUNDLE_KEY		(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xfd00)
@@ -975,6 +983,10 @@ int ra_gpio_read_int(int *value);
 int ra_gpio_write_bit(int idx, int value);
 
 extern int wl_ioctl(const char *ifname, int cmd, struct iwreq *pwrq);
+
+//cal the rate from MACHTTRANSMIT_SETTING structure replied from ioctl(CMD_RTPRIV_IOCTL_GET_MAC_TABLE_STRUCT)
+extern int getRate(MACHTTRANSMIT_SETTING_for_5G HTSetting);
+extern int getRate_2g(MACHTTRANSMIT_SETTING_for_2G HTSetting);
 
 /* for ATE Get_WanLanStatus command */
 #if defined(RTCONFIG_RALINK_MT7621)

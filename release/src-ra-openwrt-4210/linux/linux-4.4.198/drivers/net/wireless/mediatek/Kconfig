@@ -50,11 +50,6 @@ choice
 	config SECOND_IF_NONE
 	bool "None"
 
-	config SECOND_IF_MT7612E
-	bool "MT7612E"
-	select WIFI_MT_MAC
-	select MT_MAC
-
 	config SECOND_IF_MT7615E
 	bool "MT7615E"
 	select WIFI_MT_MAC
@@ -86,7 +81,6 @@ config RT_SECOND_CARD
 	int
 	depends on !SECOND_IF_NONE
 	default 7615 if SECOND_IF_MT7615E
-        default 7612 if SECOND_IF_MT7612E
 
 config RT_THIRD_CARD
 	int
@@ -231,12 +225,6 @@ endif
 if (FIRST_IF_MT7603E)
 menu "MediaTek MT7603E PCIe Wireless driver"
 source "drivers/net/wireless/mediatek/mt7603/4.1.2.1/mt7603_wifi/Kconfig"
-endmenu
-endif
-
-if (SECOND_IF_MT7612E)
-menu "MediaTek MT7612E PCIe Wireless driver"
-source "drivers/net/wireless/mediatek/mt7612/3.0.4.0/rlt_wifi/Kconfig"
 endmenu
 endif
 

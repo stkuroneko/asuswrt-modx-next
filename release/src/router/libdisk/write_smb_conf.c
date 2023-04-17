@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
 	fprintf(fp, "passdb backend = smbpasswd\n");
 //#endif
 //#if defined(RTCONFIG_SAMBA36X) && defined(RTCONFIG_QCA)
-#if defined(RTCONFIG_QCA)
+#if defined(RTCONFIG_QCA) || defined(RTCONFIG_SWRT_FASTPATH)
 	/* min protocol = SMB2, min protocol = LANMAN2, max protocol = SMB3 ... */
 	fprintf(fp, "smb encrypt = disabled\n");
 	fprintf(fp, "min receivefile size = 16384\n");
@@ -318,8 +318,35 @@ int main(int argc, char *argv[])
 		fprintf(fp, "max connections = %s\n", nvram_safe_get("st_max_user"));
 	}
 #endif
+	/* disable core dumps */
+	fprintf(fp, "enable core files = no\n");
+	/* fix for win10/11 */
+//	fprintf(fp, "lanman auth = yes\n");
+//	fprintf(fp, "ntlm auth = ntlmv1-permitted\n");
 
 	if(!nvram_get_int("stop_samba_speedup")){
+#if defined(RTCONFIG_SWRT_FASTPATH)
+//		fprintf(fp, "socket options = TCP_NODELAY SO_KEEPALIVE SO_RCVBUF=131072 SO_SNDBUF=131072\n");
+		fprintf(fp, "strict locking = no\n");
+		fprintf(fp, "deadtime = 10\n");
+		fprintf(fp, "follow symlinks = no\n");
+		fprintf(fp, "unix extensions = no\n");
+		fprintf(fp, "fake oplocks = yes\n");
+		fprintf(fp, "oplocks = no\n");
+		fprintf(fp, "posix locking = no\n");
+		fprintf(fp, "kernel oplocks = no\n");
+		fprintf(fp, "use mmap = yes\n");
+		fprintf(fp, "os level = 250\n");
+		fprintf(fp, "read raw = yes\n");
+		fprintf(fp, "write raw = yes\n");
+		fprintf(fp, "large readwrite\n");
+		fprintf(fp, "aio read size = 16384\n");
+		fprintf(fp, "aio write size = 16384\n");
+		fprintf(fp, "aio write behind = true\n");
+		fprintf(fp, "write cache size = 2097152\n");
+		fprintf(fp, "max xmit = 65536\n");
+		fprintf(fp, "getwd cache = true\n");
+#else
 #if defined(RTCONFIG_SOC_IPQ8064) || defined(RTCONFIG_SOC_IPQ8074)
 		fprintf(fp, "socket options = TCP_NODELAY SO_KEEPALIVE\n");
 #elif defined(RTCONFIG_ALPINE)
@@ -336,6 +363,7 @@ int main(int argc, char *argv[])
 #endif
 #else
 		fprintf(fp, "socket options = TCP_NODELAY SO_KEEPALIVE SO_RCVBUF=65536 SO_SNDBUF=65536\n");
+#endif
 #endif
 	}
 	fprintf(fp, "obey pam restrictions = no\n");
@@ -408,9 +436,11 @@ int main(int argc, char *argv[])
 	fprintf(fp, "store dos attributes = yes\n");
 #endif
 	fprintf(fp, "dos filemode = yes\n");
+#if !defined(RTCONFIG_SWRT_FASTPATH)
 	fprintf(fp, "oplocks = yes\n");
 	fprintf(fp, "level2 oplocks = yes\n");
 	fprintf(fp, "kernel oplocks = no\n");
+#endif
 
 	if(nvram_invmatch("re_mode", "1"))
 	{

@@ -11,6 +11,8 @@ else ifeq ($(BRCM_CHIP),$(or 4908,4912))
 SC_ARCH=arm64
 else ifeq ($(BUILD_NAME), $(filter $(BUILD_NAME), RT-AC68U RT-AC88U RT-AC3100 RT-AC3200 RT-AC5300))
 SC_ARCH=arm
+else ifeq ($(or $(RTCONFIG_BCM_7114),$(RTCONFIG_BCM_7),$(RTCONFIG_BCM4708)),y)
+SC_ARCH=arm
 endif
 
 #export SC_BUILD=y
@@ -75,6 +77,7 @@ endif
 	install -m 0755 softcenter/res/sc1TW.json $(INSTALLDIR)/rom/etc/softcenter/res
 	install -m 0755 softcenter/res/icon-default.png $(INSTALLDIR)/rom/etc/softcenter/res
 	install -m 0755 softcenter/res/swrt.png $(INSTALLDIR)/rom/etc/softcenter/res
+	install -m 0755 softcenter/res/eva.png $(INSTALLDIR)/rom/etc/softcenter/res
 	install -m 0755 softcenter/res/upgrade.png $(INSTALLDIR)/rom/etc/softcenter/res
 	install -m 0755 softcenter/res/softcenter.js $(INSTALLDIR)/rom/etc/softcenter/res
 	install -m 0755 softcenter/res/softcenter.css $(INSTALLDIR)/rom/etc/softcenter/res
@@ -123,7 +126,7 @@ else
 	install -m 0755 scTW.json $(INSTALLDIR)/www/res
 	install -m 0755 Softcenter.asp $(INSTALLDIR)/www
 endif
-ifeq ($(SWRT_NAME), $(filter $(SWRT_NAME), SBRAC1900P SBRAC3200P K3 R8500 XWR3100 TY6201_RTK TY6201_BCM TY6202 SWRT360V6 TYAX5400 JDCAX1800))
+ifeq ($(SWRT_NAME), $(filter $(SWRT_NAME), SBRAC1900P SBRAC3200P K3 R8500 XWR3100 TY6201_RTK TY6201_BCM TY6202 SWRT360V6 TYAX5400 JDCAX1800 RGMA2820A RGMA2820B RAC2V1S TY6201PRO RGMA3062 H3CTX1801))
 ifeq ($(HND_ROUTER), y)
 	install -m 0755 key.asp $(INSTALLDIR)/www/www
 else

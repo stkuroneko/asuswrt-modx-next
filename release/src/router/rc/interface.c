@@ -276,6 +276,16 @@ int _ifconfig(const char *name, int flags, const char *addr, const char *netmask
 	}
 
 	close(s);
+
+//Andrew add
+#ifdef RTCONFIG_CONNTRACK 
+	if(flags & IFUP)
+		conntrack_check(CONNTRACK_START); 
+	else if (flags & IFFDOWN)
+		conntrack_check(CONNTRACK_STOP); 
+#endif
+//Andrew end
+
 	return 0;
 
  ERROR:
@@ -666,6 +676,7 @@ int start_vlan(void)
 		case MODEL_RTAC88U:
 		case MODEL_RTAC3100:
 		case MODEL_RTAC5300:
+		case MODEL_R7000P:
 			break;
 		default:
 			// port 5 ??
@@ -707,6 +718,19 @@ int start_vlan(void)
 		set_wan_tag(wan_base_if);
 	}
 #endif
+#if defined(RTCONFIG_5301X)
+	char *vlan1 = nvram_safe_get("vlan1ports");
+	char *vlan2 = nvram_safe_get("vlan2ports");
+	char vlan1buf[64];
+	char vlan2buf[64];
+	vlan1 = brcm_to_swconfig(vlan1, vlan1buf);
+	vlan2 = brcm_to_swconfig(vlan2, vlan2buf);
+	eval("swconfig", "dev", "switch0", "set", "reset", "1");
+	eval("swconfig", "dev", "switch0", "set", "enable_vlan", "1");
+	eval("swconfig", "dev", "switch0", "vlan", "1", "set", "ports", vlan1);
+	eval("swconfig", "dev", "switch0", "vlan", "2", "set", "ports", vlan2);
+	eval("swconfig", "dev", "switch0", "set", "apply");
+#endif
 	return 0;
 }
 
@@ -735,3 +759,4 @@ int stop_vlan(void)
 
 	return 0;
 }
+

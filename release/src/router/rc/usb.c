@@ -293,7 +293,7 @@ void add_usb_host_modules(void)
 
 #ifdef RTCONFIG_HND_ROUTER_AX
 	eval("insmod",
-#if defined(BCM4912) || defined(BCM6756)
+#if defined(BCM4912) || defined(BCM6756) || defined(BCM6855)
 		"bcm_bca_usb"
 #else
 		"bcm_usb"
@@ -320,19 +320,17 @@ void add_usb_host_modules(void)
 #elif defined(RTCONFIG_ALPINE)
 	modprobe(USB30_MOD);
 #else
-#if !defined(BCM4912) && !defined(BCM6756)
+#if !defined(BCM4912) && !defined(BCM6756) && !defined(BCM6855)
 	if (nvram_get_int("usb_usb3") == 1) {
 #endif
-#ifdef RTCONFIG_HND_ROUTER
+#ifdef RTCONFIG_BCMARM
 		modprobe(USB30_MOD);
 		modprobe("xhci-plat-hcd");
-#ifdef RTCONFIG_HND_ROUTER_AX
 		modprobe("xhci-pci");
-#endif
 #else
 		modprobe(USB30_MOD);
 #endif
-#if !defined(BCM4912) && !defined(BCM6756)
+#if !defined(BCM4912) && !defined(BCM6756) && !defined(BCM6855)
 	}
 #endif
 #endif
@@ -340,12 +338,10 @@ void add_usb_host_modules(void)
 
 	/* if enabled, force USB2 before USB1.1 */
 	if (nvram_get_int("usb_usb2") == 1) {
-#ifdef RTCONFIG_HND_ROUTER
+#ifdef RTCONFIG_BCMARM
 		modprobe(USB20_MOD);
 		modprobe("ehci-platform");
-#ifdef RTCONFIG_HND_ROUTER_AX
 		modprobe("ehci-pci");
-#endif
 #else
 		i = nvram_get_int("usb_irq_thresh");
 		if ((i < 0) || (i > 6))
@@ -361,12 +357,10 @@ void add_usb_host_modules(void)
 		modprobe(USBUHCI_MOD);
 	}
 	if (nvram_get_int("usb_ohci") == 1) {
-#ifdef RTCONFIG_HND_ROUTER
+#ifdef RTCONFIG_BCMARM
 		modprobe(USBOHCI_MOD);
 		modprobe("ohci-platform");
-#ifdef RTCONFIG_HND_ROUTER_AX
 		modprobe("ohci-pci");
-#endif
 #else
 		modprobe(USBOHCI_MOD);
 #endif
@@ -456,10 +450,10 @@ void add_usb_modem_modules(void)
 
 void remove_usb_modem_modules(void)
 {
-#ifdef RTCONFIG_INTERNAL_GOBI
 	if(get_wans_dualwan()&WANSCAP_USB)
 		return;
 
+#ifdef RTCONFIG_INTERNAL_GOBI
 #if defined(RT4GAC86U)
 	modprobe_r("qmi_wwan");
 #elif defined(RTCONFIG_FIBOCOM_FG621)
@@ -1086,10 +1080,10 @@ void remove_usb_module(void)
 #ifdef RTCONFIG_USB_MODEM
 void stop_modem_program()
 {
-#ifdef RTCONFIG_INTERNAL_GOBI
 	if(get_wans_dualwan()&WANSCAP_USB)
 		return;
 
+#ifdef RTCONFIG_INTERNAL_GOBI
 #if defined(RT4GAC86U)
 	killall_tk("quectel-CM");
 #else
@@ -1392,6 +1386,9 @@ int mount_r(char *mnt_dev, char *mnt_dir, char *_type)
 					sprintf(options + strlen(options), ",nodev" + (options[0] ? 0 : 1));
 				else
 					sprintf(options + strlen(options), ",nodev,iostreaming" + (options[0] ? 0 : 1));
+#if defined(BCM49XX)
+				sprintf(options + strlen(options), ",inode32" + (options[0] ? 0 : 1));
+#endif
 #else
 				sprintf(options + strlen(options), ",noatime" + (options[0] ? 0 : 1));
 #endif
@@ -1406,6 +1403,9 @@ int mount_r(char *mnt_dev, char *mnt_dir, char *_type)
 				sprintf(options + strlen(options), ",nodev" + (options[0] ? 0 : 1));
 			else
 				sprintf(options + strlen(options), ",nodev,iostreaming" + (options[0] ? 0 : 1));
+#if defined(BCM49XX)
+			sprintf(options + strlen(options), ",inode32" + (options[0] ? 0 : 1));
+#endif
 #else
 			sprintf(options + strlen(options), ",noatime" + (options[0] ? 0 : 1));
 #endif
@@ -1567,7 +1567,10 @@ int mount_r(char *mnt_dev, char *mnt_dir, char *_type)
 #if defined(RTCONFIG_OPENPLUSTUXERA_NTFS)
 					else
 #endif
-						ret = eval("mount", "-t", "tntfs", "-o", options, mnt_dev, mnt_dir);
+					{
+						//ret = eval("mount", "-t", "tntfs", "-o", options, mnt_dev, mnt_dir);
+						ret = eval("mount", "-t", "tntfs", "-o", "nodev", mnt_dev, mnt_dir);
+					}
 #endif
 #if defined(RTCONFIG_PARAGON_NTFS)
 #if defined(RTCONFIG_OPENPLUSPARAGON_NTFS)
@@ -2093,10 +2096,8 @@ static inline void remove_disk_log(char *device) { }
 int mount_partition(char *dev_name, int host_num, char *dsc_name, char *pt_name, uint flags)
 {
 	char the_label[128], mountpoint[128], uuid[40];
-	int ret;
-	char *type, *ptr, *end;
-	static char *swp_argv[] = { "swapon", "-a", NULL };
-	struct mntent *mnt;
+	int ret = -1;
+	char *type, *ptr;
 #if defined(RTCONFIG_USB_MODEM) || defined(RTCONFIG_APP_PREINSTALLED) || defined(RTCONFIG_APP_NETINSTALLED)
 	char command[PATH_MAX];
 #endif
@@ -2108,6 +2109,10 @@ int mount_partition(char *dev_name, int host_num, char *dsc_name, char *pt_name,
 	if (type == NULL)
 		type = "unknown";
 	run_custom_script("pre-mount", 120, dev_name, type);
+#if !defined(RTCONFIG_HND_ROUTER_AX_6710) && !defined(RTCONFIG_BCM_502L07P2) && !defined(BCM4912)
+	char *end;
+	static char *swp_argv[] = { "swapon", "-a", NULL };
+	struct mntent *mnt;
 
 	if (f_exists("/etc/fstab")) {
 		if (strcmp(type, "swap") == 0) {
@@ -2130,6 +2135,7 @@ int mount_partition(char *dev_name, int host_num, char *dsc_name, char *pt_name,
 			goto done;
 		}
 	}
+#endif
 
 	if (*the_label != 0) {
 		for (ptr = the_label; *ptr; ptr++) {
@@ -2510,7 +2516,7 @@ void remove_storage_main(int shutdn)
 	exec_for_host(-1, 0x02, shutdn ? EFH_SHUTDN : 0, umount_partition);
 }
 
-#if defined(RTCONFIG_REALTEK) || (defined(RTCONFIG_RALINK) && !defined(RTCONFIG_MT798X))
+#if defined(RTCONFIG_REALTEK) || (defined(RTCONFIG_RALINK) && !defined(RTCONFIG_MT798X)) || (defined(RTCONFIG_BCMARM) && !defined(RTCONFIG_HND_ROUTER))
 static const char *path_to_name(const char *path) {
 	const char *s = path, *tmp;
 	//_dprintf("%s(1)\n", __func__);
@@ -2529,6 +2535,21 @@ static const char *path_to_name(const char *path) {
 	return 0;
 }
 #endif /* RTCONFIG_REALTEK */
+
+
+/* Optimize performance */
+#define READ_AHEAD_KB_BUF	"1024"
+#define READ_AHEAD_CONF	"/sys/block/%s/queue/read_ahead_kb"
+
+static void optimize_block_device(char *devname)
+{
+	char blkdev[8] = { 0 };
+	char read_ahead_conf[64] = { 0 };
+
+	strncpy(blkdev, devname, 3);//sda1->sda
+	snprintf(read_ahead_conf, sizeof(read_ahead_conf), READ_AHEAD_CONF, blkdev);
+	f_write_string(read_ahead_conf, READ_AHEAD_KB_BUF, 0, 0);
+}
 
 /*******
  * All the complex locking & checking code was removed when the kernel USB-storage
@@ -2626,7 +2647,7 @@ void hotplug_usb(void)
 	char *scsi_host = getenv("SCSI_HOST");
 	char *usbport = getenv("USBPORT");
 
-#if defined(RTCONFIG_REALTEK) || (defined(RTCONFIG_RALINK) && !defined(RTCONFIG_MT798X))
+#if defined(RTCONFIG_REALTEK)
 	char *devpath = getenv("DEVPATH");
 	//_dprintf("devpath: %s\n", devpath);
 	device = path_to_name(devpath);
@@ -2642,9 +2663,28 @@ void hotplug_usb(void)
 	}
 	//_dprintf("device: %s\n", device);
 #endif /* RTCONFIG_REALTEK */
-#if defined(RTCONFIG_RALINK)
-	if (!device)
+#if (defined(RTCONFIG_RALINK) && !defined(RTCONFIG_MT798X))
+	char *devpath = getenv("DEVPATH");
+	//_dprintf("devpath: %s\n", devpath);
+
+	device = path_to_name(devpath);
+	if (strncmp(device, "sd", 2) != 0 && strncmp(device, "sg", 2) != 0
+#ifdef RTCONFIG_USB_CDROM
+	    && strncmp(device, "sr", 2) != 0
+#endif
+	    ){
 		return;
+	}
+#elif defined(RTCONFIG_BCMARM) && !defined(RTCONFIG_HND_ROUTER)
+	char *devpath = getenv("DEVPATH");
+	device = path_to_name(devpath);
+	if (strncmp(device, "sd", 2) != 0 && strncmp(device, "sg", 2) != 0
+#ifdef RTCONFIG_USB_CDROM
+	    && strncmp(device, "sr", 2) != 0
+#endif
+	    ){
+		return;
+	}
 #endif
 	_dprintf("%s hotplug INTERFACE=%s ACTION=%s USBPORT=%s HOST=%s DEVICE=%s\n",
 		subsystem ? : "USB", interface, action, usbport, scsi_host, device);
@@ -2751,6 +2791,7 @@ _dprintf("restart_nas_services(%d): test 5.\n", getpid());
 					notify_rc_and_wait("restart_nasapps");
 				}
 				TRACE_PT(" end of mount\n");
+				optimize_block_device(device);
 			}
 		}
 		else {
@@ -3554,14 +3595,12 @@ start_samba(void)
 
 #if defined(SMP)
 #if defined(RTCONFIG_BCMARM) || defined(RTCONFIG_SOC_IPQ8064) || defined(RTCONFIG_SOC_IPQ8074)
-#if defined(RTCONFIG_HND_ROUTER_AX_675X)
+#if defined(RTCONFIG_HND_ROUTER_AX_675X) || defined(BCM6750)
 	taskset_ret = -1;
 #else
 	if(!nvram_match("stop_taskset", "1")){
-#if defined(RTCONFIG_HND_ROUTER_AX_6756)
-#if defined(BCM6756)
+#ifdef BCM6756
 		cpu_num = 3;
-#endif
 #endif
 		if(cpu_num > 1)
 		{
@@ -5106,7 +5145,7 @@ static void start_diskformat(char *port_path)
 		char *thfsplus_cmd[] = { "newfs_hfs", "-v", disk_label, devpath, NULL };
 #endif
 #if defined(RTCONFIG_EXT4FS)
-		char *ext4_cmd[] = { "mke2fs", "-t", "ext4", "-L", disk_label, "-T", "largefile", "-m", "1", "-pF", devpath, NULL };
+		char *ext4_cmd[] = { "mke2fs", "-t", "ext4", "-L", disk_label, "-T", "largefile", "-m", "1", "-F", "-v", devpath, NULL };
 #endif
 #if defined(RTCONFIG_NTFS3)
 		char *ntfs3_cmd[] = {"mkntfs", "-F", "-f", "-L", disk_label, "-v", devpath, NULL };

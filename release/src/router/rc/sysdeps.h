@@ -1,6 +1,6 @@
 #ifndef _RC_SYSDEPS_H_
 #define _RC_SYSDEPS_H_
-#if !defined(__GLIBC__) && !defined(__UCLIBC__) /* musl */
+#if !defined(__GLIBC__) && !defined(__UCLIBC__) && !defined(RTCONFIG_BCMARM) /* musl */
 #include <net/ethernet.h>
 #endif
 #include <rtconfig.h>
@@ -36,6 +36,9 @@ extern void post_syspara(void);
 extern void generate_wl_para(int unit, int subunit);
 #else
 extern void generate_wl_para(char *ifname, int unit, int subunit);
+#if !defined(RTCONFIG_HND_ROUTER)
+extern char *brcm_to_swconfig(char *vlan, char *buf);
+#endif
 #endif
 #if defined(RTCONFIG_RALINK)
 extern void reinit_hwnat(int unit);
@@ -62,6 +65,9 @@ extern void set_wan_tag(char *interface);
 
 extern int wlcconnect_core(void);
 extern int wlcscan_core(char *ofile, char *wif);
+#if defined(RTAC68U) || defined(R7000P)
+extern int wlcscan_core_wl(char *ofile, char *wif);
+#endif
 extern void wps_oob_both(void);
 extern void start_wsc(void);
 extern const char *get_wifname(int band);

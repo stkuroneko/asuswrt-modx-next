@@ -14,9 +14,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  *
- * Copyright 2018-2022, SWRT.
- * Copyright 2018-2022, paldier <paldier@hotmail.com>.
- * Copyright 2018-2022, lostlonger<lostlonger.g@gmail.com>.
+ * Copyright 2018-2023, SWRT.
+ * Copyright 2018-2023, paldier <paldier@hotmail.com>.
+ * Copyright 2018-2023, lostlonger<lostlonger.g@gmail.com>.
  * All Rights Reserved.
  *
  */
@@ -87,6 +87,7 @@ void swrt_init_pre()
 	nvram_set("sc_services_start_sig", "0");
 	nvram_set("sc_services_stop_sig", "0");
 	nvram_set("sc_unmount_sig", "0");
+	mkdir("/tmp/upload", 0777);
 #endif
 #if defined(RTCONFIG_ENTWARE)
 	nvram_set("entware_wan_sig", "0");
@@ -95,12 +96,9 @@ void swrt_init_pre()
 #if defined(RTAC82U)
 	fix_jffs_size();
 #endif
-#if defined(RTCONFIG_AMAS) && defined(RTCONFIG_SMARTDNS)
-	if(aimesh_re_node())
-		nvram_set("smartdns_enable", "0");
-#endif
 	swrt_insmod();
-	swrt_init_model();
+	if(swrt_init_model)
+		swrt_init_model();
 #if defined(RTCONFIG_ROG_UI)
 	nvram_set("swrt_rog", "1");
 #endif
@@ -169,6 +167,24 @@ void swrt_init_pre()
 		nvram_set("modelname", "JDCAX1800");
 #elif defined(RMAX6000)
 		nvram_set("modelname", "RMAX6000");
+#elif defined(RMAC2100)
+		nvram_set("modelname", "RMAC2100");
+#elif defined(R6800)
+		nvram_set("modelname", "R6800");
+#elif defined(PGBM1)
+		nvram_set("modelname", "PGBM1");
+#elif defined(JCGQ10PRO)
+		nvram_set("modelname", "JCGQ10PRO");
+#elif defined(H3CTX1801)
+		nvram_set("modelname", "H3CTX1801");
+#elif defined(XMCR660X)
+		nvram_set("modelname", "XMCR660X");
+#elif defined(TY6201PRO)
+		nvram_set("modelname", "TY6201PRO");
+#elif defined(RGMA3062)
+		nvram_set("modelname", "RGMA3062");
+#elif defined(JCGQ20)
+		nvram_set("modelname", "JCGQ20");
 //asus
 #elif defined(RTAC68U)
 		nvram_set("modelname", "RTAC68U");
@@ -194,12 +210,20 @@ void swrt_init_pre()
 		nvram_set("modelname", "RTAX55");
 #elif defined(RTAX56U)
 		nvram_set("modelname", "RTAX56U");
-#elif defined(RTAX58U) || defined(RTAX3000) || defined(RTAX58U_V2)
+#elif defined(RTAX57)
+		nvram_set("modelname", "RTAX57");
+#elif defined(RTAX58U) || defined(RTAX3000)
 		nvram_set("modelname", "RTAX58U");
-#elif defined(TUFAX3000) || defined(TUFAX3000_V2)
+#elif defined(RTAX58U_V2)
+		nvram_set("modelname", "RTAX58UV2");
+#elif defined(TUFAX3000)
 		nvram_set("modelname", "TUFAX3000");
+#elif defined(TUFAX3000_V2)
+		nvram_set("modelname", "TUFAX3000V2");
 #elif defined(TUFAX5400)
 		nvram_set("modelname", "TUFAX5400");
+#elif defined(TUFAX5400_V2)
+		nvram_set("modelname", "TUFAX5400V2");
 #elif defined(GSAX3000)
 		nvram_set("modelname", "GSAX3000");
 #elif defined(GSAX5400)
@@ -208,12 +232,18 @@ void swrt_init_pre()
 		nvram_set("modelname", "RTAX68U");
 #elif defined(RTAX82U)
 		nvram_set("modelname", "RTAX82U");
+#elif defined(RTAX82U_V2)
+		nvram_set("modelname", "RTAX82UV2");
 #elif defined(RTAX86U)
 		nvram_set("modelname", "RTAX86U");
 #elif defined(RTAX86U_PRO)
 		nvram_set("modelname", "RTAX86UPRO");
 #elif defined(RTAX88U)
 		nvram_set("modelname", "RTAX88U");
+#elif defined(RTAX88U_PRO)
+		nvram_set("modelname", "RTAX88UPRO");
+#elif defined(RTAX92U)
+		nvram_set("modelname", "RTAX92U");
 #elif defined(GTAX6000)
 		nvram_set("modelname", "GTAX6000");
 #elif defined(GTAX11000)
@@ -268,6 +298,10 @@ void swrt_init_pre()
 		nvram_set("modelname", "ZENWIFIXD4");
 #elif defined(RTAX82_XD6)
 		nvram_set("modelname", "ZENWIFIXD6");
+#elif defined(RTAX82_XD6S)
+		nvram_set("modelname", "ZENWIFIXD6S");
+#elif defined(XD6_V2)
+		nvram_set("modelname", "ZENWIFIXD6V2");
 #elif defined(RTAX95Q)
 		nvram_set("modelname", "ZENWIFIXT8");
 #elif defined(RTAXE95Q)
@@ -279,15 +313,21 @@ void swrt_init_pre()
 #elif defined(XD4PRO)
 		nvram_set("modelname", "ZENWIFIXD4PRO");
 #elif defined(XT8PRO)
-		nvram_set("modelname", "ZENWIFIXT8PRO");
+		nvram_set("modelname", "ZENWIFIXT9");
+#elif defined(XT8_V2)
+		nvram_set("modelname", "ZENWIFIXT8V2");
 #elif defined(ET8PRO)
-		nvram_set("modelname", "ZENWIFIET8PRO");
+		nvram_set("modelname", "ZENWIFIET9");
+#elif defined(ET8_V2)
+		nvram_set("modelname", "ZENWIFIET8V2");
 #elif defined(PLAX56_XP4)
 		nvram_set("modelname", "ZENWIFIXP4");
 #elif defined(ETJ)
 		nvram_set("modelname", "ZENWIFIETJ");
-#elif defined(XT12)
-		nvram_set("modelname", "XT12");
+#elif defined(GT10)
+		nvram_set("modelname", "GT6");
+#elif defined(RTAXE7800)
+		nvram_set("modelname", "RTAXE7800");
 #endif
 	if(!nvram_get("swrt_beta"))
 		nvram_set("swrt_beta", "0");
@@ -930,6 +970,8 @@ void init_entware(void)
 #define ENTWARE_ACT_STOP		16
 #define	ENTWARE_ACT_MASK (ENTWARE_ACT_INSTALL | ENTWARE_ACT_UPDATE | ENTWARE_ACT_REMOVE)
 #define	ENTWARE_ACT_MASK2 (ENTWARE_ACT_START | ENTWARE_ACT_STOP)
+#define ENTWARE_SERVER "bin.entware.net"
+#define ENTWARE_MIRROR "mirrors.bfsu.edu.cn/entware"
 
 void start_entware(void)
 {
@@ -949,9 +991,18 @@ void start_entware(void)
 	{
 		if (ent_action & ENTWARE_ACT_INSTALL)
 		{
-			snprintf(cmd, sizeof(cmd), "wget http://bin.entware.net/%s/installer/%s.sh -O /tmp/doentware.sh", nvram_get("entware_arch"), ent_arg);
+			snprintf(cmd, sizeof(cmd), "wget http://%s/%s/installer/%s.sh -O /tmp/doentware.sh", 
+				nvram_match("preferred_lang", "CN") ? ENTWARE_MIRROR : ENTWARE_SERVER, nvram_get("entware_arch"), ent_arg);
 			system(cmd);
 			system("chmod +x /tmp/doentware.sh");
+			if(nvram_match("preferred_lang", "CN")){
+				system("mkdir -p /opt/etc");
+				snprintf(cmd, sizeof(cmd), "wget http://%s/%s/installer/opkg.conf -O /opt/etc/opkg.conf", ENTWARE_MIRROR, nvram_get("entware_arch"));
+				system(cmd);
+				system("sed -i '/opkg.conf/d' /tmp/doentware.sh");
+				system("sed -i 's|http://bin.entware.net|http://mirrors.bfsu.edu.cn/entware|g' /tmp/doentware.sh");
+				system("sed -i 's|http://bin.entware.net|http://mirrors.bfsu.edu.cn/entware|g' /opt/etc/opkg.conf");
+			}
 			system("/tmp/doentware.sh");
 			nvram_set("entware_installed", "1");
 		}
@@ -1029,12 +1080,14 @@ void gen_arch_conf(void)
 			else
 				nvram_set("entware_arch", "armv7sf-k3.2");
 		}else if(!strcmp(uts.machine, "mips")){
-			if(!strcmp(uts.release, "4.4.198") || !strcmp(uts.release, "5.4.179"))
+			if(!strncmp(uts.release, "4.4", 3) || !strncmp(uts.release, "5.4", 3))
 				nvram_set("entware_arch", "mipselsf-k3.4");
 			else
-				nvram_set("entware_arch", "mipssf-k3.4");
+				nvram_set("entware_arch", "mipssf-k3.4");//lantiq: 3.10/4.9
 		}else if(!strcmp(uts.machine, "aarch64"))
 			nvram_set("entware_arch", "aarch64-k3.10");
+		else if(!strcmp(uts.machine, "x86_64"))
+			nvram_set("entware_arch", "x64");
 	}
 }
 #endif
@@ -1274,7 +1327,7 @@ int check_bwdpi_nvram_setting(){ return 0; }
 int check_wrs_switch(){ return 0; }
 #endif
 
-#if 0//defined(RTCONFIG_BCMARM)
+#if defined(RTCONFIG_BCMARM) && !defined(RTCONFIG_HND_ROUTER_AX)
 #define	HAPD_MAX_BUF			512
 void __attribute__((weak)) wl_apply_akm_by_auth_mode(int unit, int subunit, char *sp_prefix_auth)
 {
@@ -1900,12 +1953,107 @@ void fan_watchdog(void)
 			set_gpio(gpio1, 1);
 			set_gpio(gpio2, 0);
 			set_gpio(gpio3, 0);
+		}else{
+			printf("Turn off FAN");
+			set_gpio(gpio1, 0);
+			set_gpio(gpio2, 0);
+			set_gpio(gpio3, 0);
 		}
 	}else if(nvram_match("fan_en", "0") && status == 1){
 		printf("Turn off FAN");
 		set_gpio(gpio1, 0);
 		set_gpio(gpio2, 0);
 		set_gpio(gpio3, 0);
+	}
+}
+#endif
+
+#if defined(RTCONFIG_BCMARM)
+void get_nvramstr(int unit, char *buf, size_t len, int which)
+{
+	char *str = NULL;
+#if defined(GTAXE16000)
+const unsigned int devpath_idx[4] = {3, 4, 2, 1};    // 2.4G, 5G-1, 5G-2, 6G
+#elif defined(GTAX11000_PRO)
+const unsigned int devpath_idx[4] = {3, 4, 1, 2};    // 2.4G, 5G-1, 5G-2
+#elif defined(GT10)
+const unsigned int devpath_idx[4] = {0, 1, 2};    // 2.4G, 5G-1, 5G-2
+#endif
+	if(which == 1){
+		if(unit == 0)
+			str = "maxp2ga0";
+		else
+			str = "maxp5gb0a0";
+	}else
+		str = "macaddr";
+	switch(get_model()){
+		case MODEL_RTAC68U:
+		case MODEL_RTAC3200:
+		case MODEL_RTAC5300:
+		case MODEL_RTAC88U:
+		case MODEL_RTAC86U:
+		case MODEL_RTAC3100:
+		case MODEL_RTAX95Q:
+		case MODEL_XT8PRO:
+		case MODEL_BM68:
+		case MODEL_XT8_V2:
+		case MODEL_RTAXE95Q:
+		case MODEL_ET8PRO:
+		case MODEL_ET8_V2:
+		case MODEL_RTAX56_XD4:
+		case MODEL_XD4PRO:
+		case MODEL_CTAX56_XD4:
+		case MODEL_RTAX58U:
+		case MODEL_RTAX82U_V2:
+		case MODEL_TUFAX5400_V2:
+		case MODEL_RTAX5400:
+		case MODEL_RTAX82_XD6S:
+		case MODEL_XD6_V2:
+		case MODEL_RTAX58U_V2:
+		case MODEL_RTAXE7800:
+		case MODEL_RTAX86U:
+		case MODEL_RTAX68U:
+		case MODEL_RTAC68U_V4:
+		case MODEL_RTAX86U_PRO:
+#ifdef RTAC3200
+			if (unit < 2)
+				snprintf(buf, len, "%d:%s", 1 - unit, str);
+			else
+#endif
+			snprintf(buf, len, "%d:%s", unit, str);
+			break;
+		case MODEL_GTAC5300:
+			snprintf(buf, len, "%d:%s", unit + 1, str);
+			break;
+		case MODEL_RTAX55:
+		case MODEL_TUFAX3000_V2:
+		case MODEL_RTAX3000N:
+		case MODEL_BR63:
+		case MODEL_RPAX56:
+		case MODEL_RPAX58:
+		case MODEL_RTAX56U:
+			snprintf(buf, len, "sb/%d/%s", unit, str);
+			break;
+		case MODEL_RTAX88U:
+		case MODEL_GTAX11000:
+		case MODEL_RTAX92U:
+		case MODEL_GTAXE11000:
+		case MODEL_GTAX6000:
+		case MODEL_ET12:
+		case MODEL_XT12:
+		case MODEL_RTAX88U_PRO:
+			snprintf(buf, len, "%d:%s", unit + 1, str);
+			break;
+#if defined(GTAXE16000) || defined(GTAX11000_PRO) || defined(GT10)
+		case MODEL_GTAX11000_PRO:
+		case MODEL_GTAXE16000:
+		case MODEL_GT10:
+			snprintf(buf, len, "%d:%s", devpath_idx[unit], str);
+			break;
+#endif
+		default:
+			snprintf(buf, len, "%d:%s", unit, str);
+			break;
 	}
 }
 #endif

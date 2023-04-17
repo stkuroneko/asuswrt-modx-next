@@ -131,8 +131,16 @@ if(wl_info.band5g_2_support || isSupport('wifi6e')){
 	}	
 }
 
-var mesh_5g = JSON.parse('<% get_wl_channel_list_5g(); %>');
-var mesh_5g2 = JSON.parse('<% get_wl_channel_list_5g_2(); %>');
+try{
+	var mesh_5g = JSON.parse('<% get_wl_channel_list_5g(); %>');
+}catch(e){
+	var mesh_5g = {};
+}
+try{
+	var mesh_5g2 = JSON.parse('<% get_wl_channel_list_5g_2(); %>');
+}catch(e){
+	var mesh_5g2 = {};
+}
 function wl_chanspec_list_change(){
 	var phytype = "n";
 	var band = document.form.wl_unit.value;
@@ -846,6 +854,7 @@ function change_channel(obj){
 	var smart_connect = document.form.smart_connect_x.value;
 	cur = '<% nvram_get("wl_chanspec"); %>';
 	cur_extend_channel = cur.slice(-1);			//current control channel
+
 	if(document.form.wl_bw.value != 1){   // 20/40 MHz or 40MHz
 		if(channel_length == 12){    // 1 ~ 11
 			if(selected_channel >= 1 && selected_channel <= 4){
@@ -937,6 +946,20 @@ function change_channel(obj){
 					document.getElementById('acs_band1_checkbox').style.display = "none";
 					document.form.acs_band1.disabled = true;
 				}
+			}
+		}
+
+		if(unii4Support){
+			if(wl_unit == '1' && !band5g2_support && document.form.wl_channel.value  == 0){
+				document.getElementById('acs_unii4_field').style.display = "";
+				// document.getElementById('acs_unii4_checkbox').disabled = false;
+			}
+			else if(wl_unit == '2' && wl_nband_array[2] =='1' && document.form.wl_channel.value == 0){
+				document.getElementById('acs_unii4_field').style.display = "";
+			}
+			else{
+				document.getElementById('acs_unii4_field').style.display = "none";
+				// document.getElementById('acs_unii4_checkbox').disabled = true;
 			}
 		}
 

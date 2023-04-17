@@ -9,6 +9,7 @@ include ../../.config
 
 CFLAGS	+= -I.. -I$(SRCBASE)/include ${WLAN_StdIncPathA} -I$(SRCBASE)/common/include -I$(SRCBASE)/router/shared -Wall 
 CFLAGS	+= $(WLAN_ComponentIncPath)
+CFLAGS	+= -I$(SRCBASE)/shared/bcmwifi/include -I$(SRCBASE)/common/include/proto
 
 #CFLAGS	+= -g -DDEBUG
 CFLAGS += -DBCMDBG
@@ -57,6 +58,7 @@ nas: $(NASOBJS) $(UTLOBJS)
 install: all
 	install -D nas $(INSTALLDIR)/usr/sbin/nas
 	$(STRIP) $(INSTALLDIR)/usr/sbin/nas
+	cd $(INSTALLDIR)/usr/sbin && ln -sf nas nas4not && ln -sf nas nas4wds
 
 # clean up mess
 clean:

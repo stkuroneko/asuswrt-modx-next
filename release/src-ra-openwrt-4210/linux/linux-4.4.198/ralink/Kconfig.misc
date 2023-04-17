@@ -100,12 +100,20 @@ config  MODEL_H3CTX1801
         bool "H3C-TX1801"
         default n
 
+config  MODEL_XMCR660X
+        bool "XM-CR660X"
+        default n
+
+config  MODEL_JCGQ20
+        bool "JCG-Q20"
+        default n
+
 config  ASUS_EXT
         bool "ASUS_EXT"
         default n
 
 config  MTK_NAND_BLOCK2
-        bool "For MTK nand using 2 block"
+        bool "For MTK nand using 2 block 256k/0x40000"
         default n
 
 config  FIBOCOM_FG621

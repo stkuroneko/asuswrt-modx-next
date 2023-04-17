@@ -12,8 +12,12 @@
 #include <shared.h>
 #include <sm.h>
 
+#ifndef FALSE
 #define FALSE	0
+#endif
+#ifndef TRUE
 #define TRUE	1
+#endif
 #define INTERFACE	"br0"
 #define MODEL_NAME	RT_BUILD_NAME
 #define ARP_BUFFER_SIZE	512
@@ -59,6 +63,7 @@
 #define AMAS_WGN_BR_1	"br2"
 #define AMAS_WGN_BR_2	"br3"
 #define AMAS_WGN_BR_3	"br4"
+#define AMAS_WGN_BR_4	"br5"
 #endif
 
 //for Notification Center trigger flag
