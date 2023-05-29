@@ -148,6 +148,7 @@ void generate_switch_para(void)
 		case MODEL_R6800:
 		case MODEL_TUFAC1750:
 		case MODEL_RTAX53U:
+		case MODEL_RTXG1:
 		case MODEL_RTAX54:
 		case MODEL_PGBM1:
 		case MODEL_JCGQ10PRO:
@@ -458,6 +459,7 @@ void config_switch()
 	case MODEL_R6800:
 	case MODEL_TUFAC1750:
 	case MODEL_RTAX53U:
+	case MODEL_RTXG1:
 	case MODEL_RTAX54:
 	case MODEL_PGBM1:
 	case MODEL_JCGQ10PRO:
@@ -2206,6 +2208,7 @@ void set_wan_tag(char *interface) {
 	case MODEL_R6800:
 	case MODEL_TUFAC1750:
 	case MODEL_RTAX53U:
+	case MODEL_RTXG1:
 	case MODEL_RTAX54:
 	case MODEL_PGBM1:
 	case MODEL_JCGQ10PRO:
