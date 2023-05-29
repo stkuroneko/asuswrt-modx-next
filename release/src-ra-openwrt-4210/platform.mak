@@ -1149,7 +1149,7 @@ define platformKernelConfig
 		sed -i "/CONFIG_JFFS2/d" $(1); \
 		echo "# CONFIG_JFFS2_FS is not set" >>$(1); \
 	fi; \
-	if [ "$(BUILD_NAME)" = "RT-AX53U" ] || [ "$(BUILD_NAME)" = "RT-AX54" ] || [ "$(BUILD_NAME)" = "4G-AX56" ] || [ "$(BUILD_NAME)" = "H3C-TX1801" ] || [ "$(BUILD_NAME)" = "JCG-Q10PRO" ] || [ "$(BUILD_NAME)" = "PGB-M1" ] || [ "$(BUILD_NAME)" = "XM-CR660X" ] || [ "$(BUILD_NAME)" = "RT-TX1801" ] || [ "$(BUILD_NAME)" = "RT-AX18T" ] || [ "$(BUILD_NAME)" = "RT-HAR" ] || [ "$(BUILD_NAME)" = "RT-CR660X" ]|| [ "$(BUILD_NAME)" = "RT-MIR3G" ] || [ "$(BUILD_NAME)" = "RT-CMCCA9" ] || [ "$(BUILD_NAME)" = "RT-Q20" ] || [ "$(BUILD_NAME)" = "JCG-Q20" ] ; then \
+	if [ "$(BUILD_NAME)" = "RT-AX53U" ] || [ "$(BUILD_NAME)" = "RT-AX54" ] || [ "$(BUILD_NAME)" = "4G-AX56" ] || [ "$(BUILD_NAME)" = "H3C-TX1801" ] || [ "$(BUILD_NAME)" = "JCG-Q10PRO" ] || [ "$(BUILD_NAME)" = "PGB-M1" ] || [ "$(BUILD_NAME)" = "XM-CR660X" ] || [ "$(BUILD_NAME)" = "RT-TX1801" ] || [ "$(BUILD_NAME)" = "RT-AX18T" ] || [ "$(BUILD_NAME)" = "RT-HAR" ] || [ "$(BUILD_NAME)" = "RT-CR660X" ]|| [ "$(BUILD_NAME)" = "RT-MIR3G" ] || [ "$(BUILD_NAME)" = "RT-CMCCA9" ] || [ "$(BUILD_NAME)" = "RT-Q20" ] || [ "$(BUILD_NAME)" = "JCG-Q20" ] || [ "$(BUILD_NAME)" = "RT-XG1" ] ; then \
 		sed -i "/CONFIG_MTK_NAND_BLOCK2/d" $(1); \
 		echo "CONFIG_MTK_NAND_BLOCK2=y" >>$(1); \
 	fi; \
