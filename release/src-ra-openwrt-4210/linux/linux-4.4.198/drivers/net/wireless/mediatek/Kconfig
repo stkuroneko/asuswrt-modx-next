@@ -228,6 +228,12 @@ source "drivers/net/wireless/mediatek/mt7603/4.1.2.1/mt7603_wifi/Kconfig"
 endmenu
 endif
 
+if (SECOND_IF_MT7612E)
+menu "MediaTek MT7612E PCIe Wireless driver"
+source "drivers/net/wireless/mediatek/mt76x2_ap/Kconfig"
+endmenu
+endif
+
 if (FIRST_IF_MT7615E || SECOND_IF_MT7615E)
 menu "MediaTek MT7615E PCIe Wireless driver"
 source "drivers/net/wireless/mediatek/mt7615/5.1.0.0/mt_wifi/embedded/Kconfig"

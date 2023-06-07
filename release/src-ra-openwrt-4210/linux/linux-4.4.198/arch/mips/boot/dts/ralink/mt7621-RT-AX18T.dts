@@ -8,7 +8,7 @@
 	model = "RT-AX18T";
 
 	chosen {
-		bootargs = "console=ttyS0,115200  ROOT=/dev/mtdblock5";
+		bootargs = "console=ttyS0,115200  ROOT=mtd:rootfs";
 	};
 
 	gpio-keys-polled {

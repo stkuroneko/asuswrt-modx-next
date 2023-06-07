@@ -2549,7 +2549,7 @@ int gen_ralink_config(int band, int is_iNIC)
 		fprintf(fp, "VHT_BW=%d\n", 0);// 40 MHz
 #endif
 
-#if defined(RMAC2100)
+#if defined(RMAC2100) || defined(RTMIR3G)
 	// TxBF
 	if (band)
 #endif

@@ -78,7 +78,7 @@ void init_others(void)
 	eval("mii_mgr", "-s", "-p", "0", "-r", "14", "-v", "0x25");
 	eval("mii_mgr", "-s", "-p", "0", "-r", "13", "-v", "0x401f");
 	eval("mii_mgr", "-s", "-p", "0", "-r", "14", "-v", "0x3f");
-#elif defined(RTAC85U) || defined(RTAC85P) || defined(R6800) || defined(RMAC2100)
+#elif defined(RTAC85U) || defined(RTAC85P) || defined(R6800) || defined(RMAC2100) || defined(RTMIR3G)
 //fix me
 #endif
 #if defined(TUFAX4200)
@@ -142,6 +142,7 @@ void generate_switch_para(void)
 		case MODEL_RTA040WQ:
 		case MODEL_RTMSG1500:
 		case MODEL_RMAC2100:
+		case MODEL_RTMIR3G:
 		case MODEL_RTTX1801:
 		case MODEL_RTAX18T:
 		case MODEL_RTHAR:
@@ -453,6 +454,7 @@ void config_switch()
 	case MODEL_RTA040WQ:
 	case MODEL_RTMSG1500:
 	case MODEL_RMAC2100:
+	case MODEL_RTMIR3G:
 	case MODEL_RTTX1801:
 	case MODEL_RTAX18T:
 	case MODEL_RTHAR:
@@ -1095,8 +1097,9 @@ void init_wl(void)
 		modprobe("rlt_wifi");
 	}
 #endif
-#if defined(RTCONFIG_WLMODULE_MT7603E_AP) || defined(RTCONFIG_WLMODULE_MT7615E_AP)
 	int mtd_part = 0, mtd_size = 0;
+#if defined(RTCONFIG_WLMODULE_MT7603E_AP) || defined(RTCONFIG_WLMODULE_MT7615E_AP)
+	//int mtd_part = 0, mtd_size = 0;
 	if (mtd_getinfo("Factory", &mtd_part, &mtd_size)){
 		snprintf(cmd, sizeof(cmd), "dd if=/dev/mtdblock%d of=/lib/firmware/e2p bs=131072 skip=0 count=1", mtd_part);
 		system(cmd);
@@ -1119,7 +1122,7 @@ void init_wl(void)
 #endif
 #endif
 #if defined(RTCONFIG_WLMODULE_MT7915D_AP)
-	int mtd_part = 0, mtd_size = 0;
+	//int mtd_part = 0, mtd_size = 0;
 	if (mtd_getinfo("Factory", &mtd_part, &mtd_size)){
 		snprintf(cmd, sizeof(cmd), "dd if=/dev/mtdblock%d of=/lib/firmware/e2p bs=131072 skip=0 count=1", mtd_part);
 		system(cmd);
@@ -1142,7 +1145,7 @@ void init_wl(void)
 	system(cmd);
 #endif
 #if defined(RTCONFIG_MT798X)
-	int mtd_part = 0, mtd_size = 0;
+	//int mtd_part = 0, mtd_size = 0;
 	if (mtd_getinfo("Factory", &mtd_part, &mtd_size)){
 		snprintf(cmd, sizeof(cmd), "dd if=/dev/mtdblock%d of=/lib/firmware/e2p bs=655360 skip=0 count=1", mtd_part);
 		system(cmd);
@@ -2202,6 +2205,7 @@ void set_wan_tag(char *interface) {
 	case MODEL_RTA040WQ:
 	case MODEL_RTMSG1500:
 	case MODEL_RMAC2100:
+	case MODEL_RTMIR3G:
 	case MODEL_RTTX1801:
 	case MODEL_RTAX18T:
 	case MODEL_RTHAR:

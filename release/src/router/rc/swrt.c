@@ -169,6 +169,8 @@ void swrt_init_pre()
 		nvram_set("modelname", "RMAX6000");
 #elif defined(RMAC2100)
 		nvram_set("modelname", "RMAC2100");
+#elif defined(RTMIR3G)
+		nvram_set("modelname", "RTMIR3G");
 #elif defined(R6800)
 		nvram_set("modelname", "R6800");
 #elif defined(PGBM1)
@@ -270,6 +272,8 @@ void swrt_init_pre()
 		nvram_set("modelname", "RTMSG1500");
 #elif defined(RMAC2100)
 		nvram_set("modelname", "RMAC2100");
+#elif defined(RTMIR3G)
+		nvram_set("modelname", "RTMIR3G");
 #elif defined(RTTX1801)
 		nvram_set("modelname", "RTTX1801");
 #elif defined(RTAX18T)

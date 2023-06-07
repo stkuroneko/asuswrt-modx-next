@@ -8,7 +8,7 @@
 	model = "RT-A040WQ";
 
 	chosen {
-		bootargs = "console=ttyS0,115200  ROOT=/dev/mtdblock6";
+		bootargs = "console=ttyS0,115200  ROOT=mtd:rootfs";
 	};
 
 	gpio-keys-polled {

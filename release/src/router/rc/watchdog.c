@@ -2676,7 +2676,7 @@ static void handle_eject_usb_button(void)
 static inline void handle_eject_usb_button(void) { }
 #endif	/* RTCONFIG_EJUSB_BTN && RTCONFIG_BLINK_LED */
 
-#if defined(RMAC2100)
+#if defined(RMAC2100) || defined(RTMIR3G)
 void led_on_off(void)
 {
 	if (nvram_match("led_disable", "0")) {
@@ -9667,7 +9667,7 @@ void watchdog(int sig)
 	if (!nvram_match("asus_mfg", "0")) 
 		return;
 
-#if defined(RMAC2100)
+#if defined(RMAC2100) || defined(RTMIR3G)
 	/* handle led */
 	led_on_off();
 #elif defined(R6800)
