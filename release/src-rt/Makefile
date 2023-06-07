@@ -96,11 +96,11 @@ export BUSYBOX := busybox-1.24.1
 export BUSYBOX_DIR := $(SRCBASE)/router/busybox-1.24.1/busybox-1.24.1
 else # non-hnd
 export SRCBASE := $(shell pwd)
-#ifeq ($(or $(BCM7),$(BCM_7114),$(BCM9)),y)
-#export SRC_ROOT := $(SRCBASE)/../../src
-#else
+ifeq ($(or $(BCM7),$(BCM_7114),$(BCM9)),y)
+export SRC_ROOT := $(SRCBASE)/../../src
+else
 export SRC_ROOT := $(SRCBASE)/../src
-#endif
+endif
 export BUSYBOX := busybox
 export BUSYBOX_DIR := $(SRCBASE)/router/$(BUSYBOX)
 endif # HND_ROUTER
@@ -185,27 +185,17 @@ else
 RCSTRING:=
 RC_EXT_NO=0
 endif
-EXTENDNO1=$(shell git log --pretty=oneline asuswrt_$(KERNEL_VER).$(FS_VER).$(SERIALNO)$(RCSTRING) | wc -l)
+EXTENDNO1=$(shell git log --pretty=oneline asuswrt_$(KERNEL_VER).$(FS_VER).$(SERIALNO)..HEAD | wc -l)
 
 ifeq ($(BRANCH),)
 include ./router/extendno.conf
 else
 ifneq ($(EXTENDTYPE),)
-EXSTRING:=$(LBSTRING)-$(EXTENDTYPE)
+EXSTRING="-$(EXTENDTYPE)"
 else
-EXSTRING:=$(LBSTRING)
+EXSTRING=
 endif
-ifneq ($(FW_JUMP),)
-export EXTENDNO := $(SWRTVER)-g$(shell git log --pretty=format:'%h' -n 1|sed -e "s,\([0-9a-z]\{7\}\)[0-9a-z]*,\1,")$(EXSTRING)
-else
-#export EXTENDNO := $(shell expr $(EXTENDNO1) + $(RC_EXT_NO))-g$(shell git log --pretty=format:'%h' -n 1|sed -e "s,\([0-9a-z]\{7\}\)[0-9a-z]*,\1,")$(EXSTRING)
-export EXTENDNO := $(SWRTVER)-g$(shell git log --pretty=format:'%h' -n 1|sed -e "s,\([0-9a-z]\{7\}\)[0-9a-z]*,\1,")$(EXSTRING)
-endif
-endif
-export SWRTEXTENDNO:= $(shell expr $(EXTENDNO1) + $(RC_EXT_NO))
-
-ifeq ($(EXTENDNO),)
-export EXTENDNO := $(SWRTVER)-g$(shell git log --pretty=format:'%h' -n 1|sed -e "s,\([0-9a-z]\{7\}\)[0-9a-z]*,\1,")
+export EXTENDNO := $(shell cat ./router/extendno.conf | sed 's/EXTENDNO=//g')
 endif
 
 export SWPJNAME := $(shell git branch | grep "*" | grep "swpj-" | sed 's/.*swpj-//g')
@@ -223,7 +213,7 @@ export SWPJEXTENDNO := $(shell git describe --match swpj_$(SWPJNAME)_$(SWPJVERNO
 ifneq ($(SWPJEXTENDNO),)
 export EXTENDNO := $(SWPJEXTENDNO)
 else
-export EXTENDNO := $(SWRTVER)-g$(shell git log --pretty=format:'%h' -n 1|sed -e "s,\([0-9a-z]\{7\}\)[0-9a-z]*,\1,")
+export EXTENDNO := 0-g$(shell git log --pretty=format:'%h' -n 1|sed -e "s,\([0-9a-z]\{7\}\)[0-9a-z]*,\1,")
 endif
 endif
 
@@ -343,12 +333,7 @@ uppercase_B = $(shell echo $(BUILD_NAME) | tr a-z  A-Z)
 lowercase_B = $(shell echo $(BUILD_NAME) | tr A-Z a-z)
 BUILD_TIME := $(shell LC_ALL=C date -u)
 BUILD_USER ?= $(shell whoami)
-ifneq ($(findstring $(BUILD_USER), paldier iss),)
-BUILD_INFO := SWRTdev
-else
 BUILD_INFO := $(shell git log --pretty="%h" -n 1|sed -e "s,\([0-9a-z]\{7\}\)[0-9a-z]*,\1,")
-endif
-
 
 ifeq ($(CONFIG_LINUX26),y)
 mips_rev = $(if $(filter $(MIPS32),r2),MIPSR2,MIPSR1)
@@ -363,8 +348,7 @@ export IMGNAME := $(BUILD_NAME)_$(KERNEL_VER).$(FS_VER)_$(FORCE_SN)_$(SWPJVER)$(
 else ifneq ($(CUSTOM_MODEL),)
 export IMGNAME := $(CUSTOM_MODEL)_$(KERNEL_VER).$(FS_VER)_$(SERIALNO)_$(SWPJVER)$(EXTENDNO)$(ISPCTRL_POSTFIX)
 else
-#export IMGNAME := $(BUILD_NAME)_$(KERNEL_VER).$(FS_VER)_$(SERIALNO)_$(SWPJVER)$(EXTENDNO)$(ISPCTRL_POSTFIX)
-export IMGNAME := $(SWRTVER)_$(SWRTEXTENDNO)-g$(shell git log --pretty=format:'%h' -n 1|sed -e "s,\([0-9a-z]\{7\}\)[0-9a-z]*,\1,")$(EXSTRING)
+export IMGNAME := $(BUILD_NAME)_$(KERNEL_VER).$(FS_VER)_$(SERIALNO)_$(SWPJVER)$(EXTENDNO)$(ISPCTRL_POSTFIX)
 endif
 
 ifeq ($(OPDBG),y)
@@ -395,7 +379,6 @@ endif
 export PLATFORM_ROUTER
 
 export FW_JUMP_TARGET := FW_JUMP=y APP="none" AUTODICT=n NO_SAMBA=y NO_FTP=y WTFAST=n USBEXTRAS=n DISK_MONITOR=n MEDIASRV=n PRINTER=n WEBDAV=n SMARTSYNCBASE=n CLOUDCHECK=n TIMEMACHINE=n MDNS=n BWDPI=n EMAIL=n ALEXA=n IFTTT=n NATNL_AICLOUD=n NATNL_AIHOME=n CONNDIAG=n OPENVPN=n
-
 
 define bluecave_mkimage_extra_checks
 $(if $(CONFIG_UBOOT_CONFIG_LTQ_IMAGE_EXTRA_CHECKS), \

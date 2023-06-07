@@ -110,7 +110,7 @@ void get_ext_phy_id();
 #else
 #endif
 
-#if defined(RTN56UB1) || defined(RTN56UB2) || defined(RTAC1200GA1) || defined(RTAC1200GU) || defined(RTAX53U) || defined(RTXG1) //for MT7621
+#if defined(RTN56UB1) || defined(RTN56UB2) || defined(RTAC1200GA1) || defined(RTAC1200GU) || defined(RTAX53U) || defined(RTMIR3G) || defined(RTXG1) //for MT7621
 #define USB20_MOD	"xhci-hcd"
 #elif defined(RTCONFIG_QCN550X) && LINUX_KERNEL_VERSION >= KERNEL_VERSION(4,4,0)
 #define USB20_MOD	"ehci-ath79"

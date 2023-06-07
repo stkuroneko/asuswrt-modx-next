@@ -23,6 +23,16 @@
 			linux,code = <KEY_RESTART>;
 		};
 	};
+
+	reg_usb_vbus: regulator {
+		compatible = "regulator-fixed";
+		regulator-name = "usb_vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio0 12 1>;
+		enable-active-high;
+	};
+
 };
 
 &bch {
