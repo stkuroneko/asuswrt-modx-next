@@ -114,7 +114,7 @@ android-lib: main.cpp $(OBJS)
 ifeq ($(wildcard ./*.cpp),)
 #For prebuild on router platform. Don't remove it.
 linux-lib:
-	-cp -f $(TOP)/asusnatnl/natnl/prebuild/$(BUILD_NAME)/libasusnatnl.so libasusnatnl.so
+	-cp -f $(TOP)/asusnatnl/natnl/prebuild/$(PREBUILT_NAME)/libasusnatnl.so libasusnatnl.so
 else
 linux-lib: main.cpp $(OBJS)
 	$(CXX) -shared -o libasusnatnl.so $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LDLIBS)

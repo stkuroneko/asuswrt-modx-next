@@ -54,10 +54,10 @@ endif
 all: libwebapi.so
 
 # handle prebuilt object here
-ifneq ($(wildcard, ./prebuild/$(BUILD_NAME)),)
+ifneq ($(wildcard, ./prebuild/$(PREBUILT_NAME)),)
 priv_webapi.o:
-	@-cp -f ./prebuild/$(BUILD_NAME)/priv_webapi.o ./prebuild
-	@-cp -f ./prebuild/$(BUILD_NAME)/priv_webapi.o .
+	@-cp -f ./prebuild/$(PREBUILT_NAME)/priv_webapi.o ./prebuild
+	@-cp -f ./prebuild/$(PREBUILT_NAME)/priv_webapi.o .
 endif
 
 .c.o:

@@ -78,8 +78,8 @@ install: all
 infosvr: ./infosvr.o ./common.o ./packet.o ./interface.o ./storage.o
 	$(CC) -o $@ $^ $(LDFLAGS) $(CFLAGS)
 
-ifneq ($(wildcard ./prebuild/$(BUILD_NAME)/interface.o),)
+ifneq ($(wildcard ./prebuild/$(PREBUILT_NAME)/interface.o),)
 interface.o:
-	@-cp -f ./prebuild/$(BUILD_NAME)/interface.o .
+	@-cp -f ./prebuild/$(PREBUILT_NAME)/interface.o .
 endif
 

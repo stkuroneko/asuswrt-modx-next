@@ -1,5 +1,5 @@
 all:
-	@cp -f prebuild/$(BUILD_NAME)/ftpclient ftpclient
+	@cp -f prebuild/$(PREBUILT_NAME)/ftpclient ftpclient
 
 install:
 

@@ -78,7 +78,7 @@ void init_others(void)
 	eval("mii_mgr", "-s", "-p", "0", "-r", "14", "-v", "0x25");
 	eval("mii_mgr", "-s", "-p", "0", "-r", "13", "-v", "0x401f");
 	eval("mii_mgr", "-s", "-p", "0", "-r", "14", "-v", "0x3f");
-#elif defined(RTAC85U) || defined(RTAC85P) || defined(R6800) || defined(RMAC2100) || defined(RTMIR3G)
+#elif defined(RTAC85U) || defined(RTAC85P) || defined(RTMIR3P) || defined(R6800) || defined(RMAC2100) || defined(RTMIR3G)
 //fix me
 #endif
 #if defined(TUFAX4200)

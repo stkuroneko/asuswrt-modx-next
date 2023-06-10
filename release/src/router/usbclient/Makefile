@@ -1,5 +1,5 @@
 all:
-	@cp -f prebuild/$(BUILD_NAME)/usbclient usbclient
+	@cp -f prebuild/$(PREBUILT_NAME)/usbclient usbclient
 
 install:
 

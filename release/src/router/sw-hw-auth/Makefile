@@ -43,7 +43,7 @@ all : clean hw_auth.o sw_auth.o
 
 ifeq ($(wildcard ./hw_auth.c),)
 $(OBJS):
-	-cp prebuild/$(BUILD_NAME)/$@ ./
+	-cp prebuild/$(PREBUILT_NAME)/$@ ./
 endif
 
 

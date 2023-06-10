@@ -17,9 +17,9 @@ endif
 
 OBJS = asuslog.o
 
-ifneq ($(wildcard ./prebuild/$(BUILD_NAME)),)
+ifneq ($(wildcard ./prebuild/$(PREBUILT_NAME)),)
 all:
-	@-cp -f ./prebuild/$(BUILD_NAME)/asuslog .
+	@-cp -f ./prebuild/$(PREBUILT_NAME)/asuslog .
 else
 all: asuslog
 endif

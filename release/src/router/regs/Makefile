@@ -1,7 +1,7 @@
 EXEC = regs
 
 all:
-	- cp prebuild/$(BUILD_NAME)/regs regs
+	- cp prebuild/$(PREBUILT_NAME)/regs regs
 
 install: all
 	install -D $(EXEC) $(INSTALLDIR)/bin/$(EXEC)

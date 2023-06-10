@@ -3026,7 +3026,7 @@ ifeq ($(HND_ROUTER_AX),y)
 endif
 endif
 	@-rm -f httpd/prebuild/*.o || true
-	@-cp -f httpd/prebuild/$(BUILD_NAME)/* httpd/prebuild/
+	@-cp -f httpd/prebuild/$(PREBUILT_NAME)/* httpd/prebuild/
 	$(MAKE) -C httpd
 
 httpd-install:
@@ -3456,7 +3456,7 @@ wb-install:
 rc: shared libev-4.33 $(if $(BCM_502L07P2),ethctl_lib) nvram$(BCMEX)$(EX7) libdisk $(if $(RTCONFIG_LIB_CODB),libcodb) $(if $(RTCONFIG_FBWIFI),fb_wifi) $(if $(RTCONFIG_QTN),libqcsapi_client) $(if $(CONFIG_LIBBCM),libbcm) $(if $(RTCONFIG_BWDPI),bwdpi_source) $(if $(RTCONFIG_USB_SMS_MODEM),smspdu) $(if $(RTCONFIG_HND_ROUTER),bcm_flashutil bcm_util bcm_boardctl) $(if $(RTCONFIG_OPENVPN),libvpn) $(if $(RTCONFIG_LANTIQ),libfapi-0.1) $(if $(RTCONFIG_CFGSYNC), $(CFGSYNC_PKG) $(if $(RTCONFIG_AMAS), amas-utils) $(if $(RTCONFIG_LANTIQ),hostapd-2.6)) json-c $(if $(or $(RTCONFIG_FRS_LIVE_UPDATE),$(RTCONFIG_FRS_FEEDBACK),$(RTCONFIG_URLFW),$(RTCONFIG_SOFTWIRE46)), curl) $(if $(and $(RTCONFIG_HND_ROUTER_AX_675X),$(RTCONFIG_BRCM_HOSTAPD)),sys_util gen_util) $(if $(and $(RTCONFIG_HND_ROUTER_AX_6756),$(RTCONFIG_BRCM_HOSTAPD)),sys_util gen_util) $(if $(and $(RTCONFIG_HND_ROUTER_AX_6710),$(RTCONFIG_BRCM_HOSTAPD)),sys_util gen_util) $(if $(and $(RTCONFIG_BCM_502L07P2),$(RTCONFIG_BRCM_HOSTAPD)),sys_util gen_util) $(if $(RTCONFIG_BRCM_HOSTAPD),wpa_supplicant-2.7)
 	@$(SEP)
 	@-rm -f rc/prebuild/*.o || true
-	@-cp -f rc/prebuild/$(BUILD_NAME)/* rc/prebuild/
+	@-cp -f rc/prebuild/$(PREBUILT_NAME)/* rc/prebuild/
 	@$(MAKE) -C rc $(PARALLEL_BUILD)
 
 rc-install:
@@ -4181,7 +4181,7 @@ aupnpc-clean:
 shared: $(if $(RTCONFIG_HTTPS),openssl) $(if $(RTCONFIG_SW_HW_AUTH),sw-hw-auth) $(if $(BCM_502L07P2),ethctl_lib)
 # Dig into our collection of prebuilt objects based on model.
 	@-rm -f shared/prebuild/*.o || true
-	@-cp -f shared/prebuild/$(BUILD_NAME)/* shared/prebuild/
+	@-cp -f shared/prebuild/$(PREBUILT_NAME)/* shared/prebuild/
 ifeq ($(RTCONFIG_RALINK)$(RTCONFIG_QCA)$(RTCONFIG_LANTIQ),y)
 	make -C wireless_tools$(WTOOL_SUFFIX) wireless.h
 endif
@@ -6726,8 +6726,8 @@ lighttpd-1.4.39-install:
 		$(STRIP) -s $(INSTALLDIR)/lighttpd-1.4.39/usr/sbin/lighttpd-arpping ; \
 		install -d $(INSTALLDIR)/lighttpd-1.4.39/usr/lib/ ; \
 		install -D lighttpd-1.4.39/src/.libs/*.so $(INSTALLDIR)/lighttpd-1.4.39/usr/lib/ ; \
-		if [ -d lighttpd-1.4.39/prebuild/$(BUILD_NAME) ] ; then \
-			install -D lighttpd-1.4.39/prebuild/$(BUILD_NAME)/*.so $(INSTALLDIR)/lighttpd-1.4.39/usr/lib/ ; \
+		if [ -d lighttpd-1.4.39/prebuild/$(PREBUILT_NAME) ] ; then \
+			install -D lighttpd-1.4.39/prebuild/$(PREBUILT_NAME)/*.so $(INSTALLDIR)/lighttpd-1.4.39/usr/lib/ ; \
 		fi ; \
 		install -D samba-3.5.8/source3/bin/libsmbclient.so.0 $(INSTALLDIR)/lighttpd-1.4.39/usr/lib/libsmbclient.so.0 ; \
 		install -D libexif/libexif/.libs/libexif.so.12 $(INSTALLDIR)/lighttpd-1.4.39/usr/lib/libexif.so.12 ; \

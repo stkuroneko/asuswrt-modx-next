@@ -76,9 +76,9 @@ endif
 #CC := $(CROSS_COMPILE)gcc
 #LD := $(CROSS_COMPILE)ld
 
-ifneq ($(wildcard ./prebuild/$(BUILD_NAME)),)
+ifneq ($(wildcard ./prebuild/$(PREBUILT_NAME)),)
 all:
-	-cp prebuild/$(BUILD_NAME)/$(EXEC) $(EXEC)
+	-cp prebuild/$(PREBUILT_NAME)/$(EXEC) $(EXEC)
 else
 all: $(EXEC) $(EXEC_CLI)
 endif

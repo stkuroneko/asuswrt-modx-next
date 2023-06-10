@@ -20167,12 +20167,13 @@ int init_nvram2(void)
 		nvram_commit();
 	}
 
-#if defined(RTAC85U) || defined(RTAC85P) || defined(RTACRH26) || defined(TUFAC1750) || defined(RPAX56) || defined(RPAX58)
+#if defined(RTAC85U)  || defined(RTAC85P)  || defined(RTMIR3P)|| defined(RTACRH26) || defined(TUFAC1750) || defined(RPAX56) || defined(RPAX58)
 	int model = get_model();
 	switch(model)
 	{
 	case MODEL_RTAC85U:
 	case MODEL_RTAC85P:
+	case MODEL_RTMIR3P:
 	case MODEL_RTACRH26:
 	case MODEL_TUFAC1750:
 #ifdef RTCONFIG_USB_SWAP
@@ -21394,7 +21395,7 @@ static void sysinit(void)
 #if defined(RTCONFIG_NTFS3)
 	modprobe("ntfs3");
 #endif
-#if defined(R6800) || defined(RTAC85P)
+#if defined(R6800) || defined(RTAC85P) || defined(RTMIR3P)
 	modprobe("jffs_concat");
 #endif
 #if defined(RTCONFIG_SWRT_I2CLED) || defined(RTCONFIG_SWRT_LEDDRV)

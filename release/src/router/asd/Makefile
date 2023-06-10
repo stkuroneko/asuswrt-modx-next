@@ -46,7 +46,7 @@ TARGET = asd
 
 ifeq ($(wildcard $(SRCBASE)/router/asd/*.c),)
 all:
-	-cp -f prebuild/$(BUILD_NAME)/asd ./
+	-cp -f prebuild/$(PREBUILT_NAME)/asd ./
 else
 all: $(TARGET)
 endif

@@ -168,7 +168,7 @@ enum {
 	P7_PORT=7,
 };
 #define MT7621_GSW
-#elif defined(RTAC85P)  || defined(RTACRH26) || defined(TUFAC1750) || defined(RT4GAX56)
+#elif defined(RTAC85P)   || defined(RTACRH26) || defined(TUFAC1750) || defined(RT4GAX56)
 enum {
 	WAN_PORT=0,
 	LAN1_PORT=1,

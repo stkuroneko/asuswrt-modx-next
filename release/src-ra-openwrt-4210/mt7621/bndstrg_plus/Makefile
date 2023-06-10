@@ -5,7 +5,7 @@ ifneq ($(wildcard $(SDK_DIR_PLATFORM)/bndstrg_plus/Makefile),)
 	$(MAKE) -C bndstrg_plus all
 else
 	mkdir -p bndstrg_plus
-	cp prebuilt/$(BUILD_NAME)/bndstrg2 bndstrg_plus/bndstrg2
+	cp prebuilt/$(PREBUILT_NAME)/bndstrg2 bndstrg_plus/bndstrg2
 endif
 
 install:

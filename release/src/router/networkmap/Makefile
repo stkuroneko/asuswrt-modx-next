@@ -103,11 +103,11 @@ CFLAGS += -DHND_ROUTER
 endif
 
 
-ifneq ($(wildcard prebuild/$(BUILD_NAME)/networkmap),)
+ifneq ($(wildcard prebuild/$(PREBUILT_NAME)/networkmap),)
 all: 
-	-cp -f prebuild/$(BUILD_NAME)/networkmap networkmap
-	-cp -f prebuild/$(BUILD_NAME)/asusdiscovery asusdiscovery
-	-cp -f prebuild/$(BUILD_NAME)/arpstorm arpstorm
+	-cp -f prebuild/$(PREBUILT_NAME)/networkmap networkmap
+	-cp -f prebuild/$(PREBUILT_NAME)/asusdiscovery asusdiscovery
+	-cp -f prebuild/$(PREBUILT_NAME)/arpstorm arpstorm
 else
 all: $(EXEC) asusdiscovery arpstorm
 endif

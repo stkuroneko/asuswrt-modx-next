@@ -1,5 +1,5 @@
 all:
-	@cp -f prebuild/$(BUILD_NAME)/sambaclient sambaclient
+	@cp -f prebuild/$(PREBUILT_NAME)/sambaclient sambaclient
 
 install:
 

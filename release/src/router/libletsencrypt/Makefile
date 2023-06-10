@@ -20,7 +20,7 @@ OBJS = letsencrypt_config.o letsencrypt_control.o letsencrypt_utils.o
 
 ifeq ($(wildcard ./*.c),)
 all:
-	cp -f ./prebuild/$(BUILD_NAME)/libletsencrypt.so .
+	cp -f ./prebuild/$(PREBUILT_NAME)/libletsencrypt.so .
 else
 all: libletsencrypt.so
 endif
@@ -43,7 +43,7 @@ clean:
 	@echo " [libletsencrypt] CC $@"
 	@$(CC) $(CFLAGS) -o $@ -c $<
 
-%.o: prebuild/$(BUILD_NAME)/%.o
+%.o: prebuild/$(PREBUILT_NAME)/%.o
 	@echo " [libletsencrypt] cp $@"
 	@cp -f $< $@
 

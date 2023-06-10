@@ -32,10 +32,10 @@ OBJS=$(patsubst %.c, %.o, $(SRC))
 OBJS_MAIN=$(filter-out $(DOG).o, $(OBJS))
 WSLIB_OBJS := $(WS_SOURCES:%.c=$(OUTPUT)/%.o)
 
-ifneq ($(wildcard prebuild/$(BUILD_NAME)/aaews),)
+ifneq ($(wildcard prebuild/$(PREBUILT_NAME)/aaews),)
 all:
-	-cp -f $(TOP)/aaews/prebuild/$(BUILD_NAME)/aaews aaews
-	-cp -f $(TOP)/aaews/prebuild/$(BUILD_NAME)/mastiff mastiff
+	-cp -f $(TOP)/aaews/prebuild/$(PREBUILT_NAME)/aaews aaews
+	-cp -f $(TOP)/aaews/prebuild/$(PREBUILT_NAME)/mastiff mastiff
 else
 all: $(WSLIB) $(TARGET)
 endif
@@ -113,9 +113,9 @@ ifeq ($(RTCONFIG_SW_HW_AUTH),y)
 CFLAGS += -I$(SW_HW_AUTH_DIR) -DSW_HW_AUTH
 endif
 
-ifneq ($(wildcard prebuild/$(BUILD_NAME)/mastiff),)
+ifneq ($(wildcard prebuild/$(PREBUILT_NAME)/mastiff),)
 $(DOG):
-	-cp -f $(TOP)/aaews/prebuild/$(BUILD_NAME)/mastiff mastiff
+	-cp -f $(TOP)/aaews/prebuild/$(PREBUILT_NAME)/mastiff mastiff
 else
 $(DOG): $(DOG).o nat_nvram.o  ws_caller.o nw_util.o natapi.o $(WSLIB_OBJS) info_report.o
 	$(CC) -fPIC $(CFLAGS) $(LDFLAGS) $(LIBS) $(ROUTER_LDFLAGS) $(ROUTER_LIBS) -o $@ $^ 
@@ -123,9 +123,9 @@ $(DOG): $(DOG).o nat_nvram.o  ws_caller.o nw_util.o natapi.o $(WSLIB_OBJS) info_
 endif
 aicam:$(TARGET)
 
-ifneq ($(wildcard prebuild/$(BUILD_NAME)/aaews),)
+ifneq ($(wildcard prebuild/$(PREBUILT_NAME)/aaews),)
 router:
-	-cp -f $(TOP)/aaews/prebuild/$(BUILD_NAME)/aaews aaews
+	-cp -f $(TOP)/aaews/prebuild/$(PREBUILT_NAME)/aaews aaews
 else
 router: $(WSLIB) $(TARGET) $(DOG)
 endif

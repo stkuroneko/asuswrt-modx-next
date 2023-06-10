@@ -22,9 +22,9 @@ endif
 
 OBJS = dblogcmd.o
 
-ifneq ($(wildcard ./prebuild/$(BUILD_NAME)),)
+ifneq ($(wildcard ./prebuild/$(PREBUILT_NAME)),)
 all:
-	@-cp -f ./prebuild/$(BUILD_NAME)/dblogcmd .
+	@-cp -f ./prebuild/$(PREBUILT_NAME)/dblogcmd .
 else
 all: dblogcmd
 endif

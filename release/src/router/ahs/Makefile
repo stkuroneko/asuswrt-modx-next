@@ -33,9 +33,9 @@ LDFLAGS += -L$(TOP)/libasc -lasc
 
 OBJS = utility.o ahs.o
 
-ifneq ($(wildcard ./prebuild/$(BUILD_NAME)),)
+ifneq ($(wildcard ./prebuild/$(PREBUILT_NAME)),)
 all:
-	@-cp -f ./prebuild/$(BUILD_NAME)/ahs .
+	@-cp -f ./prebuild/$(PREBUILT_NAME)/ahs .
 else
 all: ahs
 endif

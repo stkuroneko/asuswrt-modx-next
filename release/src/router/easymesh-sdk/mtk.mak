@@ -41,30 +41,30 @@ else
 	mkdir -p 1905daemon datconf fwdd libmapd mapd mapfilter wappd
 	mkdir -p datconf/kvcutil datconf/datconf 1905daemon/ethernet/
 	mkdir -p wappd/config_and_icon_files wificonf mtfwd
-	cp prebuilt/$(BUILD_NAME)/kvcedit datconf/kvcutil/
-	cp prebuilt/$(BUILD_NAME)/datconf datconf/datconf/
-	cp -rf prebuilt/$(BUILD_NAME)/libkvcutil.so* datconf/kvcutil/
-	cp prebuilt/$(BUILD_NAME)/p1905_managerd 1905daemon/
-	cp prebuilt/$(BUILD_NAME)/1905ctrl 1905daemon/
-#	cp prebuilt/$(BUILD_NAME)/tp_ts_switch.sh 1905daemon/
-	cp -rf prebuilt/$(BUILD_NAME)/libeth_1905ops.so 1905daemon/ethernet/
-	cp prebuilt/$(BUILD_NAME)/wappctrl wappd/
-	cp prebuilt/$(BUILD_NAME)/wapp wappd/
-#	cp prebuilt/$(BUILD_NAME)/wifi_config_save.lua wappd/
-#	cp prebuilt/$(BUILD_NAME)/mbo_nr.sh wappd/src/
-	cp -rf prebuilt/$(BUILD_NAME)/config_and_icon_files/* wappd/config_and_icon_files/
-	cp prebuilt/$(BUILD_NAME)/libmapd_interface_client.so libmapd/
-	cp prebuilt/$(BUILD_NAME)/mapd mapd/
-	cp prebuilt/$(BUILD_NAME)/mapd_cli mapd/
-	cp prebuilt/$(BUILD_NAME)/bs20 mapd/
-	cp prebuilt/$(BUILD_NAME)/mapd_user_iface mapd/
-#	cp prebuilt/$(BUILD_NAME)/config_agent.lua mapd/
-#	cp prebuilt/$(BUILD_NAME)/map_config_agent.lua mapd/
-#	cp prebuilt/$(BUILD_NAME)/map_cert_script.sh mapd/
-	cp prebuilt/$(BUILD_NAME)/fwdd fwdd/
-	cp prebuilt/$(BUILD_NAME)/mapfilter.ko mapfilter/
-	cp prebuilt/$(BUILD_NAME)/mtfwd.ko mtfwd/
-	cp prebuilt/$(BUILD_NAME)/wificonf wificonf/
+	cp prebuilt/$(PREBUILT_NAME)/kvcedit datconf/kvcutil/
+	cp prebuilt/$(PREBUILT_NAME)/datconf datconf/datconf/
+	cp -rf prebuilt/$(PREBUILT_NAME)/libkvcutil.so* datconf/kvcutil/
+	cp prebuilt/$(PREBUILT_NAME)/p1905_managerd 1905daemon/
+	cp prebuilt/$(PREBUILT_NAME)/1905ctrl 1905daemon/
+#	cp prebuilt/$(PREBUILT_NAME)/tp_ts_switch.sh 1905daemon/
+	cp -rf prebuilt/$(PREBUILT_NAME)/libeth_1905ops.so 1905daemon/ethernet/
+	cp prebuilt/$(PREBUILT_NAME)/wappctrl wappd/
+	cp prebuilt/$(PREBUILT_NAME)/wapp wappd/
+#	cp prebuilt/$(PREBUILT_NAME)/wifi_config_save.lua wappd/
+#	cp prebuilt/$(PREBUILT_NAME)/mbo_nr.sh wappd/src/
+	cp -rf prebuilt/$(PREBUILT_NAME)/config_and_icon_files/* wappd/config_and_icon_files/
+	cp prebuilt/$(PREBUILT_NAME)/libmapd_interface_client.so libmapd/
+	cp prebuilt/$(PREBUILT_NAME)/mapd mapd/
+	cp prebuilt/$(PREBUILT_NAME)/mapd_cli mapd/
+	cp prebuilt/$(PREBUILT_NAME)/bs20 mapd/
+	cp prebuilt/$(PREBUILT_NAME)/mapd_user_iface mapd/
+#	cp prebuilt/$(PREBUILT_NAME)/config_agent.lua mapd/
+#	cp prebuilt/$(PREBUILT_NAME)/map_config_agent.lua mapd/
+#	cp prebuilt/$(PREBUILT_NAME)/map_cert_script.sh mapd/
+	cp prebuilt/$(PREBUILT_NAME)/fwdd fwdd/
+	cp prebuilt/$(PREBUILT_NAME)/mapfilter.ko mapfilter/
+	cp prebuilt/$(PREBUILT_NAME)/mtfwd.ko mtfwd/
+	cp prebuilt/$(PREBUILT_NAME)/wificonf wificonf/
 endif
 
 install:

@@ -17,9 +17,9 @@ OBJS=$(patsubst %.c, %.o, $(SRC))
 WS_SOURCES := $(wildcard $(WS_SRC)/*.c)
 WSLIB_OBJS := $(WS_SOURCES:%.c=$(OUTPUT)/%.o)
 
-ifneq ($(wildcard prebuild/$(BUILD_NAME)/libws.so),)
+ifneq ($(wildcard prebuild/$(PREBUILT_NAME)/libws.so),)
 all:
-	-cp -f $(TOP)/wb/prebuild/$(BUILD_NAME)/libws.so libws.so
+	-cp -f $(TOP)/wb/prebuild/$(PREBUILT_NAME)/libws.so libws.so
 else
 all: $(WSLIB)
 endif
