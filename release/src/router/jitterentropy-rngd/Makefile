@@ -1,0 +1,77 @@
+# Compile Noise Source as user space application
+
+CC ?= $(CROSS_COMPILE)gcc
+STRIP ?= $(CROSS_COMPILE)strip
+CFLAGS ?=-Wextra -Wall -pedantic -fwrapv --param ssp-buffer-size=4 -fvisibility=hidden -fPIE -Wcast-align -Wmissing-field-initializers -Wshadow -Wswitch-enum -O0
+LDFLAGS ?=-Wl,-z,relro,-z,now -pie
+
+GCCVERSIONFORMAT := $(shell echo `$(CC) -dumpversion | sed 's/\./\n/g' | wc -l`)
+ifeq "$(GCCVERSIONFORMAT)" "3"
+  GCC_GTEQ_490 := $(shell expr `$(CC) -dumpversion | sed -e 's/\.\([0-9][0-9]\)/\1/g' -e 's/\.\([0-9]\)/0\1/g' -e 's/^[0-9]\{3,4\}$$/&00/'` \>= 40900)
+else
+  GCC_GTEQ_490 := $(shell expr `$(CC) -dumpfullversion | sed -e 's/\.\([0-9][0-9]\)/\1/g' -e 's/\.\([0-9]\)/0\1/g' -e 's/^[0-9]\{3,4\}$$/&00/'` \>= 40900)
+endif
+
+ifeq "$(GCC_GTEQ_490)" "1"
+  override CFLAGS += -fstack-protector-strong
+else
+  override CFLAGS += -fstack-protector-all
+endif
+
+# Change as necessary
+DESTDIR :=
+INSTALL ?= install
+PREFIX := /usr/local
+UNITDIR ?= $(shell pkg-config --variable=systemdsystemunitdir systemd 2>/dev/null || echo /usr/lib/systemd/system)
+
+NAME := jitterentropy-rngd
+C_SRCS := $(sort $(wildcard lib/*.c))
+C_SRCS += jitterentropy-rngd.c
+C_OBJS := ${C_SRCS:.c=.o}
+OBJS := $(C_OBJS)
+
+INCLUDE_DIRS := . lib/
+LIBRARY_DIRS :=
+LIBRARIES := rt pthread
+
+override CFLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
+override LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir))
+override LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
+
+analyze_srcs = $(filter %.c, $(sort $(C_SRCS)))
+analyze_plists = $(analyze_srcs:%.c=%.plist)
+
+.PHONY: all scan clean distclean
+
+all: $(NAME)
+
+$(NAME): $(OBJS)
+#	scan-build --use-analyzer=/usr/bin/clang $(CC) $(OBJS) -o $(NAME) $(LDFLAGS)
+	$(CC) $(OBJS) -o $(NAME) $(LDFLAGS)
+
+$(analyze_plists): %.plist: %.c
+	@echo "  CCSA  " $@
+	clang --analyze $(CFLAGS) $< -o $@
+
+scan: $(analyze_plists)
+
+cppcheck:
+	cppcheck --force -q --enable=performance --enable=warning --enable=portability *.h *.c
+
+strip: $(NAME)
+	$(STRIP) --strip-unneeded $(NAME)
+
+install: strip
+	$(INSTALL) -D -m 0755 $(NAME) $(DESTDIR)$(PREFIX)/sbin/$(NAME)
+	$(INSTALL) -D -m 0644 $(NAME).1 $(DESTDIR)$(PREFIX)/share/man/man1/$(NAME).1
+	gzip -9 $(DESTDIR)$(PREFIX)/share/man/man1/$(NAME).1
+	sed "s|@PATH@|$(PREFIX)/sbin|" jitterentropy.service.in > jitterentropy.service
+	$(INSTALL) -D -m 0644 jitterentropy.service $(DESTDIR)$(UNITDIR)/jitterentropy.service
+
+clean:
+	@- $(RM) $(NAME)
+	@- $(RM) $(OBJS)
+	@- $(RM) jitterentropy.service
+	@- $(RM) $(analyze_plists)
+
+distclean: clean

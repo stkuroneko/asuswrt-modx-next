@@ -1,0 +1,127 @@
+menu "ASUS Miscellaneous options"
+
+config  SINGLE_SKU_IN_DRIVER
+        bool "Single sku in driver, not file"
+        default n
+
+#config  MTD_JFFS2_LEN
+#        hex "MTD JFFS2 Partition Length (Unit:Bytes)"
+#        default 0x0
+
+config  MODEL_RTACRH18
+        bool "RT-ACRH18"
+        default n
+
+config  MODEL_RT4GAX56
+        bool "RT-4GAX56"
+        default n
+
+config  MODEL_XD4S
+        bool "XD4S"
+       default n
+
+config  MODEL_RTAX53U
+        bool "RT-AX53U"
+        default n
+
+config  MODEL_RTXG1
+        bool "RT-XG1"
+        default n
+
+config  MODEL_RTAX54
+        bool "RT-AX54"
+        default n
+
+config  MODEL_RT4GAC86U
+        bool "4G-AC86U"
+        default n
+
+config  MODEL_RTAC85U
+        bool "RT-AC85U"
+        default n
+
+config  MODEL_RTAC85P
+        bool "RT-AC85P"
+        default n
+
+config  MODEL_RTMIR3P
+        bool "RT-MIR3P"
+        default n
+
+config  MODEL_RTA040WQ
+        bool "RT-A040WQ"
+        default n
+
+config  MODEL_RTMSG1500
+        bool "RT-MSG1500"
+        default n
+
+config  MODEL_R6800
+        bool "R6800"
+        default n
+
+config  MODEL_RMAC2100
+        bool "RMAC2100"
+        default n
+
+config  MODEL_RTTX1801
+        bool "RT-TX1801"
+        default n
+
+config  MODEL_RTAX18T
+        bool "RT-AX18T"
+        default n
+
+config  MODEL_RTHAR
+        bool "RT-HAR"
+        default n
+
+config  MODEL_RTCR660X
+        bool "RT-CR660X"
+        default n
+
+config  MODEL_RTMIR3G
+        bool "RT-MIR3G"
+        default n
+
+config  MODEL_PGBM1
+        bool "PGBM1"
+        default n
+
+config  MODEL_JCGQ10PRO
+        bool "JCG-Q10PRO"
+        default n
+
+config  MODEL_RTCMCCA9
+        bool "RT-CMCCA9"
+        default n
+
+config  MODEL_RTQ20
+        bool "RT-Q20"
+        default n
+
+config  MODEL_H3CTX1801
+        bool "H3C-TX1801"
+        default n
+
+config  MODEL_XMCR660X
+        bool "XM-CR660X"
+        default n
+
+config  MODEL_JCGQ20
+        bool "JCG-Q20"
+        default n
+
+config  ASUS_EXT
+        bool "ASUS_EXT"
+        default n
+
+config  MTK_NAND_BLOCK2
+        bool "For MTK nand using 2 block 256k/0x40000"
+        default n
+
+config  FIBOCOM_FG621
+        bool "LTE module FIBOCOM FG621"
+        default n
+
+endmenu        
