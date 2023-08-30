@@ -10,16 +10,18 @@
 
 1. 首先装好 Ubuntu 64bit，推荐  Ubuntu  18 LTS x64 /  Mint 19.1
 
-2. 命令行输入 `sudo apt-get update` ，然后输入
+2.命令行输入 `sudo dpkg --add-architecture i386` ，然后输入
+
+3. 命令行输入 `sudo apt-get update` ，然后输入
 `
 sudo apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf wget libncurses5:i386 libelf1:i386 lib32z1 lib32stdc++6 gtk-doc-tools intltool binutils-dev cmake lzma liblzma-dev lzma-dev uuid-dev liblzo2-dev xsltproc dos2unix libstdc++5 docbook-xsl-* sharutils autogen shtool gengetopt libltdl-dev libtool-bin
 `
 
-3. 使用 `git clone https://github.com/stkuroneko/asuswrt-modx-next.git` 命令下载好源代码
+4. 使用 `git clone https://github.com/stkuroneko/asuswrt-modx-next.git` 命令下载好源代码
 
-4. 使用 `git clone https://github.com/SWRT-dev/mtk-toolchains` 命令下载toolchains
+5. 使用 `git clone https://github.com/SWRT-dev/mtk-toolchains` 命令下载toolchains
 
-5. 分别执行 `cd mtk-toolchains`
+6. 分别执行 `cd mtk-toolchains`
 
 	`sudo ln -sf $(pwd)/toolchain-aarch64_cortex-a53+neon-vfpv4_gcc-5.4.0_glibc-2.24 /opt/`
 
@@ -35,12 +37,12 @@ sudo apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git
 
 	`tar xvJf libc.a.tar.xz`
 
-6. 然后 `cd ../asuswrt-modx-next/release/src-ra-openwrt-4210` 进入目录
+7. 然后 `cd ../asuswrt-modx-next/release/src-ra-openwrt-4210` 进入目录
 
-7. 输入 `make rt-cmcca9` 即可开始编译你要的固件了。
+8. 输入 `make rt-cmcca9` 即可开始编译你要的固件了。
 
 
-8. 编译完成后输出固件路径：asuswrt-modx-next/release/src-ra-openwrt-4210/image
+9. 编译完成后输出固件路径：asuswrt-modx-next/release/src-ra-openwrt-4210/image
 
 
 
