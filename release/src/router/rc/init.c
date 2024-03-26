@@ -1729,7 +1729,7 @@ misc_defaults(int restore_defaults)
 		case MODEL_RTACRH26:
 		case MODEL_TUFAC1750:
 		case MODEL_R6800:
-		case MODEL_RMAC2100:
+		case MODEL_RTAC2100:
 		case MODEL_RTMIR3G:
 		case MODEL_PGBM1:
 		case MODEL_JCGQ10PRO:
@@ -7133,8 +7133,8 @@ int init_nvram(void)
 		break;
 #endif /*  RTMSG1500  */
 
-#if defined(RMAC2100)
-	case MODEL_RMAC2100:
+#if defined(RTAC2100)
+	case MODEL_RTAC2100:
 		nvram_set("boardflags", "0x100"); // although it is not used in ralink driver, set for vlan
 		nvram_set("vlan1hwname", "et0");  // vlan. used to get "%smacaddr" for compare and find parent interface.
 		nvram_set("vlan2hwname", "et0");  // vlan. used to get "%smacaddr" for compare and find parent interface.

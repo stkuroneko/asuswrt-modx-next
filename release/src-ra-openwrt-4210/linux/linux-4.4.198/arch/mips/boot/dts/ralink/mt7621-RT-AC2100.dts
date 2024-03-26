@@ -5,7 +5,7 @@
 
 / {
 	compatible = "mediatek,mt7621-redmiac2100", "mediatek,mt7621-soc";
-	model = "RM-AC2100";
+	model = "RT-AC2100";
 
 	chosen {
 		bootargs = "console=ttyS0,115200";
