@@ -61,7 +61,11 @@ config  MODEL_R6800
         default n
 
 config  MODEL_RTAC2100
-        bool "RTAC2100"
+        bool "RT-AC2100"
+        default n
+
+config  MODEL_RTRM2100
+        bool "RT-RM2100"
         default n
 
 config  MODEL_RTTX1801

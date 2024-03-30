@@ -180,7 +180,7 @@ enum {
 	P7_PORT=7,
 };
 #define MT7621_GSW
-#elif defined(RTAC2100)
+#elif defined(RTAC2100) || defined(RTRM2100)
 enum {
 	WAN_PORT=0,
 	LAN1_PORT=2,

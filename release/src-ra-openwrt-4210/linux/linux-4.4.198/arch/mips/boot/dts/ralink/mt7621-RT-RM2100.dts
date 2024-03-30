@@ -4,8 +4,8 @@
 #include <dt-bindings/input/input.h>
 
 / {
-	compatible = "mediatek,mt7621-redmiac2100", "mediatek,mt7621-soc";
-	model = "RT-AC2100";
+	compatible = "mediatek,mt7621-redmirt2100", "mediatek,mt7621-soc";
+	model = "RT-RM2100";
 
 	chosen {
 		bootargs = "console=ttyS0,115200  ROOT=mtd:rootfs";
