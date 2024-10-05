@@ -117,54 +117,6 @@
         status = "okay";
 };
 
-&nand {
-	status = "okay";
-
-	nandflash: flash@0 {
-		reg = <0>;
-		nand-ecc-mode = "hw";
-		partitions {
-			compatible = "fixed-partitions";
-			#address-cells = <1>;
-			#size-cells = <1>;
-
-			partition@0 {
-				label = "Bootloader";
-				reg = <0x00000 0x80000>;
-			};
-
-			partition@80000 {
-				label = "nvram";
-				reg = <0x80000 0x80000>;
-			};
-
-			factory: partition@100000 {
-				label = "Factory";
-				reg = <0x100000 0x80000>;
-			};
-
-			factory2: partition@2480000  {
-				label = "Factory2";
-				reg = <0x2480000 0x80000>;
-			};
-			partition@180000 {
-				label = "Kernel";
-				reg = <0x180000 0x2300000>;
-			};
-
-			partition@2500000 {
-				label = "Kernel2";
-				reg = <0x2500000 0x2300000>;
-			};
-
-			partition@4800000 {
-				label = "jffs2";
-				reg = <0x4800000 0x3780000>;
-			};
-		};
-	};
-};
-
 &pinctrl {
 	state_default: pinctrl0 {
 		gpio {
@@ -204,5 +156,55 @@
 
 &pcie {
 	status = "okay";
+};
+
+
+&nand {
+	status = "okay";
+
+	nandflash: flash@0 {
+		reg = <0>;
+		nand-ecc-mode = "hw";
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "Bootloader";
+				reg = <0x00000 0xC0000>;
+			};
+
+			partition@C0000 {
+				label = "Bdata";
+				reg = <0xC0000 0x40000>;
+			};
+
+			partition@140000 {
+				label = "nvram";
+				reg = <0x140000 0x40000>;
+			};
+
+			factory: partition@100000 {
+				label = "Factory";
+				reg = <0x100000 0x40000>;
+			};
+
+			factory2: partition@180000  {
+				label = "Factory2";
+				reg = <0x180000 0x40000>;
+			};
+
+			partition@200000 {
+				label = "Kernel";
+				reg = <0x200000 0x2C00000>;
+			};
+
+			partition@2E00000 {
+				label = "jffs2";
+				reg = <0x2E00000 0x5100000>;
+			};
+		};
+	};
 };
 
