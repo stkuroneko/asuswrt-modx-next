@@ -180,7 +180,7 @@ enum {
 	P7_PORT=7,
 };
 #define MT7621_GSW
-#elif defined(RTAC2100) || defined(RTRM2100)
+#elif defined(RTAC2100) || defined(RTRM2100) || defined(RTAX53U) 
 enum {
 	WAN_PORT=0,
 	LAN1_PORT=2,
@@ -252,7 +252,7 @@ enum {
 	P7_PORT=7,
 };
 #define MT7621_GSW
-#elif defined(RTAX54) || defined(RTAX53U) 
+#elif defined(RTAX54)
 enum {
 	WAN_PORT=4,
 	LAN1_PORT=3,

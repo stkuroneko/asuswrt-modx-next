@@ -1860,7 +1860,7 @@ function show_footer(){
 			href_lang = "/";	//global only
 			
 	footer_code = '<div align="center" class="bottom-image"></div>\n';
-	footer_code +='<div align="center" class="copyright"><#footer_copyright_desc#> and SWRT Team</div><br>';
+	footer_code +='<div align="center" class="copyright"><#footer_copyright_desc#> and NWRT Team</div><br>';
 
 	// FAQ searching bar{
 	footer_code += '<div style="margin-top:-75px;margin-left:205px;"><table width="765px" border="0" align="center" cellpadding="0" cellspacing="0"><tr>';

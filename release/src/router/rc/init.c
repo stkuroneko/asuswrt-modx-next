@@ -4411,71 +4411,67 @@ int init_nvram(void)
 
 #if defined(RTAX53U)
 	case MODEL_RTAX53U:
-		nvram_set("boardflags", "0x100"); // although it is not used in ralink driver, set for vlan
-		nvram_set("vlan1hwname", "et0");  // vlan. used to get "%smacaddr" for compare and find parent interface.
-		nvram_set("vlan2hwname", "et0");  // vlan. used to get "%smacaddr" for compare and find parent interface.
-		nvram_set("lan_ifname", "br0");
-		wan_ifaces[WAN_IFACE_ID] = "eth1";
-		wl_ifaces[WL_2G_BAND] = "ra0";
-		wl_ifaces[WL_5G_BAND] = "rai0";
+	nvram_set("boardflags", "0x100"); // although it is not used in ralink driver, set for vlan
+	nvram_set("vlan1hwname", "et0");  // vlan. used to get "%smacaddr" for compare and find parent interface.
+	nvram_set("vlan2hwname", "et0");  // vlan. used to get "%smacaddr" for compare and find parent interface.
+	nvram_set("lan_ifname", "br0");
+	wan_ifaces[WAN_IFACE_ID] = "eth1";
+	wl_ifaces[WL_2G_BAND] = "ra0";
+	wl_ifaces[WL_5G_BAND] = "rai0";
 #if defined(RTCONFIG_AMAS) || defined(RTCONFIG_EASYMESH)
-		if(nvram_match("re_mode", "1")) //RE mode.
-			set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "eth1 vlan1", NULL, "vlan3", 0);
-		else
+	if(nvram_match("re_mode", "1")) //RE mode.
+		set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "eth1 vlan1", NULL, "vlan3", 0);
+	else
 #endif
-			set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "vlan1", NULL, "vlan3", 0);
+		set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "vlan1", NULL, "vlan3", 0);
 
-		nvram_set_int("btn_rst_gpio",  14|GPIO_ACTIVE_LOW);
-		nvram_set_int("btn_wps_gpio",  13|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_pwr_gpio",  16|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_wps_gpio",  16|GPIO_ACTIVE_LOW);
-		//nvram_set_int("led_usb_gpio",  14|GPIO_ACTIVE_LOW);
-		//nvram_set_int("led_5g_gpio", 28);
-		//nvram_set_int("led_2g_gpio", 18);
+	nvram_set_int("btn_rst_gpio",  18|GPIO_ACTIVE_LOW);
+	nvram_set_int("led_lan_gpio", 14|GPIO_ACTIVE_LOW);
+	nvram_set_int("led_wan_gpio", 12|GPIO_ACTIVE_LOW);
+	nvram_set_int("led_pwr_gpio",  8|GPIO_ACTIVE_LOW);//6: red, 10: yellow, 8: blue 
+	nvram_set_int("led_all_gpio", 6|GPIO_ACTIVE_LOW);
 
-		nvram_set("ehci_ports", "1-2");
-		nvram_set("ohci_ports", "1-2");
-		nvram_set("ct_max", "300000"); // force
+	eval("rtkswitch", "11");
 
-		/* enable bled */
-		//config_netdev_bled("led_2g_gpio", "ra0");
-		//config_netdev_bled("led_5g_gpio", "rai0");
+	/* enable bled */
+	//config_netdev_bled("led_2g_gpio", "ra0");
+	//config_netdev_bled("led_5g_gpio", "rai0");
 
-		if (nvram_get("wl_mssid") && nvram_match("wl_mssid", "1"))
-			add_rc_support("mssid");
-		add_rc_support("2.4G 5G update usbX1");
-		add_rc_support("rawifi");
-		add_rc_support("switchctrl");
-		add_rc_support("manual_stb");
-		add_rc_support("11AC");
-		add_rc_support("11AX mbo ofdma");
-		add_rc_support("wpa3");
-		//either txpower or singlesku supports rc.
-		add_rc_support("pwrctrl");
-		// the following values is model dep. so move it from default.c to here
-		nvram_set("wl0_HT_TxStream", "2");
-		nvram_set("wl0_HT_RxStream", "2");
-		nvram_set("wl1_HT_TxStream", "2");
-		nvram_set("wl1_HT_RxStream", "2");
+	nvram_set("ehci_ports", "1-1");
+	nvram_set("ohci_ports", "2-1");
+	nvram_set("ct_max", "300000"); // force
+
+	if (nvram_get("wl_mssid") && nvram_match("wl_mssid", "1"))
+		add_rc_support("mssid");
+	add_rc_support("2.4G 5G update");
+	add_rc_support("rawifi");
+	add_rc_support("switchctrl");
+	add_rc_support("manual_stb");
+	add_rc_support("11AC");
+	add_rc_support("app");
+	add_rc_support("gameMode");
+	add_rc_support("pwrctrl");
+	// the following values is model dep. so move it from default.c to here
+	nvram_set("wl0_HT_TxStream", "2");
+	nvram_set("wl0_HT_RxStream", "2");
+	nvram_set("wl1_HT_TxStream", "4");
+	nvram_set("wl1_HT_RxStream", "4");
 #if defined(RTCONFIG_AMAS) || defined(RTCONFIG_EASYMESH)
-		if (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1")) {
-			_dprintf("[%s][%d] sw mode = %d, repeater=%d, ap= %d ",
-						__func__, __LINE__,
-						sw_mode(),SW_MODE_REPEATER,SW_MODE_AP);
-			add_lan_phy((char *)APCLI_2G);
-			add_lan_phy((char *)APCLI_5G);
-			nvram_set("eth_ifnames", "eth1"); /* WAN(eth1)*/
-			nvram_set("amas_ethif_type", "4"); /* 1G */
-			nvram_set("eth_priority", "0 1 1"); /* eth1: 1G(idx:0,prio:1,used:1) */
-			nvram_set("sta_phy_ifnames", "apcli0 apclii0"); /* 2G name, 5G name */
-			nvram_set("sta_ifnames", "apcli0 apclii0"); /* 2G name, 5G name */
-			nvram_set("sta_priority", "2 0 3 1" " 5 1 2 1"); /* 2G priority:3, 5G priority:2 */
-		}
+	if (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1")) {
+		_dprintf("[%s][%d] sw mode = %d, repeater=%d, ap= %d ",
+					__func__, __LINE__,
+					sw_mode(),SW_MODE_REPEATER,SW_MODE_AP);
+		add_lan_phy((char *)APCLI_2G);
+		add_lan_phy((char *)APCLI_5G);
+		nvram_set("eth_ifnames", "eth1");
+		nvram_set("sta_phy_ifnames", "apcli0 apclii0");
+		nvram_set("sta_ifnames", "apcli0 apclii0");
+	}
 #endif
 #if defined(RTCONFIG_AMAS) || defined(RTCONFIG_CFGSYNC) || defined(RTCONFIG_EASYMESH)
-		nvram_set("wired_ifnames", "vlan1");
+	nvram_set("wired_ifnames", "vlan1");
 #endif
-		break;
+	break;
 #endif	/* RTAX53U */
 
 #if defined(RTXG1)
