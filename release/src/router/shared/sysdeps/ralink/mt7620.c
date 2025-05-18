@@ -180,7 +180,7 @@ enum {
 	P7_PORT=7,
 };
 #define MT7621_GSW
-#elif defined(RTAC2100) || defined(RTRM2100) || defined(RTAX53U) 
+#elif defined(RTAC2100) || defined(RTRM2100)
 enum {
 	WAN_PORT=0,
 	LAN1_PORT=2,
@@ -204,7 +204,7 @@ enum {
 	P7_PORT=7,
 };
 #define MT7621_GSW
-#elif defined(R6800) || defined(RTMIR3P) || defined(RTA040WQ) || defined(RTMSG1500)
+#elif defined(R6800) || defined(RTMIR3P) || defined(RTA040WQ) || defined(RTMSG1500) || defined(RTAX53U) 
 enum {
 	WAN_PORT=4,
 	LAN1_PORT=3,
@@ -2512,7 +2512,7 @@ void ATE_mt7621_esw_port_status(void)
 #if defined(RTCONFIG_CONCURRENTREPEATER) && defined(RPAC87)
 		snprintf(buf, sizeof(buf), "L1=%C",
 		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X');
-#elif defined(RTAX53U) || defined(RTCONFIG_3LANPORT_DEVICE)
+#elif defined(RTCONFIG_3LANPORT_DEVICE)
 	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;L3=%C;",
 		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
 		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
