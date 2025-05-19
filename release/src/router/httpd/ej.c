@@ -74,8 +74,8 @@ struct REPLACE_PRODUCTID_S replace_productid_t[] =
 	{"TUF-AX4200", 	"TUF GAMING AX4200", "global"},
 	{"TX-AX6000", "天选游戏路由", "CN"},
 	{"TUF-AX6000",  "TUF GAMING AX6000", "global"},
-	{"RT-AX53U", "网件 R6800", "CN"},
-	{"RT-AX53U",  "NETGEAR R6800", "global"},
+	{"RT-AX53U", "小米路由器Pro", "CN"},
+	{"RT-AX53U",  "XIAOMI R3P", "global"},
 	{NULL, NULL, NULL}
 };
 
