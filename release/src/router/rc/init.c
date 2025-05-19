@@ -4448,6 +4448,7 @@ int init_nvram(void)
 	add_rc_support("switchctrl");
 	add_rc_support("manual_stb");
 	add_rc_support("11AC");
+        add_rc_support("loclist");
 	add_rc_support("app");
 	add_rc_support("gameMode");
 	add_rc_support("pwrctrl");
