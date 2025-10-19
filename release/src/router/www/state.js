@@ -1602,7 +1602,7 @@ function showMenuTree(menuList, menuExclude){
 						menu_code += '" id="';
 						menu_code += curMenu.tab[firstEntry].url.split(".")[0];
 						menu_code += '_menu"><table><tr><td><div class="menu_Icon ';
-						if((based_modelid == "RT-AC85U" || based_modelid == "RT-AC85P" || based_modelid == "RT-MIR3P" || based_modelid == "RT-AC2100" || based_modelid == "RT-RM2100" || based_modelid == "RT-MIR3G" || based_modelid == "RT-CMCCA9" || based_modelid == "R6800") && curMenu.index == 'menu_QoS')	//MODELDEP : RT-AC85U change icon
+						if((based_modelid == "RT-AC85U" || based_modelid == "RT-AC85P" || based_modelid == "RT-AX53U" || based_modelid == "RT-AC2100" || based_modelid == "RT-RM2100" || based_modelid == "RT-MIR3G" || based_modelid == "RT-CMCCA9" || based_modelid == "R6800") && curMenu.index == 'menu_QoS')	//MODELDEP : RT-AC85U change icon
 							menu_code += 'menu_BandwidthMonitor';
 						else
 							menu_code += curMenu.index;
@@ -1860,7 +1860,7 @@ function show_footer(){
 			href_lang = "/";	//global only
 			
 	footer_code = '<div align="center" class="bottom-image"></div>\n';
-	footer_code +='<div align="center" class="copyright"><#footer_copyright_desc#> and SWRT Team</div><br>';
+	footer_code +='<div align="center" class="copyright"><#footer_copyright_desc#> and NWRT Team</div><br>';
 
 	// FAQ searching bar{
 	footer_code += '<div style="margin-top:-75px;margin-left:205px;"><table width="765px" border="0" align="center" cellpadding="0" cellspacing="0"><tr>';
@@ -3089,7 +3089,7 @@ function refreshStatus(xhr){
 		document.getElementById("bwdpi_status").onmouseover = function(){overHint("A");}
 		document.getElementById("bwdpi_status").onmouseout = function(){nd();}
 		
-		if(based_modelid == "RT-AC85U" || based_modelid == "RT-AC85P" || based_modelid == "RT-MIR3P" || based_modelid == "RT-AC68A" || based_modelid == "RT-AC65U" || based_modelid == "R6800" || based_modelid == "RT-AC2100" || based_modelid == "RT-MIR3G" || based_modelid == "RT-CMCCA9"){	//MODELDEP : Spec special fine tune
+		if(based_modelid == "RT-AC85U" || based_modelid == "RT-AC85P" || based_modelid == "RT-AX53U" || based_modelid == "RT-AC68A" || based_modelid == "RT-AC65U" || based_modelid == "R6800" || based_modelid == "RT-AC2100" || based_modelid == "RT-MIR3G" || based_modelid == "RT-CMCCA9"){	//MODELDEP : Spec special fine tune
 			document.getElementById("bwdpi_status").style.display = "none";
 		}	
 	}

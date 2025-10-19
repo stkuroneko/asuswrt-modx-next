@@ -1406,7 +1406,7 @@ void init_syspara(void)
 	{
 		if (buffer[0]!=0xff)
 			ether_etoa(buffer, macaddr2);
-#if defined(JCGQ10PRO) || defined(H3CTX1801) || defined(PGBM1) || defined(XMCR660X) || defined(RTCMCCA9)|| defined(RTQ20)|| defined(RTTX1801)|| defined(RTAX18T)|| defined(RTHAR)|| defined(RTCR660X) || defined(JCGQ20)
+#if defined(JCGQ10PRO) || defined(H3CTX1801) || defined(PGBM1) || defined(XMCR660X) || defined(RTCMCCA9)|| defined(RTQ20)|| defined(RTTX1801)|| defined(RTAX53U)|| defined(RTHAR)|| defined(RTCR660X) || defined(JCGQ20)
 		ether_cal_b(buffer, macaddr, 4);
 #endif
 	}

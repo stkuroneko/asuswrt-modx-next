@@ -4425,16 +4425,20 @@ int init_nvram(void)
 #endif
 			set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "vlan1", NULL, "vlan3", 0);
 
-		nvram_set_int("btn_rst_gpio",  14|GPIO_ACTIVE_LOW);
-		nvram_set_int("btn_wps_gpio",  13|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_pwr_gpio",  16|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_wps_gpio",  16|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_rst_gpio",  16);
+		nvram_set_int("btn_wps_gpio",  15);
+		//nvram_set_int("led_pwr_gpio",  13|GPIO_ACTIVE_LOW);
+		//nvram_set_int("led_wps_gpio",  13|GPIO_ACTIVE_LOW);
 		//nvram_set_int("led_usb_gpio",  14|GPIO_ACTIVE_LOW);
 		//nvram_set_int("led_5g_gpio", 28);
 		//nvram_set_int("led_2g_gpio", 18);
+		nvram_set_int("btn_rst_gpio_1",  18|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wps_gpio_1",  4|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_pwr_gpio",  7|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_wan_gpio", 8|GPIO_ACTIVE_LOW);
 
-		nvram_set("ehci_ports", "1-2");
-		nvram_set("ohci_ports", "1-2");
+		//nvram_set("ehci_ports", "1-2");
+		//nvram_set("ohci_ports", "1-2");
 		nvram_set("ct_max", "300000"); // force
 
 		/* enable bled */
@@ -4443,13 +4447,16 @@ int init_nvram(void)
 
 		if (nvram_get("wl_mssid") && nvram_match("wl_mssid", "1"))
 			add_rc_support("mssid");
-		add_rc_support("2.4G 5G update usbX1");
+		add_rc_support("2.4G 5G noupdate");
 		add_rc_support("rawifi");
 		add_rc_support("switchctrl");
 		add_rc_support("manual_stb");
 		add_rc_support("11AC");
 		add_rc_support("11AX mbo ofdma");
 		add_rc_support("wpa3");
+		add_rc_support("loclist");
+		add_rc_support("app");
+		add_rc_support("gameMode");
 		//either txpower or singlesku supports rc.
 		add_rc_support("pwrctrl");
 		// the following values is model dep. so move it from default.c to here

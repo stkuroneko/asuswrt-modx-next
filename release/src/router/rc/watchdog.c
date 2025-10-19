@@ -9853,7 +9853,7 @@ wdp:
 		modem_flow_check(modem_unit);
 #endif
 #endif
-	auto_firmware_check();
+	//auto_firmware_check();
 #if defined(RTCONFIG_LANTIQ) && defined(RTCONFIG_GN_WBL)
 	GN_WBL_restart();
 #endif
