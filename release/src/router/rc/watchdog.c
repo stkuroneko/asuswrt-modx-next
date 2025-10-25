@@ -9091,7 +9091,7 @@ int select_one_online(pwl_br_status list)
 			if (WLC_NUM > 1) {
 				if (j == 0 && wait_time == -99) { // 2G connected, wait 5g
 
-		#if defined(RTCONFIG_WLMODULE_MT7615E_AP)
+		#if defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 					wait_time = nvram_get_int("wl_time");
 		#else
 					wait_time = 10;
@@ -9099,7 +9099,7 @@ int select_one_online(pwl_br_status list)
 				}
 				else if (wait_time == -99){// 5G connected, wait 2g
 
-		#if defined(RTCONFIG_WLMODULE_MT7615E_AP)
+		#if defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 					wait_time = nvram_get_int("wl_time");
 		#else
 					wait_time = 10;

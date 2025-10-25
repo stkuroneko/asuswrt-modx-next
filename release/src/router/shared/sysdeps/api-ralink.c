@@ -27,7 +27,7 @@
 
 typedef uint32_t __u32;
 
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTACRH18)  || defined(RT4GAC86U) || defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTACRH18)  || defined(RT4GAC86U) || defined(RTCONFIG_WLMODULE_MT7915D_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 const char WIF_5G[]	= "rai0";
 const char WIF_2G[]	= "ra0";
 const char WDSIF_5G[]	= "wdsi";
@@ -333,7 +333,7 @@ void set_radio(int on, int unit, int subunit)
 	//if (nvram_match(strcat_r(prefix, "radio", tmp), "0")) return;
 	// TODO: replace hardcoded 
 	// TODO: handle subunit
-#if defined(RTCONFIG_WLMODULE_MT7629_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_WLMODULE_MT7629_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	// MTK suggested MT7629/MT7915D use ifconfig down/up to instead RadioOn=0/1
 	doSystem("ifconfig %s %s", unit ? WIF_5G: WIF_2G, on ? "up":"down");
 #else
@@ -342,7 +342,7 @@ void set_radio(int on, int unit, int subunit)
 	else doSystem("iwpriv %s set RadioOn=%d", WIF_5G, on);
 #endif
 
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTACRH18) || defined(RTCONFIG_WLMODULE_MT7915D_AP) //5G:7612E 2G:7603E
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTACRH18) || defined(RTCONFIG_WLMODULE_MT7915D_AP)  ||defined(RTCONFIG_WLMODULE_MT7612E_AP)//5G:7612E 2G:7603E
 	led_onoff(unit);
 #endif	
 }
@@ -863,7 +863,7 @@ int get_channel_list_via_country(int unit, const char *country_code, char *buffe
 }
 
 
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTACRH18) || defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTACRH18) || defined(RTCONFIG_WLMODULE_MT7915D_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 void led_onoff(int unit)
 {   
 	if(get_radio(unit, 0))

@@ -1317,6 +1317,10 @@ config RTCONFIG_WLMODULE_MT7615E_AP
 	bool "Wireless module MT7615E ap"
 	default n
 
+config RTCONFIG_WLMODULE_MT7612E_AP
+	bool "Wireless module MT7612E ap"
+	default n
+
 config RTCONFIG_WLMODULE_MT7663E_AP
 	bool "Wireless module MT7663E ap"
 	default n

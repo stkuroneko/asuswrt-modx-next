@@ -2543,7 +2543,7 @@ int asus_ate_command(const char *command, const char *value, const char *value2)
 		return 0;
 	}
 #endif
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	else if (!strcmp(command, "Set_DisableStp")) {
 		FWrite("1", OFFSET_BR_STP, 1);
 		puts("1");
@@ -2975,7 +2975,7 @@ int asus_ate_command(const char *command, const char *value, const char *value2)
 		return 0;
 	}
 #if defined(RTCONFIG_RALINK) && !defined(RTCONFIG_MT798X) // obsoleted error code?
-#if !defined(RTCONFIG_RALINK_MT7629) && !defined(RTCONFIG_RALINK_MT7622) && !defined(RTCONFIG_RALINK_MT7621) && !defined(RTCONFIG_WLMODULE_MT7615E_AP) && !defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#if !defined(RTCONFIG_RALINK_MT7629) && !defined(RTCONFIG_RALINK_MT7622) && !defined(RTCONFIG_RALINK_MT7621) && !defined(RTCONFIG_WLMODULE_MT7615E_AP) && !defined(RTCONFIG_WLMODULE_MT7915D_AP) && !defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	else if (!strcmp(command, "Ra_FWRITE")) {
 		return FWRITE(value, value2);
 	}

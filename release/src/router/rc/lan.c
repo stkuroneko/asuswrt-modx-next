@@ -4437,7 +4437,7 @@ void start_lan_wl(void)
 		nvram_set("btn_ez_radiotoggle", "0"); // reset to default
 	}
 
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined (RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 #if !defined(RTCONFIG_CONCURRENTREPEATER)
 	if(strcmp(nvram_safe_get("lan_ifnames"),nvram_safe_get("lan_ifnames_guess"))){
 		if (module_loaded("mt_wifi_7615E"))
@@ -5081,7 +5081,7 @@ gmac3_no_swbr:
 	enable_jumbo_frame();
 #endif
 
-#if defined(RTCONFIG_RALINK) && defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_RALINK) && defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	start_wds_ra();
 #endif
 #if defined(RTCONFIG_QCA_LBD)

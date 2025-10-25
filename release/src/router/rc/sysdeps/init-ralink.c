@@ -1100,7 +1100,7 @@ void init_wl(void)
 	}
 #endif
 	int mtd_part = 0, mtd_size = 0;
-#if defined(RTCONFIG_WLMODULE_MT7603E_AP) || defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_WLMODULE_MT7603E_AP) || defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	//int mtd_part = 0, mtd_size = 0;
 	if (mtd_getinfo("Factory", &mtd_part, &mtd_size)){
 		snprintf(cmd, sizeof(cmd), "dd if=/dev/mtdblock%d of=/lib/firmware/e2p bs=131072 skip=0 count=1", mtd_part);
@@ -1114,7 +1114,7 @@ void init_wl(void)
 		modprobe("rlt_wifi_7603e");
 #endif
 
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined (RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	if (!module_loaded("mt_wifi_7615E"))
 		//modprobe("mt_wifi_7615E", tmpStr1, tmpStr2, tmpStr3);
 		modprobe("mt_wifi_7615E");
@@ -1238,7 +1238,7 @@ void fini_wl(void)
 		unregister_hnat_wlifaces();
 		modprobe_r("mtkhnat");
 	}
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined (RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	if (module_loaded("mt_wifi_7615E"))
 		modprobe_r("mt_wifi_7615E");
 #endif
@@ -1411,7 +1411,7 @@ void init_syspara(void)
 #endif
 	}
 
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	brstp='0';
 	FRead(&brstp, OFFSET_BR_STP, 1);
 	if(brstp=='1')
@@ -1795,7 +1795,7 @@ void init_syspara(void)
 			break;
 		}
 
-#if !defined (RTCONFIG_WLMODULE_MT7615E_AP)
+#if !defined (RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	dst = txbf_para;
 	int count_0xff = 0;
 	if (FRead(dst, OFFSET_TXBF_PARA, 33) < 0)

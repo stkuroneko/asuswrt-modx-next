@@ -704,7 +704,7 @@ int gen_ralink_config(int band, int is_iNIC)
 #endif	/* CE_ADAPTIVITY */
 	if (str && *str)
 	{
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 		if(nvram_match("JP_CS","1"))
 			fprintf(fp, "CountryCode=JP\n");
 		else
@@ -1276,7 +1276,7 @@ int gen_ralink_config(int band, int is_iNIC)
 #endif
 			)
 		{ 
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 			fprintf(fp, "AutoChannelSelect=%d\n", 3);
 #else
 			fprintf(fp, "AutoChannelSelect=%d\n", 2);
@@ -1306,7 +1306,7 @@ int gen_ralink_config(int band, int is_iNIC)
 		{
 			if (atoi(str) == 0)
 			{
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 				fprintf(fp, "AutoChannelSelect=%d\n", 3);
 #else
 				fprintf(fp, "AutoChannelSelect=%d\n", 2);
@@ -1518,7 +1518,7 @@ int gen_ralink_config(int band, int is_iNIC)
 		else
 		{
 			warning = 21;
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 			fprintf(fp, "AutoChannelSelect=%d\n", 3);
 #else
 			fprintf(fp, "AutoChannelSelect=%d\n", 2);
@@ -1565,7 +1565,7 @@ int gen_ralink_config(int band, int is_iNIC)
 	fprintf(fp, "IEEE80211H=%d\n", IEEE80211H);
 
 #ifdef RTCONFIG_RALINK_DFS
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP) || (RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
+#if defined (RTCONFIG_WLMODULE_MT7615E_AP) || (RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	if (band) {
 		if (IEEE80211H)
 			fprintf(fp, "DfsEnable=%d\n", 1);
@@ -1600,7 +1600,7 @@ int gen_ralink_config(int band, int is_iNIC)
 	fprintf(fp, "StreamModeMac2=\n");
 	fprintf(fp, "StreamModeMac3=\n");
 	fprintf(fp, "StationKeepAlive=%d\n", 0);
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP) || (RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
+#if defined (RTCONFIG_WLMODULE_MT7615E_AP) || (RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	fprintf(fp, "CSPeriod=6\n");
 #else
 	fprintf(fp, "CSPeriod=10\n");
@@ -2588,11 +2588,11 @@ int gen_ralink_config(int band, int is_iNIC)
 			fprintf(fp, "ETxBfIncapable=%d\n", 0);
 			fprintf(fp, "ETxBfEnCond=%d\n", 1);
 
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 			if (band)
 #endif
 				fprintf(fp, "MUTxRxEnable=%d\n", (mumimo ? 1 : 0));
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 			fprintf(fp, "MuMimoDlEnable=%d\n", (mumimo ? 1 : 0));
 			fprintf(fp, "MuMimoUlEnable=%d\n", 0);
 #endif
@@ -3069,7 +3069,7 @@ int gen_ralink_config(int band, int is_iNIC)
 
 		nvram_set(strcat_r(prefix, "crypto", tmp), nvram_safe_get("wlc_crypto"));
 		nvram_set(strcat_r(prefix, "wpa_psk", tmp), nvram_safe_get("wlc_wpa_psk"));
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 // ui force 40,but 7615/7915 support 80 and 160
 		if(band)
 			nvram_set(strcat_r(prefix, "bw", tmp), "1");
@@ -3232,7 +3232,7 @@ int gen_ralink_config(int band, int is_iNIC)
 
 	/* Wireless IGMP Snooping */
 	fprintf(fp, "IgmpSnEnable=%d\n", nvram_get_int(strcat_r(prefix, "igs", tmp)) ? 1 : 0);
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	/*	McastPhyMode, PHY mode for Multicast frames
 	 *	McastMcs, MCS for Multicast frames
 	 *
@@ -3349,7 +3349,7 @@ next_mrate:
 
 	fprintf(fp, "WscV2Support=%d\n", 0);	// WPS/WSC v2 feature allows client to create connection via the PinCode of AP.
 						// Disable this feature causes longer detection time (click AP till show dialog box) on WIN7 client when WSC disabled either.
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	/* Set number of clients of guest network. */
 	for (i = 0; i < ssid_num; i++) {
 		int maxsta;
@@ -5425,7 +5425,7 @@ void stop_wds_ra(const char* lan_ifname, const char* wif)
 	}
 }
 
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 void start_wds_ra()
 {
 	char* lan_ifname = nvram_safe_get("lan_ifname");

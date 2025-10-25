@@ -5562,7 +5562,7 @@ static int ej_update_variables(int eid, webs_t wp, int argc, char_t **argv)
 	sleep1 = 10;
 	sleep2 = 5;
 	bss_sleep = 0;
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 	delta1 = 35;
 #endif
 #if defined(RTCONFIG_MT798X)

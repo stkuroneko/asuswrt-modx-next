@@ -28,7 +28,7 @@
 #include <shutils.h>
 #include <shared.h>
 #include <utils.h>
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 #include <linux/autoconf.h>
 #else
 #include <linux/config.h>
@@ -38,7 +38,7 @@
 #include "ra_ioctl.h"
 
 #define GPIO_DEV	"/dev/gpio0"
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 #define ETH_DEVNAME     "eth1"
 #else
 #define ETH_DEVNAME     "eth2"
@@ -466,7 +466,7 @@ int mt7621_reg_read(int offset, unsigned int *value)
          return 0;
 }   
 
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 int mt7621_phy_read(int offset, unsigned int *value)
 {
          struct ifreq ifr;
@@ -530,7 +530,7 @@ int mt7621_reg_write(int offset, int value)
 	return 0;
 }	
 #endif
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 int mt7621_phy_write(int offset, int reg, int value)
 {
 	struct ifreq ifr;
@@ -811,7 +811,7 @@ int mt7621_vlan_unset(int vid)
 }
 
 
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
  /**
  * Get TX or RX byte count of WAN and WANS_LAN
  * @unit:	WAN unit.
@@ -1330,7 +1330,7 @@ static void link_down_up_mt7620_PHY(unsigned int mask, int status, int inverse)
 static void link_down_up_mt7621_PHY(unsigned int mask, int status, int inverse)
 #endif   
 {
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
  	int i;
 	unsigned int m;
 
@@ -1569,7 +1569,7 @@ static void initialize_Vlan(int stb_bitmask)
 	switch_fini();
 }
 
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 static void fix_up_hwnat_for_wifi(void)
 {
 	int i, j, m, r, v, isp_profile_hwnat_not_safe = 0;
@@ -1577,7 +1577,7 @@ static void fix_up_hwnat_for_wifi(void)
 	char bss[] = "wl0.1_bss_enabledXXXXXX";
 	char mode_x[] = "wl0_mode_xXXXXXX";
 	struct wifi_if_vid_s w = {
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 		.wl_vid = { 21, 43 },		/* DP_RA0  ~ DP_RA3:  21, 22, 23, 24;	DP_RAI0  ~ DP_RAI3:  43, 44, 45, 46 */
 		.wl_wds_vid = { 37, 59 },	/* DP_WDS0 ~ DP_WDS3: 37, 38, 39, 40;	DP_WDSI0 ~ DP_WDSI3: 59, 60, 61, 62 */
 #elif defined(RTN14U) || defined(RTN11P) || defined(RTN300)

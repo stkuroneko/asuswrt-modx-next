@@ -13855,7 +13855,7 @@ script_allnet:
 			start_wl();
 			lanaccess_wl();
 #endif
-#if defined(RTCONFIG_RALINK) && defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_RALINK) && defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 			start_wds_ra();
 #endif
 #if defined(RTCONFIG_SMARTDNS)
@@ -14072,7 +14072,7 @@ script_allnet:
 			start_wl();
 			lanaccess_wl();
 #endif
-#if defined(RTCONFIG_RALINK) && defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_RALINK) && defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 			start_wds_ra();
 #endif
 #if defined(RTCONFIG_SMARTDNS)

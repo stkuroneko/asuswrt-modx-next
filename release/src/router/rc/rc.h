@@ -1568,7 +1568,7 @@ extern void gen_qca_wifi_cfgs(void);
 #ifdef HND_ROUTER
 extern void wait_lan_port_to_forward_state(void);
 #endif
-#if defined(RTCONFIG_RALINK) && defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined(RTCONFIG_RALINK) && defined(RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 extern void start_wds_ra();
 #endif
 #if defined(RTCONFIG_AMAS) && defined(RTCONFIG_VIF_ONBOARDING)

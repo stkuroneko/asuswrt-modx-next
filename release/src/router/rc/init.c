@@ -614,7 +614,7 @@ wl_defaults(void)
 					nvram_set(tmp, (value && *value) ? value : t->value);
 				} else
 #endif
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) && !defined(RT4GAC86U)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) && !defined(RT4GAC86U) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 				if(!strcmp(tmp,"wl0_txbf") || !strcmp(tmp,"wl0_txbf_en") ){
 				nvram_set(tmp, "0");
 				}else{
@@ -21852,7 +21852,7 @@ static void sysinit(void)
 	avblchan_defaults();
 #endif
 
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP)
+#if defined (RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
 #if !defined(RTCONFIG_CONCURRENTREPEATER)
 	nvram_set("lan_ifnames_guess", nvram_safe_get("lan_ifnames"));
 #endif
