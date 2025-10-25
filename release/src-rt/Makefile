@@ -355,6 +355,8 @@ ifeq ($(OPDBG),y)
 export IMGNAME := $(IMGNAME)_OPDBG
 endif
 
+NEW_IMGNAME := $(subst $(BUILD_NAME),$(REAL_NAME),$(IMGNAME))
+
 ifeq ($(DSL_REMOTE),y)
 ifeq ($(BUILD_NAME),DSL-AC68U)
 TCFWVER := $(shell cat ./tc_fw/fwver.conf)
@@ -914,11 +916,11 @@ else ifeq ($(CONFIG_RALINK),y)
                 -d $(PLATFORMDIR)/zImage.img image/$(IMGNAME).trx ; \
 	elif [ "$(BUILD_NAME)" = "4G-AX56" ] || [ "$(BUILD_NAME)" = "RT-AX53U" ] || [ "$(BUILD_NAME)" = "RT-AX54" ] || [ "$(BUILD_NAME)" = "XD4S" ] ; then \
 		asustools/u-boot-2014.10/tools/mkimage -A mips -O linux -T kernel -C lzma -a 0x81001000 -e 0x81001000 -r $${RFSOFFSET} \
-		-n $(BUILD_NAME) -V "$(KERNEL_VER)" "$(FS_VER)"  "$(SERIALNO)" "$(SWRT_CODEBASE)" "0" "0" "0" "0" "0" "0"  \
-		-d $(PLATFORMDIR)/zImage.img image/$(IMGNAME).trx ; \
+		-n $(BUILD_NAME) -V "$(KERNEL_VER)" "$(FS_VER)"  "$(SERIALNO)" "$(EXTENDNO)" "0" "0" "0" "0" "0" "0"  \
+		-d $(PLATFORMDIR)/zImage.img image/$(NEW_IMGNAME).trx ; \
 	else \
 		asustools/mkimage -A mips -O linux -T kernel -C lzma -a 80000000 -e $${ENTRY} -r $${RFSOFFSET} \
-		-n $(BUILD_NAME) -V "$(KERNEL_VER)" "$(FS_VER)" "$(SERIALNO)" "$(SWRT_CODEBASE)" "0" "0" "0" "0" "0" "0" \
+		-n $(BUILD_NAME) -V "$(KERNEL_VER)" "$(FS_VER)" "$(SERIALNO)" "$(EXTENDNO)" "0" "0" "0" "0" "0" "0" \
 		-d $(PLATFORMDIR)/zImage.img image/$(IMGNAME).trx ; \
 	fi ; \
 	if [ "`grep -c \"^CONFIG_RALINK_MT7620\>\" $(LINUXDIR)/.config`" -gt 0 ]; then \
@@ -1119,28 +1121,29 @@ else
 endif
 	@rm -f image/linux-lzma.trx
 endif
-	md5sum image/$(IMGNAME).trx > image/$(IMGNAME).md5
+	md5sum image/$(NEW_IMGNAME).trx > image/$(NEW_IMGNAME).md5
+
 
 #general rsasign file
 ifneq ($(LIVE_UPDATE_RSA),)
 ifneq (,$(wildcard $(KEY_PATH)/private*.pem))
 	for f in $(KEY_PATH)/private*.pem; do \
 		rsa_idx=$$(echo $${f} | sed "s/.*\///" | sed "s/private//" | sed "s/.pem//"); \
-		$$(openssl sha1 -sign $(KEY_PATH)/private$${rsa_idx}.pem -out image/$(IMGNAME)_rsa$${rsa_idx}.zip image/$(IMGNAME).trx); \
+		$$(openssl sha1 -sign $(KEY_PATH)/private$${rsa_idx}.pem -out image/$(NEW_IMGNAME)_rsa$${rsa_idx}.zip image/$(NEW_IMGNAME).trx); \
 	done
 else
 ifneq (,$(wildcard $(SRC_ROOT)/../../buildtools/private.pem))
-	openssl sha1 -sign $(SRC_ROOT)/../../buildtools/private.pem -out image/$(IMGNAME)_rsa.zip image/$(IMGNAME).trx
+	openssl sha1 -sign $(SRC_ROOT)/../../buildtools/private.pem -out image/$(NEW_IMGNAME)_rsa.zip image/$(NEW_IMGNAME).trx
 endif
 endif
 else
 ifeq ($(HTTPS),y)
 ifneq (,$(wildcard $(SRC_ROOT)/../../buildtools/private.pem))
-	openssl sha1 -sign $(SRC_ROOT)/../../buildtools/private.pem -out image/$(IMGNAME)_rsa.zip image/$(IMGNAME).trx
+	openssl sha1 -sign $(SRC_ROOT)/../../buildtools/private.pem -out image/$(NEW_IMGNAME)_rsa.zip image/$(NEW_IMGNAME).trx
 endif
 endif
 endif
-#	ln -sf $(IMGNAME).trx image/$(BUILD_NAME).trx
+	ln -sf $(NEW_IMGNAME).trx image/$(REAL_NAME).trx
 ifeq ($(ARM),y)
 #	ln -sf $(LINUXDIR)/vmlinux image/vmlinux
 #	ln -sf $(LINUXDIR)/vmlinux.o image/vmlinux.o
@@ -5966,6 +5969,11 @@ endif
 	@if grep -q "CONFIG_CHIP_MT7615E=y" $(LINUXDIR)/.config ; then \
 		sed -i "/RTCONFIG_WLMODULE_MT7615E_AP/d" router/.config; \
 		echo "RTCONFIG_WLMODULE_MT7615E_AP=y" >> router/.config; \
+	fi
+
+	@if grep -q "CONFIG_CHIP_MT7612E=y" $(LINUXDIR)/.config ; then \
+		sed -i "/RTCONFIG_WLMODULE_MT7612E_AP/d" router/.config; \
+		echo "RTCONFIG_WLMODULE_MT7612E_AP=y" >> router/.config; \
 	fi
 
 	@if grep -q "CONFIG_WIFI_MT7663E=y" $(LINUXDIR)/.config ; then \
