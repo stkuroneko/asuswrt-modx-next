@@ -616,6 +616,22 @@ int gen_ralink_config(int band, int is_iNIC)
 
 	if(band > 3)
 		return 0;
+	
+#if defined(RTCONFIG_WLMODULE_MT7612E_AP)
+	// MT7612E is 5GHz-only chip, force band=1 if somehow called with band=0
+	if (band == 0) {
+		_dprintf("MT7612E: WARNING - Called with band=0 (2.4GHz), forcing to band=1 (5GHz)\n");
+		band = 1;
+	}
+	// Set default bandwidth to 20/40/80 MHz mixed mode for 5GHz
+	char wl_bw_val[16];
+	snprintf(wl_bw_val, sizeof(wl_bw_val), "wl%d_bw", band);
+	if (!nvram_get(wl_bw_val) || nvram_get_int(wl_bw_val) == 0) {
+		_dprintf("MT7612E: Setting default wl1_bw to 3 (20/40/80 MHz)\n");
+		nvram_set(wl_bw_val, "3");
+	}
+#endif
+	
 	if(!nvram_match("acs_dfs", "1")){
 		if((band == 1 && nvram_match("wl1_bw_160", "1")) || (band == 2 && nvram_match("wl2_bw_160", "1"))){
 			nvram_set("acs_dfs", "1");
@@ -631,10 +647,18 @@ int gen_ralink_config(int band, int is_iNIC)
 	}
 	else
 	{
+#if defined(RTCONFIG_WLMODULE_MT7612E_AP)
+		// MT7612E uses custom path to match driver expectations
+		_dprintf("gen mt7612e config\n");
+		system("mkdir -p /etc/wireless/mt7612e");
+		if (!(fp=fopen("/etc/wireless/mt7612e/mt7612e.dat", "w+")))
+			return 0;
+#else
 		_dprintf("gen ralink iNIC config\n");
 		system("mkdir -p /etc/Wireless/iNIC");
 		if (!(fp=fopen("/etc/Wireless/iNIC/iNIC_ap.dat", "w+")))
 			return 0;
+#endif
 	}
 
 	fprintf(fp, "#The word of \"Default\" must not be removed\n");
@@ -674,7 +698,12 @@ int gen_ralink_config(int band, int is_iNIC)
 			str = nvram_safe_get("reg_spec");
 #endif		
 		region = getCountryRegion5G(str, &warning, IEEE80211H);
+#if defined(RTCONFIG_WLMODULE_MT7612E_AP)
+		// MT7612E: Force CountryRegionABand=7 for full 5GHz channel support (36-165)
+		fprintf(fp, "CountryRegionABand=%d\n", 7);
+#else
 		fprintf(fp, "CountryRegionABand=%d\n", region);
+#endif
 	}
 	else
 	{
@@ -808,7 +837,11 @@ int gen_ralink_config(int band, int is_iNIC)
 		{
 			if (atoi(str) == 0)       // Auto
 			{
-#if defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
+#if defined(RTCONFIG_WLMODULE_MT7612E_AP)
+				// MT7612E: Use WirelessMode=14 (A/AN/AC mixed, 5GHz-only with AC support)
+				fprintf(fp, "WirelessMode=%d\n", 14);
+				VHTBW_MAX = 1;
+#elif defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
 				if(nvram_match("wl1_11ax", "1"))
 					fprintf(fp, "WirelessMode=%d\n", 17);		// A + AN + AC +AX mixed
 				else
@@ -818,18 +851,34 @@ int gen_ralink_config(int band, int is_iNIC)
 			}
 			else if (atoi(str) == 1)  // N Only
 			{
+#if defined(RTCONFIG_WLMODULE_MT7612E_AP)
+				// MT7612E: Use mode 14 (A/AN/AC mixed) for 5GHz-only operation with AC support
+				fprintf(fp, "WirelessMode=%d\n", 14);
+				VHTBW_MAX = 1;
+#else
 				fprintf(fp, "WirelessMode=%d\n", 11);	// N in 5G
+#endif
 			}
 			else if (atoi(str) == 8)  // AN/AC Mixed
 			{
+#if defined(RTCONFIG_WLMODULE_MT7612E_AP)
+				// MT7612E: Use mode 14 (A/AN/AC mixed, pure 5GHz with AC)
+				fprintf(fp, "WirelessMode=%d\n", 14);
+				VHTBW_MAX = 1;
+#else
 				fprintf(fp, "WirelessMode=%d\n", 15);	// AN + AC mixed
 				VHTBW_MAX = 1;
+#endif
 			}
 			else if (atoi(str) == 2)  // A
 				fprintf(fp, "WirelessMode=%d\n", 2);
 			else			// A,N[,AC]
 			{
-#if defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
+#if defined(RTCONFIG_WLMODULE_MT7612E_AP)
+				// MT7612E: Use WirelessMode=14 (A/AN/AC mixed, pure 5GHz with AC)
+				fprintf(fp, "WirelessMode=%d\n", 14);
+				VHTBW_MAX = 1;
+#elif defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
 				if(nvram_match("wl1_11ax", "1"))
 					fprintf(fp, "WirelessMode=%d\n", 17);		// A + AN + AC +AX mixed
 				else
@@ -840,7 +889,11 @@ int gen_ralink_config(int band, int is_iNIC)
 		}
 		else
 		{
-#if defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
+#if defined(RTCONFIG_WLMODULE_MT7612E_AP)
+			// MT7612E: Default to WirelessMode=14 (A/AN/AC mixed, pure 5GHz with AC)
+			fprintf(fp, "WirelessMode=%d\n", 14);
+			VHTBW_MAX = 1;
+#elif defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
 			if(nvram_match("wl1_11ax", "1"))
 				fprintf(fp, "WirelessMode=%d\n", 17);		// A + AN + AC +AX mixed
 			else
@@ -859,8 +912,15 @@ int gen_ralink_config(int band, int is_iNIC)
 				fprintf(fp, "WirelessMode=%d\n", 16);		// B + G + N +AX mixed
 			else
 #endif
-			if (atoi(str) == 0)       // B,G,N
+			if (atoi(str) == 0)       // Auto: B,G,N mixed for MT7603 2.4GHz
+			{
+#if defined(RTCONFIG_WLMODULE_MT7603E_AP)
+				// MT7603 2.4GHz: Use WirelessMode=9 (B/G/N mixed) for auto mode
 				fprintf(fp, "WirelessMode=%d\n", 9);
+#else
+				fprintf(fp, "WirelessMode=%d\n", 9);
+#endif
+			}
 			else if (atoi(str) == 2)  // B,G
 				fprintf(fp, "WirelessMode=%d\n", 0);
 			else if (atoi(str) == 1)  // N

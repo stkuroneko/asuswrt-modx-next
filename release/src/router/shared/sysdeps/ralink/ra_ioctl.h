@@ -16,7 +16,7 @@
 #define RAETH_ASUS_RESET		0x0
 #define RAETH_ASUS_STATS		0x1
 
-#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTACRH18) || defined(RT4GAC86U) || defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#if defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTACRH18) || defined(RT4GAC86U) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_RALINK_MT7621)
 
 #define REG_ESW_WT_MAC_MFC              0x10
 #define REG_ESW_WT_MAC_ATA1             0x74
@@ -64,7 +64,7 @@
 #define REG_ESW_MAX			0x14C
 #elif defined (CONFIG_RALINK_RT5350) || defined(RTAC1200) || defined(RTAC1200V2) || defined(RTACRH18)|| defined(RT4GAC86U)
 #define REG_ESW_MAX                     0x16C
-#elif defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#elif defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_RALINK_MT7621)
 #define REG_ESW_MAX			0x7FFFF
 #else //RT305x, RT3350, RTACRH18
 #define REG_ESW_MAX			0xFC

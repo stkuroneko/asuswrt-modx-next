@@ -95,7 +95,7 @@ HAS_DOT11_VHT_SUPPORT=y
 HAS_WAPI_SUPPORT=n
 
 #Support for dot11r FT
-HAS_DOT11R_FT_SUPPORT=n
+HAS_DOT11R_FT_SUPPORT=y
 
 #Support for 2860/2880 co-exist 
 HAS_RT2880_RT2860_COEXIST=n
@@ -103,10 +103,10 @@ HAS_RT2880_RT2860_COEXIST=n
 HAS_KTHREAD_SUPPORT=n
 
 #Support for dot11k RRM
-HAS_DOT11K_RRM_SUPPORT=n
+HAS_DOT11K_RRM_SUPPORT=y
 
 #Support for dot 11v WNM
-HAS_DOT11V_WNM_SUPPORT=n
+HAS_DOT11V_WNM_SUPPORT=y
 
 
 
@@ -866,7 +866,12 @@ WFLAGS += -DCONFIG_BA_REORDER_MONITOR
 HAS_RLT_BBP=y
 HAS_RLT_MAC=y
 
+# Use custom path for mt7612e to match driver expectations
+ifneq ($(findstring mt7612e,$(CHIPSET)),)
+CHIPSET_DAT = 7612e
+else
 CHIPSET_DAT = 2860
+endif
 
 ifneq ($(findstring mt7662e,$(CHIPSET)),)
 WFLAGS += -DMT7662

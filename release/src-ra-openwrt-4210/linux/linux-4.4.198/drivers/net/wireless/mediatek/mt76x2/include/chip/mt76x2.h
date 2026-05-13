@@ -32,6 +32,7 @@ void mt76x2_tx_pwr_gain(struct _RTMP_ADAPTER *ad, u8 channel, u8 bw);
 void percentage_delta_pwr(struct _RTMP_ADAPTER *ad);
 
 void mt76x2_get_current_temp(struct _RTMP_ADAPTER *ad);
+UINT32 mt76x2_get_current_temp_wrapper(struct _RTMP_ADAPTER *pAd);
 void mt76x2_read_temp_info_from_eeprom(struct _RTMP_ADAPTER *ad);
 #ifdef RTMP_TEMPERATURE_TX_ALC
 void mt76x2_read_tx_alc_info_from_eeprom(struct _RTMP_ADAPTER *ad);

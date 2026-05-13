@@ -3560,12 +3560,22 @@ void mt76x2_get_current_temp(RTMP_ADAPTER *ad)
 	        pChipCap->current_temp = ((temp_val -pChipCap->temp_25_ref)*18/10) + 25; /* 1.789 */
 	} else if (temp_val < pChipCap->temp_25_ref) {
 	        pChipCap->current_temp = 25 - ((pChipCap->temp_25_ref - temp_val)*18/10);
-	}       
+	}	      
 	else
 	        pChipCap->current_temp = 25;
 
 	DBGPRINT(RT_DEBUG_INFO, ("%s::read_temp=%d (0x%x), current_temp=%d (0x%x)\n", 
 		__FUNCTION__, temp_val, temp_val, pChipCap->current_temp, pChipCap->current_temp));
+}
+
+/* Wrapper function for ChipGetCurrentTemp callback to return temperature value */
+UINT32 mt76x2_get_current_temp_wrapper(RTMP_ADAPTER *pAd)
+{
+	/* Update current temperature first */
+	mt76x2_get_current_temp(pAd);
+	
+	/* Return the current temperature in Celsius */
+	return (UINT32)pAd->chipCap.current_temp;
 }
 
 void mt76x2_read_temp_info_from_eeprom(RTMP_ADAPTER *ad)
@@ -5788,6 +5798,7 @@ static const RTMP_CHIP_OP MT76x2_ChipOp = {
 	.SkuTxPwrAdj = NULL,
 #endif
 	.TxPwrBoost = mt76x2_tx_pwr_boost,
+	.ChipGetCurrentTemp = mt76x2_get_current_temp_wrapper,
 
 };
 

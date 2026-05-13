@@ -841,13 +841,9 @@ INT set_ed_debug_proc(RTMP_ADAPTER *pAd, PSTRING arg);
 #endif /* ED_MONITOR */
 INT show_ed_cnt_for_channel_quality(RTMP_ADAPTER *pAd, PSTRING arg);
 
-#ifdef RTMP_MAC_PCI
-#ifdef LED_CONTROL_SUPPORT
 INT Set_Led_Proc(
         IN RTMP_ADAPTER *pAd,
         IN PSTRING arg);
-#endif /* LED_CONTROL_SUPPORT */
-#endif /* RTMP_MAC_PCI */
 
 #ifdef THERMAL_PROTECT_SUPPORT	
 INT set_thermal_protection_criteria_proc(
@@ -1609,11 +1605,7 @@ static struct {
 #ifdef SINGLE_SKU_V2
 	{"sku_debug",				Set_Single_Sku_Debug_Proc},
 #endif
-#ifdef RTMP_MAC_PCI
-#ifdef LED_CONTROL_SUPPORT
-	{"led",				Set_Led_Proc},
-#endif /* LED_CONTROL_SUPPORT */
-#endif /* RTMP_MAC_PCI */
+	// {"led",				Set_Led_Proc},
 #ifdef AIR_MONITOR
 	{"mnt_en",				Set_Enable_Air_Monitor_Proc},
 	{"mnt_rule",			Set_MonitorRule_Proc},
@@ -13247,21 +13239,15 @@ INT	Set_WscStatus_Proc(
 	return TRUE;
 }
 
-#ifdef RTMP_MAC_PCI
-#ifdef LED_CONTROL_SUPPORT
 INT     Set_Led_Proc(
         IN      PRTMP_ADAPTER   pAd,
         IN      PSTRING                 arg)
 {
- 
         UCHAR val = simple_strtol(arg, 0, 10);
         DBGPRINT(RT_DEBUG_OFF, ("Set_Led_Proc::(Led=%d)\n", val));
         RTMPSetLED(pAd, val);
- 
         return TRUE;
 }
-#endif /* LED_CONTROL_SUPPORT */
-#endif /* RTMP_MAC_PCI */
 
 #define WSC_GET_CONF_MODE_EAP	1
 #define WSC_GET_CONF_MODE_UPNP	2
@@ -16000,6 +15986,59 @@ INT RTMP_AP_IoctlHandle(
 			break;
 #endif /* HOSTAPD_SUPPORT */
 		
+#ifdef CONFIG_AP_SUPPORT
+		case CMD_RTPRIV_IOCTL_ASUSCMD:
+		{
+			if (subcmd == ASUS_SUBCMD_CHLIST) {
+				INT i;
+				RTMP_STRING pChannel[256], pTmp[4];
+				memset(pChannel, 0, 256);
+				for (i = 0; i < pAd->ChannelListNum; i++) {
+					if(i > 0)
+						strcat(pChannel,",");
+					snprintf(pTmp, sizeof(pTmp), "%d", pAd->ChannelList[i].Channel);
+					strcat(pChannel,pTmp);
+				}
+				wrq->u.data.length = strlen(pChannel);
+				pChannel[wrq->u.data.length] = '\0';
+				Status = copy_to_user(wrq->u.data.pointer, pChannel, wrq->u.data.length);
+			} else if (subcmd == ASUS_SUBCMD_DRIVERVER) {
+				RTMP_STRING driverVersion[16] = {0};
+				wrq->u.data.length = strlen(AP_DRIVER_VERSION);
+				snprintf(driverVersion, sizeof(driverVersion), "%s", AP_DRIVER_VERSION);
+				driverVersion[wrq->u.data.length] = '\0';
+				Status = copy_to_user(wrq->u.data.pointer, driverVersion, wrq->u.data.length);
+			} else if (subcmd == ASUS_SUBCMD_RADIO_STATUS) {
+				UINT Enable = 0;
+				if(pAd->Flags & fRTMP_ADAPTER_RADIO_OFF)
+					Enable = 0;
+				else
+					Enable = 1;
+				wrq->u.data.length = 1;
+				Status = copy_to_user(wrq->u.data.pointer, &Enable, wrq->u.data.length);
+			} else if (subcmd == ASUS_SUBCMD_RADIO_TEMPERATURE) {
+				UINT32 temperature = 0;
+#ifdef RTMP_TEMPERATURE_SUPPORT
+				temperature = MtAsicGetThemalSensor(pAd, 0);
+#else
+				/* Use chip callback to get current temperature */
+				RTMP_CHIP_GET_CURRENT_TEMP(pAd, temperature);
+#endif
+				wrq->u.data.length = sizeof(UINT32);
+				Status = copy_to_user(wrq->u.data.pointer, &temperature, wrq->u.data.length);
+			} else if (subcmd == ASUS_SUBCMD_CONN_STATUS) {
+				UINT32 pCurrState = 0;
+#ifdef APCLI_SUPPORT
+				PAPCLI_STRUCT pApCliEntry;
+				pApCliEntry = &pAd->ApCfg.ApCliTab[pObj->ioctl_if];
+				pCurrState = pApCliEntry->CtrlCurrState;
+#endif
+				wrq->u.data.length = sizeof(UINT32);
+				Status = copy_to_user(wrq->u.data.pointer, &pCurrState, wrq->u.data.length);
+			}
+		}
+		break;
+#endif /* CONFIG_AP_SUPPORT */
 
 		default:
 			Status = RTMP_COM_IoctlHandle(pAd, wrq, cmd, subcmd, pData, Data);

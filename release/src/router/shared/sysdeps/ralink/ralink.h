@@ -793,7 +793,7 @@ struct GNU_PACKED wnm_command {
 #endif
 #if defined(RTAC1200HP) || defined(RTN56UB1) || defined(RTN56UB2) || defined(RTAC1200GA1) || defined(RTAC1200GU)
 #define OFFSET_FIX_CHANNEL      0x40170
-#elif defined(RTCONFIG_WLMODULE_MT7615E_AP)
+#elif defined(RTCONFIG_WLMODULE_MT7615E_AP) || defined(RTCONFIG_RALINK_MT7621)
 #define OFFSET_BR_STP      0x4ff7e	// 1 bytes
 #endif
 
