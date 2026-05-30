@@ -4432,8 +4432,21 @@ int init_nvram(void)
 		nvram_set_int("led_all_gpio", 6|GPIO_ACTIVE_LOW);
 		//nvram_set_int("usb_pwr_gpio", 12|GPIO_ACTIVE_LOW);
 
+#ifdef RTCONFIG_XHCIMODE
+		nvram_set("xhci_ports", "2-1");
 		nvram_set("ehci_ports", "1-2");
-		nvram_set("ohci_ports", "1-2");
+#else
+		if(usb_usb3 == 1){
+			nvram_set("xhci_ports", "2-1");
+			nvram_set("ehci_ports", "1-2");
+		} else{
+			nvram_set("ehci_ports", "1-2");
+		}
+#endif
+		nvram_set("ohci_ports", "");
+		/* Set default USB3 mode to disabled */
+		if (!nvram_get("usb_usb3"))
+			nvram_set("usb_usb3", "0");
 		nvram_set("ct_max", "300000"); // force
 
 		/* enable bled */
