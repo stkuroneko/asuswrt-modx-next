@@ -1114,7 +1114,7 @@ void init_wl(void)
 		modprobe("rlt_wifi_7603e");
 #endif
 
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP) ||defined(RTCONFIG_WLMODULE_MT7612E_AP)
+#if defined (RTCONFIG_WLMODULE_MT7615E_AP)
 	if (!module_loaded("mt_wifi_7615E"))
 		//modprobe("mt_wifi_7615E", tmpStr1, tmpStr2, tmpStr3);
 		modprobe("mt_wifi_7615E");
@@ -1122,6 +1122,10 @@ void init_wl(void)
 	if (!module_loaded("mt_whnat"))
 		modprobe("mt_whnat");
 #endif
+#elif defined(RTCONFIG_WLMODULE_MT7612E_AP)
+	// MT7612E uses mt76x2_ap module
+	if (!module_loaded("mt76x2_ap"))
+		modprobe("mt76x2_ap");
 #endif
 #if defined(RTCONFIG_WLMODULE_MT7915D_AP)
 	//int mtd_part = 0, mtd_size = 0;
@@ -1273,6 +1277,18 @@ void fini_wl(void)
 #if defined (RTCONFIG_WLMODULE_MT7603E_AP)
 	if (module_loaded("rlt_wifi_7603e"))
 		modprobe_r("rlt_wifi_7603e");
+#endif
+
+#if defined (RTCONFIG_WLMODULE_MT7615E_AP)
+	if (module_loaded("mt_wifi_7615E"))
+		modprobe_r("mt_wifi_7615E");
+#if !defined(RTCONFIG_RALINK_MT7621)
+	if (module_loaded("mt_whnat"))
+		modprobe_r("mt_whnat");
+#endif
+#elif defined(RTCONFIG_WLMODULE_MT7612E_AP)
+	if (module_loaded("mt76x2_ap"))
+		modprobe_r("mt76x2_ap");
 #endif
 
 	if (module_loaded("rt2860v2_ap"))

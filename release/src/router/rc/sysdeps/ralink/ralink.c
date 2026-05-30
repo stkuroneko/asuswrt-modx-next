@@ -663,7 +663,7 @@ int gen_ralink_config(int band, int is_iNIC)
 
 	fprintf(fp, "#The word of \"Default\" must not be removed\n");
 	fprintf(fp, "Default\n");
-#if defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RALINK_DBDC_MODE) || defined(RTCONFIG_MT798X)
+#if defined(RTCONFIG_WLMODULE_MT7915D_AP) || (defined(RALINK_DBDC_MODE) && !defined(RTCONFIG_WLMODULE_MT7612E_AP)) || defined(RTCONFIG_MT798X)
 	fprintf(fp, "DBDC_MODE=1\n");
 #endif
 	snprintf(prefix, sizeof(prefix), "wl%d_", band);

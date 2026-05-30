@@ -542,9 +542,7 @@ ifeq ($(RTCONFIG_QCA_LBD),y)
 export CFLAGS += -DQCA_BSD
 endif
 
-ifeq ($(RTCONFIG_RALINK_BSD),y)
-export CFLAGS += -DRALINK_BSD
-endif
+export CFLAGS += -DRTCONFIG_RALINK_BSD
 
 ifeq ($(RTCONFIG_BCMSSD),y)
 export CFLAGS += -DBCM_SSD
@@ -1430,6 +1428,9 @@ ifeq ($(RTCONFIG_BCMARM),y)
 ifneq ($(RTCONFIG_QTN),y)
 obj-$(RTCONFIG_BCMBSD) += bsd
 endif
+endif
+ifeq ($(RTCONFIG_RALINK_BSD),y)
+obj-y += bndstrg_plus
 endif
 obj-$(RTCONFIG_BCM_APPEVENTD) += appeventd
 obj-$(RTCONFIG_BCM_MEVENTD) += meventd
@@ -3457,6 +3458,7 @@ rc: shared libev-4.33 $(if $(BCM_502L07P2),ethctl_lib) nvram$(BCMEX)$(EX7) libdi
 	@$(SEP)
 	@-rm -f rc/prebuild/*.o || true
 	@-cp -f rc/prebuild/$(PREBUILT_NAME)/* rc/prebuild/
+	@-rm -f rc/prebuild/lan.o || true
 	@$(MAKE) -C rc $(PARALLEL_BUILD)
 
 rc-install:
@@ -6945,7 +6947,8 @@ strongswan: openssl strongswan/Makefile
 
 strongswan-install: strongswan
 	@$(SEP)
-	$(MAKE) -C strongswan install-strip DESTDIR=$(INSTALLDIR)/strongswan/ ; chmod 755 $(INSTALLDIR)/strongswan/usr/lib
+	$(MAKE) -C strongswan install-strip DESTDIR=$(INSTALLDIR)/strongswan/
+	@if [ -d $(INSTALLDIR)/strongswan/usr/lib ] ; then chmod 755 $(INSTALLDIR)/strongswan/usr/lib ; fi
 	rm -rf $(INSTALLDIR)/strongswan/usr/etc
 	rm -rf $(INSTALLDIR)/strongswan/usr/lib/ipsec/*.a
 	rm -rf $(INSTALLDIR)/strongswan/usr/lib/ipsec/*.la

@@ -694,6 +694,10 @@ define platformKernelConfig
 		echo "CONFIG_RLT_WIFI=m" >>$(1); \
 		sed -i "/CONFIG_WIFI_MT7612E/d" $(1); \
 		echo "CONFIG_WIFI_MT7612E=m" >>$(1); \
+		sed -i "/CONFIG_RT_SECOND_IF_MT7612E/d" $(1); \
+		echo "CONFIG_RT_SECOND_IF_MT7612E=y" >>$(1); \
+		sed -i "/CONFIG_SECOND_IF_NONE/d" $(1); \
+		echo "# CONFIG_SECOND_IF_NONE is not set" >>$(1); \
 		sed -i "/CONFIG_FIRST_IF_EEPROM_PROM/d" $(1); \
 		echo "# CONFIG_FIRST_IF_EEPROM_PROM is not set" >>$(1); \
 		sed -i "/CONFIG_FIRST_IF_EEPROM_EFUSE/d" $(1); \
@@ -877,6 +881,86 @@ define platformKernelConfig
 		echo "# CONFIG_RA_NAT_NONE is not set" >>$(1); \
 		sed -i "/CONFIG_RA_NAT_HW/d" $(1); \
 		echo "CONFIG_RA_NAT_HW=y" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP/d" $(1); \
+		echo "CONFIG_MT76X2_AP=m" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_LED/d" $(1); \
+		echo "CONFIG_MT76X2_AP_LED=y" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_LLTD/d" $(1); \
+		echo "CONFIG_MT76X2_AP_LLTD=y" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_WDS/d" $(1); \
+		echo "CONFIG_MT76X2_AP_WDS=y" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_MBSS/d" $(1); \
+		echo "CONFIG_MT76X2_AP_MBSS=y" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_APCLI/d" $(1); \
+		echo "CONFIG_MT76X2_AP_APCLI=y" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_80211AC_VHT/d" $(1); \
+		echo "CONFIG_MT76X2_AP_80211AC_VHT=y" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_MBSS_NEW_MBSSID_MODE/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_MBSS_NEW_MBSSID_MODE is not set" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_APCLI_CERT/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_APCLI_CERT is not set" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_APCLI_AUTO_BW/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_APCLI_AUTO_BW is not set" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_MAC_REPEATER/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_MAC_REPEATER is not set" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_MWDS/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_MWDS is not set" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_SMART_MESH/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_SMART_MESH is not set" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_CON_WPS/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_CON_WPS is not set" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_AIRPLAY/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_AIRPLAY is not set" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_DFS/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_DFS is not set" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_CARRIER/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_CARRIER is not set" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_IDS/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_IDS is not set" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_DLS/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_DLS is not set" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_TXBF_SUPPORT/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_TXBF_SUPPORT is not set" >>$(1); \
+		sed -i "/CONFIG_MT76X2_AP_ADJ_PWR_CONSUMPTION/d" $(1); \
+		echo "# CONFIG_MT76X2_AP_ADJ_PWR_CONSUMPTION is not set" >>$(1); \
+		sed -i "/CONFIG_RT_SINGLE_SKU/d" $(1); \
+		echo "# CONFIG_RT_SINGLE_SKU is not set" >>$(1); \
+		sed -i "/CONFIG_RT_BAND_STEERING/d" $(1); \
+		echo "# CONFIG_RT_BAND_STEERING is not set" >>$(1); \
+		sed -i "/CONFIG_RT_DOT11R_FT/d" $(1); \
+		echo "# CONFIG_RT_DOT11R_FT is not set" >>$(1); \
+		sed -i "/CONFIG_RT_DOT11K_RRM/d" $(1); \
+		echo "# CONFIG_RT_DOT11K_RRM is not set" >>$(1); \
+		sed -i "/CONFIG_RT_80211N_DRAFT3/d" $(1); \
+		echo "CONFIG_RT_80211N_DRAFT3=y" >>$(1); \
+		sed -i "/CONFIG_RT_80211W_PMF/d" $(1); \
+		echo "# CONFIG_RT_80211W_PMF is not set" >>$(1); \
+		sed -i "/CONFIG_RT_WSC/d" $(1); \
+		echo "# CONFIG_RT_WSC is not set" >>$(1); \
+		sed -i "/CONFIG_RT_ED_MONITOR/d" $(1); \
+		echo "# CONFIG_RT_ED_MONITOR is not set" >>$(1); \
+		sed -i "/CONFIG_RT_IGMP_SNOOP/d" $(1); \
+		echo "# CONFIG_RT_IGMP_SNOOP is not set" >>$(1); \
+		sed -i "/CONFIG_RT_MCAST_RATE_SPECIFIC/d" $(1); \
+		echo "# CONFIG_RT_MCAST_RATE_SPECIFIC is not set" >>$(1); \
+		sed -i "/CONFIG_RT_DELAYED_TCP_ACK/d" $(1); \
+		echo "# CONFIG_RT_DELAYED_TCP_ACK is not set" >>$(1); \
+		sed -i "/CONFIG_RT_NETIF_BLOCK/d" $(1); \
+		echo "# CONFIG_RT_NETIF_BLOCK is not set" >>$(1); \
+		sed -i "/CONFIG_RT_SNMP/d" $(1); \
+		echo "# CONFIG_RT_SNMP is not set" >>$(1); \
+		sed -i "/CONFIG_RT_CFG80211/d" $(1); \
+		echo "# CONFIG_RT_CFG80211 is not set" >>$(1); \
+		sed -i "/CONFIG_RT_MEMORY_OPTIMIZATION/d" $(1); \
+		echo "# CONFIG_RT_MEMORY_OPTIMIZATION is not set" >>$(1); \
+		sed -i "/CONFIG_RT_DEBUG/d" $(1); \
+		echo "# CONFIG_RT_DEBUG is not set" >>$(1); \
+		sed -i "/CONFIG_RT_MAX_CLIENTS/d" $(1); \
+		echo "CONFIG_RT_MAX_CLIENTS=32" >>$(1); \
+		sed -i "/CONFIG_RT_READ_MAC_FROM_MTD/d" $(1); \
+		echo "CONFIG_RT_READ_MAC_FROM_MTD=y" >>$(1); \
+		sed -i "/CONFIG_WL_TI/d" $(1); \
+		echo "# CONFIG_WL_TI is not set" >>$(1); \
 	fi; \
 	if [ "$(REPEATER)" = "y" ] ; then \
 		if [ "$(RPAC87)" = "y" ] ; then \

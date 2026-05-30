@@ -3,6 +3,8 @@ config MT76X2_AP
 	select WIRELESS_EXT
 	select WEXT_SPY
 	select WEXT_PRIV
+	depends on RT_SECOND_IF_MT7612E
+	default m
 
 config  MT76X2_AP_LED
 	bool "LED support"

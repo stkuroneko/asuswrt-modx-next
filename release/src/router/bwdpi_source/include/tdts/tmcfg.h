@@ -26,13 +26,13 @@
 
 /*
  * Automatically generated make config: don't edit
- * Date: Tue Jul 31 00:17:52 2018
+ * Date: Thu Oct 27 15:00:20 2016
  */
 #ifndef __TMCFG__AUTOCONF_OUTPUT_H_
 #define __TMCFG__AUTOCONF_OUTPUT_H_
 
 #define TMCFG_BRAND "asus"
-#define TMCFG_MODEL "map-ac2200"
+#define TMCFG_MODEL "rt-ac85u"
 
 /*
  * Target device information
@@ -41,17 +41,17 @@
 #define TMCFG_KERN_SPACE 1 // y
 #define TMCFG_ARCH_X86 0 // n
 #define TMCFG_ARCH_X86_64 0 // n
-#define TMCFG_ARCH_MIPS 0 // n
-#define TMCFG_ARCH_ARM 1 // y
+#define TMCFG_ARCH_MIPS 1 // y
+#define TMCFG_ARCH_ARM 0 // n
 #define TMCFG_ARCH_ARM_64 0 // n
 #define TMCFG_ARCH_POWERPC 0 // n
 #define TMCFG_CPU_BIG_ENDIAN 0 // n
 #define TMCFG_CPU_LITTLE_ENDIAN 1 // y
-#define TMCFG_KERN_DIR "/opt/ASUS/asusmap_AC2200_GPL_382_11600/release/src-qca-dakota/linux/linux-3.14.x/"
-#define TMCFG_KERN_ARCH "arm"
+#define TMCFG_KERN_DIR "/opt/ASUS/asuswrt_AC85U_GPL_380_5972/release/src-ra-5010/linux/linux-3.10.14.x"
+#define TMCFG_KERN_ARCH "mips"
 #define TMCFG_CPU_32BITS 1 // y
 #define TMCFG_CPU_64BITS 0 // n
-#define TMCFG_LOCAL_ATOMIC_OP_LOCK 0 // n
+#define TMCFG_LOCAL_ATOMIC_OP_LOCK 1 // y
 
 /*
  * Toolchain (TC) configurations
@@ -60,7 +60,7 @@
 /*
  * Target device toolchain (cross utilities)
  */
-#define TMCFG_TC_PFX "/opt/ASUS/toolchains/asus-toolchain-arm-map_ac1300/bin/arm-openwrt-linux-uclibcgnueabi-"
+#define TMCFG_TC_PFX "/opt/buildroot-gcc463/usr/bin/mipsel-linux-"
 #define TMCFG_TC_BIT_FIELD_ORDER_LITTLE_ENDIAN 1 // y
 #define TMCFG_TC_BIT_FIELD_ORDER_BIG_ENDIAN 0 // n
 #define TMCFG_TC_CC "$(TMCFG_TC_PFX)gcc"
@@ -98,7 +98,6 @@
 #define TMCFG_E_KMOD_IOCTL_DEV_NAME "detector"
 #define TMCFG_E_KMOD_IOCTL_DEV_MAJ 190
 #define TMCFG_E_KMOD_IOCTL_DEV_MIN 0
-#define TMCFG_E_KMOD_IOCTL_DEV_MAGIC 190
 
 /*
  * ******
@@ -106,7 +105,7 @@
 #define TMCFG_E_MAJ_VER 2
 #define TMCFG_E_MID_VER 0
 #define TMCFG_E_MIN_VER 1
-#define TMCFG_E_LOCAL_VER "r4031774"
+#define TMCFG_E_LOCAL_VER "r2974221"
 
 /*
  * Engine core
@@ -142,13 +141,6 @@
 #define TMCFG_E_CORE_TCP_CHECKSUM 0 // n
 #define TMCFG_E_CORE_RULE_FORMAT_NK 0 // n
 #define TMCFG_E_CORE_RULE_FORMAT_FM 1 // y
-
-/*
- * Rule Limits
- */
-#define TMCFG_E_CORE_CONFIG_POLICY_NUM 12000
-#define TMCFG_E_CORE_CONFIG_CONTENT_NUM 26100
-#define TMCFG_E_CORE_CONFIG_TOTAL_CONTENT_LENGTH 290000
 #define TMCFG_E_CORE_RULE_FORMAT_V2 0 // n
 #define TMCFG_E_CORE_RULE_BINDING 1 // y
 #define TMCFG_E_CORE_RULE_BINDING_CATEGORY_CHIPSET_PROVIDER 0 // n
@@ -164,23 +156,13 @@
 #define TMCFG_E_CORE_RULE_BINDING_CATEGORY_RETAIL_COMPANY_TPLINK 0 // n
 #define TMCFG_E_CORE_RULE_BINDING_CATEGORY_RETAIL_COMPANY_BUFFALO 0 // n
 #define TMCFG_E_CORE_RULE_BINDING_CATEGORY_RETAIL_COMPANY_BELKIN 0 // n
-#define TMCFG_E_CORE_RULE_BINDING_CATEGORY_RETAIL_COMPANY_LENOVO 0 // n
-#define TMCFG_E_CORE_RULE_BINDING_CATEGORY_RETAIL_COMPANY_UBIQUITI 0 // n
-#define TMCFG_E_CORE_RULE_BINDING_CATEGORY_RETAIL_COMPANY_RUCKUS 0 // n
 #define TMCFG_E_CORE_IP6 1 // y
 #define TMCFG_E_CORE_TCP_STREAM_REASM 0 // n
 #define TMCFG_E_CORE_FINE_GRAIN_TCP_LOCK 0 // n
 #define TMCFG_E_CORE_CONFIG_TCP_CHAIN_LAYOUT 3
 #define TMCFG_E_CORE_CONFIG_TCP_CONN_NUM 8
 #define TMCFG_E_CORE_CONFIG_TCP_HASH_SIZE 1
-#define TMCFG_E_CORE_CONFIG_TCP_TURBO_MODE_ENABLED 1 // y
-#define TMCFG_E_CORE_CONFIG_TCP_PACKET_INSPECTION_DEPTH 20
-#define TMCFG_E_CORE_CONFIG_TCP_BYTE_INSPECTION_DEPTH 30000
-#define TMCFG_E_CORE_CONFIG_TCP_SG_PACKET_INSPECTION_DEPTH 50
-#define TMCFG_E_CORE_CONFIG_UDP_TURBO_MODE_ENABLED 1 // y
-#define TMCFG_E_CORE_CONFIG_UDP_PACKET_INSPECTION_DEPTH 7
-#define TMCFG_E_CORE_CONFIG_UDP_BYTE_INSPECTION_DEPTH 10000
-#define TMCFG_E_CORE_CONFIG_UDP_SG_PACKET_INSPECTION_DEPTH 50
+#define TMCFG_E_CORE_CONFIG_TCP_REASM_FLOW_NUM 1
 #define TMCFG_E_CORE_UDP_FLOW_TRACKING 1 // y
 #define TMCFG_E_CORE_CONFIG_UDP_FLOW_NUM 4
 #define TMCFG_E_CORE_CONFIG_UDP_HASH_SIZE 1
@@ -198,7 +180,7 @@
 #define TMCFG_E_CORE_AC_STATE_NUM 64
 #define TMCFG_E_CORE_DYNAMIC_SIGNATURE_TABLE 1 // y
 #define TMCFG_E_CORE_DYNAMIC_MEMORY_ALLOC 0 // n
-#define TMCFG_E_CORE_CONNECTION_DYNAMIC_ALLOC 0 // n
+#define TMCFG_E_CORE_CONNECTION_DYNAMIC_ALLOC 1 // y
 #define TMCFG_E_CORE_CONFIG_HTTP_DECODER_NUM 1
 #define TMCFG_E_CORE_CONFIG_HTTP_URI_LENGTH 2048
 #define TMCFG_E_CORE_CONFIG_HTTP_REPLY_DECODE 0 // n
@@ -239,24 +221,12 @@
  * Kernel
  */
 #define TMCFG_APP_K_EXTRA_CFLAGS ""
-#define TMCFG_APP_K_TDTS_NFFW 0 // n
-#define TMCFG_APP_K_TDTS_NFFW_INTERNAL 0 // n
+#define TMCFG_APP_K_TDTS_NFFW 1 // y
 #define TMCFG_APP_K_TEMPLATE 0 // n
 
 /*
  * Userland
  */
-
-/*
- * Userspace toolchain
- */
-#define TMCFG_APP_U_TC_PFX "/opt/ASUS/toolchains/asus-toolchain-arm-map_ac1300/bin/arm-openwrt-linux-uclibcgnueabi-"
-#define TMCFG_APP_U_TC_CC "$(TMCFG_APP_U_TC_PFX)gcc"
-#define TMCFG_APP_U_TC_AR "$(TMCFG_APP_U_TC_PFX)ar"
-#define TMCFG_APP_U_TC_LD "$(TMCFG_APP_U_TC_PFX)ld"
-#define TMCFG_APP_U_TC_RANLIB "$(TMCFG_APP_U_TC_PFX)ranlib"
-#define TMCFG_APP_U_TC_STRIP "$(TMCFG_APP_U_TC_PFX)strip"
-#define TMCFG_APP_U_TC_OBJDUMP "$(TMCFG_APP_U_TC_PFX)objdump"
 #define TMCFG_APP_U_EXTRA_CFLAGS ""
 #define TMCFG_APP_U_EXTRA_LDFLAGS ""
 #define TMCFG_APP_U_KA_API 1 // y

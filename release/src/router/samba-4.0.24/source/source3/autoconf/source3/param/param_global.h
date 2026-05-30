@@ -9,9 +9,6 @@
 struct loadparm_global 
 {
 	TALLOC_CTX *ctx; /* Context for talloced members */
-	bool   bReadRaw;
-	bool   bWriteRaw;
-	char *  szConfigFile;
 	bool   bAllowInsecureWidelinks;
 	bool   bAllowTrustedDomains;
 	bool   bAsyncSMBEchoHandler;
@@ -269,6 +266,9 @@ struct loadparm_global
 	char *  szUsernameMap;
 	char *  szUsersharePath;
 	char *  szWINSHook;
+	bool   bReadRaw;
+	bool   bWriteRaw;
+	char *  szConfigFile;
 LOADPARM_EXTRA_GLOBALS
 };
 

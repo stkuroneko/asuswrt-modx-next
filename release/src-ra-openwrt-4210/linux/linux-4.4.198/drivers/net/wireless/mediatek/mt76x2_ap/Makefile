@@ -2,6 +2,9 @@ RT_DRV_DIR  := mt76x2
 RT_DRV_PATH := ../$(RT_DRV_DIR)
 RT_DRV_NAME := mt76x2_ap
 
+# Disable frame size warning
+EXTRA_CFLAGS += -Wno-frame-larger-than
+
 CHIP_MT7620 =
 CHIP_MT76X2 =
 ifeq ($(CONFIG_RT_FIRST_CARD),7620)

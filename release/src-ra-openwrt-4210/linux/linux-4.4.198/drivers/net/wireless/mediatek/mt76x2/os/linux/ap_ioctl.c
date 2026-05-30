@@ -85,8 +85,11 @@ struct iw_priv_args ap_privtab[] = {
 #ifdef WH_EZ_SETUP
 {RTPRIV_IOCTL_GEZ_SCAN_TABLE,
 IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | 1024,
-"get_ez_table"}
+"get_ez_table"},
 #endif /* WH_EZ_SETUP */
+{RTPRIV_IOCTL_ASUSCMD,
+IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | 1024,
+"asus_subcmd"}
 
 };
 
@@ -421,6 +424,11 @@ INT rt28xx_ap_ioctl(struct net_device *net_dev, struct ifreq *rq, int cmd)
 				0, NULL, 0);
 			break;
 #endif /* WH_EZ_SETUP */
+
+		case RTPRIV_IOCTL_ASUSCMD:
+			subcmd = wrqin->u.data.flags;
+			RTMP_AP_IoctlHandle(pAd, wrq, CMD_RTPRIV_IOCTL_ASUSCMD, subcmd, wrqin->u.data.pointer, 0);
+			break;
 
 		default:
 /*			DBGPRINT(RT_DEBUG_ERROR, ("IOCTL::unknown IOCTL's cmd = 0x%08x\n", cmd)); */

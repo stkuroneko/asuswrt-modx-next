@@ -27,6 +27,16 @@
 
 #include "rt_config.h"
 
+/* ASUS proprietary structure for site survey with vendor IE */
+struct _SITESURVEY_VSIE {
+	char Ssid[33];
+	unsigned char Bssid[6];
+	unsigned char Channel;
+	char Rssi;
+	unsigned char vendor_ie[128];
+	unsigned char vendor_ie_len;
+};
+
 
 #define A_BAND_REGION_0				0
 #define A_BAND_REGION_1				1
@@ -8792,7 +8802,7 @@ INT Set_AutoChannelSelCheckTime_Proc(
 
 INT Show_DriverInfo_Proc(RTMP_ADAPTER *pAd, PSTRING arg)
 {
-	DBGPRINT(RT_DEBUG_OFF, ("driver version: %s (%s %s) .\n", AP_DRIVER_VERSION, __DATE__, __TIME__));
+	DBGPRINT(RT_DEBUG_OFF, ("driver version: %s.\n", AP_DRIVER_VERSION));
 
 #ifdef CONFIG_ANDES_SUPPORT
 	if (pAd->chipCap.MCUType == ANDES) { 
@@ -16035,6 +16045,155 @@ INT RTMP_AP_IoctlHandle(
 #endif
 				wrq->u.data.length = sizeof(UINT32);
 				Status = copy_to_user(wrq->u.data.pointer, &pCurrState, wrq->u.data.length);
+			} else if (subcmd == ASUS_SUBCMD_GSTAINFO) {
+				/* Get STA information - return MAC table as text */
+				RTMP_STRING *msg;
+				INT i;
+				MAC_TABLE_ENTRY *pEntry;
+				os_alloc_mem(NULL, (UCHAR **)&msg, 4096);
+				if (msg != NULL) {
+					memset(msg, 0, 4096);
+					sprintf(msg, "STAINF:\n");
+					for (i = 1; i < MAX_LEN_OF_MAC_TABLE; i++) {
+						pEntry = &pAd->MacTab.Content[i];
+						if (IS_ENTRY_CLIENT(pEntry) && (pEntry->Sst == SST_ASSOC)) {
+							char macstr[18];
+							sprintf(macstr, "%02X:%02X:%02X:%02X:%02X:%02X", 
+								PRINT_MAC(pEntry->Addr));
+							char tmp[256];
+							sprintf(tmp, "MAC=%s AID=%d RSSI=%d TxRate=%d RxRate=%d\n",
+								macstr, pEntry->Aid, pEntry->RssiSample.AvgRssi0,
+								pEntry->LastTxRate, pEntry->LastRxRate);
+							if ((strlen(msg) + strlen(tmp)) < 4000)
+								strcat(msg, tmp);
+						}
+					}
+					wrq->u.data.length = strlen(msg);
+					Status = copy_to_user(wrq->u.data.pointer, msg, wrq->u.data.length);
+					os_free_mem(NULL, msg);
+				}
+			} else if (subcmd == ASUS_SUBCMD_GSTAT) {
+				/* Get statistics - return driver statistics as text */
+				RTMP_STRING *msg;
+				os_alloc_mem(NULL, (UCHAR **)&msg, 4096);
+				if (msg != NULL) {
+					memset(msg, 0, 4096);
+					sprintf(msg, "STAT:\n");
+					char tmp[512];
+					sprintf(tmp, "TxSuccess=%llu TxRetry=%llu TxFail=%llu\nRxSuccess=%llu RxRetry=%llu RxFail=%llu\n",
+						pAd->WlanCounters.TransmittedFragmentCount.QuadPart,
+						pAd->WlanCounters.RetryCount.QuadPart,
+						pAd->WlanCounters.FailedCount.QuadPart,
+						pAd->WlanCounters.ReceivedFragmentCount.QuadPart,
+						0ULL, 0ULL);
+					if ((strlen(msg) + strlen(tmp)) < 4000)
+						strcat(msg, tmp);
+					wrq->u.data.length = strlen(msg);
+					Status = copy_to_user(wrq->u.data.pointer, msg, wrq->u.data.length);
+					os_free_mem(NULL, msg);
+				}
+			} else if (subcmd == ASUS_SUBCMD_CLIQ) {
+				/* Get link quality for ApCli */
+#ifdef APCLI_SUPPORT
+				PAPCLI_STRUCT pApCliEntry;
+				PMAC_TABLE_ENTRY pEntry;
+				RTMP_STRING tmp[20];
+				memset(tmp, 0, sizeof(tmp));
+				pApCliEntry = &pAd->ApCfg.ApCliTab[pObj->ioctl_if];
+				pEntry = &pAd->MacTab.Content[pApCliEntry->MacTabWCID];
+				snprintf(tmp, sizeof(tmp), "%lu", pEntry->ChannelQuality);
+				wrq->u.data.length = strlen(tmp);
+				Status = copy_to_user(wrq->u.data.pointer, tmp, wrq->u.data.length);
+#else
+				RTMP_STRING tmp[2] = "0";
+				wrq->u.data.length = 1;
+				Status = copy_to_user(wrq->u.data.pointer, tmp, wrq->u.data.length);
+#endif
+			} else if (subcmd == ASUS_SUBCMD_GROAM) {
+				/* Get roaming information - return RSSI per antenna for each STA */
+				RTMP_STRING *msg;
+				INT i;
+				MAC_TABLE_ENTRY *pEntry;
+				os_alloc_mem(NULL, (UCHAR **)&msg, 4096);
+				if (msg != NULL) {
+					memset(msg, 0, 4096);
+					for (i = 1; i < MAX_LEN_OF_MAC_TABLE; i++) {
+						pEntry = &pAd->MacTab.Content[i];
+						if (IS_ENTRY_CLIENT(pEntry) && (pEntry->Sst == SST_ASSOC)) {
+							char macstr[18];
+							sprintf(macstr, "%02X:%02X:%02X:%02X:%02X:%02X", 
+								PRINT_MAC(pEntry->Addr));
+							char tmp[256];
+							sprintf(tmp, "%s %d %d %d %d\n",
+								macstr, 
+								pEntry->RssiSample.AvgRssi0,
+								pEntry->RssiSample.AvgRssi1,
+								pEntry->RssiSample.AvgRssi2,
+								0);
+							if ((strlen(msg) + strlen(tmp)) < 4000)
+								strcat(msg, tmp);
+						}
+					}
+					wrq->u.data.length = strlen(msg);
+					Status = copy_to_user(wrq->u.data.pointer, msg, wrq->u.data.length);
+					os_free_mem(NULL, msg);
+				}
+			} else if (subcmd == ASUS_SUBCMD_GETSITESURVEY_VSIE) {
+				/* Get site survey result with vendor IE - return binary data */
+				INT i;
+				BSS_ENTRY *pBss;
+				UCHAR *buf;
+				UINT32 buf_len = 0;
+				struct _SITESURVEY_VSIE *survey_entry;
+				
+				/* Calculate required buffer size */
+				buf_len = pAd->ScanTab.BssNr * sizeof(struct _SITESURVEY_VSIE);
+				if (buf_len == 0 || buf_len > 8192) {
+					wrq->u.data.length = 0;
+					break;
+				}
+				
+				os_alloc_mem(NULL, &buf, buf_len);
+				if (buf == NULL) {
+					wrq->u.data.length = 0;
+					break;
+				}
+				
+				memset(buf, 0, buf_len);
+				survey_entry = (struct _SITESURVEY_VSIE *)buf;
+				
+				for (i = 0; i < pAd->ScanTab.BssNr && i < (buf_len / sizeof(struct _SITESURVEY_VSIE)); i++) {
+					pBss = &pAd->ScanTab.BssEntry[i];
+					
+					/* Copy SSID */
+					NdisZeroMemory(survey_entry->Ssid, 33);
+					if (pBss->SsidLen > 0 && pBss->SsidLen <= 32) {
+						NdisMoveMemory(survey_entry->Ssid, pBss->Ssid, pBss->SsidLen);
+					}
+					
+					/* Copy BSSID */
+					NdisMoveMemory(survey_entry->Bssid, pBss->Bssid, 6);
+					
+					/* Copy Channel */
+					survey_entry->Channel = pBss->Channel;
+					
+					/* Copy RSSI */
+					survey_entry->Rssi = pBss->Rssi;
+					
+					/* Copy Vendor IE if available */
+					if (pBss->VarIELen > 0 && pBss->VarIELen <= 128) {
+						survey_entry->vendor_ie_len = pBss->VarIELen;
+						NdisMoveMemory(survey_entry->vendor_ie, pBss->VarIEs, pBss->VarIELen);
+					} else {
+						survey_entry->vendor_ie_len = 0;
+					}
+					
+					survey_entry++;
+				}
+				
+				wrq->u.data.length = buf_len;
+				Status = copy_to_user(wrq->u.data.pointer, buf, wrq->u.data.length);
+				os_free_mem(NULL, buf);
 			}
 		}
 		break;

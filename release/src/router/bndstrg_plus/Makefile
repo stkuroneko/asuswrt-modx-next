@@ -20,6 +20,6 @@ else
 endif
 
 install:
-	install -D bndstrg_plus/bndstrg2 $(INSTALLDIR)/bndstrg_plus/usr/sbin/bndstrg2
-	$(STRIP) $(INSTALLDIR)/bndstrg_plus/usr/sbin/bndstrg2
+	install -D bndstrg_plus/bndstrg2 $(INSTALLDIR)/usr/sbin/bndstrg2
+	$(STRIP) $(INSTALLDIR)/usr/sbin/bndstrg2
 

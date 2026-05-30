@@ -5688,6 +5688,10 @@ void restart_wireless(void)
 		_dprintf("band steering is enabled, sync wireless settings...\n");
 		bandstr_sync_wl_settings();
 	}
+	else {
+		_dprintf("band steering is disabled, stop bndstrg2...\n");
+		stop_bsd();
+	}
 #endif
 #ifdef RTCONFIG_BCMWL6
 #ifdef RTCONFIG_AMAS

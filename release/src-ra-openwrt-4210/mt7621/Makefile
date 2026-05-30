@@ -14,11 +14,11 @@ export LDFLAGS+=$(EXTRALDFLAGS)
 pobj-y:=
 
 #pobj-y += mii_mgr regs switch wifi-fw
-pobj-$(RTCONFIG_RALINK_BSD) += bndstrg_plus
+pobj-y += bndstrg_plus
 
 
 pobj-clean := $(foreach pobj, $(pobj-y) $(pobj-n) $(pobj-), $(pobj)-clean)
-pobj-install := $(foreach pobj,$(pobj-y),$(pobj)-install)
+pobj-install := $(foreach pobj,$(pobj-y),INSTALLDIR=$(INSTALLDIR)/$(pobj) $(pobj)-install)
 
 #
 # Basic rules
@@ -26,7 +26,16 @@ pobj-install := $(foreach pobj,$(pobj-y),$(pobj)-install)
 
 all: $(pobj-y)
 
-install: $(pobj-install) gen_target
+install: $(pobj-install) gen_target copy_bndstrg2
+
+copy_bndstrg2:
+	if [ -f $(INSTALLDIR)/bndstrg_plus/usr/sbin/bndstrg2 ] ; then \
+		mkdir -p $(INSTALLDIR)/usr/sbin && \
+		cp $(INSTALLDIR)/bndstrg_plus/usr/sbin/bndstrg2 $(INSTALLDIR)/usr/sbin/bndstrg2 ; \
+	elif [ -f $(INSTALLDIR)/bndstrg_plus/bndstrg2 ] ; then \
+		mkdir -p $(INSTALLDIR)/usr/sbin && \
+		cp $(INSTALLDIR)/bndstrg_plus/bndstrg2 $(INSTALLDIR)/usr/sbin/bndstrg2 ; \
+	fi
 
 gen_target:
 	[ -d $(TARGETDIR) ] || install -d $(TARGETDIR)

@@ -137,6 +137,8 @@ typedef enum _CMD_RTPRIV_IOCTL_AP {
 #ifdef WH_EZ_SETUP
 	CMD_RTPRIV_IOCTL_GET_EZ_SCAN_TABLE,
 #endif /* WH_EZ_SETUP */
+
+	CMD_RTPRIV_IOCTL_ASUSCMD,
 	/* can not exceed 0x5000 */
 } CMD_RTPRIV_IOCTL_AP;
 

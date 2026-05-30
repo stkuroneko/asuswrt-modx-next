@@ -20190,6 +20190,7 @@ NO_USB_CAP:
 #endif
 #if defined(RTCONFIG_RALINK_BSD)
 	add_rc_support("bandstr");
+	add_rc_support("smart_connect");
 #endif
 
 	return 0;
