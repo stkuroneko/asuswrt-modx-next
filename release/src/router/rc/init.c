@@ -4453,6 +4453,7 @@ int init_nvram(void)
 		add_rc_support("pwrctrl");
 		//either txpower or singlesku supports rc.
 		add_rc_support("pwrctrl");
+		add_rc_support("smart_connect");
 		// the following values is model dep. so move it from default.c to here
 		nvram_set("wl0_HT_TxStream", "2");
 		nvram_set("wl0_HT_RxStream", "2");
