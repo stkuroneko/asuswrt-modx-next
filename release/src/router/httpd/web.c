@@ -29946,7 +29946,7 @@ ookla_exec(char *type, char *id)
 
 	/* check folder and files */
 	if (!f_exists(OOKLA_FOLDER))
-		mkdir(OOKLA_FOLDER, 0666);
+		doSystem("mkdir -p " OOKLA_FOLDER);
 
 	/* kill old ookla process */
 	if (pidof("ookla") > 0) doSystem("killall -9 ookla");
