@@ -115,6 +115,11 @@ static int uas_use_uas_driver(struct usb_interface *intf,
 	if (le16_to_cpu(udev->descriptor.idVendor) == 0x0bc2)
 		flags |= US_FL_NO_ATA_1X;
 
+	/* JMicron JMS567 has compatibility issues with UAS */
+	if (le16_to_cpu(udev->descriptor.idVendor) == 0x152d &&
+			le16_to_cpu(udev->descriptor.idProduct) == 0x0578)
+		flags |= US_FL_IGNORE_UAS;
+
 	usb_stor_adjust_quirks(udev, &flags);
 
 	if (flags & US_FL_IGNORE_UAS) {

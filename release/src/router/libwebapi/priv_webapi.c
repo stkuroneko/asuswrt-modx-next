@@ -304,7 +304,7 @@ int is_usbX(void)
 
 int is_usb3(void)
 {
-	return *nvram_safe_get("usb_usb3") != 0x0;
+	return strstr(nvram_safe_get("rc_support"), "usb3") != NULL;
 }
 
 #if defined(RTCONFIG_BCMWL6) || defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
