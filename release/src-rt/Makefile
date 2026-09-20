@@ -355,6 +355,7 @@ ifeq ($(OPDBG),y)
 export IMGNAME := $(IMGNAME)_OPDBG
 endif
 
+REAL_NAME ?= $(BUILD_NAME)
 NEW_IMGNAME := $(subst $(BUILD_NAME),$(REAL_NAME),$(IMGNAME))
 
 ifeq ($(DSL_REMOTE),y)
