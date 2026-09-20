@@ -1355,6 +1355,22 @@ IPSEC_ID_POOL =		\
 	"STRONGSWAN"
 
 define RouterOptions
+	for board in R3G HIWIFI4 R6800 R3P RM2100 SIM_AX18T; do \
+		sed -i "/RTCONFIG_BOARD_$${board}/d" $(1); \
+	done; \
+	if [ "$(BOARD_PROFILE)" = "R3G" ]; then \
+		echo "RTCONFIG_BOARD_R3G=y" >>$(1); \
+	elif [ "$(BOARD_PROFILE)" = "HIWIFI4" ]; then \
+		echo "RTCONFIG_BOARD_HIWIFI4=y" >>$(1); \
+	elif [ "$(BOARD_PROFILE)" = "R6800" ]; then \
+		echo "RTCONFIG_BOARD_R6800=y" >>$(1); \
+	elif [ "$(BOARD_PROFILE)" = "R3P" ]; then \
+		echo "RTCONFIG_BOARD_R3P=y" >>$(1); \
+	elif [ "$(BOARD_PROFILE)" = "RM2100" ]; then \
+		echo "RTCONFIG_BOARD_RM2100=y" >>$(1); \
+	elif [ "$(BOARD_PROFILE)" = "SIM-AX18T" ]; then \
+		echo "RTCONFIG_BOARD_SIM_AX18T=y" >>$(1); \
+	fi; \
 	if [ "$(CONFIG_LINUX26)" = "y" ] ; then \
 		if [ "$(SAMBA3)" = "+3.6.x" ]; then \
 			sed -i "/RTCONFIG_SAMBA36X/d" $(1); \
@@ -6119,4 +6135,3 @@ get_extendno:
 .PHONY: a b c d m Makefile allversions
 .PHONY: tags
 .PHONY: dummy
-
