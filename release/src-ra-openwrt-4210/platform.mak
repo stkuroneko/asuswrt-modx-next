@@ -215,7 +215,8 @@ FIRST_IF_POOL =		\
 	"MT7612E"	\
 	"MT7603E"	\
 	"MT7602E"	\
-	"MT7615E"
+	"MT7615E"	\
+	"MT7915"
 
 SECOND_IF_POOL = 	\
 	"NONE"		\
@@ -1241,4 +1242,3 @@ define platformKernelConfig
 endef
 
 export PARALLEL_BUILD := -j$(shell grep -c '^processor' /proc/cpuinfo)
-
