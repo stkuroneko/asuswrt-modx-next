@@ -5813,7 +5813,7 @@ else ifeq ($(MT7621),y)
 	elif [ "$(BUILD_NAME)" = "4G-AC86U" ]; then \
 		cp $(LINUXDIR)/config_base.MT7622 $(LINUXDIR)/config_$(lowercase_B) ; \
 	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && [ "$(BOARD_PROFILE)" = "SIM-AX18T" ]; then \
-		cp $(LINUXDIR)/config_base.ax $(LINUXDIR)/config_$(lowercase_B) ; \
+		cp $(LINUXDIR)/config_base.mt7915 $(LINUXDIR)/config_$(lowercase_B) ; \
 	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && { [ "$(BOARD_PROFILE)" = "R3G" ] || [ "$(BOARD_PROFILE)" = "HIWIFI4" ]; }; then \
 		cp $(LINUXDIR)/config_base.mt7603_mt7612 $(LINUXDIR)/config_$(lowercase_B) ; \
 	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && [ "$(BOARD_PROFILE)" = "RM2100" ]; then \
