@@ -1,5 +1,6 @@
 
 SKU_MODEL_DIR ?= $(BUILD_NAME)
+SKU_L1PROFILE ?= $(SKU_MODEL_DIR)/l1profile.dat
 include $(SKU_MODEL_DIR)/config
 
 SKUDIR = $(INSTALLDIR)/ra_SKU
@@ -98,7 +99,7 @@ ifneq ($(SKU_5G_KCC),)
 	@install DUMMY_SKU $(SKUDIR)/SingleSKU_5G_KCC.dat
 endif
 
-	@install $(SKU_MODEL_DIR)/l1profile.dat $(SKUDIR)/l1profile.dat
+	@install $(SKU_L1PROFILE) $(SKUDIR)/l1profile.dat
 	@install $(SKU_MODEL_DIR)/SingleSKU_mt7615e-sku.dat $(SKUDIR)/SingleSKU_mt7615e-sku.dat
 	@install $(SKU_MODEL_DIR)/SingleSKU_mt7615e-sku-bf.dat $(SKUDIR)/SingleSKU_mt7615e-sku-bf.dat
 
