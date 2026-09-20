@@ -4426,8 +4426,19 @@ int init_nvram(void)
 			set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "vlan1", NULL, "vlan3", 0);
 
 		nvram_set_int("btn_rst_gpio",  18|GPIO_ACTIVE_LOW);
+#if defined(RTCONFIG_BOARD_R3G)
+		nvram_set_int("led_lan_gpio", 10|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_wan_gpio", 6);
+		nvram_set_int("led_pwr_gpio",  8|GPIO_ACTIVE_LOW);
+#elif defined(RTCONFIG_BOARD_R6800) || defined(RTCONFIG_BOARD_R3P) || defined(RTCONFIG_BOARD_RM2100) || defined(RTCONFIG_BOARD_SIM_AX18T)
+		nvram_set_int("led_pwr_gpio",  8|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_wps_gpio",  10|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_wan_gpio", 14|GPIO_ACTIVE_LOW);
+	eval("rtkswitch", "11");
+#else
 		nvram_set_int("led_pwr_gpio",  6|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_wps_gpio",  7|GPIO_ACTIVE_LOW);
+#endif
 		nvram_set_int("usb_pwr_gpio", 12);
 		/* Enable USB power via GPIO12 */
 		doSystem("echo 12 > /sys/class/gpio/export");
@@ -4439,17 +4450,32 @@ int init_nvram(void)
 			nvram_set_int("usb_usb3", 1);
 
 #ifdef RTCONFIG_XHCIMODE
+#if defined(RTCONFIG_BOARD_HIWIFI4)
 		nvram_set("xhci_ports", "2-1 2-2");
 		nvram_set("ehci_ports", "1-1 1-2");
 #else
+		nvram_set("xhci_ports", "2-1");
+		nvram_set("ehci_ports", "1-1");
+#endif
+#else
+#if defined(RTCONFIG_BOARD_HIWIFI4)
 		if(usb_usb3 == 1){
 			nvram_set("xhci_ports", "2-1 2-2");
 			nvram_set("ehci_ports", "1-1 1-2");
 		} else{
 			nvram_set("ehci_ports", "1-1 1-2");
 		}
+#else
+		if(usb_usb3 == 1)
+			nvram_set("xhci_ports", "2-1");
+		nvram_set("ehci_ports", "1-1");
 #endif
+#endif
+#if defined(RTCONFIG_BOARD_HIWIFI4)
 		nvram_set("ohci_ports", "1-1 1-2");
+#else
+		nvram_set("ohci_ports", "2-1");
+#endif
 		nvram_set("ct_max", "300000"); // force
 
 		//config_netdev_bled("led_2g_gpio", "ra0");
@@ -4458,7 +4484,11 @@ int init_nvram(void)
 
 		if (nvram_get("wl_mssid") && nvram_match("wl_mssid", "1"))
 			add_rc_support("mssid");
+#if defined(RTCONFIG_BOARD_HIWIFI4)
 		add_rc_support("2.4G 5G noupdate usbX2");
+#else
+		add_rc_support("2.4G 5G update usbX1");
+#endif
 		add_rc_support("usb3");
 		add_rc_support("rawifi");
 		add_rc_support("switchctrl");
@@ -4473,10 +4503,17 @@ int init_nvram(void)
 		add_rc_support("pwrctrl");
 		add_rc_support("smart_connect");
 		// the following values is model dep. so move it from default.c to here
+#if defined(RTCONFIG_BOARD_R6800) || defined(RTCONFIG_BOARD_R3P) || defined(RTCONFIG_BOARD_RM2100) || defined(RTCONFIG_BOARD_SIM_AX18T)
+		nvram_set("wl0_HT_TxStream", "4");
+		nvram_set("wl0_HT_RxStream", "4");
+		nvram_set("wl1_HT_TxStream", "4");
+		nvram_set("wl1_HT_RxStream", "4");
+#else
 		nvram_set("wl0_HT_TxStream", "2");
 		nvram_set("wl0_HT_RxStream", "2");
 		nvram_set("wl1_HT_TxStream", "2");
 		nvram_set("wl1_HT_RxStream", "2");
+#endif
 #if defined(RTCONFIG_AMAS) || defined(RTCONFIG_EASYMESH)
 		if (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1")) {
 			_dprintf("[%s][%d] sw mode = %d, repeater=%d, ap= %d ",
