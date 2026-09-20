@@ -4432,42 +4432,51 @@ int init_nvram(void)
 		nvram_set_int("btn_wps_gpio_1", 4|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_pwr_gpio", 7|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_wan_gpio", 8|GPIO_ACTIVE_LOW);
-#else
-		nvram_set_int("btn_rst_gpio",  18|GPIO_ACTIVE_LOW);
-#if defined(RTCONFIG_BOARD_R3G)
+#elif defined(RTCONFIG_BOARD_R3G)
+		nvram_set_int("btn_rst_gpio", 18|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_lan_gpio", 10|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_wan_gpio", 6);
-		nvram_set_int("led_pwr_gpio",  8|GPIO_ACTIVE_LOW);
-#elif defined(RTCONFIG_BOARD_R6800) || defined(RTCONFIG_BOARD_R3P) || defined(RTCONFIG_BOARD_RM2100)
-		nvram_set_int("led_pwr_gpio",  8|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_wps_gpio",  10|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_pwr_gpio", 8|GPIO_ACTIVE_LOW);
+#elif defined(RTCONFIG_BOARD_R6800)
+		nvram_set_int("btn_rst_gpio", 12|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wps_gpio", 18|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_wps_gpio", 17);
+		nvram_set_int("led_all_gpio", 5|GPIO_ACTIVE_LOW);
+		eval("rtkswitch", "11");
+#elif defined(RTCONFIG_BOARD_R3P)
+		nvram_set_int("btn_rst_gpio", 18|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_pwr_gpio", 8|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_wps_gpio", 10|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_wan_gpio", 14|GPIO_ACTIVE_LOW);
 		eval("rtkswitch", "11");
+		config_netdev_bled("led_2g_gpio", "ra0");
+		config_netdev_bled("led_5g_gpio", "rai0");
+#elif defined(RTCONFIG_BOARD_RM2100)
+		nvram_set_int("btn_rst_gpio", 18|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_lan_gpio", 14|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_wan_gpio", 12|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_pwr_gpio", 8|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_all_gpio", 6|GPIO_ACTIVE_LOW);
+		eval("rtkswitch", "11");
 #else
-		nvram_set_int("led_pwr_gpio",  6|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_wps_gpio",  7|GPIO_ACTIVE_LOW);
-#endif
+		nvram_set_int("btn_rst_gpio", 18|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_pwr_gpio", 6|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_wps_gpio", 7|GPIO_ACTIVE_LOW);
 #endif
 
-#if !defined(RTCONFIG_BOARD_SIM_AX18T)
+#if defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_HIWIFI4)
 		nvram_set_int("usb_pwr_gpio", 12);
 		/* Enable USB power via GPIO12 */
 		doSystem("echo 12 > /sys/class/gpio/export");
 		doSystem("echo out > /sys/class/gpio/gpio12/direction");
 		doSystem("echo 1 > /sys/class/gpio/gpio12/value");
-#endif
 
-#if !defined(RTCONFIG_BOARD_SIM_AX18T)
 		/* Default to USB 3.0 mode */
 		if (!nvram_get("usb_usb3"))
 			nvram_set_int("usb_usb3", 1);
-#endif
 
 #ifdef RTCONFIG_XHCIMODE
-#if defined(RTCONFIG_BOARD_SIM_AX18T)
-		nvram_set("xhci_ports", "");
-		nvram_set("ehci_ports", "");
-#elif defined(RTCONFIG_BOARD_HIWIFI4)
+#if defined(RTCONFIG_BOARD_HIWIFI4)
 		nvram_set("xhci_ports", "2-1 2-2");
 		nvram_set("ehci_ports", "1-1 1-2");
 #else
@@ -4475,9 +4484,7 @@ int init_nvram(void)
 		nvram_set("ehci_ports", "1-1");
 #endif
 #else
-#if defined(RTCONFIG_BOARD_SIM_AX18T)
-		nvram_set("ehci_ports", "");
-#elif defined(RTCONFIG_BOARD_HIWIFI4)
+#if defined(RTCONFIG_BOARD_HIWIFI4)
 		if(usb_usb3 == 1){
 			nvram_set("xhci_ports", "2-1 2-2");
 			nvram_set("ehci_ports", "1-1 1-2");
@@ -4490,11 +4497,16 @@ int init_nvram(void)
 		nvram_set("ehci_ports", "1-1");
 #endif
 #endif
-#if defined(RTCONFIG_BOARD_SIM_AX18T)
-		nvram_set("ohci_ports", "");
-#elif defined(RTCONFIG_BOARD_HIWIFI4)
+#if defined(RTCONFIG_BOARD_HIWIFI4)
 		nvram_set("ohci_ports", "1-1 1-2");
 #else
+		nvram_set("ohci_ports", "");
+#endif
+#elif defined(RTCONFIG_BOARD_R6800)
+		nvram_set("ehci_ports", "1-1 1-2");
+		nvram_set("ohci_ports", "2-1 2-2");
+#elif defined(RTCONFIG_BOARD_R3P) || defined(RTCONFIG_BOARD_RM2100)
+		nvram_set("ehci_ports", "1-1");
 		nvram_set("ohci_ports", "2-1");
 #endif
 		nvram_set("ct_max", "300000"); // force
@@ -4506,29 +4518,50 @@ int init_nvram(void)
 		if (nvram_get("wl_mssid") && nvram_match("wl_mssid", "1"))
 			add_rc_support("mssid");
 #if defined(RTCONFIG_BOARD_SIM_AX18T)
-		add_rc_support("2.4G 5G update");
+		add_rc_support("2.4G 5G noupdate");
 #elif defined(RTCONFIG_BOARD_HIWIFI4)
 		add_rc_support("2.4G 5G noupdate usbX2");
-#else
+#elif defined(RTCONFIG_BOARD_R3G)
+		add_rc_support("2.4G 5G noupdate usbX1");
+#elif defined(RTCONFIG_BOARD_R6800)
+		add_rc_support("2.4G 5G update usbX2");
+#elif defined(RTCONFIG_BOARD_R3P)
 		add_rc_support("2.4G 5G update usbX1");
+#else
+		add_rc_support("2.4G 5G update");
 #endif
-		add_rc_support("usb3");
 		add_rc_support("rawifi");
 		add_rc_support("switchctrl");
 		add_rc_support("manual_stb");
 		add_rc_support("11AC");
+#if defined(RTCONFIG_BOARD_SIM_AX18T)
+		add_rc_support("11AX mbo ofdma");
+		add_rc_support("wpa3");
+#endif
+#if !defined(RTCONFIG_BOARD_R6800)
 		add_rc_support("loclist");
+#endif
 		add_rc_support("app");
+#if !defined(RTCONFIG_BOARD_R3P)
 		add_rc_support("gameMode");
+#endif
+#if !defined(RTCONFIG_BOARD_R6800) && !defined(RTCONFIG_BOARD_R3P)
 		add_rc_support("pwrctrl");
+#endif
+#if defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_HIWIFI4)
+		add_rc_support("usb3");
 		add_rc_support("ookla");
-		//either txpower or singlesku supports rc.
-		add_rc_support("pwrctrl");
 		add_rc_support("smart_connect");
+#endif
 		// the following values is model dep. so move it from default.c to here
-#if defined(RTCONFIG_BOARD_R6800) || defined(RTCONFIG_BOARD_R3P) || defined(RTCONFIG_BOARD_RM2100) || defined(RTCONFIG_BOARD_SIM_AX18T)
+#if defined(RTCONFIG_BOARD_R6800) || defined(RTCONFIG_BOARD_R3P)
 		nvram_set("wl0_HT_TxStream", "4");
 		nvram_set("wl0_HT_RxStream", "4");
+		nvram_set("wl1_HT_TxStream", "4");
+		nvram_set("wl1_HT_RxStream", "4");
+#elif defined(RTCONFIG_BOARD_RM2100)
+		nvram_set("wl0_HT_TxStream", "2");
+		nvram_set("wl0_HT_RxStream", "2");
 		nvram_set("wl1_HT_TxStream", "4");
 		nvram_set("wl1_HT_RxStream", "4");
 #else
