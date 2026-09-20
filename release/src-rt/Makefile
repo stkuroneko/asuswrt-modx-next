@@ -5814,6 +5814,12 @@ else ifeq ($(MT7621),y)
 		cp $(LINUXDIR)/config_base.MT7622 $(LINUXDIR)/config_$(lowercase_B) ; \
 	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && [ "$(BOARD_PROFILE)" = "SIM-AX18T" ]; then \
 		cp $(LINUXDIR)/config_base.ax $(LINUXDIR)/config_$(lowercase_B) ; \
+	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && { [ "$(BOARD_PROFILE)" = "R3G" ] || [ "$(BOARD_PROFILE)" = "HIWIFI4" ]; }; then \
+		cp $(LINUXDIR)/config_base.mt7603_mt7612 $(LINUXDIR)/config_$(lowercase_B) ; \
+	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && [ "$(BOARD_PROFILE)" = "RM2100" ]; then \
+		cp $(LINUXDIR)/config_base.mt7603_mt7615 $(LINUXDIR)/config_$(lowercase_B) ; \
+	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && { [ "$(BOARD_PROFILE)" = "R6800" ] || [ "$(BOARD_PROFILE)" = "R3P" ]; }; then \
+		cp $(LINUXDIR)/config_base.mt7615 $(LINUXDIR)/config_$(lowercase_B) ; \
 	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] || [ "$(BUILD_NAME)" = "RT-AX54" ] || [ "$(BUILD_NAME)" = "4G-AX56" ] || [ "$(BUILD_NAME)" = "H3C-TX1801" ] || [ "$(BUILD_NAME)" = "JCG-Q10PRO" ] || [ "$(BUILD_NAME)" = "PGB-M1" ] || [ "$(BUILD_NAME)" = "XM-CR660X" ]  || [ "$(BUILD_NAME)" = "RT-TX1801" ] || [ "$(BUILD_NAME)" = "RT-AX18T" ] || [ "$(BUILD_NAME)" = "RT-HAR" ] || [ "$(BUILD_NAME)" = "RT-CR660X" ] || [ "$(BUILD_NAME)" = "RT-CMCCA9" ] || [ "$(BUILD_NAME)" = "RT-Q20" ] || [ "$(BUILD_NAME)" = "JCG-Q20" ] || [ "$(BUILD_NAME)" = "RT-XG1" ] ; then \
 		cp $(LINUXDIR)/config_base.ac $(LINUXDIR)/config_$(lowercase_B) ; \
 	elif [ "$(BUILD_NAME)" = "RT-AC2100" ] || [ "$(BUILD_NAME)" = "RT-RM2100" ]|| [ "$(BUILD_NAME)" = "RT-MIR3G" ] || [ "$(BUILD_NAME)" = "R6800" ]; then \
