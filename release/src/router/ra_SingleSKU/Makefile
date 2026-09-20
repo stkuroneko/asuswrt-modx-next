@@ -1,9 +1,10 @@
 
-include $(BUILD_NAME)/config
+SKU_MODEL_DIR ?= $(BUILD_NAME)
+include $(SKU_MODEL_DIR)/config
 
 SKUDIR = $(INSTALLDIR)/ra_SKU
 
-SKU_FILES  = $(BUILD_NAME)/$(SKU_2G_FCC) $(BUILD_NAME)/$(SKU_2G_CE) $(BUILD_NAME)/$(SKU_5G_FCC) $(BUILD_NAME)/$(SKU_5G_CE)
+SKU_FILES  = $(SKU_MODEL_DIR)/$(SKU_2G_FCC) $(SKU_MODEL_DIR)/$(SKU_2G_CE) $(SKU_MODEL_DIR)/$(SKU_5G_FCC) $(SKU_MODEL_DIR)/$(SKU_5G_CE)
 
 
 # usage: $(call install_file, src_file, dest_file)
@@ -97,9 +98,9 @@ ifneq ($(SKU_5G_KCC),)
 	@install DUMMY_SKU $(SKUDIR)/SingleSKU_5G_KCC.dat
 endif
 
-	@install $(BUILD_NAME)/l1profile.dat $(SKUDIR)/l1profile.dat
-	@install $(BUILD_NAME)/SingleSKU_mt7615e-sku.dat $(SKUDIR)/SingleSKU_mt7615e-sku.dat
-	@install $(BUILD_NAME)/SingleSKU_mt7615e-sku-bf.dat $(SKUDIR)/SingleSKU_mt7615e-sku-bf.dat
+	@install $(SKU_MODEL_DIR)/l1profile.dat $(SKUDIR)/l1profile.dat
+	@install $(SKU_MODEL_DIR)/SingleSKU_mt7615e-sku.dat $(SKUDIR)/SingleSKU_mt7615e-sku.dat
+	@install $(SKU_MODEL_DIR)/SingleSKU_mt7615e-sku-bf.dat $(SKUDIR)/SingleSKU_mt7615e-sku-bf.dat
 
 else	#RA_SKU==y
 ifneq ($(SKU_2G_EAC),)
@@ -109,98 +110,98 @@ ifneq ($(SKU_5G_EAC),)
 	install DUMMY_SKU $(SKUDIR)/SingleSKU_5G_EAC.dat
 endif
 ifneq ($(SKU_2G_FCC),)
-	@install $(BUILD_NAME)/$(SKU_2G_FCC) $(SKUDIR)/SingleSKU_FCC.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_FCC) $(SKUDIR)/SingleSKU_FCC.dat
 endif
 ifneq ($(SKU_5G_FCC),)
-	@install $(BUILD_NAME)/$(SKU_5G_FCC) $(SKUDIR)/SingleSKU_5G_FCC.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_FCC) $(SKUDIR)/SingleSKU_5G_FCC.dat
 endif
 ifneq ($(SKU_2G_IC),)
-	@install $(BUILD_NAME)/$(SKU_2G_IC) $(SKUDIR)/SingleSKU_IC.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_IC) $(SKUDIR)/SingleSKU_IC.dat
 endif
 ifneq ($(SKU_5G_IC),)
-	@install $(BUILD_NAME)/$(SKU_5G_IC) $(SKUDIR)/SingleSKU_5G_IC.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_IC) $(SKUDIR)/SingleSKU_5G_IC.dat
 endif
 ifneq ($(SKU_2G_CE),)
-	@install $(BUILD_NAME)/$(SKU_2G_CE)  $(SKUDIR)/SingleSKU_CE.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_CE)  $(SKUDIR)/SingleSKU_CE.dat
 endif
 ifneq ($(SKU_5G_CE),)
-	@install $(BUILD_NAME)/$(SKU_5G_CE)  $(SKUDIR)/SingleSKU_5G_CE.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_CE)  $(SKUDIR)/SingleSKU_5G_CE.dat
 endif
 ifneq ($(SKU_2G_SG),)
-	@install $(BUILD_NAME)/$(SKU_2G_SG) $(SKUDIR)/SingleSKU_SG.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_SG) $(SKUDIR)/SingleSKU_SG.dat
 endif
 ifneq ($(SKU_5G_SG),)
-	@install $(BUILD_NAME)/$(SKU_5G_SG) $(SKUDIR)/SingleSKU_5G_SG.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_SG) $(SKUDIR)/SingleSKU_5G_SG.dat
 endif
 ifneq ($(SKU_2G_AU),)
-	@install $(BUILD_NAME)/$(SKU_2G_AU) $(SKUDIR)/SingleSKU_AU.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_AU) $(SKUDIR)/SingleSKU_AU.dat
 endif
 ifneq ($(SKU_5G_AU),)
-	@install $(BUILD_NAME)/$(SKU_5G_AU) $(SKUDIR)/SingleSKU_5G_AU.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_AU) $(SKUDIR)/SingleSKU_5G_AU.dat
 endif
 ifneq ($(SKU_2G_NCC),)
-	@install $(BUILD_NAME)/$(SKU_2G_NCC) $(SKUDIR)/SingleSKU_NCC.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_NCC) $(SKUDIR)/SingleSKU_NCC.dat
 endif
 ifneq ($(SKU_5G_NCC),)
-	@install $(BUILD_NAME)/$(SKU_5G_NCC) $(SKUDIR)/SingleSKU_5G_NCC.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_NCC) $(SKUDIR)/SingleSKU_5G_NCC.dat
 endif
 ifneq ($(SKU_2G_NCC2),)
-	@install $(BUILD_NAME)/$(SKU_2G_NCC2) $(SKUDIR)/SingleSKU_NCC2.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_NCC2) $(SKUDIR)/SingleSKU_NCC2.dat
 endif
 ifneq ($(SKU_5G_NCC2),)
-	@install $(BUILD_NAME)/$(SKU_5G_NCC2) $(SKUDIR)/SingleSKU_5G_NCC2.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_NCC2) $(SKUDIR)/SingleSKU_5G_NCC2.dat
 endif
 ifneq ($(SKU_2G_JP),)
-	@install $(BUILD_NAME)/$(SKU_2G_JP) $(SKUDIR)/SingleSKU_JP.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_JP) $(SKUDIR)/SingleSKU_JP.dat
 endif
 ifneq ($(SKU_5G_JP),)
-	@install $(BUILD_NAME)/$(SKU_5G_JP) $(SKUDIR)/SingleSKU_5G_JP.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_JP) $(SKUDIR)/SingleSKU_5G_JP.dat
 endif
 ifneq ($(SKU_2G_CN),)
-	@install $(BUILD_NAME)/$(SKU_2G_CN) $(SKUDIR)/SingleSKU_CN.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_CN) $(SKUDIR)/SingleSKU_CN.dat
 endif
 ifneq ($(SKU_5G_CN),)
-	@install $(BUILD_NAME)/$(SKU_5G_CN) $(SKUDIR)/SingleSKU_5G_CN.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_CN) $(SKUDIR)/SingleSKU_5G_CN.dat
 endif
 ifneq ($(SKU_2G_IC),)
-	@install $(BUILD_NAME)/$(SKU_2G_IC) $(SKUDIR)/SingleSKU_IC.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_IC) $(SKUDIR)/SingleSKU_IC.dat
 endif
 ifneq ($(SKU_5G_IC),)
-	@install $(BUILD_NAME)/$(SKU_5G_IC) $(SKUDIR)/SingleSKU_5G_IC.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_IC) $(SKUDIR)/SingleSKU_5G_IC.dat
 endif
 ifneq ($(SKU_2G_AP),)
-	@install $(BUILD_NAME)/$(SKU_2G_AP) $(SKUDIR)/SingleSKU_AP.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_AP) $(SKUDIR)/SingleSKU_AP.dat
 endif
 ifneq ($(SKU_5G_AP),)
-	@install $(BUILD_NAME)/$(SKU_5G_AP) $(SKUDIR)/SingleSKU_5G_AP.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_AP) $(SKUDIR)/SingleSKU_5G_AP.dat
 endif
 ifneq ($(SKU_2G_EAC),)
-	@install $(BUILD_NAME)/$(SKU_2G_EAC) $(SKUDIR)/SingleSKU_EAC.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_EAC) $(SKUDIR)/SingleSKU_EAC.dat
 endif
 ifneq ($(SKU_5G_EAC),)
-	@install $(BUILD_NAME)/$(SKU_5G_EAC) $(SKUDIR)/SingleSKU_5G_EAC.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_EAC) $(SKUDIR)/SingleSKU_5G_EAC.dat
 endif
 ifneq ($(SKU_2G_KCC),)
-	@install $(BUILD_NAME)/$(SKU_2G_KCC) $(SKUDIR)/SingleSKU_KCC.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_KCC) $(SKUDIR)/SingleSKU_KCC.dat
 endif
 ifneq ($(SKU_5G_KCC),)
-	@install $(BUILD_NAME)/$(SKU_5G_KCC) $(SKUDIR)/SingleSKU_5G_KCC.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_KCC) $(SKUDIR)/SingleSKU_5G_KCC.dat
 endif
 
 ifeq ("$(BUILD_NAME)","RT-AC52U")
-	@install $(BUILD_NAME)/$(SKU_2G_FCC_V2) $(SKUDIR)/SingleSKU_FCC_0002.dat
-	@install $(BUILD_NAME)/$(SKU_5G_FCC_V2) $(SKUDIR)/SingleSKU_5G_FCC_0002.dat
-	@install $(BUILD_NAME)/$(SKU_2G_CE_V2) $(SKUDIR)/SingleSKU_CE_0002.dat
-	@install $(BUILD_NAME)/$(SKU_5G_CE_V2) $(SKUDIR)/SingleSKU_5G_CE_0002.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_FCC_V2) $(SKUDIR)/SingleSKU_FCC_0002.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_FCC_V2) $(SKUDIR)/SingleSKU_5G_FCC_0002.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_2G_CE_V2) $(SKUDIR)/SingleSKU_CE_0002.dat
+	@install $(SKU_MODEL_DIR)/$(SKU_5G_CE_V2) $(SKUDIR)/SingleSKU_5G_CE_0002.dat
 endif
 
-	@install $(BUILD_NAME)/l1profile.dat $(SKUDIR)/l1profile.dat
+	@install $(SKU_MODEL_DIR)/l1profile.dat $(SKUDIR)/l1profile.dat
 ifeq ($(or $(MT7986A),$(MT7986B),$(MT7986C)),y)
-	@install $(BUILD_NAME)/mt7986-sku.dat $(SKUDIR)/mt7986-sku.dat
-	@install $(BUILD_NAME)/mt7986-sku-bf.dat $(SKUDIR)/mt7986-sku-bf.dat
+	@install $(SKU_MODEL_DIR)/mt7986-sku.dat $(SKUDIR)/mt7986-sku.dat
+	@install $(SKU_MODEL_DIR)/mt7986-sku-bf.dat $(SKUDIR)/mt7986-sku-bf.dat
 else ifeq ($(MT7981),y)
-	@install $(BUILD_NAME)/mt7981-sku.dat $(SKUDIR)/mt7981-sku.dat
-	@install $(BUILD_NAME)/mt7981-sku-bf.dat $(SKUDIR)/mt7981-sku-bf.dat
+	@install $(SKU_MODEL_DIR)/mt7981-sku.dat $(SKUDIR)/mt7981-sku.dat
+	@install $(SKU_MODEL_DIR)/mt7981-sku-bf.dat $(SKUDIR)/mt7981-sku-bf.dat
 endif
 
 endif	#RA_SKU_IN_DRV == y
