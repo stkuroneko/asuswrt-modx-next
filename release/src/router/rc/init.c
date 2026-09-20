@@ -4425,32 +4425,49 @@ int init_nvram(void)
 #endif
 			set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "vlan1", NULL, "vlan3", 0);
 
+#if defined(RTCONFIG_BOARD_SIM_AX18T)
+		nvram_set_int("btn_rst_gpio", 16);
+		nvram_set_int("btn_wps_gpio", 15);
+		nvram_set_int("btn_rst_gpio_1", 18|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wps_gpio_1", 4|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_pwr_gpio", 7|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_wan_gpio", 8|GPIO_ACTIVE_LOW);
+#else
 		nvram_set_int("btn_rst_gpio",  18|GPIO_ACTIVE_LOW);
 #if defined(RTCONFIG_BOARD_R3G)
 		nvram_set_int("led_lan_gpio", 10|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_wan_gpio", 6);
 		nvram_set_int("led_pwr_gpio",  8|GPIO_ACTIVE_LOW);
-#elif defined(RTCONFIG_BOARD_R6800) || defined(RTCONFIG_BOARD_R3P) || defined(RTCONFIG_BOARD_RM2100) || defined(RTCONFIG_BOARD_SIM_AX18T)
+#elif defined(RTCONFIG_BOARD_R6800) || defined(RTCONFIG_BOARD_R3P) || defined(RTCONFIG_BOARD_RM2100)
 		nvram_set_int("led_pwr_gpio",  8|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_wps_gpio",  10|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_wan_gpio", 14|GPIO_ACTIVE_LOW);
-	eval("rtkswitch", "11");
+		eval("rtkswitch", "11");
 #else
 		nvram_set_int("led_pwr_gpio",  6|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_wps_gpio",  7|GPIO_ACTIVE_LOW);
 #endif
+#endif
+
+#if !defined(RTCONFIG_BOARD_SIM_AX18T)
 		nvram_set_int("usb_pwr_gpio", 12);
 		/* Enable USB power via GPIO12 */
 		doSystem("echo 12 > /sys/class/gpio/export");
 		doSystem("echo out > /sys/class/gpio/gpio12/direction");
 		doSystem("echo 1 > /sys/class/gpio/gpio12/value");
+#endif
 
+#if !defined(RTCONFIG_BOARD_SIM_AX18T)
 		/* Default to USB 3.0 mode */
 		if (!nvram_get("usb_usb3"))
 			nvram_set_int("usb_usb3", 1);
+#endif
 
 #ifdef RTCONFIG_XHCIMODE
-#if defined(RTCONFIG_BOARD_HIWIFI4)
+#if defined(RTCONFIG_BOARD_SIM_AX18T)
+		nvram_set("xhci_ports", "");
+		nvram_set("ehci_ports", "");
+#elif defined(RTCONFIG_BOARD_HIWIFI4)
 		nvram_set("xhci_ports", "2-1 2-2");
 		nvram_set("ehci_ports", "1-1 1-2");
 #else
@@ -4458,7 +4475,9 @@ int init_nvram(void)
 		nvram_set("ehci_ports", "1-1");
 #endif
 #else
-#if defined(RTCONFIG_BOARD_HIWIFI4)
+#if defined(RTCONFIG_BOARD_SIM_AX18T)
+		nvram_set("ehci_ports", "");
+#elif defined(RTCONFIG_BOARD_HIWIFI4)
 		if(usb_usb3 == 1){
 			nvram_set("xhci_ports", "2-1 2-2");
 			nvram_set("ehci_ports", "1-1 1-2");
@@ -4471,7 +4490,9 @@ int init_nvram(void)
 		nvram_set("ehci_ports", "1-1");
 #endif
 #endif
-#if defined(RTCONFIG_BOARD_HIWIFI4)
+#if defined(RTCONFIG_BOARD_SIM_AX18T)
+		nvram_set("ohci_ports", "");
+#elif defined(RTCONFIG_BOARD_HIWIFI4)
 		nvram_set("ohci_ports", "1-1 1-2");
 #else
 		nvram_set("ohci_ports", "2-1");
@@ -4484,7 +4505,9 @@ int init_nvram(void)
 
 		if (nvram_get("wl_mssid") && nvram_match("wl_mssid", "1"))
 			add_rc_support("mssid");
-#if defined(RTCONFIG_BOARD_HIWIFI4)
+#if defined(RTCONFIG_BOARD_SIM_AX18T)
+		add_rc_support("2.4G 5G update");
+#elif defined(RTCONFIG_BOARD_HIWIFI4)
 		add_rc_support("2.4G 5G noupdate usbX2");
 #else
 		add_rc_support("2.4G 5G update usbX1");
