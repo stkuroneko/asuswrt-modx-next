@@ -4578,11 +4578,15 @@ int init_nvram(void)
 			add_lan_phy((char *)APCLI_2G);
 			add_lan_phy((char *)APCLI_5G);
 			nvram_set("eth_ifnames", "eth1"); /* WAN(eth1)*/
+#if defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_HIWIFI4) || defined(RTCONFIG_BOARD_SIM_AX18T)
 			nvram_set("amas_ethif_type", "4"); /* 1G */
 			nvram_set("eth_priority", "0 1 1"); /* eth1: 1G(idx:0,prio:1,used:1) */
+#endif
 			nvram_set("sta_phy_ifnames", "apcli0 apclii0"); /* 2G name, 5G name */
 			nvram_set("sta_ifnames", "apcli0 apclii0"); /* 2G name, 5G name */
+#if defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_HIWIFI4) || defined(RTCONFIG_BOARD_SIM_AX18T)
 			nvram_set("sta_priority", "2 0 3 1" " 5 1 2 1"); /* 2G priority:3, 5G priority:2 */
+#endif
 		}
 #endif
 #if defined(RTCONFIG_AMAS) || defined(RTCONFIG_CFGSYNC) || defined(RTCONFIG_EASYMESH)
