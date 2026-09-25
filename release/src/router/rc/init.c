@@ -4517,18 +4517,12 @@ int init_nvram(void)
 
 		if (nvram_get("wl_mssid") && nvram_match("wl_mssid", "1"))
 			add_rc_support("mssid");
-#if defined(RTCONFIG_BOARD_SIM_AX18T)
+		/* These board profiles share a product ID, not an online image. */
 		add_rc_support("2.4G 5G noupdate");
-#elif defined(RTCONFIG_BOARD_HIWIFI4)
-		add_rc_support("2.4G 5G noupdate usbX2");
-#elif defined(RTCONFIG_BOARD_R3G)
-		add_rc_support("2.4G 5G noupdate usbX1");
-#elif defined(RTCONFIG_BOARD_R6800)
-		add_rc_support("2.4G 5G update usbX2");
-#elif defined(RTCONFIG_BOARD_R3P)
-		add_rc_support("2.4G 5G update usbX1");
-#else
-		add_rc_support("2.4G 5G update");
+#if defined(RTCONFIG_BOARD_HIWIFI4) || defined(RTCONFIG_BOARD_R6800)
+		add_rc_support("usbX2");
+#elif defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_R3P)
+		add_rc_support("usbX1");
 #endif
 		add_rc_support("rawifi");
 		add_rc_support("switchctrl");
@@ -4538,20 +4532,12 @@ int init_nvram(void)
 		add_rc_support("11AX mbo ofdma");
 		add_rc_support("wpa3");
 #endif
-#if !defined(RTCONFIG_BOARD_R6800)
 		add_rc_support("loclist");
-#endif
 		add_rc_support("app");
-#if !defined(RTCONFIG_BOARD_R3P)
 		add_rc_support("gameMode");
-#endif
-#if !defined(RTCONFIG_BOARD_R6800) && !defined(RTCONFIG_BOARD_R3P)
 		add_rc_support("pwrctrl");
-#endif
 #if defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_HIWIFI4)
 		add_rc_support("usb3");
-		add_rc_support("ookla");
-		add_rc_support("smart_connect");
 #endif
 		// the following values is model dep. so move it from default.c to here
 #if defined(RTCONFIG_BOARD_R6800) || defined(RTCONFIG_BOARD_R3P)
@@ -4578,15 +4564,11 @@ int init_nvram(void)
 			add_lan_phy((char *)APCLI_2G);
 			add_lan_phy((char *)APCLI_5G);
 			nvram_set("eth_ifnames", "eth1"); /* WAN(eth1)*/
-#if defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_HIWIFI4) || defined(RTCONFIG_BOARD_SIM_AX18T)
 			nvram_set("amas_ethif_type", "4"); /* 1G */
 			nvram_set("eth_priority", "0 1 1"); /* eth1: 1G(idx:0,prio:1,used:1) */
-#endif
 			nvram_set("sta_phy_ifnames", "apcli0 apclii0"); /* 2G name, 5G name */
 			nvram_set("sta_ifnames", "apcli0 apclii0"); /* 2G name, 5G name */
-#if defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_HIWIFI4) || defined(RTCONFIG_BOARD_SIM_AX18T)
 			nvram_set("sta_priority", "2 0 3 1" " 5 1 2 1"); /* 2G priority:3, 5G priority:2 */
-#endif
 		}
 #endif
 #if defined(RTCONFIG_AMAS) || defined(RTCONFIG_CFGSYNC) || defined(RTCONFIG_EASYMESH)

@@ -542,7 +542,9 @@ ifeq ($(RTCONFIG_QCA_LBD),y)
 export CFLAGS += -DQCA_BSD
 endif
 
+ifeq ($(RTCONFIG_RALINK_BSD),y)
 export CFLAGS += -DRTCONFIG_RALINK_BSD
+endif
 
 ifeq ($(RTCONFIG_BCMSSD),y)
 export CFLAGS += -DBCM_SSD
@@ -9684,4 +9686,3 @@ $(obj-y) $(obj-n) $(obj-clean) $(obj-install): dummy
 .PHONY: all clean distclean mrproper install package image
 .PHONY: conf mconf oldconf kconf kmconf config menuconfig oldconfig
 .PHONY: dummy libnet libpcap
-

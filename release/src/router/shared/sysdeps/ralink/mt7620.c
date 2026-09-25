@@ -197,8 +197,8 @@ enum {
 	WAN_PORT=1,
 	LAN1_PORT=3,
 	LAN2_PORT=2,
-	LAN3_PORT=4, //unused
-	LAN4_PORT=0, //unused
+	LAN3_PORT=4, /* RM2100 and SIM-AX18T; unused on R3G */
+	LAN4_PORT=0, /* SIM-AX18T; unused on R3G/RM2100 */
 	P5_PORT=5,
 	CPU_PORT=6,
 	P7_PORT=7,
@@ -2512,7 +2512,12 @@ void ATE_mt7621_esw_port_status(void)
 #if defined(RTCONFIG_CONCURRENTREPEATER) && defined(RPAC87)
 		snprintf(buf, sizeof(buf), "L1=%C",
 		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X');
-#elif defined(RTAX53U) || defined(RTCONFIG_3LANPORT_DEVICE)
+#elif defined(RTCONFIG_BOARD_R3G)
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;",
+		(pS.link[WAN_PORT] == 1) ? (pS.speed[WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X');
+#elif (defined(RTAX53U) && !defined(RTCONFIG_BOARD_R6800) && !defined(RTCONFIG_BOARD_SIM_AX18T)) || defined(RTCONFIG_3LANPORT_DEVICE)
 	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;L3=%C;",
 		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
 		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',

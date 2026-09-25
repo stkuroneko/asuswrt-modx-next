@@ -1359,7 +1359,9 @@ define RouterOptions
 	for board in R3G HIWIFI4 R6800 R3P RM2100 SIM_AX18T; do \
 		sed -i "/RTCONFIG_BOARD_$${board}/d" $(1); \
 	done; \
-	if [ "$(BOARD_PROFILE)" = "R3G" ]; then \
+	if [ "$(BUILD_NAME)" != "RT-AX53U" ]; then \
+		:; \
+	elif [ "$(BOARD_PROFILE)" = "R3G" ]; then \
 		echo "RTCONFIG_BOARD_R3G=y" >>$(1); \
 	elif [ "$(BOARD_PROFILE)" = "HIWIFI4" ]; then \
 		echo "RTCONFIG_BOARD_HIWIFI4=y" >>$(1); \
@@ -5996,7 +5998,7 @@ endif
 		echo "RTCONFIG_WLMODULE_MT7615E_AP=y" >> router/.config; \
 	fi
 
-	@if grep -q "CONFIG_CHIP_MT7612E=y" $(LINUXDIR)/.config ; then \
+	@if grep -Eq "^CONFIG_MT76X2_AP=[ym]$$" $(LINUXDIR)/.config ; then \
 		sed -i "/RTCONFIG_WLMODULE_MT7612E_AP/d" router/.config; \
 		echo "RTCONFIG_WLMODULE_MT7612E_AP=y" >> router/.config; \
 	fi

@@ -526,6 +526,7 @@ define platformKernelConfig
 	done; \
 	for sec_if in $(SECOND_IF_POOL) ; do \
 		sed -i "/CONFIG_MTD_$${sec_if}_RALINK\>/d" $(1); \
+		sed -i "/CONFIG_SECOND_IF_$${sec_if}\>/d" $(1); \
 		if [ "$(SECOND_IF)" = "$${sec_if}" ] ; then \
 			echo "CONFIG_SECOND_IF_$${sec_if}=y" >> $(1); \
 		else \
