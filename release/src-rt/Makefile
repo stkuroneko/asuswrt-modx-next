@@ -5741,7 +5741,10 @@ mk-%:
 
 bbconfig:
 	@cp $(BUSYBOX_DIR)/config_base $(BUSYBOX_DIR)/config_$(lowercase_B)
-	$(call BusyboxOptions, $(BUSYBOX_DIR)/config_$(lowercase_B))
+	$(file >.config_busybox_options.sh,$(call BusyboxOptions, $(BUSYBOX_DIR)/config_$(lowercase_B)))
+	@sed -i 's/^[[:space:]]*[@+-]//' .config_busybox_options.sh
+	@/bin/sh .config_busybox_options.sh
+	@rm -f .config_busybox_options.sh
 	@cd $(BUSYBOX_DIR) && \
 		rm -f config_current ; \
 		ln -s config_$(lowercase_B) config_current ; \
@@ -5842,14 +5845,20 @@ endif
 		cp $(LINUXDIR)/config_base_$(lowercase_B) $(LINUXDIR)/config_$(lowercase_B); \
 	fi
 
-# RouterOptions exceeds the per-argument exec limit with GNU Make 4.3; run it from a script.
+# Expanded configuration macros can exceed the exec argument limit with GNU Make 4.3; run them from scripts.
 	@echo "" >> router/config_$(lowercase_B)
 	$(file >router/.config_router_options.sh,$(call RouterOptions, router/config_$(lowercase_B)))
 	@sed -i 's/^[[:space:]]*[@+-]//' router/.config_router_options.sh
 	@/bin/sh router/.config_router_options.sh
 	@rm -f router/.config_router_options.sh
-	$(call KernelConfig, $(LINUXDIR)/config_$(lowercase_B))
-	$(call BusyboxOptions, $(BUSYBOX_DIR)/config_$(lowercase_B))
+	$(file >.config_kernel_options.sh,$(call KernelConfig, $(LINUXDIR)/config_$(lowercase_B)))
+	@sed -i 's/^[[:space:]]*[@+-]//' .config_kernel_options.sh
+	@/bin/sh .config_kernel_options.sh
+	@rm -f .config_kernel_options.sh
+	$(file >.config_busybox_options.sh,$(call BusyboxOptions, $(BUSYBOX_DIR)/config_$(lowercase_B)))
+	@sed -i 's/^[[:space:]]*[@+-]//' .config_busybox_options.sh
+	@/bin/sh .config_busybox_options.sh
+	@rm -f .config_busybox_options.sh
 ifeq ($(CONFIG_RALINK),y)
 	@if [ "$(BUILD_NAME)" = "RT-N56UB1" ] || [ "$(BUILD_NAME)" = "RT-N56UB2" ]; then \
 		if [ "$(MT7603_EXTERNAL_PA_EXTERNAL_LNA)" = "y" ] ; then \

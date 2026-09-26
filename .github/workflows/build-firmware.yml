@@ -27,7 +27,7 @@ permissions:
 
 concurrency:
   group: rtax53u-firmware-build
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
