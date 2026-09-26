@@ -79,7 +79,7 @@ make BOARD_PROFILE=SIM-AX18T rt-ax53u
 
 ## GitHub 自动编译
 
-仓库通过 `.github/workflows/build-firmware.yml` 使用 GitHub 托管的 `ubuntu-22.04` Runner 编译。Workflow 会自动清理可释放的 Runner 磁盘空间、安装依赖，并从 `SWRT-dev/mtk-toolchains` 下载和配置 MIPS 工具链。
+仓库通过 `.github/workflows/build-firmware.yml` 使用 GitHub 托管的 `ubuntu-22.04` Runner 编译。Workflow 会自动清理可释放的 Runner 磁盘空间、安装依赖，并从 `SWRT-dev/mtk-toolchains` 下载和配置 MIPS 工具链。为兼容旧构建工具的路径长度限制，工作区会 bind mount 到 `/build`，编译、检查和产物收集均从该短路径执行。
 
 向 `master` 推送提交时自动编译 `A040WQ`。也可以在 GitHub 的 **Actions → Build firmware → Run workflow** 中选择任一 `BOARD_PROFILE`；选择 `ALL` 时八款机型在同一工作区依次串行编译，不会使用并行 `make`。
 

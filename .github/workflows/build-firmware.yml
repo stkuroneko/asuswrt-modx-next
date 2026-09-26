@@ -35,6 +35,7 @@ jobs:
     timeout-minutes: 720
     env:
       SELECTED_BOARD: ${{ inputs.board || 'A040WQ' }}
+      BUILD_ROOT: /build
 
     steps:
       - name: Check out source
@@ -42,6 +43,16 @@ jobs:
         with:
           clean: true
           fetch-depth: 1
+
+      - name: Mount short build path
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo mkdir -p "$BUILD_ROOT"
+          sudo mount --bind "$GITHUB_WORKSPACE" "$BUILD_ROOT"
+          sudo chown "$(id -u):$(id -g)" "$BUILD_ROOT"
+          cd "$BUILD_ROOT"
+          printf 'Build path: %s\n' "$PWD"
 
       - name: Configure build Git identity
         shell: bash
@@ -85,13 +96,13 @@ jobs:
 
       - name: Build selected profile
         if: env.SELECTED_BOARD != 'ALL'
-        working-directory: release/src-ra-openwrt-4210
+        working-directory: ${{ env.BUILD_ROOT }}/release/src-ra-openwrt-4210
         shell: bash
         run: make BOARD_PROFILE="$SELECTED_BOARD" rt-ax53u
 
       - name: Build all profiles serially
         if: env.SELECTED_BOARD == 'ALL'
-        working-directory: release/src-ra-openwrt-4210
+        working-directory: ${{ env.BUILD_ROOT }}/release/src-ra-openwrt-4210
         shell: bash
         run: |
           set -euo pipefail
@@ -101,10 +112,12 @@ jobs:
 
       - name: Validate board profiles
         shell: bash
+        working-directory: ${{ env.BUILD_ROOT }}
         run: python3 tools/check_board_profiles.py
 
       - name: Collect firmware
         shell: bash
+        working-directory: ${{ env.BUILD_ROOT }}
         run: |
           set -euo pipefail
           mkdir -p artifacts
@@ -117,6 +130,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: firmware-${{ env.SELECTED_BOARD }}-${{ github.run_number }}
-          path: artifacts/
+          path: /build/artifacts/
           if-no-files-found: error
           retention-days: 14
+
+      - name: Unmount short build path
+        if: always()
+        shell: bash
+        run: |
+          if mountpoint -q "$BUILD_ROOT"; then
+            sudo umount "$BUILD_ROOT"
+          fi
