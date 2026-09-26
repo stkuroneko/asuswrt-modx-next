@@ -43,6 +43,13 @@ jobs:
           clean: true
           fetch-depth: 1
 
+      - name: Configure build Git identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Free runner disk space
         shell: bash
         run: |
