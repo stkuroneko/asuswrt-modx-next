@@ -10,7 +10,7 @@ settings describe hardware, driver capabilities and product identity.
 | R3G | MT7603 + MT7612 | 1 + 2 | 1 | MI-R3G |
 | HIWIFI4 | MT7603 + MT7612 | 1 + 3 | 2 | HIWIFI4 |
 | E8820S | MT7603 + MT7612 | 1 + 4 | 1 | ZTE-E8820S |
-| A040WQ | MT7615 + MT7615 | 1 + 4 | 1 | NOKIA-A040WQ |
+| A040WQ | single MT7615 DBDC | 1 + 4 | 1 | NOKIA-A040WQ |
 | R6800 | MT7615 + MT7615 | 1 + 4 | 2 | NETGEAR-R6800 |
 | R3P | MT7615 + MT7615 | 1 + 3 | 1 | MI-R3P |
 | RM2100 | MT7603 + MT7615 | 1 + 3 | 0 | REDMI-AC2100 |
@@ -25,6 +25,10 @@ uses the firmware's `ra0/rai0`, `apcli0/apclii0` names and installed `/ra_SKU`
 paths. Its original EEPROM size and offset are retained. MT7615 profiles use
 the same second-card default offset (`0x8000`) as their installed L1 profiles;
 the driver can override that default from the L1 profile.
+
+A040WQ uses one MT7615 PCIe device in DBDC mode rather than two physical
+MT7615 cards. Its single L1 entry exposes `ra0` as 2.4 GHz and `rai0` as
+5 GHz, and reads a 16 KiB EEPROM image from the board's Factory partition.
 
 The internal product ID remains RT-AX53U. These different boards must not
 share an online update image, so all profiles advertise `noupdate`; manual

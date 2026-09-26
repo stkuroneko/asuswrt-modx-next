@@ -1,0 +1,92 @@
+name: Build firmware
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      board:
+        description: Board profile
+        required: true
+        default: A040WQ
+        type: choice
+        options:
+          - R3G
+          - HIWIFI4
+          - E8820S
+          - A040WQ
+          - R6800
+          - R3P
+          - RM2100
+          - SIM-AX18T
+          - ALL
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rtax53u-firmware-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+    timeout-minutes: 720
+    env:
+      SELECTED_BOARD: ${{ inputs.board || 'A040WQ' }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          clean: true
+          fetch-depth: 1
+
+      - name: Check build host
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -x /opt/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-gcc
+          df -h . /opt
+
+      - name: Build selected profile
+        if: env.SELECTED_BOARD != 'ALL'
+        working-directory: release/src-ra-openwrt-4210
+        shell: bash
+        run: make BOARD_PROFILE="$SELECTED_BOARD" rt-ax53u
+
+      - name: Build all profiles serially
+        if: env.SELECTED_BOARD == 'ALL'
+        working-directory: release/src-ra-openwrt-4210
+        shell: bash
+        run: |
+          set -euo pipefail
+          for board in R3G HIWIFI4 E8820S A040WQ R6800 R3P RM2100 SIM-AX18T; do
+            make BOARD_PROFILE="$board" rt-ax53u
+          done
+
+      - name: Validate board profiles
+        shell: bash
+        run: python3 tools/check_board_profiles.py
+
+      - name: Collect firmware
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          find release/src-ra-openwrt-4210/image -maxdepth 1 -type f \
+            \( -name "*.trx" -o -name "*.md5" \) \
+            -exec cp -a {} artifacts/ \;
+          test -n "$(find artifacts -maxdepth 1 -type f -name "*.trx" -print -quit)"
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ env.SELECTED_BOARD }}-${{ github.run_number }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 14
