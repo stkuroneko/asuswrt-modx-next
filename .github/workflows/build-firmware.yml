@@ -73,6 +73,20 @@ jobs:
             subversion texinfo uglifyjs unzip upx-ucl uuid-dev wget xmlto xsltproc \
             zlib1g-dev
 
+      - name: Install GNU Make 4.1
+        shell: bash
+        run: |
+          set -euo pipefail
+          wget -q https://ftp.gnu.org/gnu/make/make-4.1.tar.gz -O "$RUNNER_TEMP/make-4.1.tar.gz"
+          tar -xzf "$RUNNER_TEMP/make-4.1.tar.gz" -C "$RUNNER_TEMP"
+          cd "$RUNNER_TEMP/make-4.1"
+          sed -i 's/__alloca/alloca/g; s/__stat/stat/g' glob/glob.c
+          ./configure --prefix=/opt/gnu-make-4.1
+          make
+          sudo make install
+          echo "/opt/gnu-make-4.1/bin" >> "$GITHUB_PATH"
+          /opt/gnu-make-4.1/bin/make --version | head -1
+
       - name: Install MIPS toolchain
         shell: bash
         run: |
