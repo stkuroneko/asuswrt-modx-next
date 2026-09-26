@@ -10,6 +10,7 @@ settings describe hardware, driver capabilities and product identity.
 | R3G | MT7603 + MT7612 | 1 + 2 | 1 | MI-R3G |
 | HIWIFI4 | MT7603 + MT7612 | 1 + 3 | 2 | HIWIFI4 |
 | E8820S | MT7603 + MT7612 | 1 + 4 | 1 | ZTE-E8820S |
+| A040WQ | MT7615 + MT7615 | 1 + 4 | 1 | NOKIA-A040WQ |
 | R6800 | MT7615 + MT7615 | 1 + 4 | 2 | NETGEAR-R6800 |
 | R3P | MT7615 + MT7615 | 1 + 3 | 1 | MI-R3P |
 | RM2100 | MT7603 + MT7615 | 1 + 3 | 0 | REDMI-AC2100 |
@@ -36,7 +37,7 @@ capabilities, LAN status counts, stream counts, image-name uniqueness,
 profile isolation and SKU install inputs. It does not replace kernel and
 firmware builds or testing on the physical devices.
 
-For release validation, build all seven profiles in sequence, inspect final
+For release validation, build all eight profiles in sequence, inspect final
 `router/shared/rtconfig.h` and kernel `.config`, and test physical WAN/LAN,
 both wireless bands, buttons, LEDs and USB on each device. Do not infer
 runtime correctness solely from a successful image build.

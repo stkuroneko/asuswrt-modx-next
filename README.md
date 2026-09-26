@@ -1,6 +1,6 @@
 # asuswrt-modx-next
 
-基于 ASUSWRT / SWRT 的固件适配项目。`master` 已统一七款机型的适配，通过 `BOARD_PROFILE` 选择硬件，无需切换机型分支。
+基于 ASUSWRT / SWRT 的固件适配项目。`master` 已统一八款机型的适配，通过 `BOARD_PROFILE` 选择硬件，无需切换机型分支。
 
 各机型共用 RT-AX53U 构建框架和公共软件功能；无线驱动、校准数据、网口映射、GPIO、按键、LED、USB 和显示名称按硬件区分。
 
@@ -11,6 +11,7 @@
 | `R3G` | 小米路由器 3G | MT7603 + MT7612 | 1 + 2 | 1 | `MI-R3G` |
 | `HIWIFI4` | 极路由 4 增强版 HC5962 | MT7603 + MT7612 | 1 + 3 | 2 | `HIWIFI4` |
 | `E8820S` | 中兴 E8820S | MT7603 + MT7612 | 1 + 4 | 1 | `ZTE-E8820S` |
+| `A040WQ` | Nokia A-040W-Q | MT7615 + MT7615 | 1 + 4 | 1 | `NOKIA-A040WQ` |
 | `R6800` | NETGEAR R6800 | MT7615 + MT7615 | 1 + 4 | 2 | `NETGEAR-R6800` |
 | `R3P` | 小米路由器 Pro | MT7615 + MT7615 | 1 + 3 | 1 | `MI-R3P` |
 | `RM2100` | 红米 AC2100 | MT7603 + MT7615 | 1 + 3 | 0 | `REDMI-AC2100` |
@@ -49,7 +50,7 @@ sudo ln -sfn "$PWD/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24" /opt/
 cd ../asuswrt-modx-next
 ```
 
-上述七款 MT7621 机型使用这套 MIPS 工具链。其他平台需要配置各自的工具链。
+上述八款 MT7621 机型使用这套 MIPS 工具链。其他平台需要配置各自的工具链。
 
 ## 编译固件
 
@@ -65,6 +66,7 @@ make BOARD_PROFILE=R3G rt-ax53u
 ```bash
 make BOARD_PROFILE=HIWIFI4 rt-ax53u
 make BOARD_PROFILE=E8820S rt-ax53u
+make BOARD_PROFILE=A040WQ rt-ax53u
 make BOARD_PROFILE=R6800 rt-ax53u
 make BOARD_PROFILE=R3P rt-ax53u
 make BOARD_PROFILE=RM2100 rt-ax53u
@@ -79,7 +81,7 @@ make BOARD_PROFILE=SIM-AX18T rt-ax53u
 
 配套 U-Boot 项目：[stkuroneko/Uboot-mips](https://github.com/stkuroneko/Uboot-mips)。U-Boot 的编译和使用说明请参阅该项目。
 
-七机型统一沿用仓库原版 RT-AX53U 的 NAND + NMBM、硬件 ECC、双固件分区和 `MTK_NAND_BLOCK2` 模式，不使用各机型原厂固件的分区布局。
+八机型统一沿用仓库原版 RT-AX53U 的 NAND + NMBM、硬件 ECC、双固件分区和 `MTK_NAND_BLOCK2` 模式，不使用各机型原厂固件的分区布局。
 
 | 分区 | 起始地址 | 大小 |
 | --- | --- | --- |
@@ -109,7 +111,7 @@ python3 tools/check_board_profiles.py
 
 2026-09-26 验证结果：
 
-- 原有六机型及新增 E8820S 的配置回归检查通过；E8820S 完整构建成功，镜像 MD5 校验通过。
+- 原有六机型及新增 E8820S 的配置回归检查通过；E8820S 完整构建成功，镜像 MD5 校验通过。A040WQ 配置回归检查和完整构建均已通过，镜像 MD5 校验通过。
 - 原有六机型继续使用 RT-AX53U 通用 DTB；E8820S 使用专用 DTB，在 PCIe 枚举前通过 GPIO19 和 GPIO4 同时复位 MT7603 和 MT7612。
 - E8820S 实机确认已加载专用 DTB，双 PCIe 复位均成功申请，2.4G 和 5G 无线接口正常启动。
 - 镜像头和数据 CRC、FIT 哈希、SquashFS 偏移与长度校验通过，镜像均小于 50 MiB。

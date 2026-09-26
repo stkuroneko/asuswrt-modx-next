@@ -8883,8 +8883,10 @@ void wifi_dump_info(void)
 	MTWF_LOG(DBG_CAT_CFG, DBG_SUBCAT_ALL, DBG_LVL_OFF, ("%s--------------------\n", __func__));
 
 	for (idx = 0; idx < MAX_NUM_OF_INF; idx++) {
-		if (adapt_list[idx]) {
-			pAd = adapt_list[idx];
+#ifdef MULTI_INF_SUPPORT
+		pAd = adapt_list[idx];
+#endif
+		if (pAd) {
 			show_tpinfo_proc(pAd, "");
 			show_trinfo_proc(pAd, "");
 			ShowPLEInfo(pAd, "");

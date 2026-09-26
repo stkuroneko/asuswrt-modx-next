@@ -546,6 +546,10 @@ const char *getCountryCode()
 {
 	char *tcode = nvram_safe_get("territory_code");
 
+	/* Some non-ASUS boards only provide location_code. */
+	if (!*tcode)
+		tcode = nvram_safe_get("location_code");
+
 	if(nvram_contains_word("rc_support", "loclist") && nvram_match("location_code", "XX"))
 		return "AU";
 	else if(!strncmp(tcode, "US", 2))

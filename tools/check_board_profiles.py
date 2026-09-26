@@ -13,6 +13,7 @@ PROFILES = {
     "R3G": ("mt7603_mt7612", "MT7603E", "MT7612E", "usbX1", "2", "2"),
     "HIWIFI4": ("mt7603_mt7612", "MT7603E", "MT7612E", "usbX2", "2", "2"),
     "E8820S": ("mt7603_mt7612", "MT7603E", "MT7612E", "usbX1", "2", "2"),
+    "A040WQ": ("mt7615_dbdc", "MT7615E", "NONE", "usbX1", "2", "2"),
     "R6800": ("mt7615", "MT7615E", "MT7615E", "usbX2", "4", "4"),
     "R3P": ("mt7615", "MT7615E", "MT7615E", "usbX1", "4", "4"),
     "RM2100": ("mt7603_mt7615", "MT7603E", "MT7615E", None, "2", "4"),
@@ -44,7 +45,7 @@ def main():
     switch = switch[switch.index("void ATE_mt7621_esw_port_status(void)"):]
     switch = switch[switch.index("\n{"):]
     switch = switch[:switch.index("\n#if defined(RTCONFIG_SWRT_I2CLED)")]
-    lan_count = {"R3G": 2, "HIWIFI4": 3, "E8820S": 4, "R6800": 4, "R3P": 3,
+    lan_count = {"R3G": 2, "HIWIFI4": 3, "E8820S": 4, "A040WQ": 4, "R6800": 4, "R3P": 3,
                  "RM2100": 3, "SIM-AX18T": 4}
     features = None
     image_names = set()
@@ -71,6 +72,9 @@ def main():
             if second != "NONE":
                 assert "CONFIG_RT_SECOND_IF_RF_OFFSET=0x8000" in kernel, board
             assert ("CONFIG_MT76X2_AP=m" in kernel) == (second == "MT7612E"), board
+            assert ("CONFIG_DBDC_MODE=y" in kernel) == (board in {"A040WQ", "SIM-AX18T"}), board
+            assert ("CONFIG_MULTI_PROFILE_SUPPORT=y" in kernel) == (board in {"A040WQ", "SIM-AX18T"}), board
+            assert options["RALINK_DBDC_MODE"] == ("y" if board == "A040WQ" else "n"), board
 
             # Reuse one file across all boards to catch stale profile macros.
             router_cfg.touch()
@@ -83,9 +87,10 @@ def main():
             stage = pathlib.Path(temp) / board
             stage.mkdir()
             (stage / "shared").mkdir()
-            wireless = "RTCONFIG_WLMODULE_" + {
-                "MT7612E": "MT7612E_AP", "MT7615E": "MT7615E_AP",
-                "NONE": "MT7915D_AP"}[second]
+            wireless = "RTCONFIG_WLMODULE_" + (
+                "MT7915D_AP" if first == "MT7915" else {
+                    "MT7612E": "MT7612E_AP", "MT7615E": "MT7615E_AP",
+                    "NONE": "MT7615E_AP"}[second])
             (stage / ".config").write_text((ROUTER / "config_base").read_text() +
                 "\nRTCONFIG_RALINK=y\nRTCONFIG_RALINK_MT7621=y\n" + define + "=y\n" +
                 wireless + "=y\nRTCONFIG_RALINK_BSD=y\n")
@@ -120,6 +125,13 @@ def main():
                         if not source.startswith("-"):
                             assert (sku / source).exists(), (board, source)
             profile = (sku / options["SKU_L1PROFILE"]).read_text()
+            if board == "A040WQ":
+                assert profile.count("INDEX0=MT7615") == 1
+                assert "INDEX1=" not in profile
+                assert "INDEX0_EEPROM_size=0x4000" in profile
+                assert "INDEX0_profile_path=/etc/Wireless/RT2860/RT2860.dat;/etc/Wireless/iNIC/iNIC_ap.dat" in profile
+                assert "INDEX0_main_ifname=ra0;rai0" in profile
+                assert "INDEX0_apcli_ifname=apcli;apclii" in profile
             if board == "SIM-AX18T":
                 assert "INDEX0_main_ifname=ra0;rai0" in profile
                 assert "INDEX0_apcli_ifname=apcli;apclii" in profile

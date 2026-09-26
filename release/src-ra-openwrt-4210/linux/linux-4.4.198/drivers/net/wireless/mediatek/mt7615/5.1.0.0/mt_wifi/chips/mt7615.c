@@ -16,7 +16,11 @@
 
 #include "rt_config.h"
 #include "chip/mt7615_cr.h"
+#ifdef DBDC_MODE
+#include "mcu/mt7615_firmware_dbdc.h"
+#else
 #include "mcu/mt7615_firmware.h"
+#endif
 #include "mcu/mt7615_cr4_firmware.h"
 #ifdef NEED_ROM_PATCH
 #include "mcu/mt7615_rom_patch.h"
