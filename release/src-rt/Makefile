@@ -5842,8 +5842,12 @@ endif
 		cp $(LINUXDIR)/config_base_$(lowercase_B) $(LINUXDIR)/config_$(lowercase_B); \
 	fi
 
+# RouterOptions exceeds the per-argument exec limit with GNU Make 4.3; run it from a script.
 	@echo "" >> router/config_$(lowercase_B)
-	$(call RouterOptions, router/config_$(lowercase_B))
+	$(file >router/.config_router_options.sh,$(call RouterOptions, router/config_$(lowercase_B)))
+	@sed -i 's/^[[:space:]]*[@+-]//' router/.config_router_options.sh
+	@/bin/sh router/.config_router_options.sh
+	@rm -f router/.config_router_options.sh
 	$(call KernelConfig, $(LINUXDIR)/config_$(lowercase_B))
 	$(call BusyboxOptions, $(BUSYBOX_DIR)/config_$(lowercase_B))
 ifeq ($(CONFIG_RALINK),y)
