@@ -11,7 +11,7 @@
 | `R3G` | 小米路由器 3G | MT7603 + MT7612 | 1 + 2 | 1 | `MI-R3G` |
 | `HIWIFI4` | 极路由 4 增强版 HC5962 | MT7603 + MT7612 | 1 + 3 | 2 | `HIWIFI4` |
 | `E8820S` | 中兴 E8820S | MT7603 + MT7612 | 1 + 4 | 1 | `ZTE-E8820S` |
-| `A040WQ` | Nokia A-040W-Q | MT7615 + MT7615 | 1 + 4 | 1 | `NOKIA-A040WQ` |
+| `A040WQ` | Nokia A-040W-Q | 单颗 MT7615 双频 DBDC | 1 + 4 | 1 | `NOKIA-A040WQ` |
 | `R6800` | NETGEAR R6800 | MT7615 + MT7615 | 1 + 4 | 2 | `NETGEAR-R6800` |
 | `R3P` | 小米路由器 Pro | MT7615 + MT7615 | 1 + 3 | 1 | `MI-R3P` |
 | `RM2100` | 红米 AC2100 | MT7603 + MT7615 | 1 + 3 | 0 | `REDMI-AC2100` |
@@ -109,13 +109,14 @@ python3 tools/check_board_profiles.py
 
 检查覆盖配置生成、最终板级宏、Smart Connect 依赖、公共能力、LAN 状态数量、无线流数、SKU 安装输入、固件名称唯一性及机型切换隔离。
 
-2026-09-26 验证结果：
+2026-09-27 验证结果：
 
-- 原有六机型及新增 E8820S 的配置回归检查通过；E8820S 完整构建成功，镜像 MD5 校验通过。A040WQ 配置回归检查和完整构建均已通过，镜像 MD5 校验通过。
-- 原有六机型继续使用 RT-AX53U 通用 DTB；E8820S 使用专用 DTB，在 PCIe 枚举前通过 GPIO19 和 GPIO4 同时复位 MT7603 和 MT7612。
+- 八款机型的配置回归检查全部通过；E8820S 和 A040WQ 已完成完整构建，镜像 MD5 校验通过。
+- 除 E8820S 外的七款机型继续使用 RT-AX53U 通用 DTB；E8820S 使用专用 DTB，在 PCIe 枚举前通过 GPIO19 和 GPIO4 同时复位 MT7603 和 MT7612。
 - E8820S 实机确认已加载专用 DTB，双 PCIe 复位均成功申请，2.4G 和 5G 无线接口正常启动。
+- A040WQ 使用单颗 MT7615 的 DBDC 模式，`ra0` 为 2.4 GHz、`rai0` 为 5 GHz；实机已确认系统启动、DBDC 初始化和双频热点正常。监管域根据 `territory_code` 生成，缺失时回退到 `location_code`。
 - 镜像头和数据 CRC、FIT 哈希、SquashFS 偏移与长度校验通过，镜像均小于 50 MiB。
-- E8820S 已完成实机启动和双频无线接口检查；2.4G LED 的 GPIO 定义仍在实机核对中。其余网口、按键、LED、USB 及长期无线稳定性仍需测试。
+- E8820S 和 A040WQ 已完成实机启动和双频无线接口检查；其余网口、按键、LED、USB 及长期无线稳定性仍需测试。
 
 已知构建问题：旧工具 `LnxHtmlEnumDict` 处理部分 Captive Portal 模板及 `dashboard/js/chart.min.js` 时出现段错误，构建会忽略这些失败并继续打包；日志中也存在被忽略的安装错误。因此构建成功不等于所有页面及运行功能均已验证。
 
