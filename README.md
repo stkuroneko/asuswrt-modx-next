@@ -79,15 +79,11 @@ make BOARD_PROFILE=SIM-AX18T rt-ax53u
 
 ## GitHub 自动编译
 
-仓库通过 `.github/workflows/build-firmware.yml` 使用 self-hosted Linux x64 Runner 编译。Runner 主机需要预先安装“编译环境”一节列出的依赖，并将 MIPS 工具链配置在：
-
-```text
-/opt/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24
-```
+仓库通过 `.github/workflows/build-firmware.yml` 使用 GitHub 托管的 `ubuntu-22.04` Runner 编译。Workflow 会自动清理可释放的 Runner 磁盘空间、安装依赖，并从 `SWRT-dev/mtk-toolchains` 下载和配置 MIPS 工具链。
 
 向 `master` 推送提交时自动编译 `A040WQ`。也可以在 GitHub 的 **Actions → Build firmware → Run workflow** 中选择任一 `BOARD_PROFILE`；选择 `ALL` 时八款机型在同一工作区依次串行编译，不会使用并行 `make`。
 
-编译完成后，`.trx` 和 `.md5` 文件作为 GitHub Actions artifact 保存 14 天。为避免共享配置和输出目录相互覆盖，同一时间只运行一个固件构建 workflow。
+编译完成后，`.trx` 和 `.md5` 文件作为 GitHub Actions artifact 保存 14 天。为避免共享配置和输出目录相互覆盖，同一时间只运行一个固件构建 workflow。`ALL` 会串行构建八款机型，但可能受到 GitHub 托管 Runner 的磁盘空间和最长运行时间限制，日常建议选择单个机型。
 
 ## 闪存布局与启动模式
 

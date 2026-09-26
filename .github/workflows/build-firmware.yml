@@ -31,10 +31,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on:
-      - self-hosted
-      - linux
-      - x64
+    runs-on: ubuntu-22.04
     timeout-minutes: 720
     env:
       SELECTED_BOARD: ${{ inputs.board || 'A040WQ' }}
@@ -46,12 +43,38 @@ jobs:
           clean: true
           fetch-depth: 1
 
-      - name: Check build host
+      - name: Free runner disk space
         shell: bash
         run: |
           set -euo pipefail
-          test -x /opt/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-gcc
-          df -h . /opt
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          df -h /
+
+      - name: Install build dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            asciidoc autoconf automake autopoint autogen antlr3 binutils binutils-dev \
+            bison build-essential bzip2 cmake device-tree-compiler dos2unix flex gawk \
+            gengetopt gettext git gperf intltool lib32gcc-s1 lib32stdc++6 lib32z1 \
+            libc6-dev-i386 libelf-dev libelf1:i386 libglib2.0-dev libltdl-dev \
+            liblzma-dev liblzo2-dev libncurses5:i386 libncurses5-dev libssl-dev \
+            libtool libtool-bin msmtp p7zip-full patch qemu-utils sharutils shtool \
+            subversion texinfo uglifyjs unzip upx-ucl uuid-dev wget xmlto xsltproc \
+            zlib1g-dev
+
+      - name: Install MIPS toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/SWRT-dev/mtk-toolchains.git "$RUNNER_TEMP/mtk-toolchains"
+          test -x "$RUNNER_TEMP/mtk-toolchains/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-gcc"
+          sudo ln -sfn "$RUNNER_TEMP/mtk-toolchains/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24" /opt/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24
+          /opt/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-gcc --version
+          df -h /
 
       - name: Build selected profile
         if: env.SELECTED_BOARD != 'ALL'
