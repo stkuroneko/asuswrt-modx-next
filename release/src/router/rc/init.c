@@ -4437,6 +4437,16 @@ int init_nvram(void)
 		nvram_set_int("led_lan_gpio", 10|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_wan_gpio", 6);
 		nvram_set_int("led_pwr_gpio", 8|GPIO_ACTIVE_LOW);
+#elif defined(RTCONFIG_BOARD_E8820S)
+		nvram_set_int("btn_rst_gpio", 18|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wps_gpio", 8|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wifi_gpio", 10);
+		nvram_set_int("led_pwr_gpio", 16|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_all_gpio", 3|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_2g_gpio", 14|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_5g_gpio", 12|GPIO_ACTIVE_LOW);
+		config_netdev_bled("led_2g_gpio", "ra0");
+		config_netdev_bled("led_5g_gpio", "rai0");
 #elif defined(RTCONFIG_BOARD_R6800)
 		nvram_set_int("btn_rst_gpio", 12|GPIO_ACTIVE_LOW);
 		nvram_set_int("btn_wps_gpio", 18|GPIO_ACTIVE_LOW);
@@ -4505,6 +4515,20 @@ int init_nvram(void)
 #elif defined(RTCONFIG_BOARD_R6800)
 		nvram_set("ehci_ports", "1-1 1-2");
 		nvram_set("ohci_ports", "2-1 2-2");
+#elif defined(RTCONFIG_BOARD_E8820S)
+		if (!nvram_get("usb_usb3")) {
+			nvram_set_int("usb_usb3", 1);
+			usb_usb3 = 1;
+		}
+#ifdef RTCONFIG_XHCIMODE
+		nvram_set("xhci_ports", "2-1");
+		nvram_set("ehci_ports", "1-1");
+#else
+		if (usb_usb3 == 1)
+			nvram_set("xhci_ports", "2-1");
+		nvram_set("ehci_ports", "1-1");
+#endif
+		nvram_set("ohci_ports", "");
 #elif defined(RTCONFIG_BOARD_R3P) || defined(RTCONFIG_BOARD_RM2100)
 		nvram_set("ehci_ports", "1-1");
 		nvram_set("ohci_ports", "2-1");
@@ -4521,7 +4545,7 @@ int init_nvram(void)
 		add_rc_support("2.4G 5G noupdate");
 #if defined(RTCONFIG_BOARD_HIWIFI4) || defined(RTCONFIG_BOARD_R6800)
 		add_rc_support("usbX2");
-#elif defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_R3P)
+#elif defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_R3P) || defined(RTCONFIG_BOARD_E8820S)
 		add_rc_support("usbX1");
 #endif
 		add_rc_support("rawifi");
@@ -4536,7 +4560,7 @@ int init_nvram(void)
 		add_rc_support("app");
 		add_rc_support("gameMode");
 		add_rc_support("pwrctrl");
-#if defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_HIWIFI4)
+#if defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_HIWIFI4) || defined(RTCONFIG_BOARD_E8820S)
 		add_rc_support("usb3");
 #endif
 		// the following values is model dep. so move it from default.c to here

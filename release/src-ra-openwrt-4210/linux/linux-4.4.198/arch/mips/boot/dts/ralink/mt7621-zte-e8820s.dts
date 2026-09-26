@@ -1,0 +1,14 @@
+#include "mt7621-rfb-ax-nmbm.dts"
+
+/ {
+	compatible = "zte,e8820s", "mediatek,mt7621-soc";
+	model = "ZTE E8820S";
+};
+
+/*
+ * E8820S routes the two PCIe endpoint resets to GPIO19 and GPIO4.
+ * Both must be asserted before enumeration or MT7612 may fail to appear.
+ */
+&pcie {
+	reset-gpios = <&gpio0 19 1>, <&gpio0 4 1>;
+};

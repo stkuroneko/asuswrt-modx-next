@@ -825,7 +825,7 @@ else ifeq ($(CONFIG_RALINK),y)
 		#asustools/lzma -9 -f -c $(PLATFORMDIR)/vmlinus > $(PLATFORMDIR)/zImage.lzma ; \
 		asustools/lzma_9k e $(PLATFORMDIR)/vmlinus $(PLATFORMDIR)/zImage.lzma -lc2 -lp2 -pb2 -mfbt2 ; \
 	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] || [ "$(BUILD_NAME)" = "RT-AX54" ] || [ "$(BUILD_NAME)" = "4G-AX56" ] || [ "$(BUILD_NAME)" = "XD4S" ]  ; then \
-		$(CROSS_COMPILE)cpp -nostdinc -x assembler-with-cpp -I$(DTS_DIR) -I$(DTS_DIR)/include -undef -D__DTS__ -o $(DTS_DIR)/ralink/$(DTB).tmp $(DTS_DIR)/ralink/mt7621-rfb-ax-nmbm.dts ; \
+		$(CROSS_COMPILE)cpp -nostdinc -x assembler-with-cpp -I$(DTS_DIR) -I$(DTS_DIR)/include -undef -D__DTS__ -o $(DTS_DIR)/ralink/$(DTB).tmp $(DTS_DIR)/ralink/$(RTAX53U_DTS) ; \
 		$(LINUXDIR)/scripts/dtc/dtc -O dtb -i$(DTS_DIR)/ralink -o $(DTS_DIR)/ralink/$(DTB) $(DTS_DIR)/ralink/$(DTB).tmp ; \
 		rm $(DTS_DIR)/ralink/$(DTB).tmp ; \
 		$(CROSS_COMPILE)objcopy -O binary -R .reginfo -R .note -R .comment -R .mdebug -S $(LINUXDIR)/vmlinux $(PLATFORMDIR)/vmlinus ; \
@@ -1356,7 +1356,7 @@ IPSEC_ID_POOL =		\
 	"STRONGSWAN"
 
 define RouterOptions
-	for board in R3G HIWIFI4 R6800 R3P RM2100 SIM_AX18T; do \
+	for board in R3G HIWIFI4 E8820S R6800 R3P RM2100 SIM_AX18T; do \
 		sed -i "/RTCONFIG_BOARD_$${board}/d" $(1); \
 	done; \
 	if [ "$(BUILD_NAME)" != "RT-AX53U" ]; then \
@@ -1365,6 +1365,8 @@ define RouterOptions
 		echo "RTCONFIG_BOARD_R3G=y" >>$(1); \
 	elif [ "$(BOARD_PROFILE)" = "HIWIFI4" ]; then \
 		echo "RTCONFIG_BOARD_HIWIFI4=y" >>$(1); \
+	elif [ "$(BOARD_PROFILE)" = "E8820S" ]; then \
+		echo "RTCONFIG_BOARD_E8820S=y" >>$(1); \
 	elif [ "$(BOARD_PROFILE)" = "R6800" ]; then \
 		echo "RTCONFIG_BOARD_R6800=y" >>$(1); \
 	elif [ "$(BOARD_PROFILE)" = "R3P" ]; then \
@@ -5816,7 +5818,7 @@ else ifeq ($(MT7621),y)
 		cp $(LINUXDIR)/config_base.MT7622 $(LINUXDIR)/config_$(lowercase_B) ; \
 	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && [ "$(BOARD_PROFILE)" = "SIM-AX18T" ]; then \
 		cp $(LINUXDIR)/config_base.mt7915 $(LINUXDIR)/config_$(lowercase_B) ; \
-	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && { [ "$(BOARD_PROFILE)" = "R3G" ] || [ "$(BOARD_PROFILE)" = "HIWIFI4" ]; }; then \
+	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && { [ "$(BOARD_PROFILE)" = "R3G" ] || [ "$(BOARD_PROFILE)" = "HIWIFI4" ] || [ "$(BOARD_PROFILE)" = "E8820S" ]; }; then \
 		cp $(LINUXDIR)/config_base.mt7603_mt7612 $(LINUXDIR)/config_$(lowercase_B) ; \
 	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && [ "$(BOARD_PROFILE)" = "RM2100" ]; then \
 		cp $(LINUXDIR)/config_base.mt7603_mt7615 $(LINUXDIR)/config_$(lowercase_B) ; \

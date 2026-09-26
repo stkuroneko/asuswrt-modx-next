@@ -12,6 +12,7 @@ ROUTER = ROOT / "release/src/router"
 PROFILES = {
     "R3G": ("mt7603_mt7612", "MT7603E", "MT7612E", "usbX1", "2", "2"),
     "HIWIFI4": ("mt7603_mt7612", "MT7603E", "MT7612E", "usbX2", "2", "2"),
+    "E8820S": ("mt7603_mt7612", "MT7603E", "MT7612E", "usbX1", "2", "2"),
     "R6800": ("mt7615", "MT7615E", "MT7615E", "usbX2", "4", "4"),
     "R3P": ("mt7615", "MT7615E", "MT7615E", "usbX1", "4", "4"),
     "RM2100": ("mt7603_mt7615", "MT7603E", "MT7615E", None, "2", "4"),
@@ -43,7 +44,7 @@ def main():
     switch = switch[switch.index("void ATE_mt7621_esw_port_status(void)"):]
     switch = switch[switch.index("\n{"):]
     switch = switch[:switch.index("\n#if defined(RTCONFIG_SWRT_I2CLED)")]
-    lan_count = {"R3G": 2, "HIWIFI4": 3, "R6800": 4, "R3P": 3,
+    lan_count = {"R3G": 2, "HIWIFI4": 3, "E8820S": 4, "R6800": 4, "R3P": 3,
                  "RM2100": 3, "SIM-AX18T": 4}
     features = None
     image_names = set()
@@ -56,6 +57,8 @@ def main():
             options = dict(item.split("=", 1) for item in shlex.split(run(
                 ["make", "-s", "-f", "-", "check", "BOARD_PROFILE=" + board], target)))
             assert options["FIRST_IF"] == first and options["SECOND_IF"] == second, board
+            expected_dtb = "mt7621-zte-e8820s.dtb" if board == "E8820S" else "mt7621-rfb-ax-nmbm.dtb"
+            assert options["DTB"] == expected_dtb, board
             assert options["REAL_NAME"] not in image_names, "firmware filename collision"
             image_names.add(options["REAL_NAME"])
             cfg.write_text((KERNEL / ("config_base." + base)).read_text())
