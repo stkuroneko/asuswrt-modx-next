@@ -32,10 +32,15 @@ concurrency:
 
 jobs:
   build:
+    name: Build ${{ matrix.board }}
     runs-on: ubuntu-22.04
     timeout-minutes: 720
+    strategy:
+      fail-fast: false
+      matrix:
+        board: ${{ fromJSON((inputs.board == '' || inputs.board == 'ALL') && '["R3G","HIWIFI4","E8820S","A040WQ","MSG1500","R6800","R3P","RM2100","SIM-AX18T"]' || format('["{0}"]', inputs.board)) }}
     env:
-      SELECTED_BOARD: ${{ inputs.board || 'ALL' }}
+      SELECTED_BOARD: ${{ matrix.board }}
       BUILD_ROOT: /build
 
     steps:
@@ -96,20 +101,9 @@ jobs:
           df -h /
 
       - name: Build selected profile
-        if: env.SELECTED_BOARD != 'ALL'
         working-directory: ${{ env.BUILD_ROOT }}/release/src-ra-openwrt-4210
         shell: bash
         run: make BOARD_PROFILE="$SELECTED_BOARD" rt-ax53u
-
-      - name: Build all profiles serially
-        if: env.SELECTED_BOARD == 'ALL'
-        working-directory: ${{ env.BUILD_ROOT }}/release/src-ra-openwrt-4210
-        shell: bash
-        run: |
-          set -euo pipefail
-          for board in R3G HIWIFI4 E8820S A040WQ MSG1500 R6800 R3P RM2100 SIM-AX18T; do
-            make BOARD_PROFILE="$board" rt-ax53u
-          done
 
       - name: Validate board profiles
         shell: bash

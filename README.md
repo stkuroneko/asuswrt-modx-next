@@ -83,9 +83,9 @@ make BOARD_PROFILE=SIM-AX18T rt-ax53u
 
 仓库通过 `.github/workflows/build-firmware.yml` 使用 GitHub 托管的 `ubuntu-22.04` Runner 编译。Workflow 会自动清理可释放的 Runner 磁盘空间、安装依赖，并从 `SWRT-dev/mtk-toolchains` 下载和配置 MIPS 工具链。为兼容旧构建工具的路径长度限制，工作区会 bind mount 到 `/build`，编译、检查和产物收集均从该短路径执行。
 
-向 `master` 推送提交时自动编译全部九款机型。也可以在 GitHub 的 **Actions → Build firmware → Run workflow** 中选择任一 `BOARD_PROFILE`；默认选择 `ALL`，九款机型在同一工作区依次串行编译，不会使用并行 `make`。
+向 `master` 推送提交时自动编译全部九款机型，每款机型作为独立的 GitHub Actions 任务运行，使用各自的 Runner 和工作区。也可以在 GitHub 的 **Actions → Build firmware → Run workflow** 中选择任一 `BOARD_PROFILE`；默认选择 `ALL`，启动全部九个任务。
 
-编译完成后，`.trx` 和 `.md5` 文件作为 GitHub Actions artifact 保存 14 天。为避免共享配置和输出目录相互覆盖，同一时间只运行一个固件构建 workflow。编译全部机型可能受到 GitHub 托管 Runner 的磁盘空间和最长运行时间限制；手动运行时可选择单个机型。
+编译完成后，每款机型的 `.trx` 和 `.md5` 文件分别作为 GitHub Actions artifact 保存 14 天。各任务独立构建，某款机型失败不会取消其他机型的任务。单个任务仍可能受到 GitHub 托管 Runner 的磁盘空间和最长运行时间限制。
 
 ## 闪存布局与启动模式
 
