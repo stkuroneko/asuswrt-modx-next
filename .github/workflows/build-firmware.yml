@@ -9,7 +9,7 @@ on:
       board:
         description: Board profile
         required: true
-        default: A040WQ
+        default: ALL
         type: choice
         options:
           - R3G
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 720
     env:
-      SELECTED_BOARD: ${{ inputs.board || 'A040WQ' }}
+      SELECTED_BOARD: ${{ inputs.board || 'ALL' }}
       BUILD_ROOT: /build
 
     steps:
