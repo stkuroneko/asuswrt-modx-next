@@ -86,6 +86,9 @@ struct REPLACE_PRODUCTID_S replace_productid_t[] =
 #elif defined(RTCONFIG_BOARD_A040WQ)
 	{"RT-AX53U", "诺基亚贝尔 A-040W-Q", "CN"},
 	{"RT-AX53U", "Nokia A-040W-Q", "global"},
+#elif defined(RTCONFIG_BOARD_MSG1500)
+	{"RT-AX53U", "瑞斯康达 MSG1500", "CN"},
+	{"RT-AX53U", "Raisecom MSG1500", "global"},
 #elif defined(RTCONFIG_BOARD_R6800)
 	{"RT-AX53U", "网件 R6800", "CN"},
 	{"RT-AX53U", "NETGEAR R6800", "global"},

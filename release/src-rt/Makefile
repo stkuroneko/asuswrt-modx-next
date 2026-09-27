@@ -1356,7 +1356,7 @@ IPSEC_ID_POOL =		\
 	"STRONGSWAN"
 
 define RouterOptions
-	for board in R3G HIWIFI4 E8820S A040WQ R6800 R3P RM2100 SIM_AX18T; do \
+	for board in R3G HIWIFI4 E8820S A040WQ MSG1500 R6800 R3P RM2100 SIM_AX18T; do \
 		sed -i "/RTCONFIG_BOARD_$${board}/d" $(1); \
 	done; \
 	if [ "$(BUILD_NAME)" != "RT-AX53U" ]; then \
@@ -1369,6 +1369,8 @@ define RouterOptions
 		echo "RTCONFIG_BOARD_E8820S=y" >>$(1); \
 	elif [ "$(BOARD_PROFILE)" = "A040WQ" ]; then \
 		echo "RTCONFIG_BOARD_A040WQ=y" >>$(1); \
+	elif [ "$(BOARD_PROFILE)" = "MSG1500" ]; then \
+		echo "RTCONFIG_BOARD_MSG1500=y" >>$(1); \
 	elif [ "$(BOARD_PROFILE)" = "R6800" ]; then \
 		echo "RTCONFIG_BOARD_R6800=y" >>$(1); \
 	elif [ "$(BOARD_PROFILE)" = "R3P" ]; then \
@@ -5828,6 +5830,8 @@ else ifeq ($(MT7621),y)
 	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && [ "$(BOARD_PROFILE)" = "RM2100" ]; then \
 		cp $(LINUXDIR)/config_base.mt7603_mt7615 $(LINUXDIR)/config_$(lowercase_B) ; \
 	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && [ "$(BOARD_PROFILE)" = "A040WQ" ]; then \
+		cp $(LINUXDIR)/config_base.mt7615_dbdc $(LINUXDIR)/config_$(lowercase_B) ; \
+	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && [ "$(BOARD_PROFILE)" = "MSG1500" ]; then \
 		cp $(LINUXDIR)/config_base.mt7615_dbdc $(LINUXDIR)/config_$(lowercase_B) ; \
 	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] && { [ "$(BOARD_PROFILE)" = "R6800" ] || [ "$(BOARD_PROFILE)" = "R3P" ]; }; then \
 		cp $(LINUXDIR)/config_base.mt7615 $(LINUXDIR)/config_$(lowercase_B) ; \

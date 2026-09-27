@@ -1,6 +1,6 @@
 # asuswrt-modx-next
 
-基于 ASUSWRT / SWRT 的固件适配项目。`master` 已统一八款机型的适配，通过 `BOARD_PROFILE` 选择硬件，无需切换机型分支。
+基于 ASUSWRT / SWRT 的固件适配项目。`master` 已统一九款机型的适配，通过 `BOARD_PROFILE` 选择硬件，无需切换机型分支。
 
 各机型共用 RT-AX53U 构建框架和公共软件功能；无线驱动、校准数据、网口映射、GPIO、按键、LED、USB 和显示名称按硬件区分。
 
@@ -12,6 +12,7 @@
 | `HIWIFI4` | 极路由 4 增强版 HC5962 | MT7603 + MT7612 | 1 + 3 | 2 | `HIWIFI4` |
 | `E8820S` | 中兴 E8820S | MT7603 + MT7612 | 1 + 4 | 1 | `ZTE-E8820S` |
 | `A040WQ` | Nokia A-040W-Q | 单颗 MT7615 双频 DBDC | 1 + 4 | 1 | `NOKIA-A040WQ` |
+| `MSG1500` | 瑞斯康达 MSG1500 | 单颗 MT7615 双频 DBDC | 1 + 4 | 1 | `RAISECOM-MSG1500` |
 | `R6800` | NETGEAR R6800 | MT7615 + MT7615 | 1 + 4 | 2 | `NETGEAR-R6800` |
 | `R3P` | 小米路由器 Pro | MT7615 + MT7615 | 1 + 3 | 1 | `MI-R3P` |
 | `RM2100` | 红米 AC2100 | MT7603 + MT7615 | 1 + 3 | 0 | `REDMI-AC2100` |
@@ -50,7 +51,7 @@ sudo ln -sfn "$PWD/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24" /opt/
 cd ../asuswrt-modx-next
 ```
 
-上述八款 MT7621 机型使用这套 MIPS 工具链。其他平台需要配置各自的工具链。
+上述九款 MT7621 机型使用这套 MIPS 工具链。其他平台需要配置各自的工具链。
 
 ## 编译固件
 
@@ -67,6 +68,7 @@ make BOARD_PROFILE=R3G rt-ax53u
 make BOARD_PROFILE=HIWIFI4 rt-ax53u
 make BOARD_PROFILE=E8820S rt-ax53u
 make BOARD_PROFILE=A040WQ rt-ax53u
+make BOARD_PROFILE=MSG1500 rt-ax53u
 make BOARD_PROFILE=R6800 rt-ax53u
 make BOARD_PROFILE=R3P rt-ax53u
 make BOARD_PROFILE=RM2100 rt-ax53u
@@ -81,15 +83,15 @@ make BOARD_PROFILE=SIM-AX18T rt-ax53u
 
 仓库通过 `.github/workflows/build-firmware.yml` 使用 GitHub 托管的 `ubuntu-22.04` Runner 编译。Workflow 会自动清理可释放的 Runner 磁盘空间、安装依赖，并从 `SWRT-dev/mtk-toolchains` 下载和配置 MIPS 工具链。为兼容旧构建工具的路径长度限制，工作区会 bind mount 到 `/build`，编译、检查和产物收集均从该短路径执行。
 
-向 `master` 推送提交时自动编译 `A040WQ`。也可以在 GitHub 的 **Actions → Build firmware → Run workflow** 中选择任一 `BOARD_PROFILE`；选择 `ALL` 时八款机型在同一工作区依次串行编译，不会使用并行 `make`。
+向 `master` 推送提交时自动编译 `A040WQ`。也可以在 GitHub 的 **Actions → Build firmware → Run workflow** 中选择任一 `BOARD_PROFILE`；选择 `ALL` 时九款机型在同一工作区依次串行编译，不会使用并行 `make`。
 
-编译完成后，`.trx` 和 `.md5` 文件作为 GitHub Actions artifact 保存 14 天。为避免共享配置和输出目录相互覆盖，同一时间只运行一个固件构建 workflow。`ALL` 会串行构建八款机型，但可能受到 GitHub 托管 Runner 的磁盘空间和最长运行时间限制，日常建议选择单个机型。
+编译完成后，`.trx` 和 `.md5` 文件作为 GitHub Actions artifact 保存 14 天。为避免共享配置和输出目录相互覆盖，同一时间只运行一个固件构建 workflow。`ALL` 会串行构建九款机型，但可能受到 GitHub 托管 Runner 的磁盘空间和最长运行时间限制，日常建议选择单个机型。
 
 ## 闪存布局与启动模式
 
 配套 U-Boot 项目：[stkuroneko/Uboot-mips](https://github.com/stkuroneko/Uboot-mips)。U-Boot 的编译和使用说明请参阅该项目。
 
-八机型统一沿用仓库原版 RT-AX53U 的 NAND + NMBM、硬件 ECC、双固件分区和 `MTK_NAND_BLOCK2` 模式，不使用各机型原厂固件的分区布局。
+九机型统一沿用仓库原版 RT-AX53U 的 NAND + NMBM、硬件 ECC、双固件分区和 `MTK_NAND_BLOCK2` 模式，不使用各机型原厂固件的分区布局。
 
 | 分区 | 起始地址 | 大小 |
 | --- | --- | --- |
@@ -119,10 +121,10 @@ python3 tools/check_board_profiles.py
 
 2026-09-27 验证结果：
 
-- 八款机型的配置回归检查全部通过；E8820S 和 A040WQ 已完成完整构建，镜像 MD5 校验通过。
-- 除 E8820S 外的七款机型继续使用 RT-AX53U 通用 DTB；E8820S 使用专用 DTB，在 PCIe 枚举前通过 GPIO19 和 GPIO4 同时复位 MT7603 和 MT7612。
+- 九款机型的配置回归检查全部通过；E8820S、A040WQ 和 MSG1500 已完成完整构建，镜像 MD5 校验通过。
+- 除 E8820S 外的八款机型继续使用 RT-AX53U 通用 DTB；E8820S 使用专用 DTB，在 PCIe 枚举前通过 GPIO19 和 GPIO4 同时复位 MT7603 和 MT7612。
 - E8820S 实机确认已加载专用 DTB，双 PCIe 复位均成功申请，2.4G 和 5G 无线接口正常启动。
-- A040WQ 使用单颗 MT7615 的 DBDC 模式，`ra0` 为 2.4 GHz、`rai0` 为 5 GHz；实机已确认系统启动、DBDC 初始化和双频热点正常。监管域根据 `territory_code` 生成，缺失时回退到 `location_code`。
+- A040WQ 和 MSG1500 使用单颗 MT7615 的 DBDC 模式，`ra0` 为 2.4 GHz、`rai0` 为 5 GHz。A040WQ 实机已确认系统启动、DBDC 初始化和双频热点正常；MSG1500 尚需实机验证。监管域根据 `territory_code` 生成，缺失时回退到 `location_code`。
 - 镜像头和数据 CRC、FIT 哈希、SquashFS 偏移与长度校验通过，镜像均小于 50 MiB。
 - E8820S 和 A040WQ 已完成实机启动和双频无线接口检查；其余网口、按键、LED、USB 及长期无线稳定性仍需测试。
 

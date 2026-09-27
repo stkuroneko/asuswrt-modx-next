@@ -4457,6 +4457,14 @@ int init_nvram(void)
 		eval("rtkswitch", "11");
 		config_netdev_bled("led_2g_gpio", "ra0");
 		config_netdev_bled("led_5g_gpio", "rai0");
+#elif defined(RTCONFIG_BOARD_MSG1500)
+		nvram_set_int("btn_rst_gpio", 18|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_5g_gpio", 3|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_2g_gpio", 4|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_usb_gpio", 13|GPIO_ACTIVE_LOW);
+		eval("rtkswitch", "11");
+		config_netdev_bled("led_2g_gpio", "ra0");
+		config_netdev_bled("led_5g_gpio", "rai0");
 #elif defined(RTCONFIG_BOARD_R6800)
 		nvram_set_int("btn_rst_gpio", 12|GPIO_ACTIVE_LOW);
 		nvram_set_int("btn_wps_gpio", 18|GPIO_ACTIVE_LOW);
@@ -4539,7 +4547,7 @@ int init_nvram(void)
 		nvram_set("ehci_ports", "1-1");
 #endif
 		nvram_set("ohci_ports", "");
-#elif defined(RTCONFIG_BOARD_A040WQ)
+#elif defined(RTCONFIG_BOARD_A040WQ) || defined(RTCONFIG_BOARD_MSG1500)
 		nvram_set("ehci_ports", "1-2");
 		nvram_set("ohci_ports", "2-2");
 #elif defined(RTCONFIG_BOARD_R3P) || defined(RTCONFIG_BOARD_RM2100)
@@ -4558,7 +4566,7 @@ int init_nvram(void)
 		add_rc_support("2.4G 5G noupdate");
 #if defined(RTCONFIG_BOARD_HIWIFI4) || defined(RTCONFIG_BOARD_R6800)
 		add_rc_support("usbX2");
-#elif defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_R3P) || defined(RTCONFIG_BOARD_E8820S) || defined(RTCONFIG_BOARD_A040WQ)
+#elif defined(RTCONFIG_BOARD_R3G) || defined(RTCONFIG_BOARD_R3P) || defined(RTCONFIG_BOARD_E8820S) || defined(RTCONFIG_BOARD_A040WQ) || defined(RTCONFIG_BOARD_MSG1500)
 		add_rc_support("usbX1");
 #endif
 		add_rc_support("rawifi");

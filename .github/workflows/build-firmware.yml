@@ -16,6 +16,7 @@ on:
           - HIWIFI4
           - E8820S
           - A040WQ
+          - MSG1500
           - R6800
           - R3P
           - RM2100
@@ -106,7 +107,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for board in R3G HIWIFI4 E8820S A040WQ R6800 R3P RM2100 SIM-AX18T; do
+          for board in R3G HIWIFI4 E8820S A040WQ MSG1500 R6800 R3P RM2100 SIM-AX18T; do
             make BOARD_PROFILE="$board" rt-ax53u
           done
 
