@@ -6111,7 +6111,7 @@ void start_smartdns(void)
 	FILE *fp;
 	char *smartdns_argv[] = { "smartdns", "-c", "/etc/smartdns.conf", "-p", "/tmp/smartdns.pid", "-f", NULL };
 	pid_t pid;
-	int unit, i;
+	int unit, i, upstream_count = 0;
 	char tmp[100], prefix[sizeof("wanXXXXXXXXXX_")];
 	char wan_dns_buf[INET6_ADDRSTRLEN*3 + 3];
 	char *wan_dns, *next;
@@ -6136,12 +6136,14 @@ void start_smartdns(void)
 	fprintf(fp, "conf-file /etc/blacklist-ip.conf\n");
 	fprintf(fp, "conf-file /etc/whitelist-ip.conf\n");
 	fprintf(fp, "conf-file /etc/seconddns.conf\n");
+	/* dnsmasq is the public DNS listener; SmartDNS is its local upstream. */
+	fprintf(fp, "bind 127.0.0.1:9053 -group master\n");
+	fprintf(fp, "bind-tcp 127.0.0.1:9053 -group master\n");
 #if defined(RTCONFIG_IPV6)
-	fprintf(fp, "bind [::]:9053 -group master\n");
-	fprintf(fp, "bind-tcp [::]:9053 -group master\n");
-#else
-	fprintf(fp, "bind :9053 -group master\n");
-	fprintf(fp, "bind-tcp [::]:9053 -group master\n");
+	if (!nvram_match("ipv6_service", "disabled")) {
+		fprintf(fp, "bind [::1]:9053 -group master\n");
+		fprintf(fp, "bind-tcp [::1]:9053 -group master\n");
+	}
 #endif
 	fprintf(fp, "cache-size 9999\n");
 	if(nvram_match("smartdns_prefetch", "1"))
@@ -6152,7 +6154,7 @@ void start_smartdns(void)
 	//fprintf(fp, "blacklist-ip 1.0.0.0/16\n");
 	//fprintf(fp, "whitelist-ip 1.0.0.0/16\n");
 	//fprintf(fp, "ignore-ip 1.0.0.0/16\n");
-	if(nvram_match("smartdns_dis_ipv6", "1") && !nvram_match("ipv6_service", "disabled"))
+	if(nvram_match("smartdns_dis_ipv6", "1") || nvram_match("ipv6_service", "disabled"))
 		fprintf(fp, "force-AAAA-SOA yes\n");
 	else
 		fprintf(fp, "force-AAAA-SOA no\n");
@@ -6170,33 +6172,16 @@ void start_smartdns(void)
 	fprintf(fp, "log-size 64k\n");
 	fprintf(fp, "log-num 1\n");
 	if(nvram_get_int("smartdns_num") == 0){
-#if !defined(K3) && !defined(R8000P) && !defined(R7000P) && !defined(XWR3100)
-		if(!strncmp(nvram_safe_get("territory_code"), "CN",2)){
-#endif
-			nvram_set("smartdns_num", "3");
-			nvram_set("smartdns_server_1", "114.114.114.114");
-			nvram_set("smartdns_port_1", "53");
-			nvram_set("smartdns_type_1", "UDP");
-			nvram_set("smartdns_server_2", "119.29.29.29");
-			nvram_set("smartdns_port_2", "53");
-			nvram_set("smartdns_type_2", "UDP");
-			nvram_set("smartdns_server_3", "223.5.5.5");
-			nvram_set("smartdns_port_3", "53");
-			nvram_set("smartdns_type_3", "UDP");
-#if !defined(K3) && !defined(R8000P) && !defined(R7000P) && !defined(XWR3100)
-		}else{
-			nvram_set("smartdns_num", "3");
-			nvram_set("smartdns_server_1", "8.8.8.8");
-			nvram_set("smartdns_port_1", "53");
-			nvram_set("smartdns_type_1", "UDP");
-			nvram_set("smartdns_server_2", "208.67.222.222");
-			nvram_set("smartdns_port_2", "53");
-			nvram_set("smartdns_type_2", "UDP");
-			nvram_set("smartdns_server_3", "1.1.1.1");
-			nvram_set("smartdns_port_3", "53");
-			nvram_set("smartdns_type_3", "UDP");
-		}
-#endif
+		nvram_set("smartdns_num", "3");
+		nvram_set("smartdns_server_1", "8.8.8.8");
+		nvram_set("smartdns_port_1", "53");
+		nvram_set("smartdns_type_1", "UDP");
+		nvram_set("smartdns_server_2", "208.67.222.222");
+		nvram_set("smartdns_port_2", "53");
+		nvram_set("smartdns_type_2", "UDP");
+		nvram_set("smartdns_server_3", "1.1.1.1");
+		nvram_set("smartdns_port_3", "53");
+		nvram_set("smartdns_type_3", "UDP");
 	}
 	for(i = 1; i <= nvram_get_int("smartdns_num"); i++){
 		char *ss = NULL, *sp = NULL, *st = NULL;
@@ -6206,16 +6191,22 @@ void start_smartdns(void)
 		st = nvram_safe_get(strcat_r("smartdns_type", prefix, tmp));
 		if(!*ss || !*sp || !*st)
 			continue;
-		if(!strcmp(st, "UDP"))
+		if(!strcmp(st, "UDP")) {
 			fprintf(fp, "server %s:%s -group master\n", ss, sp);
-		else if(!strcmp(st, "TCP"))
+			upstream_count++;
+		} else if(!strcmp(st, "TCP")) {
 			fprintf(fp, "server-tcp %s:%s -group master\n", ss, sp);
-		else if(!strcmp(st, "TLS"))
+			upstream_count++;
+		} else if(!strcmp(st, "TLS")) {
 			fprintf(fp, "server-tls %s:%s -group master -no-check-certificate\n", ss, sp);
-		else if(!strcmp(st, "HTTPS"))
+			upstream_count++;
+		} else if(!strcmp(st, "HTTPS")) {
 			fprintf(fp, "server-https %s -group master -no-check-certificate\n", ss);
+			upstream_count++;
+		}
 	}
-	for (unit = WAN_UNIT_FIRST; unit < WAN_UNIT_MAX; unit++) {
+	/* Use WAN-provided DNS only if no valid configured upstream exists. */
+	for (unit = WAN_UNIT_FIRST; upstream_count == 0 && unit < WAN_UNIT_MAX; unit++) {
 		char *wan_xdns;
 		char wan_xdns_buf[sizeof("255.255.255.255 ")*2];
 #ifdef RTCONFIG_DUALWAN
