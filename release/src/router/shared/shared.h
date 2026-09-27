@@ -4655,7 +4655,7 @@ extern int is_account_bound();
 
 #if defined(RTCONFIG_SWRT_I2CLED)
 enum {
-#if defined(R6800)
+#if defined(R6800) || defined(RTCONFIG_BOARD_R6800)
 	I2CLED_WAN_WHITE = 1,
 	I2CLED_WAN_ORANGE,
 	I2CLED_LAN1_WHITE,

@@ -4467,9 +4467,19 @@ int init_nvram(void)
 		config_netdev_bled("led_5g_gpio", "rai0");
 #elif defined(RTCONFIG_BOARD_R6800)
 		nvram_set_int("btn_rst_gpio", 12|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wifi_gpio", 14|GPIO_ACTIVE_LOW);
 		nvram_set_int("btn_wps_gpio", 18|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_wps_gpio", 17);
 		nvram_set_int("led_all_gpio", 5|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_pwr_gpio", 9);
+		nvram_set_int("led_wan_gpio", 11);
+		nvram_set_int("led_lan1_gpio", 7);
+		nvram_set_int("led_lan2_gpio", 5);
+		nvram_set_int("led_lan3_gpio", 3);
+		nvram_set_int("led_lan4_gpio", 1);
+		nvram_set_int("led_usb_gpio", 15);
+		nvram_set_int("led_5g_gpio", 13);
+		nvram_set_int("led_2g_gpio", 12);
 		eval("rtkswitch", "11");
 #elif defined(RTCONFIG_BOARD_R3P)
 		nvram_set_int("btn_rst_gpio", 18|GPIO_ACTIVE_LOW);

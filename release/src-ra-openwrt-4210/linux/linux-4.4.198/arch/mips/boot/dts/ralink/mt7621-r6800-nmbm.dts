@@ -1,0 +1,12 @@
+#include "mt7621-rfb-ax-nmbm.dts"
+
+/ {
+	compatible = "netgear,r6800", "mediatek,mt7621-soc";
+	model = "Netgear R6800";
+};
+
+&pinctrl {
+	pinctrl0 {
+		/delete-node/ gpio;
+	};
+};

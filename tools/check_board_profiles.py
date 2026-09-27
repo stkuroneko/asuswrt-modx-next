@@ -59,7 +59,10 @@ def main():
             options = dict(item.split("=", 1) for item in shlex.split(run(
                 ["make", "-s", "-f", "-", "check", "BOARD_PROFILE=" + board], target)))
             assert options["FIRST_IF"] == first and options["SECOND_IF"] == second, board
-            expected_dtb = "mt7621-zte-e8820s.dtb" if board == "E8820S" else "mt7621-rfb-ax-nmbm.dtb"
+            expected_dtb = {
+                "E8820S": "mt7621-zte-e8820s.dtb",
+                "R6800": "mt7621-r6800-nmbm.dtb",
+            }.get(board, "mt7621-rfb-ax-nmbm.dtb")
             assert options["DTB"] == expected_dtb, board
             assert options["REAL_NAME"] not in image_names, "firmware filename collision"
             image_names.add(options["REAL_NAME"])
@@ -76,7 +79,11 @@ def main():
             assert ("CONFIG_DBDC_MODE=y" in kernel) == (board in {"A040WQ", "MSG1500", "SIM-AX18T"}), board
             assert ("CONFIG_MULTI_PROFILE_SUPPORT=y" in kernel) == (board in {"A040WQ", "MSG1500", "SIM-AX18T"}), board
             assert options["RALINK_DBDC_MODE"] == ("y" if board in {"A040WQ", "MSG1500"} else "n"), board
-
+            assert options.get("SWRT_I2CLED", "n") == ("y" if board == "R6800" else "n"), board
+            assert options.get("I2C_CHARDEV") == ("y" if board == "R6800" else None), board
+            assert options.get("I2C_GPIO") == ("y" if board == "R6800" else None), board
+            assert options.get("VHT160") == ("y" if board == "R6800" else "n"), board
+            assert options.get("BW160M") == ("y" if board == "R6800" else "n"), board
             # Reuse one file across all boards to catch stale profile macros.
             router_cfg.touch()
             recipe = board_macro + "check:\n\t$(call RouterOptions," + str(router_cfg) + ")\n"

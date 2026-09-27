@@ -2689,7 +2689,7 @@ void led_on_off(void)
 		led_control(LED_ALL, LED_OFF);
 	}
 }
-#elif defined(R6800)
+#elif defined(R6800) || defined(RTCONFIG_BOARD_R6800)
 struct i2cled_lanwan_s {
 	int lan1status;
 	int lan2status;
@@ -9670,7 +9670,7 @@ void watchdog(int sig)
 #if defined(RTAC2100) ||defined(RTRM2100) || defined(RTMIR3G)
 	/* handle led */
 	led_on_off();
-#elif defined(R6800)
+#elif defined(R6800) || defined(RTCONFIG_BOARD_R6800)
 	i2c_led_check();
 #endif
 

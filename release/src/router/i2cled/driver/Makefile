@@ -1,6 +1,6 @@
 #include $(TOP)/.config
 obj-m := i2cleds.o
-ifeq ($(R6800),y)
+ifneq ($(filter y,$(R6800) $(RTCONFIG_BOARD_R6800)),)
 i2cleds-objs := gpio-sx1503-leds.o
 else ifeq ($(RAX120),y)
 i2cleds-objs := rax120-leds.o

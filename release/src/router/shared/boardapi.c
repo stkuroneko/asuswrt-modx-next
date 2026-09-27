@@ -592,7 +592,7 @@ int init_gpio(void)
 		disable = (use_gpio&GPIO_ACTIVE_LOW)==0 ? 0: 1;
 #ifndef RTCONFIG_LEDS_CLASS
 #if defined(RTCONFIG_SWRT_I2CLED)
-#if defined(R6800)
+#if defined(R6800) || defined(RTCONFIG_BOARD_R6800)
 		if(gpio_pin == 17 || gpio_pin == 5)
 #elif defined(RAX120)
 		if(gpio_pin == 40 || gpio_pin == 41)
@@ -628,7 +628,7 @@ int init_gpio(void)
 			disable = (use_gpio & GPIO_ACTIVE_LOW)? 1 : 0;
 #endif
 #if defined(RTCONFIG_SWRT_I2CLED)
-#if defined(R6800)
+#if defined(R6800) || defined(RTCONFIG_BOARD_R6800)
 		if(gpio_pin == 17 || gpio_pin == 5)
 #elif defined(RAX120)
 		if(gpio_pin == 40 || gpio_pin == 41)
@@ -660,7 +660,7 @@ int init_gpio(void)
 #ifdef RTCONFIG_SW_CTRL_ALLLED
 		if (nvram_match("AllLED", "1"))
 #endif
-#if defined(R6800)
+#if defined(R6800) || defined(RTCONFIG_BOARD_R6800)
 			i2cled_control(I2CLED_WAN_WHITE, 1);
 #elif defined(RAX120)
 			i2cled_control(I2CLED_PWR, 1);
@@ -1017,7 +1017,7 @@ int do_led_control(int which, int mode)
 	}
 #endif
 #if defined(RTCONFIG_SWRT_I2CLED)
-#if defined(R6800)
+#if defined(R6800) || defined(RTCONFIG_BOARD_R6800)
 	if(which == LED_WPS || which == LED_ALL)
 #elif defined(RAX120)
 	if(which == LED_WPS || which == LED_LAN)
@@ -1025,7 +1025,7 @@ int do_led_control(int which, int mode)
 #endif
 	set_gpio(gpio_nr, v);
 #if defined(RTCONFIG_SWRT_I2CLED)
-#if defined(R6800)
+#if defined(R6800) || defined(RTCONFIG_BOARD_R6800)
 	if(which == LED_WAN)
 		i2cled_control(I2CLED_WAN_WHITE, mode);
 	else if (which == LED_USB)
@@ -1395,7 +1395,7 @@ int lanport_ctrl(int ctrl)
 #if defined(RTCONFIG_SWRT_I2CLED) || defined(RTCONFIG_SWRT_LED_RGB)
 void i2cled_control(int which, int onoff)
 {
-#if defined(R6800)
+#if defined(R6800) || defined(RTCONFIG_BOARD_R6800)
 	switch(which){
 		case I2CLED_WAN_WHITE:
 			f_write_string("/sys/class/leds/netgear:internet:white/trigger", onoff ? "default-on" : "none", 0, 0);

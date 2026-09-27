@@ -26,9 +26,12 @@ PWD=$(shell pwd)
 
 all:
 ifeq ($(RALINK),y)
-ifeq ($(R6800),y)
-	@[ -f driver/gpio-sx1503-leds.c ] || cp -f $(PWD)/prebuild/R6800/i2cleds.ko $(PWD)/driver/
-	@[ -f driver/gpio-sx1503-leds.c ] && $(MAKE) -C $(LINUXDIR) EXTRA_CFLAGS=-I$(TOP)/shared SUBDIRS=$(PWD)/driver modules
+ifneq ($(filter y,$(R6800) $(RTCONFIG_BOARD_R6800)),)
+	@if [ -f driver/gpio-sx1503-leds.c ]; then \
+		$(MAKE) -C $(LINUXDIR) EXTRA_CFLAGS=-I$(TOP)/shared SUBDIRS=$(PWD)/driver modules; \
+	else \
+		cp -f $(PWD)/prebuild/R6800/i2cleds.ko $(PWD)/driver/; \
+	fi
 else ifeq ($(RMAX6000),y)
 	@[ -f driver/rmax6000-leds.c ] || cp -f $(PWD)/prebuild/RMAX6000/i2cleds.ko $(PWD)/driver/
 	@[ -f driver/rmax6000-leds.c ] && $(MAKE) -C $(LINUXDIR) EXTRA_CFLAGS=-I$(TOP)/shared SUBDIRS=$(PWD)/driver modules
@@ -41,9 +44,14 @@ endif
 endif
 
 install:
+ifneq ($(filter y,$(R6800) $(RTCONFIG_BOARD_R6800)),)
+	install -D driver/i2cleds.ko $(INSTALLDIR)/lib/modules/$(LINUX_KERNEL)/extra/i2cleds.ko
+	$(STRIPX) $(INSTALLDIR)/lib/modules/$(LINUX_KERNEL)/extra/i2cleds.ko
+else
 	$(MAKE) -C $(LINUXDIR) EXTRA_CFLAGS=-I$(TOP)/shared SUBDIRS=$(PWD)/driver INSTALL_MOD_PATH=$(INSTALLDIR) modules_install
-	@find $(INSTALLDIR) -name "modules.*" | xargs rm -f
-	@find $(INSTALLDIR) -name "*.ko" | xargs $(STRIPX)
+	@find $(INSTALLDIR) -name "modules.*" | xargs -r rm -f
+	@find $(INSTALLDIR) -name "*.ko" | xargs -r $(STRIPX)
+endif
 
 clean:
 	$(RM) *.o *.ko driver/*.o driver/*.ko driver/*.mod.*

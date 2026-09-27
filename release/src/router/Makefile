@@ -1523,6 +1523,12 @@ obj-$(RTCONFIG_FPROBE) += tcpdump-4.4.0
 obj-$(RTCONFIG_BLINK_LED) += bled
 obj-$(RTCONFIG_SWRT_I2CLED) += i2cled i2c-tools-3.1.2
 obj-$(RTCONFIG_SWRT_LEDDRV) += i2cled
+i2cled:
+	$(MAKE) -C i2cled RTCONFIG_BOARD_R6800=$(RTCONFIG_BOARD_R6800)
+
+i2cled-install: i2cled
+	$(MAKE) -C i2cled install INSTALLDIR=$(INSTALLDIR)/i2cled RTCONFIG_BOARD_R6800=$(RTCONFIG_BOARD_R6800)
+
 ifeq ($(RTCONFIG_APFS),y)
 ifneq ($(RTCONFIG_TUXERA_APFS),y)
 obj-y += apfs apfsprogs
