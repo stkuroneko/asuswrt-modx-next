@@ -2098,7 +2098,7 @@ static void post_restore_defaults(void)
 #endif
 
 /* ASUS use erase nvram to reset default only */
-static void
+static int
 restore_defaults(void)
 {
 	struct nvram_tuple *t;
@@ -2378,6 +2378,8 @@ restore_defaults(void)
 	/* Keep below statment at end of restore_defaults(). */
 	post_restore_defaults();
 #endif
+	return restore_defaults;
+
 }
 
 /* Set terminal settings to reasonable defaults */
@@ -4539,7 +4541,6 @@ int init_nvram(void)
 		add_rc_support("pwrctrl");
 		add_rc_support("smart_connect");
 		add_rc_support("defpsk");
-		add_rc_support("defpass");
 		add_led_ctrl_capability(LED_ON_OFF);
 		// the following values is model dep. so move it from default.c to here
 		nvram_set("wl0_HT_TxStream", "2");
@@ -17296,7 +17297,6 @@ NO_USB_CAP:
 #endif
 	if(!nvram_match("forget_it", ""))
 		add_rc_support("defpass");
-
 	return 0;
 }
 
@@ -18873,7 +18873,11 @@ static void sysinit(void)
 	}
 	start_jffs2();
 #endif
-	restore_defaults(); // restore default if necessary
+	       
+	if(restore_defaults()) // restore default if necessary
+	{
+               init_nvram();   //refill nvram parameters after restore
+  	}
 	init_nvram2();
 
 #ifdef RPAX56
