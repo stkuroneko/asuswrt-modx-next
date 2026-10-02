@@ -938,14 +938,14 @@ void set_acceptable_frame_type(int port, int type)
 void set_admit_all_frames()
 {
 	unsigned int value;
-	for (int i = 0; i <= 6; i++)
+	for (int i = 0; i <= NR_WANLAN_PORT; i++)
 		set_acceptable_frame_type(i, 0);
 }
 
 void set_admit_untag_frames()
 {
 	unsigned int value;
-	for (int i = 0; i <= 6; i++)
+	for (int i = 0; i <= NR_WANLAN_PORT; i++)
 		set_acceptable_frame_type(i, 2);
 }
 

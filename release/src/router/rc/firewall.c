@@ -1672,8 +1672,6 @@ void nat_setting(char *wan_if, char *wan_ip, char *wanx_if, char *wanx_ip, char 
 		case WAN_V6PLUS:
 			if (nvram_get_int("s46_hgw_case") == S46_CASE_MAP_HGW_ON)
 				break;
-		case WAN_LW4O6:
-		case WAN_MAPE:
 			fprintf(fp, "-A PREROUTING -i %s -d %s -j MAPE\n", lan_if, wan_ip);
 			foreach(proto, "tcp udp", next) {
 				nvp = nv = strdup(nvram_safe_get("ipv6_s46_ports"));

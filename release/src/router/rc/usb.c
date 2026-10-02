@@ -338,8 +338,11 @@ void add_usb_host_modules(void)
 
 	/* if enabled, force USB2 before USB1.1 */
 	if (nvram_get_int("usb_usb2") == 1) {
-#if defined(RTN56UB1) || defined(RTN56UB2) || defined(RTAC1200GA1) || defined(RTAC1200GU)
+#if defined(RTN56UB1) || defined(RTN56UB2) || defined(RTAC1200GA1) || defined(RTAC1200GU) || defined(RTAX53U)
 		modprobe(USB20_MOD);
+#if defined(RTAX53U)
+		modprobe("xhci-mtk");
+#endif
 #else
 #ifdef RTCONFIG_HND_ROUTER
 		modprobe(USB20_MOD);
@@ -1030,6 +1033,7 @@ void remove_usb_host_module(void)
 #ifndef RTCONFIG_HND_ROUTER
 	modprobe_r(USBOHCI_MOD);
 	modprobe_r(USBUHCI_MOD);
+
 	modprobe_r(USB20_MOD);
 #if defined(RTCONFIG_BT_CONN_USB)
 	modprobe_r("ath3k");
@@ -1199,7 +1203,10 @@ void stop_usb(int f_force)
 	if (disabled || nvram_get_int("usb_uhci") != 1 || f_force) modprobe_r(USBUHCI_MOD);
 	if (disabled || nvram_get_int("usb_usb2") != 1 || f_force) modprobe_r(USB20_MOD);
 
-#if defined(RTN56UB1) ||  defined(RTN56UB2) || defined(RTAC1200GA1) || defined(RTAC1200GU)
+#if defined(RTN56UB1) ||  defined(RTN56UB2) || defined(RTAC1200GA1) || defined(RTAC1200GU)|| defined(RTAX53U)
+#if defined(RTAX53U)
+	modprobe_r("xhci-mtk");
+#endif
 	modprobe_r(USB20_MOD);
 #endif
 

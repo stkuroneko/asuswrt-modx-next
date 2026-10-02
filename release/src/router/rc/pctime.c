@@ -208,7 +208,7 @@ pctime_loop(struct timer_entry *timer, void *data)
     cleantrack_daytime_pc_list(mfpc_list, pnow->tm_wday, pnow->tm_hour, pcdbg);
 #endif
 #endif
-pctimer:
+//pctimer:
 	mod_timer(timer, next_expires);
 }
 

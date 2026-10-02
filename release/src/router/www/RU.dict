@@ -115,12 +115,12 @@ ASUS_eula_withdraw_desc2_AlexaIFTTT=В будущем, для включения
 ASUS_eula_withdraw_note=Возможны трудности при запуске процедуры отказа без подключения к Интернету. Пожалуйста выполните отказ при подключении к Интернету.
 ASUS_eula_withdraw_unstable=Невозможно завершить процедуру отказа из-за нестабильного подключения к сети Интернет. Повторите попытку позже.
 TM_eula_confirm=Используя ASUS AiProtection, Вы соглашаетесь с
-TM_eula_desc1=Используя функции AiProtection, Traffic analyzer, Apps analyzer, Adaptive QoS/Game boost, Web history, Вы соглашаетесь с лицензионным<a id="eula_url" style="text-decoration:underline;" target="_blank">соглашением Trend Micro</a>.
-TM_eula_desc2=Обратите внимание, что Trend Micro будет собирать вашу информацию с помощью функций AiProtection, Traffic analyzer, Apps analyzer, Adaptive QoS and web history. Вы также подтверждаете и соглашаетесь с тем, что ASUS не несет ответственности ни за соглашение между вами и Trend Micro, ни за какие-либо службы, предоставленные Trend Micro. Если у вас есть вопросы об обработке и использовании вашей информации в Trend Micro, обратитесь к заявлению о конфиденциальности Trend Micro или свяжитесь с Trend Micro для получения более подробной информации.
+TM_eula_desc1=Используя функции AiProtection, Родительский контроль( Фильтры сайтов и приложений ), Traffic analyzer, Apps analyzer, Adaptive QoS/Game boost, Web history, Вы соглашаетесь с лицензионным<a id="eula_url" style="text-decoration:underline;" target="_blank">соглашением Trend Micro</a>.
+TM_eula_desc2=Обратите внимание, что Trend Micro будет собирать вашу информацию с помощью функций AiProtection, Родительский контроль( Фильтры сайтов и приложений ), Traffic analyzer, Apps analyzer, Adaptive QoS and web history. Вы также подтверждаете и соглашаетесь с тем, что ASUS не несет ответственности ни за соглашение между вами и Trend Micro, ни за какие-либо службы, предоставленные Trend Micro. Если у вас есть вопросы об обработке и использовании вашей информации в Trend Micro, обратитесь к заявлению о конфиденциальности Trend Micro или свяжитесь с Trend Micro для получения более подробной информации.
 TM_eula_desc3=Если вы хотите отключить обмен информацией с Trend Micro с помощью вышеуказанных функций, в веб-интерфейсе роутера перейдите в Дополнительные настройки > Администрирование > Конфиденциальность.
 TM_privacy_policy=<a id="tm_eula_url" style="text-decoration:underline;" target="_blank">TrendMicro политика конфиденциальности</a>
 TM_data_collection=<a id="tm_disclosure_url" style="text-decoration:underline;" target="_blank">Раскрытие информации о конфиденциальности и сборе персональных данных</a>
-TM_eula_withdraw0=Для функций AiProtection, Traffic Analyzer, Apps analyzer, Adaptive QoS/Game boost, Web history:
+TM_eula_withdraw0=Для функций AiProtection, Родительский контроль( Фильтры сайтов и приложений ), Traffic Analyzer, Apps analyzer, Adaptive QoS/Game boost, Web history:
 TM_eula_withdraw_desc1=Обратите внимание, что ваша информация будет собрана Trend Micro с помощью вышеуказанных функций.
 TM_eula_withdraw_desc2=Если вы хотите отключить обмен информацией с Trend Micro с помощью следующих функций, нажмите <span style="font-weight: bold;">[Отказаться]</span> ниже. Тем не менее, имейте в виду, что такие функции могут не работать при отключении обмена информацией с Trend Micro.
 withdraw_confirm=Вы действительно хотите отказаться?
@@ -1089,7 +1089,7 @@ AiMesh_confirm_msg9=Учитывая совместимость системы A
 AiMesh_confirm_msg10=Чтобы обеспечить подключение вашей системы AiMesh и конечного устройства(ов), пожалуйста, прочтите этот <a id="wpa3FaqLink">FAQ</a> перед переключением на WPA3-Personal.
 AiMesh_confirm_msg11=В настоящее время вы используете WPA3-Personal. Чтобы создать систему AiMesh, ваш метод аутентификации будет изменен на WPA2/WPA3-Personal. Вы хотите продолжить?
 AiMesh_confirm_msg12=Вы можете прочитать этот <a id='wpa3FaqLink'>FAQ</a> для получения дополнительной информации.
-AiMesh_confirm_msg13=Для получения подробной информации посетите <a style='font-weight: bolder;text-decoration: underline;color:#000000;' href='' target='_blank'>Вопросы и ответы</a>
+AiMesh_confirm_msg13=Для получения подробной информации посетите <a style='font-weight: bolder;text-decoration: underline;' href='' target='_blank'>Вопросы и ответы</a>
 AiMesh_Feature_Desc=Advanced ASUS AiMesh - это инновационная новая возможность роутера, позволяющая объединять несколько роутеров ASUS вместе, создавая сеть WiFi для всего дома.
 AiMesh_FAQ=Дополнительная информация о ASUS AiMesh
 AiMesh_FindNode=Найти узел AiMesh
@@ -1175,6 +1175,9 @@ AiMesh_NodeLocation22=Балкон
 AiMesh_NodeLocation23=Конференц-зал
 AiMesh_NodeLocation24=Настраиваемое место
 AiMesh_NodeLocation25=Гараж
+AiMesh_NodeLocation26=Первый этаж
+AiMesh_NodeLocation27=Игровая комната
+AiMesh_NodeLocation28=Спортзал
 AiMesh_OfflineTips=Советы
 AiMesh_OfflineTips1=Убедитесь, что узел AiMesh включен.
 AiMesh_OfflineTips2=Перезагрузите узел AiMesh и повторите попытку.
@@ -1795,6 +1798,8 @@ DDNS_https_cert_Import=Импорт собственного сертифика�
 DDNS_https_cert_Import_desc=Загрузите сюда сертификат, выданный центром сертификации. Необходим Ваш закрытый ключ и сертификат SSL.
 DDNS_https_cert_PrivateKey=Закрытый ключ
 DDNS_https_cert_PrivateKey_note=Закрытые ключи не могут быть защищены ключевой фразой.
+DDNS_ipv6_update=Обновить IPv6
+DDNS_ipv6_update_desc=Если сетевая среда клиента использует сетевой адрес IPv6, включение этой функции сначала преобразует домен в сетевой адрес IPv6 при доступе к удаленному устройству.
 DDNS_ssl_cert=Сертификат SSL
 DDNS_termofservice_Title=Условия использования официального сайта
 DDNS_transfer=Передача ASUS DDNS имени
@@ -2139,11 +2144,11 @@ FirewallConfig_display2_sectiondesc=Включите брандмауэр для
 FirewallConfig_display3_sectiondesc=<b>Черный список :</b> В течении запланированного времени клиенты в черном списке не могут использовать указанные Интернет-сервисы.<br><b>Белый список :</b> В течении запланированного времени клиенты в белом списке могут использовать только разрешенные Интернет-сервисы. Вне запланированного времени клиенты в белом списке не смогут использовать никакие Интернет-сервисы.
 FirewallConfig_display4_sectiondesc=<b>Примечание :</b> При задании подсети для белого списка, IP-адреса не входящие в эту подсеть, не смогут получить доступ к сети Интернет.
 FirewallConfig_display5_sectiondesc=MAC-фильтр позволяет разрешить или отклонить доступ к сети для устройств с конкретными МАС адресами. <p>Вы можете задать MAC фильтр для режима разрешения или отклонения. <p>В режиме Отклонения, устройства в списке не могут подключиться к сети. <p>В режиме Разрешения, только устройства, находящиеся в списке могут подключиться к сети. Устройства, не находящиеся в списке не могут подключиться к сети.
-FirewallConfig_DoSEnable_itemdesc=\"Отказ в обслуживании\" - атака, направленная на блокировку ресурса со стороны пользователей. <p>Включение этой функции может защитить роутер от DoS атак, но приведет к увеличению нагрузки роутера.
+FirewallConfig_DoSEnable_itemdesc=Включение этой функции может защитить роутер от DoS (Denial- of-Service) атак, но приведет к увеличению нагрузки роутера.
 FirewallConfig_DoSEnable_itemname=Включить защиту DoS
 FirewallConfig_FirewallEnable_itemdesc=Отключение брандмауэра отключит все связанные функции
 FirewallConfig_FirewallEnable_itemname=Включить брандмауэр
-FirewallIPv4_enable=Включить IPv4 Брандмауэр
+FirewallIPv4_enable=Включить IPv4 Входящие правила брандмауэра
 FirewallIPv4=Брандмауэр для IPv4
 FirewallConfig_FTPPrompt_itemdesc=Если Вы назначили порты 20:21 для Вашего FTP сервера в локальной сети, этот FTP сервер будет конфликтовать с FTP сервером ZVMODELVZ.
 FirewallConfig_KeywordFilterEnable_itemname=Включить фильтр ключевых слов
@@ -2251,6 +2256,9 @@ FW_updated=Обновлён
 FW_new_firmware_available=Доступна новая прошивка.
 FW_rlnote_loading=Загружаются замечания о выпуске, подождите…
 FW_rlnote_failed=Не удается найти замечания о выпуске.
+FW_rollback=Откатить
+FW_rollback_choose=Выберите версию микропрограммы
+FW_rollback_selector=Селектор отката микропрограммы
 Game_acceleration=Ускорение игры
 Game_Boost=Оптимизатор игр
 Game_Boost_acceleration=Трехуровневое ускорение игры
@@ -2404,7 +2412,7 @@ Internet=Интернет
 Interval=Интервал
 Introduce_demo=Введение
 Invitation=Приглашение
-Interaction=Interaktion
+Interaction=Взаимодействие
 InternetSpeed=Скорость Интернета
 InternetSpeed_desc=Эта служба предоставляется Ookla®. Она обнаруживает скорость загрузки и выгрузки с маршрутизатора в Интернет. Выполнение тестирования занимает примерно минуту. При использовании этой службы вы принимаете <a href="https://www.speedtest.net/about/privacy" style="font-family:Lucida Console;text-decoration:underline;color:#7ECAFF;" target="_blank">Политику конфиденциальности Ookla</a>.
 InternetSpeed_ookla_mark=Ookla® и Speedtest® являются федерально зарегистрированными марками Ookla, LLC.
@@ -2994,6 +3002,7 @@ PM_RADIUS_Create=Создать нового клиента RADIUS
 PM_Group_Table=Групповая таблица
 PoolName=Имя раздела
 Port_format=Для исходного или конечного диапазонов портов Вы можете : a) ввести порт, например \"95\"; или b) ввести диапазон портов, например \"103:315\", \">100\", или \"<65535\".
+Port_Gaming=Игровой порт
 Port_Mapping_desc1=Сопоставление портов
 Port_Mapping_desc2=Port Mapping поддерживает IPTV WAN интерфейс для конкретного LAN порта. Вы можете выбрать соответствующий LAN порт, затем нажать Применить.
 Port_Mapping_desc3=Включить функцию Port Mapping
@@ -4227,8 +4236,7 @@ VPN_Fusion_Deactivate_Delete_Alert=Перед удалением профиля,
 VPN_Fusion_Exception_Policies_Delete_Alert=Все исключения, установленные для профиля VPN, будут удалены при удалении профиля. Удалить профиль?
 VPN_Fusion_Delete_Alert=Вы хотите удалить этот профиль?
 VPN_Fusion_Exception_Policy_And_IP_Binding_Delete_Alert=Удаление клиентской политики в списке исключений также приведет к удалению IP-привязки клиента для DHCP-сервера. Удалить это?
-VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Multiple VPN Connection FAQ.</a>
-[###MODEL_DEP###][TUF-AX5400][GS-AX5400][GS-AX3000][GT-AXE16000][GT-AXE11000][GT-AX11000_BO4][GT-AX11000_PRO][GT-AX11000][GT-AX6000][GT-AC5300][TUF-AX3000][TUF-AX3000_V2][GT-AC2900_SH][GT-AC2900][GT-AXY16000][RT-AXE7800][RT-AX86U_PRO][GT10]VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Часто задаваемые вопросы по VPN Fusion.</a>
+VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Часто задаваемые вопросы по VPN Fusion.</a>
 VPN_Fusion_Default_Alert=Невозможно установить соединение по умолчанию для целевой политики.
 Beta_test_only=Только бета-тест
 FIRM_fupgrade_desc=Вы также можете выбрать [Отменить], устройство автоматически начнет загрузку обновления в ночное время.
@@ -4272,6 +4280,7 @@ BoostKey_GeForce=GeForce Now
 BoostKey_GeForce_desc=Выберите GeForce Now для ускорения трафика игровых устройств GeForce Now.
 BoostKey_LED=Светодиод Вкл./Выкл.
 BoostKey_LED_desc=Управление включением/выключением светодиодов используется для выключения всех светодиодов, включая свет Aura.
+AURA_enable_notice_1=To enable Aura RGB, LED must remain on. Please turn on LED by pressing hardware button on the router for 3 seconds or enable it via web/app interface.
 AURA_Event=Событие
 AURA_Event_desc=Система изменит режим работы индикатора при обнаружении следующих событий.
 AURA_Event_Boost_desc=При включении Game Boost, Вы увидите медленно мигающий красный.

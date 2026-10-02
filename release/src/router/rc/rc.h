@@ -107,7 +107,7 @@ void get_ext_phy_id();
 #else
 #endif
 
-#if defined(RTN56UB1) || defined(RTN56UB2) || defined(RTAC1200GA1) || defined(RTAC1200GU) //for MT7621
+#if defined(RTN56UB1) || defined(RTN56UB2) || defined(RTAC1200GA1) || defined(RTAC1200GU) || defined(RTAX53U) //for MT7621
 #define USB20_MOD	"xhci-hcd"
 #elif defined(RTCONFIG_QCN550X) && LINUX_KERNEL_VERSION >= KERNEL_VERSION(4,4,0)
 #define USB20_MOD	"ehci-ath79"
@@ -461,7 +461,7 @@ extern int stress_pktgen_main(int argc, char *argv[]);
 #if defined(RTCONFIG_SOC_IPQ8074)
 extern int test_bl_updater_main(int argc, char *argv[]);
 #endif
-#if defined(RTCONFIG_QCA)
+#if defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
 extern int test_switch_log_main(int argc, char *argv[]);
 extern void __gen_wifi_ap_stats_log(char *fn) __attribute__((weak));
 extern void __gen_wifi_sta_stats_log(char *fn) __attribute__((weak));
@@ -650,6 +650,7 @@ extern int get_wifi_country_code_tmp(char *ori_countrycode, char *output, int le
 #if defined(RTCONFIG_AMAS_MTK_EZWDS)
 extern void set_ezwds_radio_type(void);
 #endif
+extern void duplicate_wl_ifaces(void);
 extern int Set_SwitchPort_LEDs(const char *group, const char *action);
 extern int ralink_mssid_mac_validate(const char *macaddr);
 extern int wl_WscConfigured(int unit);
@@ -788,6 +789,12 @@ extern void stop_mcsd(void);
 #else
 static inline int start_mcsd(FILE __attribute__((__unused__)) *fp) { return 0; }
 static inline void stop_mcsd(void) { }
+#endif
+
+#if defined(RTCONFIG_COBRAND)
+extern int get_cb(void);
+extern int set_cb(int n);
+extern int unset_cb(void);
 #endif
 
 #ifdef RTCONFIG_CONCURRENTREPEATER
@@ -2195,7 +2202,8 @@ extern void start_ipv6_tunnel(void);
 extern void stop_ipv6_tunnel(void);
 #ifdef RTCONFIG_SOFTWIRE46
 #define S46_LOG_PATH	"/jffs/s46.log"
-extern int s46_mapcalc(char *rules, char *peerbuf, size_t peerbufsz,
+extern void set_s46_ra_addr(int wan_type, char *wan_ifname);
+extern int s46_mapcalc(int wan_proto, char *rules, char *peerbuf, size_t peerbufsz,
 	char *addr6buf, size_t addr6bufsz, char *addr4buf, size_t addr4bufsz,
 	int *poffset, int *ppsidlen, int *ppsid, char **fmrs, int draft);
 extern void start_s46_tunnel(int unit);
@@ -2614,7 +2622,8 @@ void start_amas_service(void);
 #if defined(RTCONFIG_QCA_LBD)
 extern void duplicate_wl_ifaces(void);
 #endif
-#if defined(RTCONFIG_QCA) && LINUX_KERNEL_VERSION >= KERNEL_VERSION(3,14,0)
+#if defined(RTCONFIG_QCA) && LINUX_KERNEL_VERSION >= KERNEL_VERSION(3,14,0) \
+ || defined(RTCONFIG_RALINK) && LINUX_KERNEL_VERSION >= KERNEL_VERSION(3,14,0)
 extern void config_mssid_isolate(char *ifname, int vif);
 #endif
 
@@ -2850,7 +2859,7 @@ static inline int find_brifname_by_wlifname(const char __attribute__((__unused__
 // amas_wgn.c
 #ifdef RTCONFIG_AMAS_WGN
 extern void wgn_init(void);
-extern void wgn_start(void);
+extern int wgn_start(void);
 extern void wgn_stop(void);
 #if defined(RTCONFIG_IPV6)
 extern void wgn_filter_forward(FILE *fp, FILE *fp_ipv6, char *wan_if);
@@ -3201,6 +3210,7 @@ extern int oauth_google_send_message(const char* receiver, const char* subject, 
 extern void oauth_google_check_token_status(void);
 extern void oauth_google_drive_check_token_status(void);
 #endif
+extern void exec_uu();
 
 #if defined(RTCONFIG_QCA_LBD)
 #define LBD_PATH "/tmp/lbd.conf"

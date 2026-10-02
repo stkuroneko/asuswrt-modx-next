@@ -896,6 +896,9 @@ int do_led_control(int which, int mode)
 {
 	int use_gpio, gpio_nr;
 	int v = (mode == LED_OFF)? 0:1;
+#ifndef HND_ROUTER
+	char *led_gpio = NULL;
+#endif
 
 	if (which < 0 || which >= LED_ID_MAX || mode < 0 || mode >= LED_FAN_MODE_MAX)
 		return -1;
@@ -939,14 +942,19 @@ int do_led_control(int which, int mode)
 		v ^= 1;
 
 #ifndef HND_ROUTER
+	if (which == LED_2G)
+		led_gpio = "led_2g_gpio";
+	else if (which == LED_5G)
+		led_gpio = "led_5g_gpio";
+
 	if (mode == LED_OFF) {
-		stop_bled(use_gpio);
+		__stop_bled(led_gpio, use_gpio);
 	}
 #endif
 	set_gpio(gpio_nr, v);
 #ifndef HND_ROUTER
 	if (mode == LED_ON) {
-		start_bled(use_gpio);
+		__start_bled(led_gpio, use_gpio);
 	}
 #endif
 	return 0;

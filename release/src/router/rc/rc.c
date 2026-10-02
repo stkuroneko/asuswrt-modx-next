@@ -1654,7 +1654,7 @@ static const applets_t applets[] = {
 	{ "test_blu",			test_bl_updater_main		},
 	{ "split_q6mem",		split_q6mem_main		},
 #endif
-#if defined(RTCONFIG_SOC_IPQ8074)
+#if defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
 	{ "test_switch_log",		test_switch_log_main		},
 	{ "test_wifi_stats_log",	test_wifi_stats_log_main	},
 #endif
@@ -3099,8 +3099,17 @@ _dprintf("LED_NOMOBILE=%d, LED_2G_YELLOW=%d, LED_3G_BLUE=%d, LED_4G_WHITE=%d.\n"
 		char rules[4096], *fmrs;
 		int k, offset, psidlen, psid, start, end;
 		int draft = argv[1] && strcmp(argv[1], "draft") == 0;
+		int wan_proto = -1;
+
+		if (!strcmp(argv[2], "map-e"))
+			wan_proto = WAN_MAPE;
+		else if (!strcmp(argv[2], "lw4o6"))
+			wan_proto = WAN_LW4O6;
+		else
+			wan_proto = WAN_V6PLUS;
+
 		while (fgets(rules, sizeof(rules), stdin) != NULL) {
-			if (s46_mapcalc(rules, peerbuf, sizeof(peerbuf), addr6buf, sizeof(addr6buf),
+			if (s46_mapcalc(wan_proto, rules, peerbuf, sizeof(peerbuf), addr6buf, sizeof(addr6buf),
 					addr4buf, sizeof(addr4buf), &offset, &psidlen, &psid, &fmrs, draft) <= 0) {
 				peerbuf[0] = addr6buf[0] = addr4buf[0] = '\0';
 				offset = 0, psidlen = 0, psid = 0;

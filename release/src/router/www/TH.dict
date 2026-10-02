@@ -115,12 +115,12 @@ ASUS_eula_withdraw_desc2_AlexaIFTTT=ในอนาคตถ้าคุณต�
 ASUS_eula_withdraw_note=คุณไม่สามารถดำเนินขั้นตอนเพิกถอนได้โดยไม่ต้องเชื่อมต่ออินเทอร์เน็ต โปรดเพิกถอนเมื่อเชื่อมต่อกับอินเทอร์เน็ต
 ASUS_eula_withdraw_unstable=คุณไม่สามารถดำเนินขั้นตอนเพิกถอนได้เพราะสถานะอินเทอร์เน็ตไม่เสถียร โปรดเพิกถอนลองอีกครั้งในภายหลัง
 TM_eula_confirm=โดยใช้ ASUS AiProtection แสดงว่าคุณเห็นด้วยกับ
-TM_eula_desc1=โดยการใช้งาน AiProtection, ตัววิเคราะห์เครือข่ายการรับส่งข้อมูล, ตัววิเคราะห์แอป, QoS แบบปรับเปลี่ยนได้/การบูตส์เกม, ประวัติเว็บไซต์ จะถือว่าคุณเห็นด้วยกับ <a id="eula_url" style="text-decoration:underline;" target="_blank">ข้อตกลงอนุญาตให้ใช้สิทธิของผู้ใช้ของ Trend Micro</a>.
-TM_eula_desc2=โปรดทราบว่าข้อมูลของคุณจะเก็บรวบรวมโดย Trend Micro ผ่าน AiProtection, ตัววิเคราะห์เครือข่ายการรับส่งข้อมูล, ตัววิเคราะห์แอป, QoS แบบปรับเปลี่ยนได้ และประวัติเว็บ. นอกจากนี้คุณยอมรับและเห็นด้วยว่า ASUS ไม่รับผิดชอบต่อข้อตกลงระหว่างคุณกับ Trend Micro หรือเนื้อหาใด ๆ ที่ให้บริการโดย Trend Micro. หากคุณอาจมีคำถามใด ๆ เกี่ยวกับวิธีการที่ Trend Micro รวบรวม ประมวลผล และใช้ข้อมูลข้างต้นของคุณ, โปรดอ่านคำชี้แจงเกี่ยวกับความเป็นส่วนตัวของ Trend Micro หรือติดต่อ Trend Micro เพื่อดูรายละเอียดเพิ่มเติม.
+TM_eula_desc1=โดยการใช้งาน AiProtection, การควบคุมของผู้ปกครอง( ตัวกรองเว็บ & แอป ), ตัววิเคราะห์เครือข่ายการรับส่งข้อมูล, ตัววิเคราะห์แอป, QoS แบบปรับเปลี่ยนได้/การบูตส์เกม, ประวัติเว็บไซต์ จะถือว่าคุณเห็นด้วยกับ <a id="eula_url" style="text-decoration:underline;" target="_blank">ข้อตกลงอนุญาตให้ใช้สิทธิของผู้ใช้ของ Trend Micro</a>.
+TM_eula_desc2=โปรดทราบว่าข้อมูลของคุณจะเก็บรวบรวมโดย Trend Micro ผ่าน AiProtection, การควบคุมของผู้ปกครอง( ตัวกรองเว็บ & แอป ), ตัววิเคราะห์เครือข่ายการรับส่งข้อมูล, ตัววิเคราะห์แอป, QoS แบบปรับเปลี่ยนได้ และประวัติเว็บ. นอกจากนี้คุณยอมรับและเห็นด้วยว่า ASUS ไม่รับผิดชอบต่อข้อตกลงระหว่างคุณกับ Trend Micro หรือเนื้อหาใด ๆ ที่ให้บริการโดย Trend Micro. หากคุณอาจมีคำถามใด ๆ เกี่ยวกับวิธีการที่ Trend Micro รวบรวม ประมวลผล และใช้ข้อมูลข้างต้นของคุณ, โปรดอ่านคำชี้แจงเกี่ยวกับความเป็นส่วนตัวของ Trend Micro หรือติดต่อ Trend Micro เพื่อดูรายละเอียดเพิ่มเติม.
 TM_eula_desc3=หากคุณต้องการปิดใช้งานการแบ่งปันข้อมูลของคุณกับ Trend Micro ผ่านฟังก์ชันดังกล่าวข้างต้น โปรดไปที่  Router web GUI (GUI เว็บของเราเตอร์) > Advanced settings (การตั้งค่าขั้นสูง) > Administration (การดูแลระบบ) > Privacy (ความเป็นส่วนตัว)
 TM_privacy_policy=<a id="tm_eula_url" style="text-decoration:underline;" target="_blank">TrendMicro Privacy Policy</a>
 TM_data_collection=<a id="tm_disclosure_url" style="text-decoration:underline;" target="_blank">Privacy and Personal Data Collection Disclosure</a>
-TM_eula_withdraw0=สำหรับ AiProtection, ตัววิเคราะห์เครือข่ายการรับส่งข้อมูล, ตัววิเคราะห์แอป, QoS แบบปรับเปลี่ยนได้/การบูตส์เกม, ประวัติเว็บ:
+TM_eula_withdraw0=สำหรับ AiProtection, การควบคุมของผู้ปกครอง( ตัวกรองเว็บ & แอป ), ตัววิเคราะห์เครือข่ายการรับส่งข้อมูล, ตัววิเคราะห์แอป, QoS แบบปรับเปลี่ยนได้/การบูตส์เกม, ประวัติเว็บ:
 TM_eula_withdraw_desc1=โปรดทราบข้อมูลจะเก็บรวบรวมโดย Trend Micro ผ่านฟังก์ชันดังกล่าวข้างต้น
 TM_eula_withdraw_desc2=หากคุณต้องการปิดใช้งานการแบ่งปันข้อมูลของคุณกับ Trend Micro ผ่านฟังก์ชันต่อไปนี้ โปรดคลิกที่ <span style="font-weight: bold;">[Withdraw (เพิกถอน)]</span> ด้านล่าง. อย่างไรก็ตาม โปรดทราบคุณสมบัติ/ฟังก์ชันดังกล่าวอาจไม่สามารถใช้งานได้หากคุณหยุดการแบ่งปันข้อมูลของคุณกับ Trend Micro.
 withdraw_confirm=แน่ใจหรือว่าต้องการเพิกถอน?
@@ -1089,7 +1089,7 @@ AiMesh_confirm_msg9=เมื่อพิจารณาจากความเ
 AiMesh_confirm_msg10=เพื่อให้แน่ใจในการเชื่อมต่อของระบบ AiMesh และอุปกรณ์ของผู้ใช้งานปลายทาง กรุณาอ่าน<a id="wpa3FaqLink">คำถามที่ถามบ่อย</a> ก่อนที่จะเปลี่ยนไปใช้ WPA3-ส่วนบุคคล
 AiMesh_confirm_msg11=คุณกำลังใช้งาน WPA3-ส่วนบุคคลอยู่ในขณะนี้ หากคุณสร้างระบบ AiMesh วิธีการรับรองความถูกต้องของคุณจะถูกเปลี่ยนเป็น WPA2/WPA3-ส่วนบุคคล คุณต้องการดำเนินการต่อหรือไม่?
 AiMesh_confirm_msg12=You can read this <a id='wpa3FaqLink'>FAQ</a> for more information.
-AiMesh_confirm_msg13=สำหรับรายละเอียดเพิ่มเติม โปรดเยี่ยมชมที่ <a style='font-weight: bolder;text-decoration: underline;color:#000000;' href='' target='_blank'>คำถามที่ถามบ่อยนี้</a>
+AiMesh_confirm_msg13=สำหรับรายละเอียดเพิ่มเติม โปรดเยี่ยมชมที่ <a style='font-weight: bolder;text-decoration: underline;' href='' target='_blank'>คำถามที่ถามบ่อยนี้</a>
 AiMesh_Feature_Desc=ASUS AiMesh ขั้นสูงคือคุณสมบัติเราเตอร์ใหม่ที่เป็นนวัตกรรมซึ่งเชื่อมต่อเราเตอร์ ASUS หลายตัวเข้าด้วยกันโดยการสร้างเครือข่าย WiFi ทั่วทั้งบ้าน
 AiMesh_FAQ=ค้นหาข้อมูลเพิ่มเติมเกี่ยวกับ ASUS AiMesh
 AiMesh_FindNode=ค้นหาโหนด AiMesh
@@ -1175,6 +1175,9 @@ AiMesh_NodeLocation22=ระเบียง
 AiMesh_NodeLocation23=ห้องประชุม
 AiMesh_NodeLocation24=กำหนดเอง
 AiMesh_NodeLocation25=โรงรถ
+AiMesh_NodeLocation26=ชั้นหนึ่ง
+AiMesh_NodeLocation27=ห้องเล่นเกม
+AiMesh_NodeLocation28=โรงยิม
 AiMesh_OfflineTips=เคล็ดลับแบบออฟไลน์
 AiMesh_OfflineTips1=ตรวจสอบว่าโหนด AiMesh ของคุณเปิดอยู่
 AiMesh_OfflineTips2=รีบูตโหนด AiMesh และลองอีกครั้ง
@@ -1795,6 +1798,8 @@ DDNS_https_cert_Import=นำเข้าใบรับรองของคุ
 DDNS_https_cert_Import_desc=อัปโหลดใบรับรองที่ออกโดยหน่วยงานออกใบรับรองได้ที่นี่ ต้องระบุคีย์ส่วนตัวและใบรับรอง SSL ของคุณ
 DDNS_https_cert_PrivateKey=คีย์ส่วนตัว
 DDNS_https_cert_PrivateKey_note=คีย์ส่วนตัวต้องไม่ได้รับการป้องกันด้วยวลีรหัสผ่าน
+DDNS_ipv6_update=การอัปเดต IPv6
+DDNS_ipv6_update_desc=ถ้าสภาพแวดล้อมของเครือข่ายของไคลเอ็นต์ใช้ที่อยู่เครือข่าย IPv6 การเปิดใช้งานฟีเจอร์นี้จะแปลงชื่อโดเมนให้เป็นที่อยู่เครือข่าย IPv6 ก่อน เมื่อเข้าถึงอุปกรณ์ระยะไกล
 DDNS_ssl_cert=ใบรับรอง SSL
 DDNS_termofservice_Title=ข้อกำหนดและเงื่อนไขในการใช้เวปไซด์
 DDNS_transfer=Transfer ASUS DDNS name
@@ -2139,11 +2144,11 @@ FirewallConfig_display2_sectiondesc=เปิดทำงานไฟร์ว�
 FirewallConfig_display3_sectiondesc=<b>ระยะเวลาบัญชีดำ :</b> ระหว่างระยะเวลาที่กำหนดไว้ ไคลเอ็นต์ในบัญชีดำไม่สามารถใช้บริการเครือข่ายที่ระบุได้ หลังจากระยะเวลาที่ระบุ ไคลเอ็นทั้งหมดใน LAN สามารถเข้าถึงบริการเครือข่ายที่ระบุได้<br><b>ระยะเวลาบัญชีขาว :</b> ระหว่างระยะเวลาที่กำหนดไว้ ไคลเอ็นต์ในบัญชีขาวสามารถใช้เฉพาะบริการเครือข่ายที่ระบุได้ หลังจากระยะเวลาที่ระบุ ไคลเอ็นต์ในบัญชีขาวและไคลเอ็นต์เครือข่ายอื่นๆ จะไม่สามารถเข้าถึงอินเทอร์เน็ต หรือบริการอินเทอร์เน็ตใดๆ ได้
 FirewallConfig_display4_sectiondesc=<b>หมายเหตุ :</b> ถ้าคุณตั้งค่าซับเน็ตสำหรับบัญชีขาว, IP แอดเดรสภายนอกซับเน็ตจะไม่สามารถเข้าถึงอินเทอร์เน็ต หรือบริการอินเทอร์เน็ตใดๆ ได้
 FirewallConfig_display5_sectiondesc=ตัวกรอง MAC อนุญาตให้คุณยอมรับหรือปฏิเสธการเข้าถึงเครือข่าย สำหรับอุปกรณ์ที่มี MAC แอดเดรสเฉพาะ<p>คุณสามารถตั้งค่าตัวกรอง MAC เป็นโหมดยอมรับ หรือปฏิเสธ<p>ในโหมดปฏิเสธ อุปกรณ์ในรายการจะถูกปฏิเสธการเข้าถึงไปยังเครือข่าย<p>ในโหมดยอมรับ เฉพาะอุปกรณ์ในรายการเท่านั้นที่สามารถเข้าถึงเครือข่ายได้ อุปกรณ์ที่ไม่อยู่ในรายการ จะถูกปฏิเสธการเข้าถึงไปยังเครือข่าย
-FirewallConfig_DoSEnable_itemdesc=การโจมตีแบบ \"ปฏิเสธการบริการ\" เป็นความพยายามที่ชัดเจนในการปฏิเสธผู้ใช้ที่ถูกต้องจากการใช้บริการหรือทรัพยากรคอมพิวเตอร์<p>การเปิดทำงานคุณสมบัตินี้ สามารถป้องกันเราเตอร์จากการโจมตี DoS แต่จะเพิ่มภาระงานของเราเตอร์
+FirewallConfig_DoSEnable_itemdesc=การเปิดทำงานคุณสมบัตินี้ สามารถป้องกันเราเตอร์จากการโจมตี DoS (Denial- of-Service) แต่จะเพิ่มภาระงานของเราเตอร์
 FirewallConfig_DoSEnable_itemname=เปิดทำงานการป้องกัน DoS
 FirewallConfig_FirewallEnable_itemdesc=การปิดทำงานไฟล์วอลล์ จะปิดทำงานฟังก์ชั่นที่เกี่ยวข้องทั้งหมด
 FirewallConfig_FirewallEnable_itemname=เปิดทำงานไฟร์วอลล์
-FirewallIPv4_enable=เปิดทำงาน IPv4 ไฟร์วอลล์
+FirewallIPv4_enable=เปิดทำงาน IPv4 กฎไฟร์วอลล์ขาเข้า
 FirewallIPv4=IPv4 ไฟร์วอลล์
 FirewallConfig_FTPPrompt_itemdesc=เมื่อคุณตั้งค่าเป็น 20:21 ช่วงพอร์ตเซิร์ฟเวอร์ FTP สำหรับการติดตั้งระบบ WAN ของคุณแล้วเซิร์ฟเวอร์ FTP ของคุณจะอยู่ในความขัดแย้งกับชาวพื้นเมือง ZVMODELVZ เซิร์ฟเวอร์ FTP
 FirewallConfig_KeywordFilterEnable_itemname=เปิดทำงานตัวกรองคำสำคัญ
@@ -2251,6 +2256,9 @@ FW_updated=Updated
 FW_new_firmware_available=เฟิร์มแวร์ใหม่สามารถใช้ได้
 FW_rlnote_loading=กำลังโหลดบันทึกย่อประจำรุ่น กรุณารอ...
 FW_rlnote_failed=ค้นหาบันทึกย่อประจำรุ่นไม่พบ
+FW_rollback=ย้อนกลับ
+FW_rollback_choose=เลือกเวอร์ชันของเฟิร์มแวร์
+FW_rollback_selector=ตัวเลือกการย้อนกลับเฟิร์มแวร์
 Game_acceleration=อัตราเร่งเกม
 Game_Boost=ตัวเร่งความเร็วในการเล่นเกม
 Game_Boost_acceleration=อัตราเร่งเกมสามระดับ
@@ -2404,7 +2412,7 @@ Internet=อินเทอร์เน็ต
 Interval=ช่วง
 Introduce_demo=การสาธิตเพื่อให้คำแนะนำ
 Invitation=คำเชิญ
-Interaction=Etkileşim
+Interaction=ปฏิสัมพันธ์
 InternetSpeed=ความเร็วของอินเทอร์เน็ต
 InternetSpeed_desc=บริการนี้ให้บริการโดย Ookla® ระบบจะตรวจหาความเร็วในการดาวน์โหลดและอัปโหลดจากเราเตอร์ของคุณไปยังอินเทอร์เน็ต การทดสอบนี้ใช้เวลาประมาณหนึ่งนาทีในการดำเนินการจนเสร็จสมบูรณ์ ในการใช้บริการนี้ เราถีอว่าคุณยอมรับใน <a href="https://www.speedtest.net/about/privacy" style="font-family:Lucida Console;text-decoration:underline;color:#7ECAFF;" target="_blank">นโยบายความเป็นส่วนตัวของ Ookla</a>
 InternetSpeed_ookla_mark=Ookla® และ Speedtest® เป็นเครื่องหมายการค้าจดทะเบียนของ Ookla, LLC.
@@ -2994,6 +3002,7 @@ PM_RADIUS_Create=สร้างไคลเอ็นต์RADIUSใหม่
 PM_Group_Table=ตารางกลุ่ม
 PoolName=ชื่อพาร์ติชั่น
 Port_format=สำหรับช่วงพอร์ตต้นทางหรือปลายทาง, คุณสามารถ เลือกว่าจะ : a) ป้อน พอร์ตที่เจาะจง, เช่น \"95\"; หรือ b) ป้อน พอร์ตภายในช่วง เช่น \"103:315\", \">100\" หรือ \"<65535\"
+Port_Gaming=พอร์ตสำหรับเล่นเกม
 Port_Mapping_desc1=การแมปพอร์ต
 Port_Mapping_desc2=การแมปพอร์ต สนับสนุน IPTV WAN อินเตอร์เฟซ สำหรับพอร์ต LAN ที่เจาะจง คุณสามารถเลือกพอร์ต LAN ที่เหมาะสม จากนั้นคลิก Apply (นำไปใช้)
 Port_Mapping_desc3=เปิดทำงานการแมปพอร์ต
@@ -3444,7 +3453,7 @@ TZ17=เวลาแอตแลนติก (แคนาดา)
 TZ18=ลาปาซ
 TZ18_1=คารากัส
 TZ19=ซานติอาโก้
-TZ19_1=อาซุนซิออน
+TZ19_1=อะซุนซิออง
 TZ20=นิวฟาวนด์แลนด์
 TZ21=บราซิเลีย
 TZ22=บัวโนส ไอเรส, จอร์จทาวน์
@@ -4227,8 +4236,7 @@ VPN_Fusion_Deactivate_Delete_Alert=โปรดปิดใช้งานโป
 VPN_Fusion_Exception_Policies_Delete_Alert=ข้อยกเว้นของนโยบายทั้งหมดที่กำหนดไว้สำหรับโปรไฟล์VPNจะถูกนำออกเมื่อลบโปรไฟล์แน่ใจหรือว่าคุณต้องการลบโปรไฟล์
 VPN_Fusion_Delete_Alert=แน่ใจหรือว่าคุณต้องการลบโปรไฟล์นี้
 VPN_Fusion_Exception_Policy_And_IP_Binding_Delete_Alert=การลบนโยบายของไคลเอ็นต์ในรายการข้อยกเว้นจะลบการผูกข้อมูลIPของไคลเอ็นต์ของเซิร์ฟเวอร์DHCPด้วยแน่ใจหรือว่าคุณต้องการลบ
-VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Multiple VPN Connection FAQ.</a>
-[###MODEL_DEP###][TUF-AX5400][GS-AX5400][GS-AX3000][GT-AXE16000][GT-AXE11000][GT-AX11000_BO4][GT-AX11000_PRO][GT-AX11000][GT-AX6000][GT-AC5300][TUF-AX3000][TUF-AX3000_V2][GT-AC2900_SH][GT-AC2900][GT-AXY16000][RT-AXE7800][RT-AX86U_PRO][GT10]VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">คำถามที่พบบ่อยของ VPN Fusion </a>
+VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">คำถามที่พบบ่อยของ VPN Fusion</a>
 VPN_Fusion_Default_Alert=ไม่สามารถกำหนดเป็นค่าเริ่มต้นWANสำหรับนโยบายเป้าหมายได้
 Beta_test_only=Beta test only
 FIRM_fupgrade_desc=You can also select [Cancel], the device will automatically start downloading the update during the night time.
@@ -4272,6 +4280,7 @@ BoostKey_GeForce=GeForce Now
 BoostKey_GeForce_desc=เลือก GeForce Now เพื่อจัดลำดับความสำคัญของอุปกรณ์เล่นเกม GeForce Now เพื่อประสบการณ์การเล่นเกมที่เร็วขึ้นและดีขึ้น
 BoostKey_LED=LED On/Off
 BoostKey_LED_desc=The LED on/off control is used to turn off all LEDs includes Aura light.
+AURA_enable_notice_1=To enable Aura RGB, LED must remain on. Please turn on LED by pressing hardware button on the router for 3 seconds or enable it via web/app interface.
 AURA_Event=เหตุการณ์
 AURA_Event_desc=ระบบจะตรวจจับเหตุการณ์ต่อไปนี้และเรียกใช้เอฟเฟกต์ LED ที่แตกต่างกัน
 AURA_Event_Boost_desc=เมื่อเปิดใช้งาน Game Boost คุณจะเห็นแถบ LED ใช้เอฟเฟกต์การหายใจสีแดง

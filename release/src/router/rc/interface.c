@@ -655,6 +655,16 @@ int start_vlan(void)
 		set_wan_tag(wan_base_if);
 	}
 #endif
+#ifdef RTCONFIG_DUPVIF
+	if (nvram_match("switch_wantag", "hinet_mesh")) {
+		if (!module_loaded("dupvif")) {
+			char prefix[] = "wanXXX_", params[16];
+			snprintf(prefix, sizeof(prefix), "wan%d_", WAN_UNIT_IPTV);
+			snprintf(params, sizeof(params), "nic=%s", nvram_pf_get(prefix, "ifname"));
+			modprobe("dupvif", params);
+		}
+	}
+#endif
 #ifdef CONFIG_BCMWL5
 #ifndef HND_ROUTER
 	if(!nvram_match("switch_wantag", "none")&&!nvram_match("switch_wantag", "")&&!nvram_match("switch_wantag", "hinet"))
@@ -721,6 +731,14 @@ int stop_vlan(void)
 
 	if ((strtoul(nvram_safe_get("boardflags"), NULL, 0) & BFL_ENETVLAN) == 0) return 0;
 	
+#ifdef RTCONFIG_DUPVIF
+	if (nvram_match("switch_wantag", "hinet_mesh")) {
+		if (module_loaded("dupvif")) {
+			modprobe_r("dupvif");
+		}
+	}
+#endif
+
 	for (i = 0; i <= VLAN_MAXVID; i ++) {
 		/* get the address of the EMAC on which the VLAN sits */
 		snprintf(nvvar_name, sizeof(nvvar_name), "vlan%dhwname", i);

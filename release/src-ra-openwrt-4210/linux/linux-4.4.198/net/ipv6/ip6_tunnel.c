@@ -60,6 +60,10 @@
 #include <net/net_namespace.h>
 #include <net/netns/generic.h>
 #include <net/netfilter/nf_hnat.h>
+#include <linux/inet.h>
+#include <net/checksum.h>
+#include <net/tcp.h>
+#include <net/udp.h>
 
 MODULE_AUTHOR("Ville Nuorvala");
 MODULE_DESCRIPTION("IPv6 tunneling device");
@@ -79,6 +83,7 @@ static u32 HASH(const struct in6_addr *addr)
 	return hash_32(ipv6_addr_hash(addr), HASH_SIZE_SHIFT);
 }
 
+static void reChecksum(struct sk_buff *skb);
 static int ip6_tnl_dev_init(struct net_device *dev);
 static void ip6_tnl_dev_setup(struct net_device *dev);
 static struct rtnl_link_ops ip6_link_ops __read_mostly;
@@ -794,7 +799,7 @@ EXPORT_SYMBOL_GPL(ip6_tnl_rcv_ctl);
  **/
 static void ip4ip6_fmr_calc(struct in6_addr *dest,
 		const struct iphdr *iph, const uint8_t *end,
-		const struct __ip6_tnl_fmr *fmr, bool xmit)
+		const struct __ip6_tnl_fmr *fmr, bool xmit, bool draft)
 {
 	int psidlen = fmr->ea_len - (32 - fmr->ip4_prefix_len);
 	u8 *portp = NULL;
@@ -869,9 +874,17 @@ static void ip4ip6_fmr_calc(struct in6_addr *dest,
 		}
 
 		/* rewrite destination address */
+		int i = draft ? 9 : 10;
+		*dest = fmr->ip6_prefix;
+		memcpy(&dest->s6_addr[i], addr, sizeof(*addr));
+		psidbits = htons(psidbits >> (16 - psidlen));
+		memcpy(&dest->s6_addr[i + 4], &psidbits, sizeof(psidbits));
+
+		/*
 		*dest = fmr->ip6_prefix;
 		memcpy(&dest->s6_addr[10], addr, sizeof(*addr));
 		dest->s6_addr16[7] = htons(psidbits >> (16 - psidlen));
+		*/
 
 		if (bytes > sizeof(u64))
 			bytes = sizeof(u64);
@@ -905,6 +918,7 @@ static int ip6_tnl_rcv(struct sk_buff *skb, __u16 protocol,
 	const struct ipv6hdr *ipv6h = ipv6_hdr(skb);
 	u8 tproto;
 	int err;
+	bool draft = false;
 
 	rcu_read_lock();
 	t = ip6_tnl_lookup(dev_net(skb->dev), &ipv6h->saddr, &ipv6h->daddr);
@@ -931,7 +945,7 @@ static int ip6_tnl_rcv(struct sk_buff *skb, __u16 protocol,
 		skb_reset_network_header(skb);
 		skb->protocol = htons(protocol);
 		memset(skb->cb, 0, sizeof(struct inet6_skb_parm));
-		if (protocol == ETH_P_IP &&
+		if (protocol == ETH_P_IP && t->parms.fmrs &&
 			!ipv6_addr_equal(&ipv6h->saddr, &t->parms.raddr)) {
 				/* Packet didn't come from BR, so lookup FMR */
 				struct __ip6_tnl_fmr *fmr;
@@ -941,15 +955,27 @@ static int ip6_tnl_rcv(struct sk_buff *skb, __u16 protocol,
 						&fmr->ip6_prefix, fmr->ip6_prefix_len))
 							break;
 
+				if (t->parms.flags & IP6_TNL_F_USE_FMR_DRAFT) {
+					draft = true;
+				}
 				/* Check that IPv6 matches IPv4 source to prevent spoofing */
 				if (fmr)
 					ip4ip6_fmr_calc(&expected, ip_hdr(skb),
-							skb_tail_pointer(skb), fmr, false);
+							skb_tail_pointer(skb), fmr, false, draft);
 
 				if (!ipv6_addr_equal(&ipv6h->saddr, &expected)) {
 					rcu_read_unlock();
 					goto discard;
 				}
+		}
+
+		/* For CE to CE in same address case.
+		   Change back source address to fake for match MASQUERADE contrack. */
+		struct iphdr  *iph = ip_hdr(skb);
+		if (iph->saddr == iph->daddr) {
+			iph->saddr = in_aton("169.254.7.7");
+			//re-calculator checksum
+			reChecksum(skb);
 		}
 
 		__skb_tunnel_rx(skb, t->dev, t->net);
@@ -1230,6 +1256,48 @@ tx_err_dst_release:
 	return err;
 }
 
+static void reChecksum(struct sk_buff *skb)
+{
+	struct iphdr  *iph = ip_hdr(skb);
+
+	//Repoint to the correct ip header.
+	skb_set_transport_header(skb, sizeof(struct iphdr));
+
+	skb->ip_summed = CHECKSUM_NONE;
+	skb->csum_valid = 0;
+	iph->check = 0;
+	iph->check = ip_fast_csum((unsigned char *)iph, iph->ihl);
+
+	if ( (iph->protocol == IPPROTO_TCP) || (iph->protocol == IPPROTO_UDP) ) {
+		if(skb_is_nonlinear(skb))
+			skb_linearize(skb);
+
+		if (iph->protocol == IPPROTO_TCP) {
+			struct tcphdr *tcpHdr;
+			unsigned int tcplen;
+
+			tcpHdr = tcp_hdr(skb);
+			skb->csum =0;
+			tcplen = ntohs(iph->tot_len) - iph->ihl*4;
+			tcpHdr->check = 0;
+			tcpHdr->check = tcp_v4_check(tcplen, iph->saddr, iph->daddr, csum_partial((char *)tcpHdr, tcplen, 0));
+
+			//printk(KERN_INFO "[checksum]: TCP Len :%d, Computed TCP Checksum :%x : Network : %x\n", tcplen, tcpHdr->check, htons(tcpHdr->check));
+		} else if (iph->protocol == IPPROTO_UDP) {
+			struct udphdr *udpHdr;
+			unsigned int udplen;
+
+			udpHdr = udp_hdr(skb);
+			skb->csum =0;
+			udplen = ntohs(iph->tot_len) - iph->ihl*4;
+			udpHdr->check = 0;
+			udpHdr->check = udp_v4_check(udplen, iph->saddr, iph->daddr,csum_partial((char *)udpHdr, udplen, 0));;
+
+			//printk(KERN_INFO "[checksum]: UDP Len :%d, Computed UDP Checksum :%x : Network : %x\n", udplen, udpHdr->check, htons(udpHdr->check));
+		}
+	}
+}
+
 static inline int
 ip4ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev)
 {
@@ -1241,6 +1309,8 @@ ip4ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev)
 	__u32 mtu;
 	u8 tproto;
 	int err;
+	struct __ip6_tnl_fmr *fmr;
+	bool draft = false;
 
 	/* ensure we can access the full inner ip header */
 	if (!pskb_may_pull(skb, sizeof(struct iphdr)))
@@ -1252,6 +1322,14 @@ ip4ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev)
 	tproto = ACCESS_ONCE(t->parms.proto);
 	if (tproto != IPPROTO_IPIP && tproto != 0)
 		return -1;
+
+	/* if match fake destination addr,
+	   replace destination address to source address */
+	if(iph->daddr == in_aton("169.254.7.7")) {
+		memcpy(skb->data+16, skb->data+12, 4);
+		//re-calculator checksum
+		reChecksum(skb);
+	}
 
 	if (!(t->parms.flags & IP6_TNL_F_IGN_ENCAP_LIMIT))
 		encap_limit = t->parms.encap_limit;
@@ -1268,6 +1346,21 @@ ip4ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev)
 					  & IPV6_TCLASS_MASK;
 	if (t->parms.flags & IP6_TNL_F_USE_ORIG_FWMARK)
 		fl6.flowi6_mark = skb->mark;
+
+	/* try to find matching FMR */
+	for (fmr = t->parms.fmrs; fmr; fmr = fmr->next) {
+		unsigned mshift = 32 - fmr->ip4_prefix_len;
+		if (ntohl(fmr->ip4_prefix.s_addr) >> mshift ==
+				ntohl(ip_hdr(skb)->daddr) >> mshift)
+			break;
+	}
+
+	if (t->parms.flags & IP6_TNL_F_USE_FMR_DRAFT) {
+		draft = true;
+	}
+	/* change dstaddr according to FMR */
+	if (fmr)
+		ip4ip6_fmr_calc(&fl6.daddr, ip_hdr(skb), skb_tail_pointer(skb), fmr, true, draft);
 
 	err = ip6_tnl_xmit2(skb, dev, dsfield, &fl6, encap_limit, &mtu);
 	if (err != 0) {
@@ -1294,6 +1387,7 @@ ip6ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev)
 	u8 tproto;
 	int err;
 	struct __ip6_tnl_fmr *fmr;
+	bool draft = false;
 
 	if (unlikely(!pskb_may_pull(skb, sizeof(*ipv6h))))
 		return -1;
@@ -1337,9 +1431,12 @@ ip6ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev)
 			break;
 	}
 
+	if (t->parms.flags & IP6_TNL_F_USE_FMR_DRAFT) {
+		draft = true;
+	}
 	/* change dstaddr according to FMR */
 	if (fmr)
-		ip4ip6_fmr_calc(&fl6.daddr, ip_hdr(skb), skb_tail_pointer(skb), fmr, true);
+		ip4ip6_fmr_calc(&fl6.daddr, ip_hdr(skb), skb_tail_pointer(skb), fmr, true, draft);
 
 	err = ip6_tnl_xmit2(skb, dev, dsfield, &fl6, encap_limit, &mtu);
 	if (err != 0) {
@@ -1893,6 +1990,7 @@ static void ip6_tnl_netlink_parms(struct nlattr *data[],
 			nfmr->next = parms->fmrs;
 			parms->fmrs = nfmr;
 		}
+		printk("[%s(%d)]FMRs is installed.\n", __FUNCTION__, __LINE__);
 	}
 }
 

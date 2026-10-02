@@ -157,6 +157,7 @@ static const struct model_s model_list[] = {
 	{ "RT-AX58U",		MODEL_RTAX58U		},
 	{ "TUF-AX3000",		MODEL_RTAX58U		},
 	{ "TUF-AX5400",         MODEL_RTAX58U		},
+	{ "TUF-AX5400_V2",      MODEL_TUFAX5400_V2      },
 	{ "RT-AX82U",           MODEL_RTAX58U		},
 	{ "RT-AX82_XD6",	MODEL_RTAX58U		},
 	{ "GS-AX3000",		MODEL_RTAX58U		},
@@ -185,6 +186,7 @@ static const struct model_s model_list[] = {
 	{ "ET12",		MODEL_ET12		},
 	{ "XT12",		MODEL_XT12		},
 	{ "RT-AX86U_PRO",	MODEL_RTAX86U_PRO	},
+	{ "RT-AX88U_PRO",       MODEL_RTAX88U_PRO       },
 	{ "DSL-AX82U",		MODEL_DSLAX82U		},
 	{ "RT-N53",		MODEL_RTN53		},
 	{ "RT-N16",		MODEL_RTN16		},
@@ -208,6 +210,10 @@ static const struct model_s model_list[] = {
 	{ "DSL-AC68U",		MODEL_DSLAC68U		},
 	{ "RT-AC1200G",		MODEL_RTAC1200G		},
 	{ "RT-AC1200G+",	MODEL_RTAC1200GP	},
+	{ "BM68",		MODEL_BM68		},
+	{ "ET8_V2",		MODEL_ET8_V2		},
+	{ "XD6_V2",		MODEL_XD6_V2		},
+	{ "RT-AX5400",		MODEL_RTAX5400		},
 #endif	/* !RTCONFIG_RALINK */
 	{ NULL, 0 },
 };

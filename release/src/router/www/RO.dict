@@ -115,12 +115,12 @@ ASUS_eula_withdraw_desc2_AlexaIFTTT=În viitor, dacă intenționați să activa�
 ASUS_eula_withdraw_note=Nu puteți finaliza procedura de retragere fără conexiune la internet. Vă rugăm să vă retrageți consimțământul atunci când sunteți conectat la internet.
 ASUS_eula_withdraw_unstable=Nu puteți finaliza procedura de retragere a consimțământului deoarece starea internetului este instabilă. Reîncercați mai târziu.
 TM_eula_confirm=Folosind ASUS AiProtection, sunteți de acord cu
-TM_eula_desc1=Prin utilizarea lui AiProtection, a Traffic analyzer (Analizor de trafic), a Apps analyzer (Analizor de aplicații), Adaptive QoS (Adaptiv QoS)/Game boost (Accelerare jocuri), Istoricul web, sunteți de acord cu <a id="eula_url" style="text-decoration:underline;" target="_blank">Acordul de licență pentru utilizatorul final Trend Micro</a>.
-TM_eula_desc2=Vă rugăm să rețineți că informațiile dvs. vor fi colectate de Trend Micro prin AiProtection, Traffic Analyzer (Analizor de trafic), Apps analyzer (Analizor de trafic), Adaptive QoS (Adaptiv QoS) și istoric web. De asemenea, recunoașteți și sunteți de acord că ASUS nu este responsabil nici pentru acordul dintre dvs. și Trend Micro și nici pentru conținutul serviciului oferit de Trend Micro. Dacă aveți întrebări despre modul în care Trend Micro colectează, procesează și utilizează informațiile de mai sus, consultați declarația referitoare la confidențialitate emisă de Trend Micro sau contactați Trend Micro pentru mai multe detalii.
+TM_eula_desc1=Prin utilizarea lui AiProtection, a Control parental( Filtre Aplicații și Web ), a Traffic analyzer (Analizor de trafic), a Apps analyzer (Analizor de aplicații), Adaptive QoS (Adaptiv QoS)/Game boost (Accelerare jocuri), Istoricul web, sunteți de acord cu <a id="eula_url" style="text-decoration:underline;" target="_blank">Acordul de licență pentru utilizatorul final Trend Micro</a>.
+TM_eula_desc2=Vă rugăm să rețineți că informațiile dvs. vor fi colectate de Trend Micro prin AiProtection, a Control parental( Filtre Aplicații și Web ), Traffic Analyzer (Analizor de trafic), Apps analyzer (Analizor de trafic), Adaptive QoS (Adaptiv QoS) și istoric web. De asemenea, recunoașteți și sunteți de acord că ASUS nu este responsabil nici pentru acordul dintre dvs. și Trend Micro și nici pentru conținutul serviciului oferit de Trend Micro. Dacă aveți întrebări despre modul în care Trend Micro colectează, procesează și utilizează informațiile de mai sus, consultați declarația referitoare la confidențialitate emisă de Trend Micro sau contactați Trend Micro pentru mai multe detalii.
 TM_eula_desc3=Daca doriți să dezactivați partajarea informațiilor cu Trend Micro prin intermediul funcțiilor de mai sus, accesați:  Router web GUI (GUI web router) > Advanced settings (Setări avansate) > Administration (Administrare) > Privacy (Confidențialitate).
 TM_privacy_policy=<a id="tm_eula_url" style="text-decoration:underline;" target="_blank">TrendMicro Privacy Policy</a>
 TM_data_collection=<a id="tm_disclosure_url" style="text-decoration:underline;" target="_blank">Privacy and Personal Data Collection Disclosure</a>
-TM_eula_withdraw0=Analizor de trafic, Analizator aplicații, QoS adaptiv/ Accelerare jocuri, Istoric web:
+TM_eula_withdraw0=AiProtection, a Control parental( Filtre Aplicații și Web ), Analizor de trafic, Analizator aplicații, QoS adaptiv/ Accelerare jocuri, Istoric web:
 TM_eula_withdraw_desc1=Vă rugăm să rețineți că informațiile dvs. vor fi colectate de Trend Micro prin intermediul funcțiilor de mai sus.
 TM_eula_withdraw_desc2=Daca doriți să dezactivați trimiterea informațiilor cu Trend Micro prin funcțiile următoare, faceți clic pe <span style="font-weight: bold;">[Retragere]</span> de mai jos. În orice caz, vă rugăm să rețineți că astfel de caracteristici/funcții ar putea să nu funcționeze dacă mai trimiteți informațiile la Trend Micro.
 withdraw_confirm=Sigur doriţi să retrageți consimțământul?
@@ -1089,7 +1089,7 @@ AiMesh_confirm_msg9=Luând în considerare compatibilitatea dintre sistemul AiMe
 AiMesh_confirm_msg10=Pentru a asigura conexiunea sistemului AiMesh și a dispozitivelor terminale, citiți <a id="wpa3FaqLink">FAQ</a> înainte de a trece la WPA3-Personal.
 AiMesh_confirm_msg11=Momentan utilizați WPA3-personal. Pentru a crea un sistem AiMesh, metoda dvs. de autentificare va fi schimbată la WPA2/WPA3-personal. Doriți să continuați?
 AiMesh_confirm_msg12=You can read this <a id='wpa3FaqLink'>FAQ</a> for more information.
-AiMesh_confirm_msg13=Pentru detalii suplimentare, vizitaţi <a style='font-weight: bolder;text-decoration: underline;color:#000000;' href='' target='_blank'>această întrebare frecventă</a>
+AiMesh_confirm_msg13=Pentru detalii suplimentare, vizitaţi <a style='font-weight: bolder;text-decoration: underline;' href='' target='_blank'>această întrebare frecventă</a>
 AiMesh_Feature_Desc=Advanced ASUS AiMesh este o funcție nouă a routerului care permite conectarea mai multor routere ASUS și crearea unei rețele WiFi cu acoperire în toată locuința.
 AiMesh_FAQ=Aflați mai multe despre ASUS AiMesh
 AiMesh_FindNode=Găsire nod AiMesh
@@ -1175,6 +1175,9 @@ AiMesh_NodeLocation22=Balcon
 AiMesh_NodeLocation23=Sală de ședințe
 AiMesh_NodeLocation24=Particular
 AiMesh_NodeLocation25=Garaj
+AiMesh_NodeLocation26=Primul etaj
+AiMesh_NodeLocation27=Cameră de jocuri
+AiMesh_NodeLocation28=Sală de gimnastică
 AiMesh_OfflineTips=Sfaturi offline
 AiMesh_OfflineTips1=Asigurați-vă că nodul dvs. AiMesh este pornit.
 AiMesh_OfflineTips2=Reporniți nodul AiMesh și încercați din nou.
@@ -1795,6 +1798,8 @@ DDNS_https_cert_Import=Importați propriul certificat
 DDNS_https_cert_Import_desc=Încărcați un certificat eliberat de o autoritate de certificare aici. Cheia dvs. privată și certificatul SSL sunt necesare.
 DDNS_https_cert_PrivateKey=Cheie privată
 DDNS_https_cert_PrivateKey_note=Cheile private nu poate fi protejate cu parolă.
+DDNS_ipv6_update=Actualizare IPv6
+DDNS_ipv6_update_desc=În cazul în care mediul de rețea al clientului utilizează o adresă de rețea IPv6, activarea acestei caracteristici va rezolva domeniul la o adresă de rețea IPv6 mai întâi la accesarea dispozitivului la distanță.
 DDNS_ssl_cert=Certificat SSL
 DDNS_termofservice_Title=Termenii serviciului
 DDNS_transfer=Transfer ASUS DDNS name
@@ -2139,11 +2144,11 @@ FirewallConfig_display2_sectiondesc=Activaţi funcţia firewall pentru a proteja
 FirewallConfig_display3_sectiondesc=<b>Black List Duration (Durată listă neagră):</b> Pe durata programată, clienţii din lista neagră nu vor putea utiliza serviciile de reţea specificate. După expirarea duratei specificate, toţi clienţii din reţeaua LAN vor putea accesa serviciile de reţea specificate<br><b>White List Duration (Durată listă albă):</b> Pe durata programată, clienţii din lista albă vor putea utiliza NUMAI serviciile de reţea specificate. După expirarea duratei specificate, clienţii din lista albă şi orice alţi clienţi din reţea nu vor mai multe accesa Internetul sau orice serviciu bazat pe Internet.
 FirewallConfig_display4_sectiondesc=<b>NOTĂ :</b> Dacă setaţi subreţeaua pentru lista albă, adresele IP din afara subreţelei nu vor putea accesa Internetul sau orice serviciu bazat pe Internet.
 FirewallConfig_display5_sectiondesc=Filtrul de adrese MAC vă permite să acceptaţi sau să respingeţi accesul la Internet pentru dispozitivele care au adresele MAC specificate<p>Puteţi seta filtrul de adrese MAC în modul Accept (Acceptare) sau Reject (Respingere)<p>În modul Reject (Respingere), dispozitivelor din listă li se va interzice accesul la reţea.<p>În modul Accept (Acceptare), numai dispozitivele care se află în listă vor putea accesa reţeaua. Dispozitivele care nu se află în listă nu vor putea accesa reţeaua.
-FirewallConfig_DoSEnable_itemdesc=Un atac de tip \"denial-of-service\" este o încercare explicită de a interzice unor utilizatori legitimi să utilizeze un serviciu sau o resursă dintr-un computer<p>Activarea acestei caracteristici poate proteja routerul împotriva atacurilor de tip DoS, însă va duce la creşterea volumului de lucru al routerului.
+FirewallConfig_DoSEnable_itemdesc=Activarea acestei caracteristici poate proteja routerul împotriva atacurilor de tip DoS (Denial- of-Service), însă va duce la creşterea volumului de lucru al routerului.
 FirewallConfig_DoSEnable_itemname=Activare protecţie DoS
 FirewallConfig_FirewallEnable_itemdesc=Dezactivarea aplicaţiei firewall va duce la dezactivarea tuturor funcţiilor corelate.
 FirewallConfig_FirewallEnable_itemname=Activare firewall
-FirewallIPv4_enable=Activare IPv4 Firewall
+FirewallIPv4_enable=Activare IPv4 Reguli de intrare paravan de securitate
 FirewallIPv4=Paravan de securitate IPv4
 FirewallConfig_FTPPrompt_itemdesc=Când setaţi 20:21 ca interval de porturi pentru serverul FTP în configuraţia WAN, serverul FTP va intra în conflict cu serverul FTP nativ al dispozitivului ZVMODELVZ.
 FirewallConfig_KeywordFilterEnable_itemname=Activarea filtrului de cuvinte cheie
@@ -2251,6 +2256,9 @@ FW_updated=Updated
 FW_new_firmware_available=Este disponibil un firmware nou.
 FW_rlnote_loading=Se încarcă nota de lansare, aștepați...
 FW_rlnote_failed=Nu s-a găsit nota de lansare.
+FW_rollback=Resetare
+FW_rollback_choose=Alegeți o versiune de firmware
+FW_rollback_selector=Selector resetare firmware
 Game_acceleration=Accelerare pe pentru jocuri
 Game_Boost=Accelerare joc
 Game_Boost_acceleration=Accelerare pe trei niveluri pentru jocuri
@@ -2404,7 +2412,7 @@ Internet=Internet
 Interval=Interval
 Introduce_demo=Demo introductiv
 Invitation=Invitaţie
-Interaction=Interakcija
+Interaction=Interacţiune
 InternetSpeed=Viteză Internet
 InternetSpeed_desc=Acest serviciu este furnizat de Ookla®. Detectează viteza de încărcare și descărcare a routerului pe Internet. Efectuarea acestui test durează circa un minut. Prin utilizarea acestui serviciu, sunteți de acord cu  <a href="https://www.speedtest.net/about/privacy" style="font-family:Lucida Console;text-decoration:underline;color:#7ECAFF;" target="_blank">Politica de confidențialitate Ookla</a>.
 InternetSpeed_ookla_mark=Ookla® și Speedtest® sunt înregistrate federal de Ookla, LLC.
@@ -2994,6 +3002,7 @@ PM_RADIUS_Create=Creare client RADIUS nou
 PM_Group_Table=Tabel grup
 PoolName=Nume partiţie
 Port_format=Pentru intervalul de porturi sursă sau destinaţie, puteţi să realizaţi următoarele: a) să introduceţi un anumit port, precum \"95\"; sau b) să introduceţi porturile dintr-un interval, precum \"103:315\", \">100\" sau \"<65535\".
+Port_Gaming=Port de jocuri
 Port_Mapping_desc1=Maparea porturilor
 Port_Mapping_desc2=Maparea porturilor acceptă interfaţa WAN IPTV pentru anumite porturi din reţeaua LAN. Puteţi selecta portul LAN corespunzător şi apoi face clic pe Aplicare.
 Port_Mapping_desc3=Activare mapare porturi
@@ -3444,7 +3453,7 @@ TZ17=Ora Atlanticului (Canada)
 TZ18=La Paz
 TZ18_1=Caracas
 TZ19=Santiago
-TZ19_1=Asunción
+TZ19_1=Asuncion
 TZ20=Newfoundland
 TZ21=Brasilia
 TZ22=Buenos Aires, Georgetown
@@ -3474,7 +3483,7 @@ TZ40_2=Kaliningrad
 TZ41=Atena
 TZ42=Ierusalim
 TZ43=Harare, Pretoria
-TZ43_2=Kiev
+TZ43_2=Kyiv
 TZ44=Moscova, St. Petersburg
 TZ45=Volgograd
 TZ46=Kuweit, Riad
@@ -4227,8 +4236,7 @@ VPN_Fusion_Deactivate_Delete_Alert=Dezactivați profilul înainte de a-l șterge
 VPN_Fusion_Exception_Policies_Delete_Alert=Toate excepțiile de la politică configurate pentru un profil VPN vor fi șterse atunci când ștergeți profilul. Sigur doriți să ștergeți profilul?
 VPN_Fusion_Delete_Alert=Sigur doriți să ștergeți acest profil?
 VPN_Fusion_Exception_Policy_And_IP_Binding_Delete_Alert=Ștergerea politicii pentru dispozitivul client în lista de excepții va șterge și legarea adresei IP a dispozitivului client la serverul DHCP. Sigur doriți să ștergeți această opțiune?
-VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Multiple VPN Connection FAQ.</a>
-[###MODEL_DEP###][TUF-AX5400][GS-AX5400][GS-AX3000][GT-AXE16000][GT-AXE11000][GT-AX11000_BO4][GT-AX11000_PRO][GT-AX11000][GT-AX6000][GT-AC5300][TUF-AX3000][TUF-AX3000_V2][GT-AC2900_SH][GT-AC2900][GT-AXY16000][RT-AXE7800][RT-AX86U_PRO][GT10]VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Întrebări frecvente despre funcția VPN Fusion (Fuziune VPN).</a>
+VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Întrebări frecvente despre funcția VPN Fusion (Fuziune VPN).</a>
 VPN_Fusion_Default_Alert=Nu se poate configura ca WAN implicit pentru politica țintă.
 Beta_test_only=Beta test only
 FIRM_fupgrade_desc=You can also select [Cancel], the device will automatically start downloading the update during the night time.
@@ -4272,6 +4280,7 @@ BoostKey_GeForce=GeForce Now
 BoostKey_GeForce_desc=Selectați GeForce Now pentru a prioritiza dispozitivele de jocuri GeForce Now pentru o experiență de joc mai rapidă și mai bună.
 BoostKey_LED=LED On/Off
 BoostKey_LED_desc=The LED on/off control is used to turn off all LEDs includes Aura light.
+AURA_enable_notice_1=To enable Aura RGB, LED must remain on. Please turn on LED by pressing hardware button on the router for 3 seconds or enable it via web/app interface.
 AURA_Event=Eveniment
 AURA_Event_desc=Sistemul va detecta următoarele evenimente și va declanșa diferite efecte LED.
 AURA_Event_Boost_desc=Când activați Game Boost (Accelerare jocuri), veți vedea bara de LED-uri folosind un efect de respiraţie roșu.

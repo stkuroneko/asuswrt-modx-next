@@ -38,7 +38,7 @@
 #define ENC_WORDS_LEN  (384)
 #define ASUSRT_STACKSIZE        0x200000
 
-extern int doSystem(char *fmt, ...);
+extern int doSystem(const char *fmt, ...);
 
 /*
  * Reads file and returns contents

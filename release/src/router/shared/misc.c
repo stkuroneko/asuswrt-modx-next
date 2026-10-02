@@ -3468,7 +3468,9 @@ int get_upstream_wan_unit(void)
 }
 
 /* Return WiFi unit number in accordance with interface name.
- * @wif:	pointer to WiFi interface name.
+ * @wif:	pointer to WiFi interface name. VAP interfaces for guest network is support.
+ * 		VLAN interface that derived from VAP interfaces for guest network is considered as invalid unit.
+ * 		See fec2ddeebe5d8d024c853d0d6eec3943430c8b20.
  * @return:
  * 	< 0:	invalid
  *  otherwise:	unit
@@ -3479,8 +3481,24 @@ int get_wifi_unit(char *wif)
 	char word[256], *next, *ifn, nv[20];
 	char wl_ifnames[32] = { 0 };
 
-	if (!wif || *wif == '\0')
+	if (!wif || *wif == '\0' || strchr(wif, '.'))
 		return -1;
+
+#if defined(RTCONFIG_RALINK)
+	if (guest_wlif(wif)) {
+		char vap[IFNAMSIZ];
+
+		/* Check 2G later due to raX is sub-string of raiX or raxX. */
+		for (i = MAX_NR_WL_IF - 1; i >= 0; --i) {
+			strlcpy(vap, get_wififname(i), sizeof(vap));
+			if (strncmp(wif, vap, strlen(vap) - 1))
+
+				continue;
+
+			return i;
+		}
+	}
+#endif
 
 	strlcpy(wl_ifnames, nvram_safe_get("wl_ifnames"), sizeof(wl_ifnames));
 	foreach (word, wl_ifnames, next) {
@@ -3488,7 +3506,7 @@ int get_wifi_unit(char *wif)
 		if (strncmp(word, wif, strlen(word)))
 			continue;
 #if defined(RTCONFIG_AMAS_WGN) && defined(RTCONFIG_QCA) 
-		if (strlen(word)!=strlen(wif))
+		if (strchr(wif, '.') && strlen(word)!=strlen(wif))
 			continue;
 #endif
 		for (i = 0; i <= MAX_NR_WL_IF; ++i) {

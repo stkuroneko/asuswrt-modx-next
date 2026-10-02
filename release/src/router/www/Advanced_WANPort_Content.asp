@@ -215,8 +215,12 @@ function initial(){
 	}
 
 	if (based_modelid == "TUF-AX4200") {
-		var desc = [ "LAN Port 1", "LAN Port 2", "LAN Port 3", "LAN Port 4", "2.5G LAN" ];
-		var value = [ "1", "2", "3", "4", "5" ];
+		var desc = [ "LAN Port 1", "LAN Port 2", "LAN Port 3", "LAN Port 4" ];
+		var value = [ "1", "2", "3", "4" ];
+		if (based_modelid == "TUF-AX4200" && "<% nvram_get("HwId"); %>" == "B") {
+			desc.push("2.5G LAN");
+			value.push("5");
+		}
 		add_options_x2(document.form.wans_lanport1, desc, value, <% nvram_get("wans_lanport"); %>);
 		add_options_x2(document.form.wans_lanport2, desc, value, <% nvram_get("wans_lanport"); %>);
 	}

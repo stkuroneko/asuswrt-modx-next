@@ -83,6 +83,7 @@ static struct time_mapping_s time_mapping_list[] = {
 	{ "ET12", 50,    120,     60},
 	{ "XT12", 50,    120,     60},
 	{ "ZenWiFi_XD4S", 80,    120,     60},
+	{ "ZenWiFi_XD4_Plus", 80,    120,     60},
 	{ "RT-AXE7800",	50,     120,     60},
 	{ "XT8_V2",   50,     120,     60},
 	/* END */

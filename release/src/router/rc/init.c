@@ -2817,6 +2817,9 @@ static int set_basic_ifname_vars(char *wan_ifaces[MAX_WAN_IFACE_ID], char *lan, 
 	int w, upstream_unit;
 	char buf[128], prefix[sizeof("wanXXXXXX_")], *wan = wan_ifaces[WAN_IFACE_ID];
 	char *wan2 = wan_ifaces[WAN2_IFACE_ID], *wan2_orig __attribute__((unused)) = wan_ifaces[WAN2_IFACE_ID];
+#ifdef RTCONFIG_DUPVIF
+	char br_wan[8], dupvif[16];
+#endif
 #if defined(RTCONFIG_DUALWAN)
 	int unit, type;
 	int enable_dw_wan __attribute__((unused)) = 0;
@@ -3125,8 +3128,16 @@ static int set_basic_ifname_vars(char *wan_ifaces[MAX_WAN_IFACE_ID], char *lan, 
 			}
 #endif
 
-			if (wphy)
+			if (wphy) {
+#ifdef RTCONFIG_DUPVIF
+				if (nvram_match("switch_wantag", "hinet_mesh") && !strcmp(wphy, wan)) {
+					strlcpy(br_wan, wphy, sizeof(br_wan));
+					snprintf(dupvif, sizeof(dupvif), "%s_dup", br_wan);
+					wphy = dupvif;
+				}
+#endif
 				add_wan_phy(wphy);
+			}
 		}
 
 #if defined(RTCONFIG_SWITCH_RTL8370M_PHY_QCA8033_X2) || \
@@ -3168,6 +3179,13 @@ static int set_basic_ifname_vars(char *wan_ifaces[MAX_WAN_IFACE_ID], char *lan, 
 			add_lan_phy(wl5g2);
 		if (wl60g)
 			add_lan_phy(wl60g);
+#ifdef RTCONFIG_DUPVIF
+		if (nvram_match("switch_wantag", "hinet_mesh")) {
+			strlcpy(br_wan, wan, sizeof(br_wan));
+			snprintf(dupvif, sizeof(dupvif), "%s_dup", br_wan);
+			wan = dupvif;
+		}
+#endif
 		set_wan_phy(wan);
 #endif /* !RTCONFIG_DUALWAN */
 	}
@@ -3182,6 +3200,16 @@ static int set_basic_ifname_vars(char *wan_ifaces[MAX_WAN_IFACE_ID], char *lan, 
 		nvram_unset("vlan2hwname");
 	}
 #endif
+#endif
+
+#ifdef RTCONFIG_DUPVIF
+	if (nvram_match("switch_wantag", "hinet_mesh")) {
+		add_lan_phy(br_wan);
+		snprintf(prefix, sizeof(prefix), "wan%d_", WAN_UNIT_IPTV);
+		nvram_pf_set(prefix, "ifname", br_wan);
+		nvram_pf_set(prefix, "proto", "bridge");
+		nvram_pf_set(prefix, "enable", "1");
+	}
 #endif
 
 	_dprintf("%s: WAN %s LAN %s [%s] "
@@ -4820,11 +4848,22 @@ int init_nvram(void)
 		nvram_set_int("btn_rst_gpio", 9|GPIO_ACTIVE_LOW);
 		// led
 		nvram_set_int("led_pwr_gpio", 11);
+		nvram_set_int("led_wps_gpio", 11);
 		nvram_set_int("led_wan_red_gpio", 12|GPIO_ACTIVE_LOW);
-#if 0 // temporarily use WiFi FW to blink WF5G_LED
-		nvram_set_int("led_2g_gpio", 1);	/* MT7986, WF2G_LED */
-		nvram_set_int("led_5g_gpio", 2);	/* MT7986, WF5G_LED */
-#endif
+		if (nvram_match("HwId", "A")) {
+			/* 2.5G x 1, WiFi LED x 2 */
+			nvram_set_int("led_2g_gpio", 1);	/* MT7986, WF2G_LED */
+			nvram_set_int("led_5g_gpio", 2);	/* MT7986, WF5G_LED */
+			config_netdev_bled("led_2g_gpio", "ra0");
+			config_netdev_bled("led_5g_gpio", "rax0");
+		} else if (nvram_match("HwId", "B")) {
+			/* 2.5G x 2, WiFi LED x 1 */
+			gpio_dir(1, GPIO_DIR_OUT_LOW);		/* Don't turn on WiFi LED by WF2G_LED, it can't be output high or input. */
+			nvram_set_int("led_2g_gpio", 2 /*1*/);	/* Use same PIN, WF5G_LED, to control WiFi LED. */
+			nvram_set_int("led_5g_gpio", 2);	/* MT7986, WF5G_LED */
+			config_netdev_bled("led_2g_gpio", "ra0");
+			config_netdev_bled("led_5g_gpio", "rax0");
+		}
 		nvram_set("led_wan_gpio", "gpy211");
 		if (is_2500m_lan_exist())
 			nvram_set("led_lan_gpio", "gpy211");	/* LAN1~4: MT7531, LAN5: GPY211 */
@@ -4856,6 +4895,7 @@ int init_nvram(void)
 		add_rc_support("wpa3");
 		//either txpower or singlesku supports rc.
 		add_rc_support("pwrctrl");
+		add_rc_support("smart_connect");
 		// the following values is model dep. so move it from default.c to here
 		nvram_set("wl0_HT_TxStream", "2");
 		nvram_set("wl0_HT_RxStream", "2");
@@ -5025,21 +5065,28 @@ int init_nvram(void)
 		nvram_set_int("btn_rst_gpio", 9|GPIO_ACTIVE_LOW);
 		// led
 		nvram_set_int("led_pwr_gpio", 11);
+		nvram_set_int("led_wps_gpio", 11);
 		nvram_set_int("led_wan_red_gpio", 12|GPIO_ACTIVE_LOW);
-#if 0 // temporarily use WiFi FW to blink WF5G_LED
 		nvram_set_int("led_2g_gpio", 1);	/* MT7986, WF2G_LED */
 		nvram_set_int("led_5g_gpio", 2);	/* MT7986, WF5G_LED */
-#endif
 		nvram_set("led_wan_gpio", "gpy211");
 		nvram_set("led_lan_gpio", "gpy211");	/* LAN1~4: MT7531, LAN5: GPY211 */
-		////// temporarily set RGB LED
-		nvram_set_int("led_red_gpio", 21);
-		nvram_set_int("led_green_gpio", 22);
+		// PWM channel R:0, G:1
+		// leave pwm_export at first time set_rgbled function call
+		//pwm_export(0, 255, 255); // period: 255, duty cycle:255
+		//pwm_export(1, 255, 255); // period: 255, duty cycle:255
+		nvram_set_int("led_red_gpio", 0+200);	/* for bled, pwm nr >=200 */
+		nvram_set_int("led_green_gpio", 1+200);	/* for bled, pwm nr >=200 */
 		nvram_set_int("led_blue_gpio", 20);
 		/* enable bled */
+		config_netdev_bled("led_2g_gpio", "ra0");
+		config_netdev_bled("led_5g_gpio", "rax0");
 		config_netdev_bled("led_blue_gpio", "ra0");
 		add_gpio_to_bled("led_blue_gpio", "led_green_gpio");
 		add_gpio_to_bled("led_blue_gpio", "led_red_gpio");
+		// leave LED breathing during bootup
+		//if (nvram_match("success_start_service", "0"))
+		//	set_rgbled(RGBLED_BOOTING);
 		//////
 
 		nvram_set("ct_max", "300000"); // force
@@ -5069,6 +5116,7 @@ int init_nvram(void)
 		add_rc_support("wpa3");
 		//either txpower or singlesku supports rc.
 		add_rc_support("pwrctrl");
+		add_rc_support("smart_connect");
 		// the following values is model dep. so move it from default.c to here
 		nvram_set("wl0_HT_TxStream", "2");
 		nvram_set("wl0_HT_RxStream", "2");
@@ -16934,6 +16982,9 @@ NO_USB_CAP:
 #ifdef RTCONFIG_QAM256_2G
 	add_rc_support("qam256_2g");
 #endif
+#ifdef RTCONFIG_QAM1024_5G
+	add_rc_support("qam1024_5g");
+#endif
 #ifdef RTCONFIG_NOIPTV
 	add_rc_support("noiptv");
 #endif
@@ -17411,7 +17462,10 @@ int init_nvram2(void)
 	nvram_set("webs_chg_sku", "0");
 	nvram_set("webs_SG_mode", "0");
 #endif
-
+#if defined(RTCONFIG_IFTTT) || defined(RTCONFIG_ALEXA) || defined(RTCONFIG_GOOGLE_ASST)
+	nvram_set("ifttt_stoken", "");
+	nvram_set("ifttt_timestamp", "");
+#endif
 	return 0;
 }
 
@@ -19076,6 +19130,9 @@ int init_main(int argc, char *argv[])
 #if !defined(RTCONFIG_TEST_BOARDDATA_FILE) && !defined(RTCONFIG_JFFS_NVRAM)
 		start_jffs2();
 #endif
+#ifdef RTCONFIG_AMAS
+		create_amas_sys_folder();
+#endif
 #ifdef RTCONFIG_NVRAM_ENCRYPT
 		init_enc_nvram();
 		init_nvram4();
@@ -19182,6 +19239,30 @@ int init_main(int argc, char *argv[])
 
 		_eval(argv, NULL, 0, &pid);
 	}
+#endif
+#if defined(RTCONFIG_RALINK_MT7621)
+{
+	int cert_need_update = 0;
+	char cert_ver[12];
+
+	memset(cert_ver, 0, sizeof(cert_ver));
+
+	if (!f_exists(CERT_VERSION_PATH) || f_read_string(CERT_VERSION_PATH, cert_ver, sizeof(cert_ver)) <= 0)
+		cert_need_update = 1;
+
+	if (atoi(cert_ver) < atoi(CERT_VERSION))
+		cert_need_update = 1;
+
+	f_write_string(CERT_VERSION_PATH, CERT_VERSION, 0, 0);
+	//system("cat /jffs/cert.version");
+
+	if (cert_need_update){
+		//_dprintf("====================== clean old cert files!! ===========================\n");
+		unlink("/etc/cert.pem");
+		unlink("/etc/key.pem");
+		unlink("/jffs/cert.tgz");
+	}
+}
 #endif
 	for (;;) {
 //		TRACE_PT("main loop signal/state=%d\n", state);

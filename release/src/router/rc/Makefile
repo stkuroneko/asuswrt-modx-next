@@ -669,8 +669,8 @@ ifeq ($(or $(RTCONFIG_FRS_LIVE_UPDATE),$(RTCONFIG_FRS_FEEDBACK),$(RTCONFIG_URLFW
 CFLAGS += -I$(TOP)/curl-7.21.7/include
 LDFLAGS += -L$(TOP)/curl-7.21.7/lib/.libs -lcurl
 ifeq ($(RTCONFIG_TR069),y)
-CFLAGS += -I$(TOP)/libssh2-1.9.0/include -I$(TOP)/zlib/include
-LDFLAGS += -L$(TOP)/libssh2-1.9.0/src/.libs -lssh2 -L$(TOP)/zlib -lz
+CFLAGS += -I$(TOP)/libssh2-1.10.0/include -I$(TOP)/zlib/include
+LDFLAGS += -L$(TOP)/libssh2-1.10.0/src/.libs -lssh2 -L$(TOP)/zlib -lz
 endif
 endif
 
@@ -1319,6 +1319,8 @@ endif
 ifeq ($(RTCONFIG_SOC_IPQ8074),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc test_blu
 	@cd $(INSTALLDIR)/sbin && ln -sf rc split_q6mem
+endif
+ifeq ($(or $(RTCONFIG_QCA),$(RTCONFIG_RALINK)),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc test_wifi_stats_log
 endif
 ifeq ($(RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033),y)

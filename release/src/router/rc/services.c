@@ -2332,7 +2332,7 @@ void start_s46_tunnel(int unit)
 	char tmp[256], prefix[sizeof("wanXXXXXXXXXX_")];
 	char ipaddr[INET_ADDRSTRLEN], draft[4];
 	char *wan_ifname, *wan6_ifname, *elim, *ttl, *end;
-	char *ports[256] = {0};
+	//char *ports[256] = {0};
 #if defined(RTCONFIG_PORT_BASED_VLAN) || defined(RTCONFIG_TAGGED_BASED_VLAN)
 	char ip_mask[sizeof("192.168.100.200/255.255.255.255XXX")];
 #endif
@@ -2345,6 +2345,7 @@ void start_s46_tunnel(int unit)
 	case WAN_LW4O6:
 	case WAN_MAPE:
 		snprintf(draft, sizeof(draft), "OFF");
+		break;
 	case WAN_V6PLUS:
 		snprintf(draft, sizeof(draft), "ON");
 		break;
@@ -2363,6 +2364,8 @@ void start_s46_tunnel(int unit)
 	if (inet_equal(nvram_safe_get(strcat_r(prefix, "ipaddr", tmp)), nvram_safe_get(strcat_r(prefix, "netmask", tmp)),
 		       nvram_safe_get("lan_ipaddr"), nvram_safe_get("lan_netmask"))) {
 		update_wan_state(prefix, WAN_STATE_STOPPED, WAN_STOPPED_REASON_INVALID_IPADDR);
+		S46_DBG("[Err] WAN/LAN inet is equal.  [%s] [%s]\n",
+			nvram_safe_get(strcat_r(prefix, "ipaddr", tmp)), nvram_safe_get("lan_ipaddr"));
 		return;
 	}
 
@@ -2398,8 +2401,13 @@ void start_s46_tunnel(int unit)
 	if (strtoul(elim, &end, 0) == 0 && elim == end)
 		elim = "none";
 	ttl = nvram_safe_get(ipv6_nvname("ipv6_s46_ttl"));
+
 	eval("ip", "-6", "addr", "add", nvram_safe_get(ipv6_nvname("ipv6_s46_addr6")),
 	     "dev", wan6_ifname, "preferred_lft", "0");
+
+	S46_DBG("[CMD]:[ip -6 addr add %s dev %s preferred_lft 0]\n",
+		nvram_safe_get(ipv6_nvname("ipv6_s46_addr6")), wan6_ifname);
+
 	eval("ip", "-6", "tunnel", "add", wan_ifname, "mode", "ipip6",
 	     "remote", nvram_safe_get(ipv6_nvname("ipv6_s46_peer")),
 	     "local", nvram_safe_get(ipv6_nvname("ipv6_s46_addr6")),
@@ -2407,20 +2415,24 @@ void start_s46_tunnel(int unit)
 	     "encaplimit", elim,
 	     atoi(ttl) ? "hoplimit" : NULL, ttl);
 
-	S46_DBG("[wan_ifname]:%s\n", wan_ifname);
-	S46_DBG("[wan6_ifname]:%s\n", wan6_ifname);
-	S46_DBG("[elim]:%s\n", elim);
+	S46_DBG("[CMD]:[ip -6 tunnel add %s mode ipip6 remote %s local %s dev %s encaplimit %s %s %s]\n",
+		wan_ifname, nvram_safe_get(ipv6_nvname("ipv6_s46_peer")),
+		nvram_safe_get(ipv6_nvname("ipv6_s46_addr6")), wan6_ifname,
+		elim, atoi(ttl) ? "hoplimit" : NULL, ttl);
 
 	/* Install FMRS into ip6_tunnel module via iproute2*/
 	eval("ip", "link", "set", wan_ifname, "type", "ip6tnl", "fmrs", "/tmp/v6maps", "draft", draft);
+	S46_DBG("[CMD]:[ip link set %s type ip6tnl fmrs /tmp/v6maps draft %s]\n", wan_ifname, draft);
+#if 0
 	/* Set reserved ports setting */
 	snprintf(tmp, sizeof(tmp), "echo \"%s\" > /proc/sys/net/ipv4/ip_local_reserved_ports",
 		 calc_s46_port_range(0, nvram_get_int(ipv6_nvname("ipv6_s46_psid")),
 					nvram_get_int(ipv6_nvname("ipv6_s46_psidlen")),
 					nvram_get_int(ipv6_nvname("ipv6_s46_offset")),
 					ports, sizeof(ports)));
-	//S46_DBG("[CMD]:%s\n", tmp);
-	//system(tmp);
+	S46_DBG("[CMD]:%s\n", tmp);
+	system(tmp);
+#endif
 
 	/* Assign static IP address to i/f */
 	_ifconfig(wan_ifname, IFUP,
@@ -2437,7 +2449,7 @@ void start_s46_tunnel(int unit)
 void stop_s46_tunnel(int unit, int unload)
 {
 	char prefix[sizeof("wanXXXXXXXXXX_")];
-	char tmp[256], *wan_ifname, *wan6_ifname;
+	char /*tmp[256],*/ *wan_ifname, *wan6_ifname;
 	int wan_proto;
 
 	//unit = wan_primary_ifunit();
@@ -2470,9 +2482,11 @@ void stop_s46_tunnel(int unit, int unload)
 //#endif
 	}
 
+#if 0
 	/* Unset reserved ports setting */
 	snprintf(tmp, sizeof(tmp), "%s", "echo > /proc/sys/net/ipv4/ip_local_reserved_ports");
-	//system(tmp);
+	system(tmp);
+#endif
 }
 void
 start_s46map_rptd(void)
@@ -2920,7 +2934,11 @@ start_wpsaide()
 
 	stop_wpsaide();
 
+	if (mediabridge_mode())
+		return ret;
+
 	ret = _eval(wpsaide_argv, NULL, 0, &pid);
+
 	return ret;
 }
 #endif
@@ -3167,11 +3185,11 @@ int start_wlceventd(void)
 
 	stop_wlceventd();
 
-#if defined(RTCONFIG_CONCURRENTREPEATER) || defined(RTCONFIG_BCMWL6)
 	if (mediabridge_mode())
 		return ret;
-#endif
+
 	ret = _eval(ev_argv, NULL, 0, &pid);
+
 	return ret;
 }
 
@@ -3195,10 +3213,8 @@ int start_hapdevent(void)
 
 	stop_hapdevent();
 
-#if defined(RTCONFIG_CONCURRENTREPEATER)
 	if (mediabridge_mode())
 		return ret;
-#endif
 
 	ret = _eval(ev_argv, NULL, 0, &pid);
 
@@ -3234,10 +3250,8 @@ int start_wlc_nt(void)
 
 	stop_wlc_nt();
 
-#if defined(RTCONFIG_CONCURRENTREPEATER) || defined(RTCONFIG_BCMWL6)
 	if (mediabridge_mode())
 		return ret;
-#endif
 
 	ret = _eval(ev_argv, NULL, 0, &pid);
 
@@ -9868,10 +9882,9 @@ start_notification_center(void)
 	char *nt_monitor_argv[] = {"nt_monitor", NULL};
 	pid_t pid;
 
-#if defined(RTCONFIG_CONCURRENTREPEATER) || defined(RTCONFIG_BCMWL6)
 	if (mediabridge_mode())
 		return 0;
-#endif
+
 #ifdef RTCONFIG_TCPLUGIN
 	exec_tcplugin();
 #endif
@@ -11953,9 +11966,7 @@ void handle_notifications(void)
 	char tmp2[100], prefix2[32];
 	char env_unit[32];
 #endif
-#if 1 //defined(RTCONFIG_DUAL_TRX)
-	char *fwpart[2] = { LINUX_MTD_NAME, LINUX2_MTD_NAME };
-#endif
+	char *fwpart[2] __attribute__((unused)) = { LINUX_MTD_NAME, LINUX2_MTD_NAME };
 
 #if defined(RTCONFIG_LANTIQ)
 	f_write_string("/proc/sys/vm/drop_caches", "1", 0, 0);
@@ -18338,10 +18349,9 @@ void start_roamast(void){
 	int i;
 
 	stop_roamast();
-#if defined(RTCONFIG_CONCURRENTREPEATER) || defined(RTCONFIG_BCMWL6)
+
 	if (mediabridge_mode())
 		return;
-#endif
 
 #ifdef RTCONFIG_FAST_ACL_SET
 	if (nvram_match("watchdog_wait_a_moment", "1"))

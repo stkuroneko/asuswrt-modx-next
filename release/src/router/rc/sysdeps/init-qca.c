@@ -1623,6 +1623,9 @@ void config_switch(void)
 					eval("rtkswitch", "8", "4");		/* LAN4 with WAN */
 				}
 			}
+			else if (!strcmp(nvram_safe_get("switch_wantag"), "hinet_mesh")) { /* Hinet MOD Mesh */
+				/* Nothing to do. */
+			}
 			else if (!strcmp(nvram_safe_get("switch_wantag"), "superonline")) {
 				system("rtkswitch 38 1");			/* IPTV: P0 */
 				/* Internet:	untag: P4, P9;   port: P4, P9 */

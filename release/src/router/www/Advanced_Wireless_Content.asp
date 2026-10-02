@@ -580,10 +580,12 @@ function applyRule(){
 				}
 			}
 			else {
-				//if(!AiMesh_confirm_msg("Wireless_Hide", radio_value))
-					//return false;
-				confirm_flag=6;
-				confirm_content="<#AiMesh_confirm_msg6#>";
+				if(radio_value) {
+					//if(!AiMesh_confirm_msg("Wireless_Hide", radio_value))
+						//return false;
+					confirm_flag=6;
+					confirm_content="<#AiMesh_confirm_msg6#>";
+				}
 			}
 		}
 		else {
@@ -708,6 +710,11 @@ function applyRule(){
 			if($(".confirm_block").length > 0){
 				$(".confirm_block").remove();
 			}
+			if(window.scrollTo)
+				window.scrollTo(0,0);
+			htmlbodyforIE = document.getElementsByTagName("html");
+			htmlbodyforIE[0].style.overflow = "hidden";
+
 			$("#Loading").css('visibility', 'visible');
 			$("#loadingBlock").css('visibility', 'hidden');
 
@@ -721,6 +728,8 @@ function applyRule(){
 						document.form.wps_enable.value = "0";
 					}
 					confirm_cancel();
+					htmlbodyforIE = document.getElementsByTagName("html");
+					htmlbodyforIE[0].style.overflow = "";
 					$("#loadingBlock").css('visibility', 'visible');
 					showLoading();
 					document.form.submit();
@@ -729,6 +738,8 @@ function applyRule(){
 				right_button: "<#CTL_Cancel#>",
 				right_button_callback: function(){
 					confirm_cancel();
+					htmlbodyforIE = document.getElementsByTagName("html");
+					htmlbodyforIE[0].style.overflow = "";
 					$("#Loading").css('visibility', 'hidden');
 					return false;
 				},
@@ -739,7 +750,7 @@ function applyRule(){
 			});
 			$(".confirm_block").css( "zIndex", 10001 );
 			$("#ssid_hide_faq").attr('target', '_blank')
-							.attr('style', 'color:#FC0;text-decoration:underline;')
+							.attr('style', 'color:#FFCC00;text-decoration:underline;')
 							.attr("href", faq_href_hide_ssid);
 
 		}
@@ -1004,6 +1015,10 @@ function enableSmartCon(val){
 		}
 	}
 	
+	if (Qcawifi_support || Rawifi_support) {
+		document.getElementById("smartcon_rule_link").style.display = "none";
+		document.getElementById("smart_connect_field").style.display = "none";
+	}
 	
 	if(based_modelid=="RT-AC5300" || 
 		based_modelid=="GT-AC5300" || 

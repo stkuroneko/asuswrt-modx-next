@@ -115,12 +115,12 @@ ASUS_eula_withdraw_desc2_AlexaIFTTT=W celu włączenia funkcji Alexa™ i IFTTT�
 ASUS_eula_withdraw_note=Nie można ukończyć procedury wycofania zgody bez połączenia z Internetem. Wycofaj zgodę po nawiązaniu połączenia z Internetem.
 ASUS_eula_withdraw_unstable=Nie można ukończyć procedury wycofania zgody ze względu na niestabilność połączenia z Internetem. Spróbuj ponownie wycofać zgodę później.
 TM_eula_confirm=Korzystanie z ASUS AiProtection oznacza zgodę na
-TM_eula_desc1=Korzystanie z funkcji AiProtection, Traffic analyzer (Analizator ruchu), Apps analyzer (Analizator aplikacji), Adaptive QoS (Adaptacyjna funkcja QoS)/Game boost (Przyspieszenie gier), Web history (Historia stron sieci Web) oznacza zgodę na postanowienia <a id="eula_url" style="text-decoration:underline;" target="_blank"> Umowy licencyjnej użytkownika oprogramowania firmy Trend Micro</a>.
-TM_eula_desc2=Należy pamiętać, że firma Trend Micro będzie gromadzić informacje użytkownika za pośrednictwem funkcji AiProtection, Traffic analyzer (Analizator ruchu), Apps analyzer (Analizator aplikacji), Adaptive QoS (Adaptacyjna funkcja QoS) i Web history (Historia stron sieci Web). Użytkownik przyjmuje ponadto do wiadomości i zgadza się na to, że firma ASUS nie ponosi odpowiedzialności za żadne umowy między użytkownikiem a firmą Trend Micro ani za jakąkolwiek zawartość usługi zapewnianej przez firmę Trend Micro. W razie jakichkolwiek pytań dotyczących sposobów gromadzenia, przetwarzania i wykorzystywania powyższych informacji użytkownika przez firmę Trend Micro, należy zapoznać się z oświadczeniem firmy Trend Micro w sprawie ochrony prywatności lub skontaktować się z firmą Trend Micro w celu uzyskania szczegółowych informacji.
+TM_eula_desc1=Korzystanie z funkcji AiProtection, Kontrola rodzicielska( Filtry Sieci i Aplikacji ), Traffic analyzer (Analizator ruchu), Apps analyzer (Analizator aplikacji), Adaptive QoS (Adaptacyjna funkcja QoS)/Game boost (Przyspieszenie gier), Web history (Historia stron sieci Web) oznacza zgodę na postanowienia <a id="eula_url" style="text-decoration:underline;" target="_blank"> Umowy licencyjnej użytkownika oprogramowania firmy Trend Micro</a>.
+TM_eula_desc2=Należy pamiętać, że firma Trend Micro będzie gromadzić informacje użytkownika za pośrednictwem funkcji AiProtection, Kontrola rodzicielska( Filtry Sieci i Aplikacji ), Traffic analyzer (Analizator ruchu), Apps analyzer (Analizator aplikacji), Adaptive QoS (Adaptacyjna funkcja QoS) i Web history (Historia stron sieci Web). Użytkownik przyjmuje ponadto do wiadomości i zgadza się na to, że firma ASUS nie ponosi odpowiedzialności za żadne umowy między użytkownikiem a firmą Trend Micro ani za jakąkolwiek zawartość usługi zapewnianej przez firmę Trend Micro. W razie jakichkolwiek pytań dotyczących sposobów gromadzenia, przetwarzania i wykorzystywania powyższych informacji użytkownika przez firmę Trend Micro, należy zapoznać się z oświadczeniem firmy Trend Micro w sprawie ochrony prywatności lub skontaktować się z firmą Trend Micro w celu uzyskania szczegółowych informacji.
 TM_eula_desc3=Aby wyłączyć udostępnianie informacji użytkownika firmie Trend Micro za pośrednictwem powyższych funkcji, należy przejść kolejno do pozycji:  Interfejs Web GUI routera > Advanced settings (Ustawienia zaawansowane) > Administration (Administracja) > Privacy (Prywatność).
 TM_privacy_policy=<a id="tm_eula_url" style="text-decoration:underline;" target="_blank">TrendMicro Privacy Policy</a>
 TM_data_collection=<a id="tm_disclosure_url" style="text-decoration:underline;" target="_blank">Privacy and Personal Data Collection Disclosure</a>
-TM_eula_withdraw0=W przypadku funkcji AiProtection, Traffic Analyzer (Analizator ruchu), Apps analyzer (Analizator aplikacji), Adaptive QoS (Adaptacyjna funkcja QoS)/Game boost (Przyspieszenie gier), Web history (Historia stron sieci Web):
+TM_eula_withdraw0=W przypadku funkcji AiProtection, Kontrola rodzicielska( Filtry Sieci i Aplikacji ), Traffic Analyzer (Analizator ruchu), Apps analyzer (Analizator aplikacji), Adaptive QoS (Adaptacyjna funkcja QoS)/Game boost (Przyspieszenie gier), Web history (Historia stron sieci Web):
 TM_eula_withdraw_desc1=Please noted that your information will be collected by Trend Micro through the above functionsNależy pamiętać, że firma Trend Micro będzie gromadzić informacje użytkownika za pośrednictwem powyższych funkcji.
 TM_eula_withdraw_desc2=Aby wyłączyć udostępnianie informacji użytkownika firmie Trend Micro za pośrednictwem tych funkcji, należy kliknąć pozycję <span style="font-weight: bold;">[Withdraw] (Wycofaj zgodę)</span> poniżej. Należy jednak pamiętać, że po zaprzestaniu udostępniania informacji użytkownika firmie Trend Micro funkcje te mogą nie działać.
 withdraw_confirm=Czy na pewno chcesz wycofać zgodę?
@@ -439,7 +439,7 @@ OP_WISP_item=Tryb WISP
 OP_WISP_desc1=ZVMODELVZ łączy się bezprzewodowo z posiadanym głównym routerem, punktem dostępowym lub publicznym hotspotem udostępnia internet klientom przewodowym/bezprzewodowym. W tym trybie, domyślnie włączone są NAT, firewall i serwer DHCP.
 OP_WISP_desc2=Podczas łączenia z hotspotem WiFi, należy się upewnić, że posiada się uprawnienia dostępu do Internetu.
 page_not_support_mode_hint=Ta funkcja jest wyłączona.
-Parental_Control=kontrola rodzicielska
+Parental_Control=Kontrola rodzicielska
 PASS_new=Nowe hasło
 PASS_retype=Powtórz hasło
 PASS_score0=Bardzo słaby
@@ -1089,7 +1089,7 @@ AiMesh_confirm_msg9=Ze względu na kompatybilność systemu AiMesh i urządzeń 
 AiMesh_confirm_msg10=Aby zapewnić bezproblemową łączność systemu AiMesh i urządzeń końcowych, zapoznaj się z tą stroną <a id="wpa3FaqLink">FAQ</a> przed przełączeniem w tryb WPA3-Personal.
 AiMesh_confirm_msg11=Obecnie używasz trybu WPA3-personal. W ramach tworzenia systemu AiMesh metoda uwierzytelniania zostanie zmieniona na WPA2/WPA3-personal. Czy chcesz kontynuować?
 AiMesh_confirm_msg12=You can read this <a id='wpa3FaqLink'>FAQ</a> for more information.
-AiMesh_confirm_msg13=Więcej informacji można znaleźć w witrynie <a style='font-weight: bolder;text-decoration: underline;color:#000000;' href='' target='_blank'>tym FAQ</a>
+AiMesh_confirm_msg13=Więcej informacji można znaleźć w witrynie <a style='font-weight: bolder;text-decoration: underline;' href='' target='_blank'>tym FAQ</a>
 AiMesh_Feature_Desc=Zaawansowany system ASUS AiMesh to innowacyjna nowa funkcja routerów, umożliwiająca połączenie wielu routerów ASUS w celu utworzenia sieci WiFi w całym domu.
 AiMesh_FAQ=Dowiedz się więcej o funkcji ASUS AiMesh
 AiMesh_FindNode=Znajdź węzeł AiMesh
@@ -1175,6 +1175,9 @@ AiMesh_NodeLocation22=Balkon
 AiMesh_NodeLocation23=Pokój spotkań
 AiMesh_NodeLocation24=Niestandardowy
 AiMesh_NodeLocation25=Garaż
+AiMesh_NodeLocation26=Parter
+AiMesh_NodeLocation27=Pokój gier
+AiMesh_NodeLocation28=Sala gimnastyczna
 AiMesh_OfflineTips=Porady offline
 AiMesh_OfflineTips1=Upewnij się, że węzeł AiMesh jest włączony.
 AiMesh_OfflineTips2=Uruchom ponownie węzeł AiMesh i spróbuj ponownie.
@@ -1795,6 +1798,8 @@ DDNS_https_cert_Import=Importuj własny certyfikat
 DDNS_https_cert_Import_desc=Pobierz tutaj wydany certyfikat wydany przez urząd certyfikacji. Konieczny jest twój klucz prywatny i certyfikat SSL.
 DDNS_https_cert_PrivateKey=Klucz prywatny
 DDNS_https_cert_PrivateKey_note=Klucz prywatny nie może być chroniony hasłem.
+DDNS_ipv6_update=Aktualizacja IPv6
+DDNS_ipv6_update_desc=Jeśli w środowisku sieciowym klienta jest używany adres sieciowy IPv6, włączenie tej funkcji będzie najpierw tłumaczyć domenę na adres IPv6 w przypadku dostępu zdalnego urządzenia.
 DDNS_ssl_cert=Certyfikat SSL
 DDNS_termofservice_Title=Zasady korzystania ze strony
 DDNS_transfer=Transfer ASUS DDNS name
@@ -2013,7 +2018,7 @@ EZQoSDesc2=Po szersze informacje dotyczące konfiguracji wejdź tu
 Failover_retry_count=Liczba ponownych prób przełączanie awaryjne
 fan_tuning=Fan tuning
 fan_tuning_desc=Fine tune the radio power to enhance/decrease the coverage and change the cooler spin mode.Please note: If the output power is increased for long distance signal transmission, the client also need to use high power card to get the best performance.
-fan_tuning_temperature=System Temperature
+fan_tuning_temperature=Temperatury Systemu
 FAQ_Desc=Szczegółowe wyjaśnienia dostępne są na stronie często zadawanych pytań <a id="network_detect_faq" href="" target="_blank" style="margin-left:5px; text-decoration: underline;">portalu ASUS Support</a>, i mogą one pomóc w skutecznym skorzystaniu z tej funkcji.
 FAQ_Find=Znajdź FAQ
 feedback_3G_log=3G/4G Log (Dziennik 3G/4G)
@@ -2139,11 +2144,11 @@ FirewallConfig_display2_sectiondesc=Włącz firewall w celu zabezpieczenia sieci
 FirewallConfig_display3_sectiondesc=<b>Czas obowiązywania czarnej listy :</b> W zaplanowanym czasie, klienci znajdujący się na czarnej liści, nie będą mogli używać określonych usług sieciowych. Po określonym czasie, wszyscy klienci w sieci LAN mogą uzyskać dostęp do określonych usług sieciowych.<br><b>Czas obowiązywania białej listy :</b> W zaplanowanym czasie, klienci znajdujący się na białej liście, będą mogli używać JEDYNIE określonych usług sieciowych. Po określonym czasie, klienci na białej liście i inni klienci sieciowi, nie będą mogli uzyskać dostępu do Internetu lub dowolnej usługi sieciowej.
 FirewallConfig_display4_sectiondesc=<b>UWAGA :</b> Po ustawieniu podsieci dla białej listy, adresy IP poza podsiecią nie będą mogły uzyskać dostępu do Internetu lub do dowolnej usługi Internetu.
 FirewallConfig_display5_sectiondesc=Filtr MAC, umożliwia akceptację lub uniemożliwienie dostępu do sieci urządzeniom o specyficznych adresach MAC.<p>Filtr MAC można ustawić na tryb akceptacji lub odrzucenia.<p>W trybie Reject (Odrzucenie), urządzeniom na liście uniemożliwia się dostęp do sieci.<p>W trybie Accept (Akceptacja), dostęp do sieci mogą uzyskać wyłącznie urrządzenia wymienione na liście. Urządzeniom, których nie ma na liście, uniemożliwia się dostęp do sieci.
-FirewallConfig_DoSEnable_itemdesc=Atak \"denial-of-service\" to próba uniemożliwienia korzystania przez użytkowników z usługi lub z zasobu komputera.<p>Włączenie tej funkcji, może zabezpieczyć router przed atakiem DoS ale zwiększa obciążenie routera.
+FirewallConfig_DoSEnable_itemdesc=Włączenie tej funkcji, może zabezpieczyć router przed atakiem DoS (Denial- of-Service) ale zwiększa obciążenie routera.
 FirewallConfig_DoSEnable_itemname=Włącz zabezpieczenia przed atakami DoS
 FirewallConfig_FirewallEnable_itemdesc=Wyłączenie firewalla spowoduje dezaktywację wszystkich powiązanych funkcji.
 FirewallConfig_FirewallEnable_itemname=Uruchomić firewall
-FirewallIPv4_enable=Uruchom IPv4 Firewall
+FirewallIPv4_enable=Uruchom reguły firewalla dla połączeń wewnętrznych
 FirewallIPv4=Firewall IPv4
 FirewallConfig_FTPPrompt_itemdesc=Po ustawieniu 20:21 jako zakresu portów serwera FTP do ustawień WAN, może wystąpić konflikt serwera FTP z oryginalnym serwerem FTP ZVMODELVZ.
 FirewallConfig_KeywordFilterEnable_itemname=Włączenie filtra słów kluczowych
@@ -2251,6 +2256,9 @@ FW_updated=Updated
 FW_new_firmware_available=Dostępne jest nowe oprogramowanie sprzętowe.
 FW_rlnote_loading=Wczytywanie informacji o wersji, proszę czekać…
 FW_rlnote_failed=Nie znaleziono informacji o wersji.
+FW_rollback=Wycofanie
+FW_rollback_choose=Wybierz wersję firmware
+FW_rollback_selector=Selektor wycofania firmware
 Game_acceleration=Przyspieszenie gry
 Game_Boost=Przyspieszanie gier
 Game_Boost_acceleration=Trzypoziomowe przyspieszenie gry
@@ -2294,7 +2302,7 @@ Game_WTFast_desc=WTFast łączy sieć domową z serwerem gier przez najkrótszą
 Gear_Accelerator=Wyższy bieg
 Gear_Accelerator_desc=Priorytet urządzeń do gier
 Gear_Accelerator_desc1=Nadaj najwyższy priorytet urządzeniom używanym do gier, aby zapewnić maksymalną wydajność rozgrywki.
-Gear_Accelerator_List=Game Device List
+Gear_Accelerator_List=Lista urządzeń do gier
 OpenNAT_desc=OpenNAT oferuje bezproblemowe tworzenie reguł przekierowania portów dla gier online i optymalizuje routing pakietów z konsoli do gier do modemu, zapewniając optymalną jakość grania w gry.
 OpenNAT_note=* To ensure the gaming connection, we suggest you use a Full Cone NAT. More details on NAT type, please refer to this <a id="faq">FAQ.</a>
 OpenNAT_TYPE=Typ NAT
@@ -2311,7 +2319,7 @@ GB_management_note2=Zgodnie z zastrzeżeniem zamieszczonym na stronie produktu W
 GB_management_note3=Wydajność sieci GPN zależy od usługodawcy internetowego i lokalizacji. Należy pamiętać, że oprogramowanie sprzętowe powinno być zawsze aktualne.
 GB_management_note4=Jak wybrać odpowiedni serwer GPN? <span><a id="link" href="javascript:open_link('gpn1')" style="text-decoration:underline;color:#008DE5;">Tutaj</a></span> Jak uzyskać najwyższą jakość podczas grania? <span><a id="link" href="javascript:open_link('gpn2')" style="text-decoration:underline;color:#008DE5;">Tutaj</a></span>
 GB_management_note5=Jak korzystać z WTFast na routerze ASUS? <span><a id="link" href="javascript:open_link('howto')" style="text-decoration:underline;color:#008DE5;">Tutaj</a></span>
-GB_mobile=Mobile Game Mode
+GB_mobile=Tryb Gry Mobilnej
 GB_mobile_desc=Przyspiesz działanie gier na urządzeniach mobilnych
 GB_mobile_desc1=Pobierz i zainstaluj aplikację ASUS Router. Włącz w aplikacji tryb gier mobilnych, aby zapewnić maksymalną wydajność grania na urządzeniach mobilnych.
 GB_OpenNAT_desc=Konfigurowanie przekierowania portów w 3 krokach
@@ -2404,7 +2412,7 @@ Internet=Internet status
 Interval=Odstęp czasu
 Introduce_demo=Demo wprowadzające
 Invitation=Zaproszenie
-Interaction=Взаимодействие
+Interaction=Interakcja
 InternetSpeed=Szybkość Internetu
 InternetSpeed_desc=Usługę udostępnia firma Ookla®. Usługa mierzy szybkość wysyłania i pobierania danych między routerem a Internetem. Wykonanie testu trwa około minuty. Korzystając z tej usługi, akceptujesz warunki <a href="https://www.speedtest.net/about/privacy" style="font-family:Lucida Console;text-decoration:underline;color:#7ECAFF;" target="_blank">Polityki prywatności firmy Ookla</a>.
 InternetSpeed_ookla_mark=Ookla® i Speedtest® stanowią zastrzeżone znaki towarowe firmy Ookla, LLC.
@@ -2934,8 +2942,8 @@ ParentalCtrl_deny=Odmów
 ParentalCtrl_disable_NAT=Wyłącz <a id="disable_NAT" style="color:#FC0;text-decoration: underline;" href="" target="_blank">Przyspieszenie NAT</a>, aby uzyskać bardziej precyzyjną kontrolę nad harmonogramem.
 ParentalCtrl_Enable=Włącz kontrola rodzicielska
 ParentalCtrl_Enable_TS=Włącz Ustalanie harmonogramu
-ParentalCtrl_Desc=kontrola rodzicielska umożliwia ustawienie ograniczenia czasu używania sieci klienta. Aby korzystać z kontroli rodzicielskiej:
-[###MODEL_DEP###][BRT-AC828][RT-AD7200]ParentalCtrl_Desc=Funkcja kontroli rodzicielskiej umożliwia ustawienie ograniczenia czasu korzystania z sieci przez grupę urządzeń. Aby korzystać z funkcji kontroli rodzicielskiej:
+ParentalCtrl_Desc=Kontrola rodzicielska umożliwia ustawienie ograniczenia czasu używania sieci klienta. Aby korzystać z kontroli rodzicielskiej:
+[###MODEL_DEP###][BRT-AC828][RT-AD7200]ParentalCtrl_Desc=Kontroli rodzicielska umożliwia ustawienie ograniczenia czasu korzystania z sieci przez grupę urządzeń. Aby korzystać z funkcji kontroli rodzicielskiej:
 ParentalCtrl_Desc_TS=Funkcja Ustalanie harmonogramu umożliwia ustawienie ograniczenia czasu używania sieci klienta. Korzystanie z funkcji Ustalanie harmonogramu:
 ParentalCtrl_Desc1=W kolumnie [Nazwa klienta], wybierz klienta, którego korzystanie z sieci chcesz kontrolować. Można także wprowadzić adres MAC klienta w kolumnie [Adres MAC klienta].
 [###MODEL_DEP###][BRT-AC828][RT-AD7200]ParentalCtrl_Desc1=W kolumnie [Nazwa grupy] wybierz grupę, której korzystanie z sieci chcesz kontrolować.
@@ -2994,6 +3002,7 @@ PM_RADIUS_Create=Utwórz nowego klienta RADIUS
 PM_Group_Table=Tabela grup
 PoolName=Nazwa partycji
 Port_format=Dla zakresu portów źródłowego lub docelowego, można : a) wprowadzić specyficzny port, taki jak \"95\"; lub b) wprowadzić porty z zakresu, takie jak \"103:315\", \">100\" albo \"<65535\".
+Port_Gaming=Port gier
 Port_Mapping_desc1=Mapowanie portów
 Port_Mapping_desc2=Mapowanie portów obsługuje interfejs IPTV WAN dla określonych gniazd sieci LAN. Można wybrać odpowiednie gniazdo sieci LAN, a następnie kliknąć Apply (Zastosuj).
 Port_Mapping_desc3=Włącz mapowanie portów
@@ -3356,7 +3365,7 @@ sync_router_Invit_desc5=Połącz swoje urządzenie z routerem ASUS przez połąc
 sync_router_list=Lista synchronizacji
 sync_router_localfolder=Lokalny folder synchronizacji
 sys_adjustment=System adjustment
-sys_temp_unit=Temperature unit
+sys_temp_unit=Jednostka temperatury
 sys_fan_speed=Fan speed
 System_title=Zmiana hasła logowania routera, strefy czasowej i ustawień serwera NTP.
 [###MODEL_DEP###][RP-AC87][RP-AC68U][RP-AC66U][RP-AC55][RP-AC53][RP-AC52][RP-AC51][RP-AC92]System_title=Zmiana hasła logowania wzmacniacza sygnału, strefy czasowej i ustawień serwera NTP.
@@ -3444,7 +3453,7 @@ TZ17=Atlantic Time (Canada)
 TZ18=La Paz
 TZ18_1=Caracas
 TZ19=Santiago
-TZ19_1=Asunción
+TZ19_1=Asuncion
 TZ20=Newfoundland
 TZ21=Brasilia
 TZ22=Buenos Aires, Georgetown
@@ -3520,7 +3529,7 @@ TZ80=Solomon Is.
 TZ81=New Caledonia
 TZ82=Marshall Is.
 TZ82_1=Magadan
-TZ82_2=Fiji
+TZ82_2=Fidżi
 TZ83=Auckland, Wellington
 TZ84=Nuku'alofa
 TZ85=Anadyr, Pietropawłowsk Kamczacki
@@ -4227,8 +4236,7 @@ VPN_Fusion_Deactivate_Delete_Alert=Przed usunięciem profil należy wyłączyć.
 VPN_Fusion_Exception_Policies_Delete_Alert=Po usunięciu profilu, usunięte zostaną wszystkie wyjątki zasad ustawione dla profilu VPN. Czy na pewno chcesz usunąć profil?
 VPN_Fusion_Delete_Alert=Czy na pewno chcesz usunąć ten profil?
 VPN_Fusion_Exception_Policy_And_IP_Binding_Delete_Alert=Usunięcie zasad klienta na liście wyjątków, spowoduje także usunięcie powiązania IP klienta serwera DHCP. Czy na pewno chcesz je usunąć?
-VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Multiple VPN Connection FAQ.</a>
-[###MODEL_DEP###][TUF-AX5400][GS-AX5400][GS-AX3000][GT-AXE16000][GT-AXE11000][GT-AX11000_BO4][GT-AX11000_PRO][GT-AX11000][GT-AX6000][GT-AC5300][TUF-AX3000][TUF-AX3000_V2][GT-AC2900_SH][GT-AC2900][GT-AXY16000][RT-AXE7800][RT-AX86U_PRO][GT10]VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Często zadawane pytania dotyczące funkcji VPN Fusion.</a>
+VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Często zadawane pytania dotyczące funkcji VPN Fusion.</a>
 VPN_Fusion_Default_Alert=Nie można ustawić, jako domyślnej sieci WAN dla docelowych zasad.
 Beta_test_only=Beta test only
 FIRM_fupgrade_desc=You can also select [Cancel], the device will automatically start downloading the update during the night time.
@@ -4272,6 +4280,7 @@ BoostKey_GeForce=GeForce Now
 BoostKey_GeForce_desc=Wybierz GeForce Now, aby nadać priorytet urządzeniom obsługującym usługę gamingową GeForce Now i zapewnić większą szybkość oraz wyższą jakość podczas grania w gry.
 BoostKey_LED=LED On/Off
 BoostKey_LED_desc=The LED on/off control is used to turn off all LEDs includes Aura light.
+AURA_enable_notice_1=To enable Aura RGB, LED must remain on. Please turn on LED by pressing hardware button on the router for 3 seconds or enable it via web/app interface.
 AURA_Event=Zdarzenie
 AURA_Event_desc=System będzie wykrywał poniższe zdarzenia i uaktywniał różne efekty LED.
 AURA_Event_Boost_desc=Po włączeniu funkcji Game Boost (Przyspieszenie gier) pasek LED będzie świecił czerwonym oddychającym światłem.

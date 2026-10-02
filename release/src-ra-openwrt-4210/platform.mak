@@ -120,6 +120,8 @@ define platformRouterOptions
 			if [ "$(BUILD_NAME)" = "XD4S" ]; then \
 				sed -i "/RTCONFIG_FIXED_BRIGHTNESS_RGBLED\>/d" $(1); \
                 		echo "RTCONFIG_FIXED_BRIGHTNESS_RGBLED=y" >>$(1); \
+				sed -i "/RTCONFIG_32BYTES_ODMPID/d" $(1); \
+		                echo "RTCONFIG_32BYTES_ODMPID=y" >>$(1); \
 			fi; \
 		else \
 			sed -i "/RTCONFIG_RALINK_MT7621/d" $(1); \

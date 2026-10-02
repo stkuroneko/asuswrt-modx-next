@@ -3994,6 +3994,10 @@ define RouterOptions
 	else \
 		echo "# RTCONFIG_BCMBSD_V2 is not set" >>$(1); \
 	fi; \
+	if [ "$(DUPVIF)" = "y" ]; then \
+		sed -i "/RTCONFIG_DUPVIF/d" $(1); \
+		echo "RTCONFIG_DUPVIF=y" >>$(1); \
+	fi; \
 	)
 	$(call platformRouterOptions, $(1))
 endef

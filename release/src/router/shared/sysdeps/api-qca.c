@@ -287,6 +287,10 @@ uint32_t gpio_dir(uint32_t gpio, int dir)
 		snprintf(path, sizeof(path), "%s/gpio%d/value", GPIOLIB_DIR, gpio);
 		if (f_read_string(path, v, sizeof(v)) > 0 && safe_atoi(v) == 1)
 			dir_str = "high";	/* output, high voltage */
+	} else if (dir == GPIO_DIR_OUT_LOW) {
+                dir_str = "low";
+        } else if (dir == GPIO_DIR_OUT_HIGH) {
+                dir_str = "high";
 	}
 
 	__export_gpio(gpio);

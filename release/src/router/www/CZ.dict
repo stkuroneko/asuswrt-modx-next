@@ -115,12 +115,12 @@ ASUS_eula_withdraw_desc2_AlexaIFTTT=Pokud budete chtít v budoucnu povolit funkc
 ASUS_eula_withdraw_note=Proces odvolání nelze dokončit bez připojení k internetu. Odvolání prosím proveďte, když jste připojeni k internetu.
 ASUS_eula_withdraw_unstable=Proces odvolání nemůžete dokončit, protože stav internetu je nestabilní. Zkuste to prosím později.
 TM_eula_confirm=Použitím ASUS AiProtection souhlasíte se
-TM_eula_desc1=Použitím AiProtection, Traffic Analyzer, Apps Analyzer, Adaptive QoS/Game boost webové historie souhlasíte s <a id="eula_url" style="text-decoration:underline;" target="_blank">Licenční smlouvou společnosti Trend Micro s koncovým uživatelem</a>.
-TM_eula_desc2=Upozorňujeme, že vaše údaje budou shromažďovány Trend Micro přes AiProtection, Traffic Analyzer, Apps Analyzer, Adaptive QoS a webovou historii. Také berete na vědomí a souhlasíte s tím, že společnost ASUS není zodpovědná za smlouvu mezi vámi a společností Trend Micro ani za žádný obsah služby poskytované společností Trend Micro. Máte-li nějaké dotazy ohledně toho, jak společnost Trend Micro shromažďuje, zpracovává a používá výše uvedené informace, přečtěte si prosím prohlášení ohledně soukromí vydané společností Trend Micro nebo kontaktujte společnost Trend Micro pro více informací.
+TM_eula_desc1=Použitím AiProtection, rodičovská kontrola( Filtry pro webové stránky a aplikace ), Traffic Analyzer, Apps Analyzer, Adaptive QoS/Game boost webové historie souhlasíte s <a id="eula_url" style="text-decoration:underline;" target="_blank">Licenční smlouvou společnosti Trend Micro s koncovým uživatelem</a>.
+TM_eula_desc2=Upozorňujeme, že vaše údaje budou shromažďovány Trend Micro přes AiProtection, rodičovská kontrola( Filtry pro webové stránky a aplikace ), Traffic Analyzer, Apps Analyzer, Adaptive QoS a webovou historii. Také berete na vědomí a souhlasíte s tím, že společnost ASUS není zodpovědná za smlouvu mezi vámi a společností Trend Micro ani za žádný obsah služby poskytované společností Trend Micro. Máte-li nějaké dotazy ohledně toho, jak společnost Trend Micro shromažďuje, zpracovává a používá výše uvedené informace, přečtěte si prosím prohlášení ohledně soukromí vydané společností Trend Micro nebo kontaktujte společnost Trend Micro pro více informací.
 TM_eula_desc3=Chcete-li zakázat sdílení vašich údajů se společností Trend Micro přes výše uvedené funkce přejděte prosím na:  Router web GUI (Web GUI směrovače) > Advanced settings (Pokročilá nastavení) > Administration (Správa) > Privacy (Soukromí).
 TM_privacy_policy=<a id="tm_eula_url" style="text-decoration:underline;" target="_blank">TrendMicro Privacy Policy</a>
 TM_data_collection=<a id="tm_disclosure_url" style="text-decoration:underline;" target="_blank">Privacy and Personal Data Collection Disclosure</a>
-TM_eula_withdraw0=Pro AiProtection, Traffic Analyzer, Apps Analyzer, Adaptive QoS/Game boost, webovou historii:
+TM_eula_withdraw0=Pro AiProtection, rodičovská kontrola( Filtry pro webové stránky a aplikace ), Traffic Analyzer, Apps Analyzer, Adaptive QoS/Game boost, webovou historii:
 TM_eula_withdraw_desc1=Upozorňujeme vás, že vaše informace budou shromažďovány společností Trend Micro přes výše uvedené funkce.
 TM_eula_withdraw_desc2=Chcete-li zakázat sdílení vašich informací se společností Trend Micro přes následující funkce, klikněte prosím na <span style="font-weight: bold;">[(Odvolat]</span> níže. Nicméně vás upozorňujeme, že pokud zastavíte sdílení vašich informací se společností Trend Micro, tyto funkce nemusí fungovat.
 withdraw_confirm=Určitě chcete odvolat?
@@ -439,7 +439,7 @@ OP_WISP_item=Režim Klient
 OP_WISP_desc1=ZVMODELVZ se bezdrátově připojí k hlavnímu routeru, přístupovému bodu nebo veřejnému hot spotu a sdílí připojení s kabelovými / bezdrátovými klienty. V tomto režimu jsou NAT, firewall a DHCP server ve výchozím nastavení povoleny.
 OP_WISP_desc2=Ujistěte se, že jste oprávněni k přístupu k internetu, pokud se připojujete k veřejným hot spotům.
 page_not_support_mode_hint=Tato funkce je deaktivována.
-Parental_Control=rodičovská kontrola
+Parental_Control=Rodičovská kontrola
 PASS_new=Nové heslo
 PASS_retype=Zadejte heslo znovu
 PASS_score0=Velmi slabé
@@ -1089,7 +1089,7 @@ AiMesh_confirm_msg9=Z důvodu kompatibility systému AiMesh a koncových zaříz
 AiMesh_confirm_msg10=Chcete-li zajistit připojení systému AiMesh a koncových zařízení, měli byste si před přepnutím na WPA3-Personal přečíst tento přehled <a id="wpa3FaqLink">Nejčastější dotazy</a>.
 AiMesh_confirm_msg11=Aktuálně používáte WPA3-personal. Chcete-li vytvořit systém AiMesh, je nutné změnit způsob ověřování na WPA2/WPA3-personal. Chcete pokračovat?
 AiMesh_confirm_msg12=You can read this <a id='wpa3FaqLink'>FAQ</a> for more information.
-AiMesh_confirm_msg13=Další podrobnosti najdete na webu <a style='font-weight: bolder;text-decoration: underline;color:#000000;' href='' target='_blank'>Nejčastější dotazy</a>
+AiMesh_confirm_msg13=Další podrobnosti najdete na webu <a style='font-weight: bolder;text-decoration: underline;' href='' target='_blank'>Nejčastější dotazy</a>
 AiMesh_Feature_Desc=Pokročilý ASUS AiMesh je inovativní nová funkce směrovače, která připojuje více směrovačů ASUS a vytváří celou domácí síť WiFi.
 AiMesh_FAQ=Zjistěte víc o ASUS AiMesh
 AiMesh_FindNode=Najít uzel AiMesh
@@ -1175,6 +1175,9 @@ AiMesh_NodeLocation22=Balkón
 AiMesh_NodeLocation23=Jednací místnost
 AiMesh_NodeLocation24=Vlastní
 AiMesh_NodeLocation25=Garáž
+AiMesh_NodeLocation26=První patro
+AiMesh_NodeLocation27=Herní místnost
+AiMesh_NodeLocation28=Tělocvična
 AiMesh_OfflineTips=Offline tipy
 AiMesh_OfflineTips1=Zkontrolujte, zda je zapnuté napájení vašeho uzlu AiMesh.
 AiMesh_OfflineTips2=Restartujte uzel AiMesh a zkuste to znovu.
@@ -1795,6 +1798,8 @@ DDNS_https_cert_Import=Importujte vlastní certifikát
 DDNS_https_cert_Import_desc=Odešlete certifikát vystavený certifikační autoritou zde. Je nezbytný váš privátní klíč a certifikát SSL.
 DDNS_https_cert_PrivateKey=Privátní klíč
 DDNS_https_cert_PrivateKey_note=Privátní klíče nemohou být chráněny heslem.
+DDNS_ipv6_update=Aktualizace IPv6
+DDNS_ipv6_update_desc=Pokud síťové prostředí klienta používá síťovou adresu IPv6, povolením této funkce dojde nejdříve při přístupu ke vzdálenému zařízení k překladu domény na síťovou adresu IPv6.
 DDNS_ssl_cert=Certifikát SSL
 DDNS_termofservice_Title=Ustanovení a Podmínky použití
 DDNS_transfer=Transfer ASUS DDNS name
@@ -2139,11 +2144,11 @@ FirewallConfig_display2_sectiondesc=Aktivujte bránu firewall na ochranu vaší 
 FirewallConfig_display3_sectiondesc=<b>Doba trvání - černá listina :</b> Během plánované doby trvání nemohou klienti na černé listině používat určené síťové služby. Po uplynutí určené doby trvání mohou všichni klienti v místní síti LAN přistupovat k určeným síťovým službám.<br><b>Doba trvání - bílá listina :</b> Během plánované doby trvání nemohou určené síťové služby používat POUZE klienti na bílé listině. Po uplynutí určené dob trvání nebudou moci klienti na bílé listině a ostatní síťoví klienti přistupovat k Internetu ani k žádné internetové službě.
 FirewallConfig_display4_sectiondesc=<b>POZNÁMKA :</b> Nastavíte-li masku podsítě pro bílou listinu, adresy IP mimo podsíť nebudou moci přistupovat k Internetu ani k žádné internetové službě.
 FirewallConfig_display5_sectiondesc=Filtr adres MAC umožňuje povolovat nebo odmítat přístup k síti pro zařízení se specifickými adresami MAC.<p>Filtr adres MAC lze nastavit na režim Přijmout nebo Odmítnout.<p>V režimu Odmítnout bude zařízením v seznamu odmítnut přístup k síti.<p>V režimu Přijmout mohou přistupovat k síti pouze zařízení v seznamu. Zařízení, která nejsou v seznamu, mají zamítnutý přístup k síti.
-FirewallConfig_DoSEnable_itemdesc=Útok DoS (Denial-of-Service) je otevřený pokus zabránit legitimním uživatelům v používání služby nebo počítačového zdroje.<p>Aktivací této funkce lze chránit směrovač před útokem DoS, ale zvýší se tím zatížení směrovače.
+FirewallConfig_DoSEnable_itemdesc=Aktivací této funkce lze chránit směrovač před útokem DoS (Denial- of-Service), ale zvýší se tím zatížení směrovače.
 FirewallConfig_DoSEnable_itemname=Povolit ochranu DoS
 FirewallConfig_FirewallEnable_itemdesc=Deaktivací brány firewall budou deaktivovány všechny související funkce.
 FirewallConfig_FirewallEnable_itemname=Povolit Firewall
-FirewallIPv4_enable=Povolit IPv4 Firewall
+FirewallIPv4_enable=Povolit IPv4 Příchozí pravidla brány firewall
 FirewallIPv4=Brána firewall IPv4
 FirewallConfig_FTPPrompt_itemdesc=Když pro konfiguraci vaší sítě WAN nastavíte 20:21 jako rozsah portů serveru FTP, potom bude váš server FTP v konfliktu s nativním serverem FTP zařízení ZVMODELVZ.
 FirewallConfig_KeywordFilterEnable_itemname=Povolit filtr klíčových slov
@@ -2251,6 +2256,9 @@ FW_updated=Updated
 FW_new_firmware_available=K dispozici je nový firmware.
 FW_rlnote_loading=Načítají se poznámky k verzi, čekejte prosím...
 FW_rlnote_failed=Poznámky k verzi se nepodařilo najít.
+FW_rollback=Vrácení zpět
+FW_rollback_choose=Vyberte verzi firmwaru
+FW_rollback_selector=Výběr vrácení firmwaru zpět
 Game_acceleration=Herní akcelerace
 Game_Boost=Zrychlení her
 Game_Boost_acceleration=Trojúrovňová herní akcelerace
@@ -2994,6 +3002,7 @@ PM_RADIUS_Create=Vytvořit nového klienta RADIUS
 PM_Group_Table=Skupinová tabulka
 PoolName=Název oddílu
 Port_format=Pro zdrojový nebo cílový rozsah portů můžete: a) zadat konkrétní port, například \"95\"; nebo b) zadat porty v určitém rozsahu, například \"103:315\", \">100\" nebo \"<65535\".
+Port_Gaming=Herní port
 Port_Mapping_desc1=Port Mapping (Mapování portů)
 Port_Mapping_desc2=Mapování portů podporuje rozhraní IPTV WAN pro specifický port LAN. Můžete vybrat příslušný port LAN a potom klepněte na Apply (Použít).
 Port_Mapping_desc3=Enable Port Mapping (Povolit mapování portů)
@@ -3520,7 +3529,7 @@ TZ80=Šalamounovy ostrovy
 TZ81=Nová Kaledonie
 TZ82=Marshallovy ostrovy
 TZ82_1=Magadan
-TZ82_2=Fiji
+TZ82_2=Fidži
 TZ83=Auckland, Wellington
 TZ84=Nuku'alofa
 TZ85=Anadyr, Petropavlovsk-Kamchatsky
@@ -4227,8 +4236,7 @@ VPN_Fusion_Deactivate_Delete_Alert=Před smazáním profilu prosím profil deakt
 VPN_Fusion_Exception_Policies_Delete_Alert=Veškeré výjimky ze zásad pro profil VPN budou při smazání profilu odstraněny. Opravdu chcete profil odstranit?
 VPN_Fusion_Delete_Alert=Opravdu chcete tento profil odstranit?
 VPN_Fusion_Exception_Policy_And_IP_Binding_Delete_Alert=Smazáním zásady klienta v seznamu výjimek smažete také klientovu IP vazbu serveru DHCP. Opravdu toto chcete odstranit?
-VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Multiple VPN Connection FAQ.</a>
-[###MODEL_DEP###][TUF-AX5400][GS-AX5400][GS-AX3000][GT-AXE16000][GT-AXE11000][GT-AX11000_BO4][GT-AX11000_PRO][GT-AX11000][GT-AX6000][GT-AC5300][TUF-AX3000][TUF-AX3000_V2][GT-AC2900_SH][GT-AC2900][GT-AXY16000][RT-AXE7800][RT-AX86U_PRO][GT10]VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Často kladené dotazy k fúzi VPN.</a>
+VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Často kladené dotazy k fúzi VPN.</a>
 VPN_Fusion_Default_Alert=Nelze nastavit jako výchozí WAN pro cílovou zásadu.
 Beta_test_only=Beta test only
 FIRM_fupgrade_desc=You can also select [Cancel], the device will automatically start downloading the update during the night time.
@@ -4272,6 +4280,7 @@ BoostKey_GeForce=GeForce Now
 BoostKey_GeForce_desc=Výběrem GeForce Now budou upřednostněna zařízení GeForce Now pro zážitek z rychlejšího a lepšího hraní.
 BoostKey_LED=LED On/Off
 BoostKey_LED_desc=The LED on/off control is used to turn off all LEDs includes Aura light.
+AURA_enable_notice_1=To enable Aura RGB, LED must remain on. Please turn on LED by pressing hardware button on the router for 3 seconds or enable it via web/app interface.
 AURA_Event=Událost
 AURA_Event_desc=Systém rozpoznává následující události a aktivuje různé efekty LED.
 AURA_Event_Boost_desc=Při aktivaci Game Boost se na panelu LED zobrazí červený efekt pulzování.

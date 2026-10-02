@@ -1848,19 +1848,31 @@ validator.invalidChar = function(str){
 		'errReason': ''
 	}
 
-	var invalid_char = [];
-	for(var i = 0; i < str.length; ++i){
-		if(str.charAt(i) < ' ' || str.charAt(i) > '~'){
-			invalid_char.push(str.charAt(i));
-		}
-	}
-
-	if(invalid_char.length != 0){
+	if(str.charAt(0) == '"'){
 		testResult.isError = true;
-		testResult.errReason = "<#JS_validstr2#> '" + invalid_char.join('') + "' !";
+		testResult.errReason = '<#JS_validstr1#> ["]';
+                return testResult;
 	}
+	else if(str.charAt(str.length - 1) == '"'){
+		testResult.isError = true;
+		testResult.errReason = '<#JS_validstr3#> ["]';
+		return testResult;
+	}
+	else{
+		var invalid_char = [];
+		for(var i = 0; i < str.length; ++i){
+			if(str.charAt(i) < ' ' || str.charAt(i) > '~'){
+				invalid_char.push(str.charAt(i));
+			}
+		}
 
-	return testResult;
+		if(invalid_char.length != 0){
+			testResult.isError = true;
+			testResult.errReason = "<#JS_validstr2#> '" + invalid_char.join('') + "' !";
+		}
+
+		return testResult;
+	}
 };
 
 validator.KRSkuPwd = function(str){

@@ -1332,7 +1332,10 @@ char *get_default_ssid(int unit, int subunit)
 #elif defined(XT8_V2)
 		strlcat(ssid, "_XT8", sizeof(ssid));
 #elif defined(XD4S)
-		strlcat(ssid, "_XD4S", sizeof(ssid));
+		if(nvram_match("odmpid","ZenWiFi_XD4_Plus"))
+			strlcat(ssid, "_XD4_Plus", sizeof(ssid));
+		else
+			strlcat(ssid, "_XD4S", sizeof(ssid));
 #endif
 
 #endif

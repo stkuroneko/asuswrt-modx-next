@@ -4218,6 +4218,9 @@ void btn_check(void)
 #endif // RTCONFIG_LP5523
 
 				alarmtimer(NORMAL_PERIOD, 0);
+#if defined(RTCONFIG_WPSMULTIBAND)
+				stop_wps_method();
+#endif
 #if defined(RTCONFIG_BCM_CLED) && defined(RTCONFIG_SINGLE_LED)
 				bcm_cled_ctrl(BCM_CLED_WHITE, BCM_CLED_STEADY_NOBLINK);
 				nvram_unset("bcm_cled_in_wps");

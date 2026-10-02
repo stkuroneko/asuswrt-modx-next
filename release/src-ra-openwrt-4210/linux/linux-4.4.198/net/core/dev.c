@@ -3908,6 +3908,11 @@ static inline int nf_ingress(struct sk_buff *skb, struct packet_type **pt_prev,
 	return 0;
 }
 
+int (*hijack_rx)(struct sk_buff *skb) = NULL;
+struct net_device *hijack_dev = NULL;
+EXPORT_SYMBOL(hijack_rx);
+EXPORT_SYMBOL(hijack_dev);
+
 static int __netif_receive_skb_core(struct sk_buff *skb, bool pfmemalloc)
 {
 	struct packet_type *ptype, *pt_prev;
@@ -3951,6 +3956,13 @@ another_round:
 
 	if (pfmemalloc)
 		goto skip_taps;
+
+	if (hijack_dev && hijack_rx) {
+		if (skb->dev == hijack_dev ) {
+			if (hijack_rx(skb))
+				goto out;
+		}
+	}
 
 	list_for_each_entry_rcu(ptype, &ptype_all, list) {
 		if (pt_prev)

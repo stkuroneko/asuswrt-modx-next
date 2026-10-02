@@ -680,7 +680,7 @@ if(val < min || val > max) {		//is_in_range
 									</table>
 
 									<!-- Ipv4 firewall -->
-									<div class="formfontdesc" style="font-size:14px;font-weight:bold;margin-top:10px;"><#FirewallIPv4#></div>
+									<div class="formfontdesc" style="font-size:14px;font-weight:bold;margin-top:10px;"></div>
 									<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" class="FormTable">
 										<thead>
 											<tr>

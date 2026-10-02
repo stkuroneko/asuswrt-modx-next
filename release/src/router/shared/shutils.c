@@ -1670,10 +1670,10 @@ static void put_ulong(strbuf_t *buf, unsigned long int value, int base,
  *	the first call, msize can be set to -1.
  */
 
-static int dsnprintf(char **s, int size, char *fmt, va_list arg, int msize)
+static int dsnprintf(char **s, int size, const char *fmt, va_list arg, int msize)
 {
 	strbuf_t	buf;
-	char		c;
+	char	c;
 
 	assert(s);
 	assert(fmt);
@@ -1865,7 +1865,7 @@ static int dsnprintf(char **s, int size, char *fmt, va_list arg, int msize)
  *	point, like %e, %f, %g...
  */
 
-int fmtAlloc(char **s, int n, char *fmt, ...)
+int fmtAlloc(char **s, int n, const char *fmt, ...)
 {
 	va_list	ap;
 	int		result;
@@ -1885,7 +1885,7 @@ int fmtAlloc(char **s, int n, char *fmt, ...)
  *	A vsprintf replacement.
  */
 
-int fmtValloc(char **s, int n, char *fmt, va_list arg)
+int fmtValloc(char **s, int n, const char *fmt, va_list arg)
 {
 	assert(s);
 	assert(fmt);
@@ -1897,7 +1897,7 @@ int fmtValloc(char **s, int n, char *fmt, va_list arg)
 /*
  *  * description: parse va and do system
  *  */
-int doSystem(char *fmt, ...)
+int doSystem(const char *fmt, ...)
 {
 	va_list		vargs;
 	char		*cmd = NULL;

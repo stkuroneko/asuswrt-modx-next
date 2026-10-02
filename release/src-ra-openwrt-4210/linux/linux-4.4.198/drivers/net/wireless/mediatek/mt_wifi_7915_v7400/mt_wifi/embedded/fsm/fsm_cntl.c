@@ -414,6 +414,7 @@ BOOLEAN cntl_connect_request(
 				ScanCtrl->SyncFsm.CurrState,
 				wdev->auth_machine.CurrState,
 				wdev->assoc_machine.CurrState));
+			os_free_mem(cntl_conn);
 			return FALSE;
 		}
 

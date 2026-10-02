@@ -1703,6 +1703,18 @@ TRACE_PT("3g begin with %s.\n", wan_ifname);
 			stop_s46map_rptd();
 			nvram_set_int("s46_hgw_case", S46_CASE_INIT);
 		}
+#if defined(RTCONFIG_RALINK)
+		switch (wan_proto) {
+		case WAN_MAPE:
+		case WAN_V6PLUS:
+			/* Enable mtkhnat to support map-e. */
+			system("echo 1 > /sys/kernel/debug/hnat/mape_toggle");
+			break;
+		default:
+			/* Enable mtkhnat to support ds-lite.(As Default) */
+			system("echo 0 > /sys/kernel/debug/hnat/mape_toggle");
+		}
+#endif
 #endif
 		/*
 		 * Configure PPPoE connection. The PPPoE client will run
@@ -2013,6 +2025,11 @@ TRACE_PT("3g begin with %s.\n", wan_ifname);
 			/* Start pre-authenticator */
 			dbG("start auth:%d\n", unit);
 			start_auth(unit, 0);
+
+#if defined(RTCONFIG_RALINK)
+			/* Enable mtkhnat to support map-e. */
+			system("echo 1 > /sys/kernel/debug/hnat/mape_toggle");
+#endif
 
 #ifdef RTCONFIG_DSL
 			nvram_set(strcat_r(prefix, "clientid_type", tmp), nvram_safe_get("dslx_dhcp_clientid_type"));
@@ -2722,9 +2739,10 @@ void wan6_up(const char *pwan_ifname)
 			ipv6_sysconf(nvram_safe_get("lan_ifname"), "mtu", mtu);
 
 #ifdef RTCONFIG_SOFTWIRE46
+		int wan_proto = -1;
 		wan_unit = wan_primary_ifunit();
 		snprintf(prefix, sizeof(prefix), "wan%d_", wan_unit);
-		switch (get_wan_proto(prefix)) {
+		switch (wan_proto = get_wan_proto(prefix)) {
 			char peerbuf[INET6_ADDRSTRLEN];
 			char addr6buf[INET6_ADDRSTRLEN];
 			char addr4buf[INET_ADDRSTRLEN + sizeof("/32")];
@@ -2772,7 +2790,7 @@ void wan6_up(const char *pwan_ifname)
 				rules = NULL;
 			}
 		s46_mapcalc:
-			if (s46_mapcalc(rules, peerbuf, sizeof(peerbuf), addr6buf, sizeof(addr6buf),
+			if (s46_mapcalc(wan_proto, rules, peerbuf, sizeof(peerbuf), addr6buf, sizeof(addr6buf),
 					addr4buf, sizeof(addr4buf), &offset, &psidlen, &psid, NULL, draft) <= 0) {
 				peerbuf[0] = addr6buf[0] = addr4buf[0] = '\0';
 				offset = 0, psidlen = 0, psid = 0;
@@ -3004,6 +3022,10 @@ wan_up(const char *pwan_ifname)
 	char prc[16] = {0};
 
 	prctl(PR_GET_NAME, prc);
+
+	strlcpy(wan_ifname, pwan_ifname, sizeof(wan_ifname));
+	if ((wan_unit = wan_ifunit(wan_ifname)) < 0)
+		wan_unit = 0;
 	snprintf(prefix, sizeof(prefix), "wan%d_", wan_unit);
 	wan_proto = get_wan_proto(prefix);
 
@@ -3292,6 +3314,12 @@ NOIP:
 
 #ifdef RTCONFIG_SOFTWIRE46
 	switch (wan_proto) {
+	case WAN_MAPE:
+		if (nvram_invmatch(ipv6_nvname("ipv6_ra_route"), "")) {
+			eval("ip", "-6", "route", "add", "::/0", "via", nvram_safe_get(ipv6_nvname("ipv6_ra_route")), "dev", wan_ifname);
+			S46_DBG("[CMD]:[ip -6 route add ::/0 via %s dev %s]\n", nvram_safe_get(ipv6_nvname("ipv6_ra_route")), wan_ifname);
+		}
+		break;
 	case WAN_V6PLUS:
 		if (!strcmp(prc, "udhcpc") && nvram_get_int("s46_hgw_case") == S46_CASE_INIT) {
 			if (inet_addr_(nvram_safe_get(strcat_r(prefix, "gateway", tmp))) != INADDR_ANY) {
@@ -3758,6 +3786,7 @@ wan_ifunit(char *wan_ifname)
 		case WAN_DHCP:
 		case WAN_STATIC:
 #ifdef RTCONFIG_SOFTWIRE46
+		case WAN_MAPE:
 		case WAN_V6PLUS:
 #endif
 			if (nvram_match(strcat_r(prefix, "ifname", tmp), wan_ifname))
@@ -3809,6 +3838,7 @@ wanx_ifunit(char *wan_ifname)
 		case WAN_PPTP:
 		case WAN_L2TP:
 #ifdef RTCONFIG_SOFTWIRE46
+		case WAN_MAPE:
 		case WAN_V6PLUS:
 #endif
 			if (nvram_match(strcat_r(prefix, "ifname", tmp), wan_ifname))

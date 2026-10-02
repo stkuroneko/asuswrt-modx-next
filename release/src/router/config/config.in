@@ -2698,3 +2698,9 @@ config RTCONFIG_SWITCH_MT7986_MT7531
 	bool "MTK SoC MT7986 + MT7531"
 	depends on RTCONFIG_MT798X
 	default n
+
+config RTCONFIG_DUPVIF
+	bool "QCA/MTK platform support Hinet MOD Mesh"
+	depends on RTCONFIG_MULTICAST_IPTV
+	default n
+

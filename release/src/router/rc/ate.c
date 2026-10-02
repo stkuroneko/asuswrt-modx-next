@@ -202,6 +202,16 @@ static int setAllSpecificColorLedOn(enum ate_led_color color)
 	case MODEL_TUFAX4200:
 	case MODEL_TUFAX6000:
 		{
+#if defined(RTCONFIG_FIXED_BRIGHTNESS_RGBLED)
+			static enum led_id blue_led[] = {
+				LED_BLUE,
+				LED_ID_MAX
+			};
+			static enum led_id green_led[] = {
+				LED_GREEN,
+				LED_ID_MAX
+			};
+#endif
 			static enum led_id white_led[] = {
 				LED_POWER,
 				LED_WAN, 	/* GPY211 */
@@ -211,11 +221,18 @@ static int setAllSpecificColorLedOn(enum ate_led_color color)
 			};
 			static enum led_id red_led[] = {
 				LED_WAN_RED,
+#if defined(RTCONFIG_FIXED_BRIGHTNESS_RGBLED)
+				LED_RED,
+#endif
 				LED_ID_MAX
 			};
 
 			all_led[LED_COLOR_WHITE] = white_led;
 			all_led[LED_COLOR_RED] = red_led;
+#if defined(RTCONFIG_FIXED_BRIGHTNESS_RGBLED)
+			all_led[LED_COLOR_BLUE] = blue_led;
+			all_led[LED_COLOR_GREEN] = green_led;
+#endif
 			switch_led_color = LED_COLOR_WHITE;
 		}
 		break;

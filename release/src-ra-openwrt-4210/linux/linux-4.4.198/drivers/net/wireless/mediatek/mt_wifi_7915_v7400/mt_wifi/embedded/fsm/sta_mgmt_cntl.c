@@ -3568,6 +3568,11 @@ INT LinkDown_Infra(RTMP_ADAPTER *pAd, struct wifi_dev *wdev, BOOLEAN ReqByAP, ML
 			("%s():pEntry NULL, this is possible in this flow\n", __func__));
 		return FALSE;
 	}
+#ifdef CONFIG_ASUS_FORCE4 
+       	if (wdev->is_force4) {
+               map_a4_peer_disable(pAd, pEntry, FALSE);
+       	}
+#endif	
 #endif
 	/* Infra structure mode */
 	MTWF_LOG(DBG_CAT_CLIENT, DBG_SUBCAT_ALL, DBG_LVL_TRACE, ("!!! LINK DOWN INFRA !!!\n"));

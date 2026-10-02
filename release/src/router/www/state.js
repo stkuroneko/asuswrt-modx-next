@@ -523,7 +523,8 @@ var pptpd_support = isSupport("pptpd");
 var openvpnd_support = isSupport("openvpnd"); 
 var vpnc_support = isSupport("vpnc");
 var WebDav_support = isSupport("webdav"); 
-var HTTPS_support = isSupport("HTTPS"); 
+var HTTPS_support = isSupport("HTTPS");
+var ftp_ssl_support = isSupport("ftp_ssl");
 var nodm_support = isSupport("nodm"); 
 var wimax_support = isSupport("wimax");
 var downsize_4m_support = isSupport("sfp4m");
@@ -590,6 +591,7 @@ var reboot_schedule_support = isSupport("reboot_schedule");
 var captivePortal_support = isSupport("captivePortal");
 var cp_freewifi_support = isSupport("cp_freewifi");
 var cp_advanced_support = isSupport("cp_advanced");
+var account_binding_support = isSupport("account_binding");
 var fbwifi_support = isSupport("fbwifi");
 var noiptv_support = isSupport("noiptv");
 var improxy_support = isSupport("improxy");
@@ -832,9 +834,9 @@ var aimesh_location_arr = [
 	{value:"Basement",text:"<#AiMesh_NodeLocation10#>"}, {value:"Yard",text:"<#AiMesh_NodeLocation11#>"}, {value:"Master Bedroom",text:"<#AiMesh_NodeLocation12#>"},
 	{value:"Guest Room",text:"<#AiMesh_NodeLocation13#>"}, {value:"Kids Room",text:"<#AiMesh_NodeLocation14#>"}, {value:"Study Room",text:"<#AiMesh_NodeLocation15#>"},
 	{value:"Hallway",text:"<#AiMesh_NodeLocation16#>"}, {value:"Walk-in Closet",text:"<#AiMesh_NodeLocation17#>"}, {value:"Bathroom",text:"<#AiMesh_NodeLocation18#>"},
-	{value:"First Floor",text:"First Floor"}, {value:"Second Floor",text:"<#AiMesh_NodeLocation19#>"}, {value:"Third Floor",text:"<#AiMesh_NodeLocation20#>"},
+	{value:"First Floor",text:"<#AiMesh_NodeLocation26#>"}, {value:"Second Floor",text:"<#AiMesh_NodeLocation19#>"}, {value:"Third Floor",text:"<#AiMesh_NodeLocation20#>"},
 	{value:"Storage",text:"<#AiMesh_NodeLocation21#>"}, {value:"Balcony",text:"<#AiMesh_NodeLocation22#>"}, {value:"Meeting Room",text:"<#AiMesh_NodeLocation23#>"},
-	{value:"Garage",text:"<#AiMesh_NodeLocation25#>"}, {value:"Gaming Room",text:"Gaming Room"}, {value:"Gym",text:"Gym"},
+	{value:"Garage",text:"<#AiMesh_NodeLocation25#>"}, {value:"Gaming Room",text:"<#AiMesh_NodeLocation27#>"}, {value:"Gym",text:"<#AiMesh_NodeLocation28#>"},
 	{value:"Custom",text:"<#AiMesh_NodeLocation24#>"}
 ];
 
@@ -2682,7 +2684,7 @@ var date_year = date.getFullYear();
 var date_month = date.getMonth();
 var modem_enable = '';
 var modem_sim_order = '';
-var wanConnectStatus = true;
+var wanConnectStatus = false;
 var wlc0_ssid = htmlEnDeCode.htmlEncode(decodeURIComponent('<% nvram_char_to_ascii("WLANConfig11b", "wlc0_ssid"); %>'));
 var wlc1_ssid = htmlEnDeCode.htmlEncode(decodeURIComponent('<% nvram_char_to_ascii("WLANConfig11b", "wlc1_ssid"); %>'));
 var concurrent_pap = false;
@@ -3675,23 +3677,23 @@ function isPortConflict(_val, service){
 		str = str + "HTTP LAN port.";
 		return str;
 	}
-	else if(_val == '<% nvram_get("dm_http_port"); %>'){
+	else if(!nodm_support && _val == '<% nvram_get("dm_http_port"); %>'){
 		str = str + "<#DM_title#>.";
 		return str;
 	}
-	else if(_val == '<% nvram_get("webdav_http_port"); %>'){
+	else if(WebDav_support && _val == '<% nvram_get("webdav_http_port"); %>'){
 		str = str + "Cloud Disk.";
 		return str;
 	}
-	else if(_val == '<% nvram_get("webdav_https_port"); %>'){
+	else if(WebDav_support && _val == '<% nvram_get("webdav_https_port"); %>'){
 		str = str + "Cloud Disk.";
 		return str;
 	}
-	else if(service != "ssh" && _val == '<% nvram_get("sshd_port"); %>'){
+	else if(ssh_support && service != "ssh" && _val == '<% nvram_get("sshd_port"); %>'){
 		str = str + "SSH.";
 		return str;
 	}
-	else if(service != "openvpn" && _val == '<% nvram_get("vpn_server_port"); %>'){
+	else if(openvpnd_support && service != "openvpn" && _val == '<% nvram_get("vpn_server_port"); %>'){
 		str = str + "OpenVPN.";
 		return str;
 	}

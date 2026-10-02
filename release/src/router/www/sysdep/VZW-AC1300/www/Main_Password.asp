@@ -264,9 +264,8 @@ function submitForm(){
 			httpApi.chpass(postData);
 		}, 100);
 
-		var nextPage = decodeURIComponent('<% get_ascii_parameter("nextPage"); %>');
 		setTimeout(function(){
-			location.href = (nextPage != "") ? nextPage : "<% rel_index_page(); %>";
+			location.href = "<% rel_index_page(); %>";
 		}, 3000);
 	}
 	else

@@ -363,10 +363,8 @@ function submitForm(){
 		setTimeout(function(){
 			httpApi.chpass(postData);
 		}, 100);
-
-		var nextPage = decodeURIComponent('<% get_ascii_parameter("nextPage"); %>');
 		setTimeout(function(){
-			location.href = (nextPage != "") ? nextPage : "/";
+			location.href = "/";
 		}, 3000);
 	}
 	else

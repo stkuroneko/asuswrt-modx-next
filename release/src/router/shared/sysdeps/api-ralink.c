@@ -96,17 +96,59 @@ static int __export_gpio(uint32_t gpio)
 	return 0;
 }
 
+#define PWM_SYS_PREFIX	"/sys/class/pwm/pwmchip0"
+uint32_t is_pwm_exported(uint8_t channel)
+{
+	char path[PATH_MAX], tmpbuf[20];
+	snprintf(tmpbuf, sizeof(tmpbuf), "%u", channel);
+	snprintf(path, sizeof(path), PWM_SYS_PREFIX"/pwm%u", channel);
+	if (!d_exists(path))
+		return 0;
+	return 1;
+}
+
+uint32_t pwm_export(uint8_t channel, uint32_t period, uint32_t duty_cycle)
+{
+	char path[PATH_MAX], tmpbuf[20];
+
+	if (!d_exists(PWM_SYS_PREFIX))
+		return -1;
+
+	snprintf(tmpbuf, sizeof(tmpbuf), "%u", channel);
+	f_write_string(PWM_SYS_PREFIX"/export", tmpbuf, 0, 0);
+
+	snprintf(path, sizeof(path), PWM_SYS_PREFIX"/pwm%u/period", channel);
+	snprintf(tmpbuf, sizeof(tmpbuf), "%u", period);
+	f_write_string(path, tmpbuf, 0, 0);
+
+	snprintf(path, sizeof(path), PWM_SYS_PREFIX"/pwm%u/duty_cycle", channel);
+	snprintf(tmpbuf, sizeof(tmpbuf), "%u", duty_cycle);
+	f_write_string(path, tmpbuf, 0, 0);
+
+	// toggle enable to make the status correct
+	snprintf(path, sizeof(path), PWM_SYS_PREFIX"/pwm%u/enable", channel);
+	f_write_string(path, "1", 0, 0);
+	f_write_string(path, "0", 0, 0);
+
+	return 0;
+}
+
 uint32_t gpio_dir(uint32_t gpio, int dir)
 {
 	char path[PATH_MAX], v[10], *dir_str = "in";
 
+	if (gpio >= 200) return 0; // PWM, only output
 	if (dir == GPIO_DIR_OUT) {
 		dir_str = "out";		/* output, low voltage */
 		*v = '\0';
 		snprintf(path, sizeof(path), "%s/gpio%d/value", GPIOLIB_DIR, gpio);
 		if (f_read_string(path, v, sizeof(v)) > 0 && safe_atoi(v) == 1)
 			dir_str = "high";	/* output, high voltage */
-	}
+	} else if (dir == GPIO_DIR_OUT_LOW) {
+                dir_str = "low";
+        } else if (dir == GPIO_DIR_OUT_HIGH) {
+                dir_str = "high";
+        }
 
 	__export_gpio(gpio);
 	snprintf(path, sizeof(path), "%s/gpio%d/direction", GPIOLIB_DIR, gpio);
@@ -119,7 +161,11 @@ uint32_t get_gpio(uint32_t gpio)
 {
 	char path[PATH_MAX], value[10];
 
-	snprintf(path, sizeof(path), "%s/gpio%d/value", GPIOLIB_DIR, gpio);
+	if (gpio >= 200) { // PWM
+		snprintf(path, sizeof(path), PWM_SYS_PREFIX"/pwm%u/enable", gpio-200);
+	} else {
+		snprintf(path, sizeof(path), "%s/gpio%d/value", GPIOLIB_DIR, gpio);
+	}
 	f_read_string(path, value, sizeof(value));
 
 	return safe_atoi(value);
@@ -130,7 +176,11 @@ uint32_t set_gpio(uint32_t gpio, uint32_t value)
 	char path[PATH_MAX], val_str[10];
 
 	snprintf(val_str, sizeof(val_str), "%d", !!value);
-	snprintf(path, sizeof(path), "%s/gpio%d/value", GPIOLIB_DIR, gpio);
+	if (gpio >= 200) { // PWM
+		snprintf(path, sizeof(path), PWM_SYS_PREFIX"/pwm%u/enable", gpio-200);
+	} else {
+		snprintf(path, sizeof(path), "%s/gpio%d/value", GPIOLIB_DIR, gpio);
+	}
 	f_write_string(path, val_str, 0, 0);
 
 	return 0;
@@ -940,7 +990,7 @@ char *get_wlifname(int unit, int subunit, int subunit_x, char *buf)
 		{
 #if defined(RTCONFIG_RALINK_BUILDIN_WIFI)
 #if defined(RTCONFIG_AMAS)
-			if (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1") && subunit >=2) {
+			if (aimesh_re_node() && subunit >=2) {
 				sprintf(buf, "%s%d", wifbuf, subunit-1);
 			} else
 #endif
@@ -989,9 +1039,7 @@ char *get_wlxy_ifname(int x, int y, char *buf)
 		}
 
 		snprintf(prefix, sizeof(prefix), "wl%d.%d_", x, i);
-#if !defined(RTCONFIG_RALINK_BUILDIN_WIFI)
-		if (nvram_pf_match(prefix, "bss_enabled", "1"))
-#endif
+		if (is_bss_enabled(prefix))
 			sidx++;
 	}
 

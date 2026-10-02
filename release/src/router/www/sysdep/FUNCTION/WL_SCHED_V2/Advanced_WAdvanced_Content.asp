@@ -216,6 +216,10 @@ if(location_list_support && amesh_support && ameshRouter_support) {
 
 var QAM256_support = false;
 var QAM1024_support = false;
+var QAM256_2G_support = isSupport('qam256_2g');	// RTCONFIG_QAM256_2G
+var QAM1024_5G_support = isSupport('qam1024_5g'); // RTCONFIG_QAM1024_5G
+var MUMIMO2G_support = isSupport('mumimo_2g'); // RTCONFIG_MUMIMO_2G
+var MUMIMO5G_support = isSupport('mumimo_5g'); // RTCONFIG_MUMIMO_5G
 (function(){
 	if(Bcmwifi_support){
 		var _cap = '';
@@ -373,7 +377,7 @@ function initial(){
 		}
 		if( based_modelid == "RT-AC55U" || based_modelid == "RT-AC55UHP")
 			inputCtrl(document.form.traffic_5g, 1);
-		if(Qcawifi_support && band5g_11ax_support)
+		if((Qcawifi_support || Rawifi_support) && band5g_11ax_support)
 			document.getElementById('wl_txbf_desc').innerHTML = "<#WLANConfig11b_x_axBeam#>";
 
 		if(QAM1024_support || (Bcmwifi_support && QAM256_support)){
@@ -402,6 +406,14 @@ function initial(){
 			$('#turbo_qam_hint').click(function(){openHint(3,33);});
 		}
 
+		if(based_modelid == "RT-AX53U" || based_modelid == "RT-AX54" || based_modelid == "XD4S"){
+			inputCtrl(document.form.wl_turbo_qam, 1);
+		}
+		if ((Qcawifi_support || Rawifi_support) && QAM1024_5G_support) {
+			inputCtrl(document.form.wl_turbo_qam, 1);
+			$("#turbo_qam_title").html("1024-QAM");
+		}
+
 		if((!Qcawifi_support && !Rawifi_support) || based_modelid == "RT-AC87U"
 		    || based_modelid == "MAP-AC1300" || based_modelid == "MAP-AC2200" || based_modelid == "VZW-AC1300" || based_modelid == "RT-AC95U"
 		    || based_modelid == "RT-AC82U" || based_modelid == "RT-AC58U" || based_modelid == "4G-AC53U" || based_modelid == "4G-AC56" || (based_modelid == "RP-AC87" && wl_unit_value == "1") ){		// hide on Broadcom platform
@@ -411,6 +423,17 @@ function initial(){
 		if(based_modelid == "RT-AC66U" || based_modelid == "RT-AC85U" || based_modelid == "RT-AC65U" || based_modelid == "RT-AC85P" || based_modelid == "RT-ACRH26" || based_modelid == "RT-AC1200_V2" || based_modelid == "RT-ACRH18" || based_modelid == "4G-AC86U"){
 			document.getElementById('wl_txbf_desc').innerHTML = "<#WLANConfig11b_x_acBeam#>";
 			inputCtrl(document.form.wl_txbf, 1);	
+		}
+
+		if (based_modelid == "TUF-AX4200") {
+			inputCtrl(document.form.wl_itxbf, 1);
+		}
+
+		if (MUMIMO5G_support) {
+			document.getElementById("wl_MU_MIMO_field").style.display = "";
+			document.form.wl_mumimo.disabled = false;
+			if ((Qcawifi_support || Rawifi_support))
+				inputCtrl(document.form.wl_txbf, 1);
 		}
 	}
 	else if(wl_unit_value == '3'){ // 60GHz up
@@ -428,8 +451,9 @@ function initial(){
 		document.getElementById("wl_txPower_field").style.display = "none";
 	}
 	else{ // 2.4GHz
-		if((Qcawifi_support || Rawifi_support) && QAM256_support){
+		if((Qcawifi_support || Rawifi_support) && (QAM256_support || QAM256_2G_support)){
 			inputCtrl(document.form.wl_turbo_qam, 1);
+			$("#turbo_qam_title").html("256-QAM");
 		}
 		else if(QAM1024_support || (Bcmwifi_support && QAM256_support)){
 			if(based_modelid == "RT-N18U" && bootLoader_ver < 2000)
@@ -477,8 +501,6 @@ function initial(){
 			$('wl_txbf_desc').innerHTML = "<#WLANConfig11b_x_ExpBeam#>";
 			inputCtrl(document.form.wl_txbf, 1);
 		}
-		if(Qcawifi_support && band5g_11ax_support)
-			document.getElementById('wl_txbf_desc').innerHTML = "<#WLANConfig11b_x_acBeam#>";
 		if(Qcawifi_support && (based_modelid == "GT-AXY16000" || based_modelid == "RT-AX89U") && document.form.wl_nmode_x.value == "0" && document.form.wl0_11ax.value == "1"){
 			inputCtrl(document.form.wl_txbf, 1);
 			document.getElementById("wl_MU_MIMO_field").style.display = "";
@@ -488,6 +510,21 @@ function initial(){
 			inputCtrl(document.form.wl_txbf, 1);
 			document.getElementById("wl_MU_MIMO_field").style.display = "";
 			document.form.wl_mumimo.disabled = false;
+		}
+
+		if(based_modelid == "4G-AC86U" || based_modelid == "4G-AX56" || based_modelid == "RT-AX53U" || based_modelid == "RT-AX54" || based_modelid == "XD4S"  || based_modelid == "TUF-AX4200"){
+			inputCtrl(document.form.wl_itxbf, 1);
+		}
+
+		if(based_modelid == "RT-AX53U" || based_modelid == "RT-AX54" || based_modelid == "XD4S"){
+			inputCtrl(document.form.wl_txbf, 1);			
+		}
+
+		if(MUMIMO2G_support){
+			document.getElementById("wl_MU_MIMO_field").style.display = "";
+			document.form.wl_mumimo.disabled = false;
+			if ((Qcawifi_support || Rawifi_support))
+				inputCtrl(document.form.wl_txbf, 1);
 		}
 	}
 

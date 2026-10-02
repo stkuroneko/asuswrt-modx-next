@@ -645,7 +645,7 @@ export CFLAGS := $(shell echo $(CFLAGS)| sed 's/-fno-common//g')
 endif
 
 ifeq ($(RTCONFIG_NOTIFICATION_CENTER),y)
-KERNEL_PTHREAD_ONE = $(if $(or $(findstring linux-4.4,$(LINUXDIR)),$(findstring linux-4.1,$(LINUXDIR)),$(findstring linux-3.10,$(LINUXDIR)),$(RTCONFIG_QCA)),y)
+KERNEL_PTHREAD_ONE = $(if $(or $(findstring linux-3,$(LINUXDIR)),$(findstring linux-4,$(LINUXDIR)),$(findstring linux-5,$(LINUXDIR))),y)
 export CONFIG_KERNEL_PTHREAD_ONE = $(KERNEL_PTHREAD_ONE)
 endif
 
@@ -890,6 +890,8 @@ IPTC_LIBS := -lip4tc $(if $(RTCONFIG_IPV6),-lip6tc,) -liptc
 obj-y += iptables-1.4.x
 ifeq ($(HND_ROUTER),y)
 obj-y += iproute2-4.3
+else ifeq ($(or $(RTAX53U),$(RTAX54),$(RT4GAX56),$(RTCONFIG_MT798X),$(if $(filter $(BUILD_NAME),XD4S),y,)),y)
+obj-y += iproute2-5.18.0
 else
 obj-y += iproute2-3.x
 endif
@@ -1755,6 +1757,8 @@ endif
 obj-$(RTCONFIG_HD_SPINDOWN) += sd-idle
 
 obj-$(HND_ROUTER) += dhcpfwd
+obj-$(RTCONFIG_DUPVIF) += dhcpfwd
+obj-$(RTCONFIG_DUPVIF) += dupvif
 
 obj-$(RTCONFIG_FSMD) += fsmd
 
@@ -2859,6 +2863,12 @@ ifneq ($(RT4GAC86U),y)
 	install $(LIBDIR)/libc.so.0 $(TARGETDIR)/lib/
 endif
 endif
+ifeq ($(TUFAX4200),y)
+	@if [ -d $(TARGETDIR)/www/images/TUF-AX4200Q ] ; then \
+		rm -rf $(TARGETDIR)/TUF-AX4200Q; \
+		mv $(TARGETDIR)/www/images/TUF-AX4200Q $(TARGETDIR)/TUF-AX4200Q; \
+	fi
+endif
 endif
 endif
 
@@ -3359,6 +3369,9 @@ ifeq ($(HND_ROUTER),y)
 	cp -u $(OPENSSL)/include/openssl/* $(BCM_FSBUILD_DIR)/public/include/openssl
 endif
 	install -D -m 0500 httpd/gencert.sh $(INSTALLDIR)$(INSTALLSUBDIR)/usr/sbin/gencert.sh
+ifeq ($(RTCONFIG_RALINK_MT7621),y)
+	install -D -m 0500 httpd/gencert_ecc.sh $(INSTALLDIR)$(INSTALLSUBDIR)/usr/sbin/gencert.sh
+endif
 endif
 
 openssl-stage:
@@ -5269,6 +5282,19 @@ iproute2-4.4.0-clean:
 	-@$(MAKE) -C iproute2-4.4.0 clean
 	-rm -f iproute2-4.4.0/src/Config
 
+iproute2-5.18.0:
+	touch iproute2-5.18.0/configure
+	$(MAKE) -C $@ IPTABLES_DIR=$(TOP)/$(IPTABLES) KERNEL_INCLUDE=$(TOP)/kernel_header/include EXTRACFLAGS="$(EXTRACFLAGS) $(if $(RTCONFIG_IPV6),-DUSE_IPV6,-DNO_IPV6)" && $(MAKE) -C $@ stage
+
+iproute2-5.18.0-install:
+	install -D iproute2-5.18.0/tc/tc $(INSTALLDIR)/iproute2-5.18.0/usr/sbin/tc
+	install -D iproute2-5.18.0/ip/ip $(INSTALLDIR)/iproute2-5.18.0/usr/sbin/ip
+	-$(STRIP) $(INSTALLDIR)/iproute2-5.18.0/usr/sbin/*
+
+iproute2-5.18.0-clean:
+	-@$(MAKE) -C iproute2-5.18.0 clean
+	-rm -f iproute2-5.18.0/config.mk
+
 ntpclient: nvram$(BCMEX)$(EX7) shared $(if $(BCM_502L07P2),ethctl_lib)
 
 ntpclient-install:
@@ -6812,11 +6838,11 @@ fb_wifi-clean:
 #libssh2
 libssh2-stage:
 	@$(SEP)
-	@$(MAKE) libssh2-1.9.0-stage
+	@$(MAKE) libssh2-1.10.0-stage
 
 libssh2/Makefile:
 	@$(SEP)
-	cd libssh2-1.9.0 && autoreconf -fi && $(CONFIGURE) --prefix=/usr CC=$(CC) CXX=$(CXX) AR=$(AR) RANLIB=$(RANLIB) --enable-shared --enable-static \
+	cd libssh2-1.10.0 && autoreconf -fi && $(CONFIGURE) --prefix=/usr CC=$(CC) CXX=$(CXX) AR=$(AR) RANLIB=$(RANLIB) --enable-shared --enable-static \
 	$(if $(RTCONFIG_OPENSSL11)$(RTCONFIG_OPENSSL10),--with-libssl-prefix=$(STAGEDIR)/usr,--without-openssl) \
 	--with-libz-prefix=$(STAGEDIR)/usr \
 	--with-libgcrypt-prefix=$(TOP)/libgcrypt-1.5.1 \
@@ -6827,18 +6853,18 @@ libssh2/Makefile:
 
 libssh2: libgcrypt-1.5.1 zlib libssh2/Makefile
 	@$(SEP)
-	$(MAKE) -j 8 -C libssh2-1.9.0 && $(MAKE) $@-stage
+	$(MAKE) -j 8 -C libssh2-1.10.0 && $(MAKE) $@-stage
 
 libssh2-install:
 	@$(SEP)
-	pwd & install -D libssh2-1.9.0/src/.libs/libssh2.so.1.0.1 $(INSTALLDIR)/libssh2/usr/lib/libssh2.so.1.0.1
+	pwd & install -D libssh2-1.10.0/src/.libs/libssh2.so.1.0.1 $(INSTALLDIR)/libssh2/usr/lib/libssh2.so.1.0.1
 	$(STRIP) $(INSTALLDIR)/libssh2/usr/lib/libssh2.so.1.0.1
 	cd $(INSTALLDIR)/libssh2/usr/lib &&\
 	rm -f libssh2.so && ln -sf libssh2.so.1.0.1 libssh2.so && \
 	rm -f libssh2.so.1 && ln -sf libssh2.so.1.0.1 libssh2.so.1
 
 libssh2-clean:
-	cd libssh2-1.9.0 && make clean
+	cd libssh2-1.10.0 && make clean
 
 #libcurl
 curl/configure:

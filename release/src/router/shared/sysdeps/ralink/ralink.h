@@ -849,6 +849,9 @@ struct GNU_PACKED wnm_command {
 #define OFFSET_HW_BOM	0x6FE0C	// 32 bytes
 #define OFFSET_HW_DATE_CODE	0x6FE3E	// 8 bytes
 #define OFFSET_HW_COBRAND       0x6FE46 // 1 byte
+#ifdef RTCONFIG_32BYTES_ODMPID  
+#define OFFSET_32BYTES_ODMPID   0x6FE47 // 32 bytes
+#endif
 #elif defined(RT4GAC86U)
 #define OFFSET_TERRITORY_CODE	0x5ff90	/* 5 bytes, e.g., US/01, US/02, TW/01, etc. */
 #define OFFSET_DEV_FLAGS	0x5ffa0 //device dependent flags

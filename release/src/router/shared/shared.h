@@ -217,6 +217,8 @@ extern int PS_pclose(FILE *);
 
 #define GPIO_DIR_IN	0
 #define GPIO_DIR_OUT	1
+#define GPIO_DIR_OUT_LOW	(2)
+#define GPIO_DIR_OUT_HIGH	(3)
 
 #define PROC_IRQ		"/proc/irq"
 #define SYS_CLASS_MTD		"/sys/class/mtd"
@@ -1618,6 +1620,53 @@ static inline int __aimesh_re_node(int __attribute__((__unused__)) sw_mode) { re
 static inline int aimesh_re_node(void) { return 0; }
 #endif
 
+#if defined(RTCONFIG_RALINK_BUILDIN_WIFI)
+static inline int is_bss_enabled(char __attribute__((unused)) *prefix) { return 1; }
+#else
+static inline int is_bss_enabled(char *prefix)
+{
+	if (!prefix || *prefix == '\0')
+		return 0;
+
+	return nvram_pf_match(prefix, "bss_enabled", "1");
+}
+#endif
+
+#if defined(RTCONFIG_WIRELESSREPEATER)
+#if defined(RTCONFIG_CONCURRENTREPEATER)
+static inline int __is_rp_wlc_band(int sw_mode, int band)
+{
+        int wlc_express = nvram_get_int("wlc_express");
+
+        if (sw_mode == SW_MODE_REPEATER && ((wlc_express == 0 || (wlc_express - 1) != band))
+                return 1;
+        return 0;
+}
+
+static inline int is_rp_wlc_band(int band)
+{
+        return __is_rp_wlc_band(sw_mode(), band);
+}
+#else	/* !RTCONFIG_CONCURRENTREPEATER */
+static inline int __is_rp_wlc_band(int sw_mode, int band)
+{
+        int wlc_band = nvram_get_int("wlc_band");
+
+        if (sw_mode == SW_MODE_REPEATER && (wlc_band == band))
+                return 1;
+        return 0;
+}
+
+static inline int is_rp_wlc_band(int band)
+{
+        return __is_rp_wlc_band(sw_mode(), band);
+}
+#endif	/* RTCONFIG_CONCURRENTREPEATER */
+#else
+static inline int __is_rp_wlc_band(int __attribute__((unused)) sw_mode, int __attribute__((unused)) band) { return 0; }
+static inline int is_rp_wlc_band(int __attribute__((unused)) band) { return 0; }
+#endif	/* RTCONFIG_WIRELESSREPEATER */
+
 #if defined(RTCONFIG_WIFI_QCN5024_QCN5054) && !defined(RTCONFIG_SOC_IPQ60XX)
 static inline char *sta_default_mode(int band)
 {
@@ -1956,7 +2005,7 @@ static inline int eth_wantype(int unit)
 #ifdef CONFIG_BCMWL5
 extern int get_ifname_unit(const char* ifname, int *unit, int *subunit);
 
-static inline int guest_wlif(char *ifname)
+static inline int guest_wlif(const char *ifname)
 {
 	int unit = -1, subunit = -1;
 
@@ -1975,7 +2024,7 @@ static inline int guest_wlif(char *ifname)
 #endif
 }
 #elif defined RTCONFIG_RALINK
-static inline int guest_wlif(char *ifname)
+static inline int guest_wlif(const char *ifname)
 {
 	return strncmp(ifname, "ra", 2) == 0 && !strchr(ifname, '0');
 }
@@ -1987,10 +2036,10 @@ static inline int guest_wlif(char *ifname)
  * 	0:	@ifname is not any guest network interface name.
  *  otherwise:	@ifname is one of gueset network interface name.
  */
-static inline int guest_wlif(char *ifname)
+static inline int guest_wlif(const char *ifname)
 {
 	int r, r1, v;
-	char *p = ifname + 4;
+	const char *p = ifname + 4;
 
 	r = !strncmp(ifname, "ath0", 4) || !strncmp(ifname, "ath1", 4) || !strncmp(ifname, "ath2", 4);
 	if (r) {
@@ -2088,6 +2137,17 @@ static inline int guest_wlif(char *ifname)
 
 	return 0;
 }
+#endif
+
+#if defined(RTCONFIG_TCODE)
+static inline int is_tcode_country(char *cc)
+{
+	if (!cc)
+		return 0;
+	return !strncmp(nvram_safe_get("territory_code"), cc, 2);
+}
+#else
+static inline int is_tcode_country(char __attribute__((unused) *cc) { return 0; }
 #endif
 
 extern int init_gpio(void);
@@ -2227,8 +2287,10 @@ extern void __wgn_sysdep_swtich_set(int vid) __attribute__((weak));
 #if defined(RTCONFIG_FITFDT)
 extern int get_imageheader_size(void);
 #endif
-#if defined(RTCONFIG_QCA)
+#if defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
 extern void __gen_switch_log(char *fn) __attribute__((weak));
+#endif
+#if defined(RTCONFIG_QCA)
 extern char *__get_wlifname(int band, int subunit, char *buf);
 extern int get_wlsubnet(int band, const char *ifname);
 extern int get_wlif_unit(const char *wlifname, int *unit, int *subunit);
@@ -2267,6 +2329,10 @@ extern void execute_bt_bscp();
 #endif
 extern uint32_t pwm_export(uint8_t channel, uint32_t period, uint32_t duty_cycle);
 #endif // end of RTCONFIG_QCA
+#if defined(RTCONFIG_RALINK) && defined(RTCONFIG_MT798X)
+extern uint32_t is_pwm_exported(uint8_t channel);
+extern uint32_t pwm_export(uint8_t channel, uint32_t period, uint32_t duty_cycle);
+#endif // end of RTCONFIG_RALINK
 #if defined(RTCONFIG_REALTEK)
 extern char *get_wififname(int band);
 extern char *get_staifname(int band);
@@ -2377,6 +2443,8 @@ extern int get_psta_status(int unit);
 #if defined(RTCONFIG_QCA)
 extern int get_psta_status(int unit);
 #endif
+
+extern void create_amas_sys_folder();
 
 #define WLSTA_JSON_FILE 				"/tmp/wl_sta_list.json"
 #define MAX_STA_COUNT 128
@@ -3303,9 +3371,12 @@ extern int set_bled_udef_pattern(const char *led_gpio, unsigned int interval, co
 extern int set_bled_udef_tigger(const char *main_led_gpio, const char *tigger);
 extern int set_bled_normal_mode(const char *led_gpio);
 extern int set_bled_udef_pattern_mode(const char *led_gpio);
-extern int start_bled(unsigned int gpio_nr);
-extern int stop_bled(unsigned int gpio_nr);
-extern int del_bled(unsigned int gpio_nr);
+extern int __start_bled(const char *led_gpio, unsigned int gpio_nr);
+extern int __stop_bled(const char *led_gpio, unsigned int gpio_nr);
+extern int __del_bled(const char *led_gpio, unsigned int gpio_nr);
+static inline int start_bled(unsigned int gpio_nr) { return __start_bled(NULL, gpio_nr); }
+static inline int stop_bled(unsigned int gpio_nr) { return __stop_bled(NULL, gpio_nr); }
+static inline int del_bled(unsigned int gpio_nr) { return __del_bled(NULL, gpio_nr); }
 extern int append_netdev_bled_if(const char *led_gpio, const char *ifname);
 extern int remove_netdev_bled_if(const char *led_gpio, const char *ifname);
 extern int __config_swports_bled(const char *led_gpio, unsigned int port_mask, unsigned int min_blink_speed, unsigned int interval, int sleep);
@@ -3403,12 +3474,27 @@ static inline void enable_wifi_bled(char *ifname)
 		v = LED_OFF;	/* WiFi not ready. Don't turn on WiFi LED here. */
 #endif
 #if defined(RTAC1200HP) || defined(RTN56UB1) || defined(RTN56UB2) || defined(RTAC1200GA1) || defined(RTAC1200GU) || defined(RTAC85U) || defined(RTAC85P) || defined(RTACRH26) || defined(TUFAC1750) || defined(RT4GAC86U) || defined(RTACRH18) || defined(RT4GAX56)
-		if(!get_radio(1, 0) && unit==1) //*5G WiFi not ready. Don't turn on WiFi GPIO LED . */
+		if(!get_radio(1, 0) && unit==1) /* 5G WiFi not ready. Don't turn on WiFi GPIO LED . */
 		 	v=LED_OFF;
 #endif
 #if defined(RTN56UB1) || defined(RTN56UB2) || defined(RTAC1200GA1) || defined(RTAC1200GU) || defined(RTAC85U) || defined(RTAC85P) || defined(RTN800HP) || defined(RTACRH26) || defined(TUFAC1750) || defined(RT4GAC86U) || defined(RTACRH18) || defined(RT4GAX56)
-		if(!get_radio(0, 0) && unit==0) //*2G WiFi not ready. Don't turn on WiFi GPIO LED . */
+		if(!get_radio(0, 0) && unit==0) /* 2G WiFi not ready. Don't turn on WiFi GPIO LED . */
 		 	v=LED_OFF;
+#endif
+#if defined(RTCONFIG_MT798X)
+		if (get_model() == MODEL_TUFAX4200 && nvram_match("HwId", "B")) {
+			/* 2G/5G use same LED. */
+			if (!nvram_match("wl0_radio", "1") && !nvram_match("wl1_radio", "1")) {
+				v = LED_OFF;
+			}
+		} else {
+			char prefix[sizeof("wlXXX_")] __attribute__((unused));
+
+			snprintf(prefix, sizeof(prefix), "wl%d_", unit);
+			if (!nvram_pf_match(prefix, "radio", "1")) {	/* WiFi is disabled. Don't turn on WiFi LED here. */
+				v = LED_OFF;
+			}
+		}
 #endif
 		led_control(get_wl_led_id(unit), v);
 	} else {
@@ -3481,6 +3567,9 @@ static inline int set_bled_udef_pattern(__attribute__ ((unused)) const char *led
 static inline int set_bled_udef_tigger(__attribute__ ((unused)) const char *main_led_gpio, __attribute__ ((unused)) const char *tigger) { return 0; }
 static inline int set_bled_normal_mode(__attribute__ ((unused)) const char *led_gpio) { return 0; }
 static inline int set_bled_udef_pattern_mode(__attribute__ ((unused)) const char *led_gpio) { return 0; }
+static inline int __start_bled(__attribute__ ((unused)) const char *led_gpio, __attribute__ ((unused)) unsigned int gpio_nr) { return 0; }
+static inline int __stop_bled(__attribute__ ((unused)) const char *led_gpio, __attribute__ ((unused)) unsigned int gpio_nr) { return 0; }
+static inline int __del_bled(__attribute__ ((unused)) const char *led_gpio, __attribute__ ((unused)) unsigned int gpio_nr) { return 0; }
 static inline int start_bled(__attribute__ ((unused)) unsigned int gpio_nr) { return 0; }
 static inline int stop_bled(__attribute__ ((unused)) unsigned int gpio_nr) { return 0; }
 static inline int chg_bled_state(__attribute__ ((unused)) unsigned int gpio_nr) { return 0; }
@@ -3580,6 +3669,10 @@ extern int FindBrifByWlif(const char *wl_ifname, char *brif_name, int size);
 #endif
 
 #ifdef RTCONFIG_HTTPS
+#if defined(RTCONFIG_RALINK_MT7621)
+#define CERT_VERSION "20221011"
+#define CERT_VERSION_PATH "/jffs/cert.version"
+#endif
 #define HTTPD_CERT	"/etc/cert.pem"
 #define HTTPD_KEY	"/etc/key.pem"
 #define LIGHTTPD_CERTKEY	"/etc/server.pem"

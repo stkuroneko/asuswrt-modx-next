@@ -152,7 +152,7 @@ Set Up Environment(Tested in Fedora 8/9 and Ubuntu)
 	=================================
 
 		To install the tools:
-		    - extract tools/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24.tgz to /opt
+		    - extract tools/openwrt-gcc840_musl-1.1.24.aarch64.tar.bz2 to /opt
 		    If your PC environment is 32bit or Ubuntu 16, extract tools/openwrt-gcc840_musl-1.1.24.aarch64-U16-32bit.tar.bz2 instead
 
 	Qualcomm QCA9557/QCA953x/QCA956x MIPS SoC models
