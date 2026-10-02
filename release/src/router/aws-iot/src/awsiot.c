@@ -1900,6 +1900,12 @@ void init_basic_data()
 
     while(1) {
 
+        if (nvram_get_int("ASUS_EULA") == 0)
+        {
+            sleep(30);
+            continue;
+        }
+
         ready_count++;
 
         int ntp_ready = nvram_get_int("ntp_ready");
@@ -2151,6 +2157,14 @@ int run_subscribe_topic(MQTTContext_t * pMqttContext, bool * pMqttSessionEstabli
 
     do {
         while_count++;
+
+        if (nvram_get_int("ASUS_EULA") == 0)
+        {
+            //- EULA level is not allow and exit awsiot.
+            Cdbg(APP_DBG, "EULA level is not allow and exit awsiot.");
+            returnStatus = EXIT_AWSIOT;
+            break;
+        }
 
         if(publish_running) {
             sleep( WAITING_PUBLISHES_SECONDS );

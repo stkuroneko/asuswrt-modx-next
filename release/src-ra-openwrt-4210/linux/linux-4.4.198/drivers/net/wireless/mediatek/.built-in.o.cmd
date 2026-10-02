@@ -1,1 +1,0 @@
-cmd_drivers/net/wireless/mediatek/built-in.o :=  /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-musl-ld  -m elf32ltsmip   -r -o drivers/net/wireless/mediatek/built-in.o drivers/net/wireless/mediatek/mt_wifi_7915_v7400/mt_wifi_ap/built-in.o 

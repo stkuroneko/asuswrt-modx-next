@@ -538,7 +538,7 @@ endif
 
 aae_ipc.o:
 ifeq ($(wildcard $(SRCBASE)/router/aaews/*.c),)
-	cp -f $(TOP)/aaews/prebuild/aae_ipc.o ./
+    cp -f $(TOP)/aaews/prebuild/aae_ipc.o ./
 endif
 
 ifeq ($(RTCONFIG_USB),y)
