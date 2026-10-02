@@ -384,6 +384,9 @@ wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit)
 	char tmp[128], prefix[] = "wlXXXXXXXXXX_", *ifname;
 	int wl_mode_x;
 	int r;
+#if defined(RTCONFIG_AMAS)
+	uint64_t all_ch_m = 0, unavbl_ch_m = 0;
+#endif
 
 	snprintf(prefix, sizeof(prefix), "wl%d_", unit);
 	ifname = nvram_safe_get(strlcat_r(prefix, "ifname", tmp, sizeof(tmp)));
@@ -621,7 +624,11 @@ wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit)
 			m |= ch5g2bitmask(radar_list[i]);
 		}
 #if defined(RTCONFIG_AMAS)
-		m |= chlist5g2bitmask(nvram_pf_get(prefix, "unavbl_ch"), ",");
+		all_ch_m = get_channel_list_mask(unit);
+		unavbl_ch_m = chlist5g2bitmask(nvram_pf_get(prefix, "unavbl_ch"), ",");
+		if (unavbl_ch_m && unavbl_ch_m == all_ch_m)
+			unavbl_ch_m = 0;
+		m |= unavbl_ch_m & DFS_CH_M;
 #endif
 	}
 	if (m) {
@@ -1547,6 +1554,9 @@ static int wl_scan(int eid, webs_t wp, int argc, char_t **argv, int unit)
 	SSA *ssap;
 	char tmp[128], prefix[] = "wlXXXXXXXXXX_";
 	int lock;
+#if defined(RTCONFIG_MTK_BSD)
+	int restart_bs20 = 0;
+#endif
 
 	snprintf(prefix, sizeof(prefix), "wl%d_", unit);
 	memset(data, 0x00, 255);
@@ -1554,7 +1564,12 @@ static int wl_scan(int eid, webs_t wp, int argc, char_t **argv, int unit)
 	wrq.u.data.length = strlen(data)+1;
 	wrq.u.data.pointer = data;
 	wrq.u.data.flags = 0;
-
+#if defined(RTCONFIG_MTK_BSD)
+	if (nvram_match("smart_connect_x", "1") && pids("bs20")) {
+		eval("rc", "rc_service", "stop_mtk_bs20");
+		restart_bs20 = 1;
+	}
+#endif
 	lock = file_lock("nvramcommit");
 	if (wl_ioctl(nvram_safe_get(strlcat_r(prefix, "ifname", tmp, sizeof(tmp))), RTPRIV_IOCTL_SET, &wrq) < 0)
 	{
@@ -1563,6 +1578,7 @@ static int wl_scan(int eid, webs_t wp, int argc, char_t **argv, int unit)
 		return 0;
 	}
 	file_unlock(lock);
+	
 	dbg("Please wait");
 	sleep(1);
 	dbg(".");
@@ -1582,6 +1598,11 @@ static int wl_scan(int eid, webs_t wp, int argc, char_t **argv, int unit)
 		dbg("errors in getting site survey result\n");
 		return 0;
 	}
+#if defined(RTCONFIG_MTK_BSD)
+	if (restart_bs20) {
+		eval("rc", "rc_service", "start_mtk_bs20");
+	}
+#endif
 	memset(header, 0, sizeof(header));
 	//snprintf(header, sizeof(header), "%-3s%-33s%-18s%-8s%-15s%-9s%-8s%-2s\n", "Ch", "SSID", "BSSID", "Enc", "Auth", "Siganl(%)", "W-Mode", "NT");
 #if 0// defined(RTN14U)

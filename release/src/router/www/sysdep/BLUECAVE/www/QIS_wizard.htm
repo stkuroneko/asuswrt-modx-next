@@ -148,6 +148,7 @@
 					systemVariable.forceChangePw = (httpApi.hookGet("check_pw") == '1') ? true : false;
 					systemVariable.linkLnternet = httpApi.isConnected();
 					systemVariable.maxPasswordLen = getSupportNum("MaxLen_http_passwd");
+					systemVariable.keepDefpsk = (systemVariable.productid == "RT-AX53U" && isSupport("defpsk") && isSku("JP")) ? true : false;
 
 					httpApi.log("tcode", systemVariable.territoryCode, systemVariable.qisSession)
 

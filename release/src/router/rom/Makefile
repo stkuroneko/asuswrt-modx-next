@@ -87,7 +87,7 @@ install:
 	mkdir -p $(INSTALLDIR)
 	( tar --exclude=.svn --exclude=*.bak -cpf - rom bin ) | ( cd $(INSTALLDIR) && tar -xpf - )
 ifeq ($(RTCONFIG_DEBUG),y)
-	$(if $(or $(RTCONFIG_SOC_IPQ8064),$(RTCONFIG_SOC_IPQ8074)),install -m 0755 gdb.ipq806x $(INSTALLDIR)/bin/gdb)
+	$(if $(or $(RTCONFIG_SOC_IPQ8064),$(RTCONFIG_SOC_IPQ8074)),install -m 0755 $(if $(filter y,$(MUSL64)),gdb.ipq807x.musl64,gdb.ipq806x) $(INSTALLDIR)/bin/gdb)
 	$(if $(RTCONFIG_MT798X),install -m 0755 gdb-10.1-arm64-musl $(INSTALLDIR)/bin/gdb)
 	$(if $(RTCONFIG_RALINK_MT7621),install -m 0755 gdb.mips-musl $(INSTALLDIR)/bin/gdb)
 endif
@@ -321,6 +321,14 @@ ifeq ($(BUILD_NAME), GTAX6000)
 	install -m 0755 dlna/icon_sm.gt-ax6000_eva.png $(INSTALLDIR)/rom/dlna/icon_eva_sm.png
 	install -m 0755 dlna/icon_lrg.gt-ax6000_eva.jpg $(INSTALLDIR)/rom/dlna/icon_eva_lrg.jpg
 	install -m 0755 dlna/icon_lrg.gt-ax6000_eva.png $(INSTALLDIR)/rom/dlna/icon_eva_lrg.png
+endif
+ifeq ($(BUILD_NAME),TUF-AX4200)
+	# Non-default icon files
+	mkdir -p $(INSTALLDIR)/rom/dlna.TUF-AX4200Q
+	install -m 0755 dlna/icon_sm.tuf-ax4200q.jpg $(INSTALLDIR)/rom/dlna.TUF-AX4200Q/icon_sm.jpg
+	install -m 0755 dlna/icon_sm.tuf-ax4200q.png $(INSTALLDIR)/rom/dlna.TUF-AX4200Q/icon_sm.png
+	install -m 0755 dlna/icon_lrg.tuf-ax4200q.jpg $(INSTALLDIR)/rom/dlna.TUF-AX4200Q/icon_lrg.jpg
+	install -m 0755 dlna/icon_lrg.tuf-ax4200q.png $(INSTALLDIR)/rom/dlna.TUF-AX4200Q/icon_lrg.png
 endif
 ifeq ($(and $(LJPG),$(SJPG),$(LPNG),$(SPNG)),)
 	$(warning Add media server icon for $(BUILD_NAME) !!!!!!!!!!!!)

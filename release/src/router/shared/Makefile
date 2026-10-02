@@ -505,7 +505,7 @@ install: all
 	@echo " [shared] Installing as $(INSTALLDIR)/usr/lib/libshared.so"
 	@install -d $(INSTALLDIR)/usr/lib
 	@install -m 755 libshared.so $(INSTALLDIR)/usr/lib
-	@$(STRIP) $(INSTALLDIR)/usr/lib/libshared.so
+	$(if $(RTCONFIG_DEBUG),,@$(STRIP) $(INSTALLDIR)/usr/lib/libshared.so)
 
 clean:
 	rm -f *.o *.so *.a .*.depend *.prep sysdeps/*.o sysdeps/broadcom/*.o sysdeps/ralink/*.o sysdeps/qtn/*.o

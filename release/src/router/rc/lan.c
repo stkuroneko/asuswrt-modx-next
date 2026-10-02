@@ -2413,7 +2413,6 @@ _dprintf("nat_rule: stop_nat_rules 1.\n");
 #if defined(RTCONFIG_AMAS_MTK_EZWDS)
 	set_ezwds_radio_type();
 #endif  
-
 	post_start_lan();
 	_dprintf("%s %d\n", __FUNCTION__, __LINE__);
 }
@@ -5160,7 +5159,9 @@ gmac3_no_swbr:
 #if defined(RTCONFIG_AMAS_MTK_EZWDS)
 	set_ezwds_radio_type();
 #endif
-
+#if defined(RTCONFIG_MTK_BSD)
+	start_mtk_bs20();
+#endif	
 
 	free(lan_ifname);
 
@@ -6056,8 +6057,14 @@ void restart_wireless(void)
 		}
 	}
 #endif
-#if defined(RTCONFIG_AMAS) && defined(RTCONFIG_VIF_ONBOARDING)
+#if defined(RTCONFIG_AMAS)
+#if defined(RTCONFIG_VIF_ONBOARDING)
 	set_onboarding_vif_status();
+#endif	//RTCONFIG_VIF_ONBOARDING
+	if (nvram_get_int("re_mode") == 1) {
+		if (killall("amas_lanctrl", SIGUSR1) != 0)
+			nvram_set_int("amas_recheck_bss", 1);
+	}
 #endif
 #ifdef RTCONFIG_CFGSYNC
 	send_event_to_cfgmnt(EID_RC_RESTART_WIRELESS);

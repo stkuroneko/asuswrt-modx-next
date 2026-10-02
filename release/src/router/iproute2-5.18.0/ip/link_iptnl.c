@@ -11,7 +11,10 @@
  */
 
 #include <string.h>
+#if !defined(__GLIBC__) && !defined(__UCLIBC__) /* musl */
+#else
 #include <net/if.h>
+#endif
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>

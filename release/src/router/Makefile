@@ -1108,6 +1108,15 @@ ifeq ($(RTCONFIG_QCA_LBD),y)
 obj-y  += jansson-2.7
 endif
 
+
+ifeq ($(RTCONFIG_MTK_BSD),y)
+ifeq ($(BUILD_NAME), $(filter $(BUILD_NAME), XD4S ))
+obj-y  += wapp
+obj-y  += mapd
+endif
+endif
+
+
 obj-$(RTCONFIG_BATMAN_ADV) += libnl-bf
 obj-$(RTCONFIG_BATMAN_ADV) += batctl-2016.0
 
@@ -4929,7 +4938,7 @@ endif
 nt_center/stamp-h1:
 	touch $@
 
-nt_center: nt_center/stamp-h1 wb curl libxml2
+nt_center: nt_center/stamp-h1 wb curl libxml2 $(if $(RTCONFIG_DMALLOC),dmalloc)
 	$(MAKE) -C nt_center
 
 
@@ -4943,12 +4952,12 @@ nt_center-install: nt_center
 	install -D nt_center/Notify_Event2NC $(INSTALLDIR)/nt_center/usr/sbin/Notify_Event2NC
 	install -D nt_center/lib/nt_db $(INSTALLDIR)/nt_center/usr/sbin/nt_db
 	#install -D nt_center/lib/nt_db_test $(INSTALLDIR)/nt_center/usr/sbin/nt_db_test
-	$(STRIP) $(INSTALLDIR)/nt_center/usr/lib/libnt.so
-	$(STRIP) $(INSTALLDIR)/nt_center/usr/sbin/nt_center
-	$(STRIP) $(INSTALLDIR)/nt_center/usr/sbin/nt_monitor
-	$(STRIP) $(INSTALLDIR)/nt_center/usr/sbin/nt_actMail
-	$(STRIP) $(INSTALLDIR)/nt_center/usr/sbin/Notify_Event2NC
-	$(STRIP) $(INSTALLDIR)/nt_center/usr/sbin/nt_db
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)/nt_center/usr/lib/libnt.so)
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)/nt_center/usr/sbin/nt_center)
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)/nt_center/usr/sbin/nt_monitor)
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)/nt_center/usr/sbin/nt_actMail)
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)/nt_center/usr/sbin/Notify_Event2NC)
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)/nt_center/usr/sbin/nt_db)
 	#$(STRIP) $(INSTALLDIR)/nt_center/usr/sbin/nt_db_test
 
 nt_center-clean:
@@ -7554,7 +7563,8 @@ wget-install:
 
 rtk_wifi_eventd: $(if $(RTCONFIG_CFGSYNC), cfg_mnt)
 
-cfg_mnt: $(if $(RTCONFIG_NOTIFICATION_CENTER),nt_center sqlite wlc_nt) $(if $(RTCONFIG_AMAS),$(LLDPD) amas-utils) $(if $(RTCONFIG_LANTIQ),libfapi-0.1) libasuslog
+cfg_mnt: $(if $(RTCONFIG_NOTIFICATION_CENTER),nt_center sqlite wlc_nt) $(if $(RTCONFIG_AMAS),$(LLDPD) amas-utils) $(if $(RTCONFIG_LANTIQ),libfapi-0.1) libasuslog \
+	$(if $(RTCONFIG_DMALLOC),dmalloc)
 
 batctl-2016.0: libnl-bf
 	CFLAGS="-Os -ffunction-sections -fdata-sections $(CFLAGS)" \
@@ -8287,9 +8297,9 @@ amas-utils-clean:
 amas-utils-install:
 	install -d $(INSTALLDIR)/amas-utils/usr/lib/
 	install -D amas-utils/libamas-utils.so $(INSTALLDIR)/amas-utils/usr/lib/libamas-utils.so
-	$(STRIP) -s $(INSTALLDIR)/amas-utils/usr/lib/libamas-utils.so
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) -s $(INSTALLDIR)/amas-utils/usr/lib/libamas-utils.so)
 	install -D amas-utils/amas-utils-cli $(INSTALLDIR)/amas-utils/usr/sbin/amas-utils-cli
-	$(STRIP) -s $(INSTALLDIR)/amas-utils/usr/sbin/amas-utils-cli
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) -s $(INSTALLDIR)/amas-utils/usr/sbin/amas-utils-cli)
 
 json-c/stamp-h1:
 ifeq ($(RTCONFIG_LANTIQ),y)
@@ -8303,7 +8313,7 @@ else
 	cd $(TOP)/json-c && \
 	$(CONFIGURE) --prefix=/usr --enable-shared --disable-static \
 	ac_cv_func_realloc_0_nonnull=yes ac_cv_func_malloc_0_nonnull=yes \
-	CFLAGS="-Os -Wno-error $(EXTRACFLAGS)" \
+	CFLAGS="-Os -Wno-error $(EXTRACFLAGS) $(if $(RTCONFIG_DEBUG),-g)" \
 	LDFLAGS="$(EXTRALDFLAGS) -Wl,--as-needed -lm"
 	touch $@
 endif
@@ -8313,7 +8323,7 @@ json-c: json-c/stamp-h1
 
 json-c-install: json-c
 	install -D json-c/.libs/libjson-c.so.2.0.2 $(INSTALLDIR)/json-c/usr/lib/libjson-c.so.2.0.2
-	$(STRIP) $(INSTALLDIR)/json-c/usr/lib/libjson-c.so.2.0.2
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)/json-c/usr/lib/libjson-c.so.2.0.2)
 	cd $(INSTALLDIR)/json-c/usr/lib && \
 		ln -sf libjson-c.so.2.0.2 libjson-c.so && \
 		ln -sf libjson-c.so.2.0.2 libjson-c.so.2

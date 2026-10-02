@@ -1426,6 +1426,27 @@ int get_ipv4_service(void)
 	return get_ipv4_service_by_unit(wan_primary_ifunit());
 }
 
+#ifdef RTCONFIG_SOFTWIRE46
+int is_s46_service_by_unit(int unit)
+{
+	int ret = 0;
+
+	switch (get_ipv4_service_by_unit(unit)) {
+	case WAN_MAPE:
+	case WAN_V6PLUS:
+	case WAN_OCNVC:
+		ret = 1;
+		break;
+	}
+	return ret;
+}
+
+int is_s46_service(void)
+{
+	return is_s46_service_by_unit(wan_primary_ifunit());
+}
+#endif
+
 #ifdef RTCONFIG_IPV6
 char *ipv6_nvname_by_unit(const char *name, int unit)
 {

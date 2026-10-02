@@ -272,7 +272,7 @@ function initial(){
 		else if(based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000") {
 			var desc = [ "LAN 1", "LAN 2", "LAN 3", "LAN 4" ];
 			var val = [ "0 1", "0 2", "0 3", "0 4" ];
-			if (based_modelid == "TUF-AX4200" && "<% nvram_get("HwId"); %>" == "B") {
+			if ((based_modelid == "TUF-AX4200" && "<% nvram_get("HwId"); %>" == "B") || based_modelid == "TUF-AX6000") {
 				desc.push("2.5G LAN");
 				val.push("0 5");
 			}
@@ -440,7 +440,7 @@ function genWANSoption(){
 				document.form.wan_unit.options[i] = new Option("10G base-T", i);
 			else if(wans_dualwan_NAME == "SFP+")
 				document.form.wan_unit.options[i] = new Option("10G SFP+", i);
-		} else if (based_modelid == "TUF-AX4200") {
+		} else if (based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000") {
 			if (wans_dualwan_NAME == "WAN")
 				document.form.wan_unit.options[i] = new Option("2.5G WAN", i);
 		}
@@ -448,7 +448,10 @@ function genWANSoption(){
 	
 	document.form.wan_unit.selectedIndex = '<% nvram_get("wan_unit"); %>';
 	if(wans_dualwan.search(" ") < 0 || wans_dualwan.split(" ")[1] == 'none' || !dualWAN_support)
+	{
 		document.getElementById("WANscap").style.display = "none";
+		document.form.wan_unit.value = 0; //avoid wan_unit=1 case
+	}
 }
 
 var reboot_confirm=0;

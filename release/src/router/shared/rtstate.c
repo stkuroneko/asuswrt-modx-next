@@ -1312,6 +1312,14 @@ char *get_default_ssid(int unit, int subunit)
 #elif defined(DSL_AX82U) && !defined(RTCONFIG_BCM_MFG)
 		if (is_ax5400_i1() && unit == WL_5G_BAND)
 			strlcat(ssid, "_5G", sizeof(ssid));
+#elif defined(RTAX53U)
+		if (!strncmp(nvram_safe_get("territory_code"), "JP", 2))
+		{
+			if(unit == WL_2G_BAND)
+				strlcat(ssid, "_2G", sizeof(ssid));
+			else
+				strlcat(ssid, "_5G", sizeof(ssid));
+		}
 #endif
 #if defined(RTCONFIG_NEWSSID_REV5)
 #if defined(RTAX56_XD4)
@@ -1368,7 +1376,6 @@ char *get_default_ssid(int unit, int subunit)
 		{
 			strlcat(ssid, post_5g, sizeof(ssid));
 		}
-
 		break;
 	case WL_5G_2_BAND:
 #if !defined(RTCONFIG_NEWSSID_REV4)

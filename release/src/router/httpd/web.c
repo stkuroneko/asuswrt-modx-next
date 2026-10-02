@@ -501,7 +501,7 @@ static int is_wireless_client(char *mac);
 static int is_cfg_client_by_unique_mac(P_CM_CLIENT_TABLE p_client_tbl, char *mac);
 static int is_cfg_client_by_sta_mac(P_CM_CLIENT_TABLE p_client_tbl, char *staMac);
 static void gen_wired_client_info(P_CM_CLIENT_TABLE p_client_tbl, json_object *wiredClietListObj, json_object *wiredInfoObj);
-static int check_wired_client_connected_node(char *nodeMac, char *wiredMac, json_object *wiredClietListObj, json_object *wiredInfoObj);
+static int check_wired_client_connected_node(P_CM_CLIENT_TABLE p_client_tbl, char *nodeMac, char *wiredMac, json_object *wiredClietListObj, json_object *wiredInfoObj);
 #ifdef RTCONFIG_FRONTHAUL_DWB
 int get_fronthaul_network_capability_val();
 #endif
@@ -8740,7 +8740,7 @@ static int get_amas_wired_client_info(struct json_object *json_object_ptr, AMAS_
 					continue;
 
 				/* filter not connected to correct node */
-				if (!check_wired_client_connected_node(key, (char *)json_object_get_string(wiredClientEntry), wiredClietListObj, wiredInfoObj))
+				if (!check_wired_client_connected_node(p_client_tbl, key, (char *)json_object_get_string(wiredClientEntry), wiredClietListObj, wiredInfoObj))
 					continue;
 
 				if (!wired_client_first)
@@ -9280,7 +9280,7 @@ static int get_client_detail_info(struct json_object *clients, struct json_objec
  			json_object_object_add(client, "isOnline", json_object_new_string("1"));
 			json_object_array_add(macArray, json_object_new_string(mac_buf));
 #else
-			json_object_object_add(client, "isOnline", json_object_new_string("0"));
+			json_object_object_add(client, "isOnline", json_object_new_string(online));
 #endif
 			json_object_object_add(client, "ssid", json_object_new_string(p_client_info_tab->ssid[i]));
 			if(!strcmp(ipaddr, nvram_safe_get("login_ip_str"))){
@@ -9532,38 +9532,24 @@ static int get_client_detail_info(struct json_object *clients, struct json_objec
 			if(!memcmp(wireless, "0", 1)) {
 				// get nmp_cl_json.js content -> is_wireless
 				if(get_wireless_client_info(mac_buf, &wireless) > 0) {
-					json_object_object_add(client, "isOnline", json_object_new_string("0"));
-					snprintf(online, sizeof(online), "%s", "0");
+					json_object_object_add(client, "isWL", json_object_new_string(wireless));
 				}
 			}
 			// end : get wireless type
 
-			struct json_object *isOnline = NULL;
-			json_object_object_get_ex(client, "isOnline", &isOnline);
-			//check isOnline attribute only on amas support(not when RTCONFIG_AMAS defined)
-			if(is_amas_support()) {
-				//handle wired client isOnline by networkmap
-				if(!memcmp(wireless, "0", 1)) {
-					if(p_client_info_tab->device_flag[i]&(1<<FLAG_EXIST)) {
-						json_object_object_add(client, "isOnline", json_object_new_string("1"));
-						json_object_array_add(macArray, json_object_new_string(mac_buf));
-					}
-					else
-						json_object_object_add(client, "isOnline", json_object_new_string("0"));
-				}
-				else if(isOnline && !strcmp(json_object_get_string(isOnline), "1")) {
- 					json_object_array_add(macArray, json_object_new_string(mac_buf));
-				} else {
-					json_object_object_add(client, "isOnline", json_object_new_string(online));
-					if(strcmp(online, "1") == 0) {
-						json_object_array_add(macArray, json_object_new_string(mac_buf));	
-					}
-				}
-			}
-			else {
-				json_object_object_add(client, "isOnline", json_object_new_string("1"));
-				json_object_array_add(macArray, json_object_new_string(mac_buf));
-			}
+            //check isOnline attribute only on amas support(not when RTCONFIG_AMAS defined)
+            if(is_amas_support()) {
+
+                json_object_object_add(client, "isOnline", json_object_new_string(online));
+
+                if(strcmp(online, "1") == 0) {
+                    json_object_array_add(macArray, json_object_new_string(mac_buf));   
+                }
+
+            } else {
+                json_object_object_add(client, "isOnline", json_object_new_string("1"));
+                json_object_array_add(macArray, json_object_new_string(mac_buf));
+            }
 #endif
 
 			json_object_object_add(clients, mac_buf, client);
@@ -29340,7 +29326,31 @@ static void gen_wired_client_info(P_CM_CLIENT_TABLE p_client_tbl, json_object *w
 	}
 }
 
-static int check_wired_client_connected_node(char *nodeMac, char *wiredMac, json_object *wiredClietListObj, json_object *wiredInfoObj)
+static int is_cfg_client_online(P_CM_CLIENT_TABLE p_client_tbl, char *mac)
+{
+	int i = 0;
+	int ret = 1;
+	char rmac_buf[18] = {0};
+
+	for(i = 0; i < p_client_tbl->count; i++) {
+		memset(rmac_buf, 0, sizeof(rmac_buf));
+		snprintf(rmac_buf, sizeof(rmac_buf), "%02X:%02X:%02X:%02X:%02X:%02X",
+			p_client_tbl->realMacAddr[i][0], p_client_tbl->realMacAddr[i][1],
+			p_client_tbl->realMacAddr[i][2], p_client_tbl->realMacAddr[i][3],
+			p_client_tbl->realMacAddr[i][4], p_client_tbl->realMacAddr[i][5]);
+
+		/* pass cap and check re only */
+		if (strcasecmp(rmac_buf, mac) == 0) {
+			if (i != 0)
+				ret = ((int) difftime(time(NULL), p_client_tbl->reportStartTime[i]) < OFFLINE_THRESHOLD) ? 1 : 0;
+			break;
+		}
+	}
+
+	return ret;
+}
+
+static int check_wired_client_connected_node(P_CM_CLIENT_TABLE p_client_tbl, char *nodeMac, char *wiredMac, json_object *wiredClietListObj, json_object *wiredInfoObj)
 {
 	int i = 0;
 	int wiredClientListLen = 0;
@@ -29355,6 +29365,9 @@ static int check_wired_client_connected_node(char *nodeMac, char *wiredMac, json
 	}
 
 	json_object_object_foreach(wiredClietListObj, key, val) {
+		if (!is_cfg_client_online(p_client_tbl, key) && !nvram_get("cfg_re_offline"))
+			continue;
+
 		json_object_object_get_ex(wiredInfoObj, key, &wiredInfoEntry);
 
 		if (!wiredInfoEntry) {

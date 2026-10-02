@@ -1252,6 +1252,9 @@ show_wliface_info(webs_t wp, int unit, char *ifname, char *op_mode)
 #endif
 	int i, ret = 0, cac = 0, radar_cnt = 0, radar_list[32];
 	uint64_t m = 0;
+#if defined(RTCONFIG_AMAS)
+	uint64_t all_ch_m = 0, unavbl_ch_m = 0;
+#endif
 	FILE *fp;
 	unsigned char mac_addr[ETHER_ADDR_LEN];
 	char tmpstr[1024], cmd[sizeof("iwconfig staXYYYYYY")], prefix[sizeof("wlX_XXX")];
@@ -1307,7 +1310,11 @@ show_wliface_info(webs_t wp, int unit, char *ifname, char *op_mode)
 			m |= ch5g2bitmask(radar_list[i]);
 		}
 #if defined(RTCONFIG_AMAS)
-		m |= chlist5g2bitmask(nvram_pf_get(prefix, "unavbl_ch"), ",");
+		all_ch_m = get_channel_list_mask(unit);
+		unavbl_ch_m = chlist5g2bitmask(nvram_pf_get(prefix, "unavbl_ch"), ",");
+		if (unavbl_ch_m && unavbl_ch_m == all_ch_m)
+			unavbl_ch_m = 0;
+		m |= unavbl_ch_m & DFS_CH_M;
 #endif
 	}
 	ret += websWrite(wp, "Bit Rate	: %s%s", tmpstr, cac? " (CAC scan)" : "");

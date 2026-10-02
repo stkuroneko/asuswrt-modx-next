@@ -24,6 +24,11 @@
 #include "utils.h"
 #include "tc_util.h"
 
+/* Below definitions should be defined in include/time.h of toolchain and older toolchain may not have it. */
+#ifndef CLOCK_BOOTTIME
+#define CLOCK_BOOTTIME           7
+#endif
+
 #define CLOCKID_INVALID (-1)
 static const struct static_clockid {
 	const char *name;

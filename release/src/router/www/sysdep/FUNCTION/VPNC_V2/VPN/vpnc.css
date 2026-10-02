@@ -41,7 +41,7 @@
 	height: auto;
 }
 .vpn_icon_all_collect{
-	background-image: url(/images/New_ui/VPN/vpn_icon_all_collect.svg);
+	background-image: url(/images/New_ui/vpn_icon_all_collect.svg);
 	background-repeat: no-repeat;
 }
 .server_list_container{
@@ -224,7 +224,7 @@
 	width: 24px;
 	height: 24px;
 	background-position: -108px -163px;
-	background-image: url(/images/New_ui/VPN/vpn_icon_all_collect.svg);
+	background-image: url(/images/New_ui/vpn_icon_all_collect.svg);
 	background-repeat: no-repeat;
 }
 .svr_list_add_icon, .client_list_add_icon{
@@ -321,7 +321,7 @@
 	width: 24px;
 	height: 24px;
 	background-position: -540px 0px;
-	background-image: url(/images/New_ui/VPN/vpn_icon_all_collect.svg);
+	background-image: url(/images/New_ui/vpn_icon_all_collect.svg);
 	background-repeat: no-repeat;
 }
 .svr_item_container.active .svr_item_main_info:before{
@@ -418,7 +418,7 @@
 }
 .svr_item_error_hint_container{
 	height: 32px;
-	margin-top: -10px;
+	margin-top: -16px;
 	margin-bottom: 10px;
 	background: rgb(0 0 0 / 50%);
 	border-radius: 0 0 8px 8px;
@@ -442,7 +442,7 @@
 	height: 24px;
 	right: 6%;
 	top: 4px;
-	background-image: url(/images/New_ui/VPN/vpn_icon_all_collect.svg);
+	background-image: url(/images/New_ui/vpn_icon_all_collect.svg);
 	background-repeat: no-repeat;
 	background-position: -216px -163px;
 }
@@ -599,7 +599,7 @@
 .btn_item .btn_container .text.import_file:before, .btn_item .btn_container .text.create_account:before{
 	position: absolute;
 	content: "";
-	background-image: url(/images/New_ui/VPN/vpn_icon_all_collect.svg);
+	background-image: url(/images/New_ui/vpn_icon_all_collect.svg);
 	background-repeat: no-repeat;
 	background-position: 0px -163px;
 	width: 24px;
@@ -1026,7 +1026,7 @@
 	left: -60px;
 	border-radius: 24px;
 	background-color: rgba(164, 183, 195, 0.2);
-	background-image: url(/images/New_ui/VPN/vpn_icon_all_collect.svg);
+	background-image: url(/images/New_ui/vpn_icon_all_collect.svg);
 	background-repeat: no-repeat;
 }
 .feature_desc .step_text.add:before{

@@ -83,6 +83,9 @@ enum
 #define USERAGENT			"Asuswrt/networkmap"
 #define NMP_VC_FILE_LOCK		"nmpvc"
 
+#define BRCTL_TABLE_PATH				"/tmp/nmp_brctl_table"
+
+#define CFG_FILE_LOCK					"cfg_mnt"
 #define ALLWCLIENT_LIST_JSON_PATH		"/tmp/allwclientlist.json"
 #define ALLWEVENT_FILE_LOCK				"allwevent"
 
@@ -226,6 +229,7 @@ typedef struct {
 
 	unsigned char	is_wireless[MAX_NR_CLIENT_LIST];
 	int        		conn_ts[MAX_NR_CLIENT_LIST];		// connect  timestamp
+	int        		offline_time[MAX_NR_CLIENT_LIST];
 /* wireless log information
 */
 #ifdef RTCONFIG_LANTIQ
@@ -276,6 +280,12 @@ int isBaseType(int type);
 
 int QueryConvTypes(P_CLIENT_DETAIL_INFO_TABLE p_client_detail_info_tab, int i);
 
+int get_brctl_macs(char * mac);
+
 int get_wrieless_info(P_CLIENT_DETAIL_INFO_TABLE p_client_detail_info_tab, const int i);
+
+void regularly_check_devices(P_CLIENT_DETAIL_INFO_TABLE p_client_detail_info_tab);
+
+void check_clientlist_offline(CLIENT_DETAIL_INFO_TABLE *p_client_detail_info_tab);
 
 #endif  /*__NETWORKMAP_H__*/

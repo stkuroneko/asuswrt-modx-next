@@ -214,10 +214,10 @@ function initial(){
 		add_options_x2(document.form.wans_lanport2, name, value, <% nvram_get("wans_lanport"); %>);
 	}
 
-	if (based_modelid == "TUF-AX4200") {
+	if (based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000") {
 		var desc = [ "LAN Port 1", "LAN Port 2", "LAN Port 3", "LAN Port 4" ];
 		var value = [ "1", "2", "3", "4" ];
-		if (based_modelid == "TUF-AX4200" && "<% nvram_get("HwId"); %>" == "B") {
+		if ((based_modelid == "TUF-AX4200" && "<% nvram_get("HwId"); %>" == "B") || based_modelid == "TUF-AX6000") {
 			desc.push("2.5G LAN");
 			value.push("5");
 		}
@@ -682,7 +682,7 @@ function addWANOption(obj, wanscapItem){
 					wanscapName = "10G base-T";
 				else if(wanscapName == "SFP+")
 					wanscapName = "10G SFP+";
-			} else if (based_modelid == "TUF-AX4200") {
+			} else if (based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000") {
 				if (wanscapName == "WAN")
 					wanscapName = "2.5G WAN";
 			}

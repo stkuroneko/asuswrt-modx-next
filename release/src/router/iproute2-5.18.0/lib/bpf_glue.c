@@ -8,6 +8,10 @@
 #include <limits.h>
 #include <unistd.h>
 
+#ifndef __NR_bpf
+#define __NR_bpf	386	/* arm = 386; aarch64 = 280 */
+#endif
+
 #include "bpf_util.h"
 #ifdef HAVE_LIBBPF
 #include <bpf/bpf.h>

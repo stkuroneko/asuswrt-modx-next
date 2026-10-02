@@ -445,7 +445,7 @@ static int build_temp_rootfs(const char *newroot)
 	struct utsname u;
 	const char *mdir[] = { "/proc", "/tmp", "/sys", "/usr", "/var", "/var/lock" };
 	const char *bin = "ash busybox cat cp dd df echo grep iwpriv kill ls ps mkdir mount nvram ping sh tar umount uname rm chmod mv klogd syslogd";
-	const char *sbin = "init rc hotplug2 insmod lsmod modprobe reboot rmmod rtkswitch"
+	const char *sbin = "init rc hotplug2 ifconfig insmod lsmod modprobe reboot rmmod rtkswitch"
 #if defined(RTCONFIG_BWDPI)
 		" bwdpi* rsasign_sig_check"
 #endif
@@ -466,7 +466,7 @@ static int build_temp_rootfs(const char *newroot)
 			     " cnssdaemon"
 #endif
 		;
-	const char *usrsbin __attribute__((unused)) = "httpd cru"
+	const char *usrsbin __attribute__((unused)) = "httpd brctl ip iptables ip6tables"
 #if defined(RTCONFIG_HTTPS)
 			     " httpds"
 #endif
@@ -533,6 +533,10 @@ static int build_temp_rootfs(const char *newroot)
 		"usb-common\\|"			/* usb-common.ko, kernel 3.2 or above */
 #endif
 #endif
+#if defined(RTCONFIG_IPV6)
+		"ip6t_REJECT\\|ip6t_ROUTE\\|ip6t_LOG\\|xt_length\\|"
+#endif
+		"xt_HL\\|xt_hl\\|"
 		"nvram_linux\\)'";		/* nvram_linux.ko */
 	const char *modules = "find /lib/modules -name 'modules.dep'";
 
@@ -553,9 +557,7 @@ static int build_temp_rootfs(const char *newroot)
 	__cp("", "/lib", lib, newroot);
 	__cp("", "/lib", "libcrypt*", newroot);
 	__cp("", "/usr/bin", usrbin, newroot);
-#ifdef RTCONFIG_BCMARM
 	__cp("", "/usr/sbin", usrsbin, newroot);
-#endif
 	__cp("", "/usr/lib", usrlib, newroot);
 	__cp("L", "/etc", "", newroot);		/* don't creat symbolic link (/tmp/etc/foo) that will be broken soon */
 
@@ -595,6 +597,12 @@ static int build_temp_rootfs(const char *newroot)
 		__cp("", "/usr/sbin", "openvpn", newroot);
 		__cp("", "/usr/lib", "libz.so* liblzo2.so* liblz4.so*", newroot);
 	}
+#endif
+#if defined(RTCONFIG_WIREGUARD)
+	/* Use dummy command instead of preparing environment for real one. */
+	snprintf(d1, sizeof(d1), "%s/usr/sbin/cru", newroot);
+	f_write_string(d1, "#!/bin/sh\n", 0, 0);
+	eval("chmod", "a+x", d1);
 #endif
 #if defined(RTCONFIG_IPSEC)
 	if (nvram_get_int("ipsec_server_enable") || nvram_get_int("ipsec_client_enable")
@@ -6414,6 +6422,29 @@ int write_lltd_conf(void)
 
 	return 0;
 }
+#elif defined(RTCONFIG_MT798X)
+int write_lltd_conf(void)
+{
+	char *model = NULL;
+	FILE *fp;
+
+	unlink("/etc/lld2d.conf");
+	if (!(fp = fopen("/etc/lld2d.conf", "w"))) {
+		perror("/etc/lld2d.conf");
+		return -1;
+	}
+
+#ifdef TUFAX4200
+	if (nvram_match("HwId", "B")) {	/* TUF-AX4200Q, CN sku */
+		model = "TUF-AX4200Q";
+	}
+#endif
+
+	fprintf(fp, "icon = /rom/etc/icon%s%s.ico\n", model? "." : "", model);
+	fprintf(fp, "jumbo-icon = /rom/etc/icon.large%s%s.ico\n", model? "." : "", model);
+	fclose(fp);
+	return 0;
+}
 #endif
 
 int start_lltd(void)
@@ -6446,7 +6477,7 @@ int start_lltd(void)
 	else
 #endif
 	{
-#ifdef RTCONFIG_BCMARM
+#if defined(RTCONFIG_BCMARM) || defined(RTCONFIG_MT798X)
 		write_lltd_conf();
 /* TODO: clarify do we need to use lan_hostname instead of productid here */
 		nvram_set("lld2d_hostname", get_productid());
@@ -10470,6 +10501,11 @@ start_services(void)
 #ifdef RTCONFIG_FSMD
 	system("fsmd");
 #endif
+#ifdef RTCONFIG_MTK_BSD
+	 system("mkdir -p /etc/map");
+	if (nvram_match("smart_connect_x", "1") && !pids("bs20"))
+		start_mtk_bs20();
+#endif	
 	return 0;
 }
 
@@ -10749,6 +10785,9 @@ stop_services(void)
 #ifdef HND_ROUTER
 	stop_jitterentropy();
 #endif /* HND_ROUTER */
+#ifdef RTCONFIG_MTK_BSD
+	stop_mtk_bs20();
+#endif	
 }
 
 #ifdef HND_ROUTER
@@ -15587,7 +15626,10 @@ retry_wps_enr:
 		|| defined(RTCONFIG_QSR10G) || defined(RTCONFIG_LANTIQ)
 	else if (strcmp(script, "wlcscan")==0)
 	{
-#if defined(RTCONFIG_QCA_LBD)
+#if defined(RTCONFIG_MTK_BSD) 
+		int restart_bs20 = 0;
+#endif
+#if defined(RTCONFIG_QCA_LBD) 
 		int restart_lbd = 0;
 #endif
 		if(action & RC_SERVICE_STOP) {
@@ -15597,6 +15639,12 @@ retry_wps_enr:
 				restart_lbd = 1;
 			}
 #endif
+#if defined(RTCONFIG_MTK_BSD)
+			if (nvram_match("smart_connect_x", "1") && pids("bs20")) {
+				stop_mtk_bs20();
+				restart_bs20 = 1;
+			}
+#endif
 			stop_wlcscan();
 		}
 		if(action & RC_SERVICE_START) {
@@ -15604,6 +15652,10 @@ retry_wps_enr:
 #if defined(RTCONFIG_QCA_LBD)
 			if (restart_lbd)
 				start_qca_lbd();
+#endif
+#if defined(RTCONFIG_MTK_BSD)
+			if (restart_bs20)
+				start_mtk_bs20();
 #endif
 		}
 	}
@@ -15703,6 +15755,10 @@ retry_wps_enr:
 			if (nvram_match("wlc_mode", "0"))
 				stop_qca_lbd();
 #endif
+#if defined(RTCONFIG_MTK_BSD)
+			if (nvram_match("wlc_mode", "0"))
+				stop_mtk_bs20();
+#endif
 
 #if defined(RTCONFIG_SAMBASRV) && defined(RTCONFIG_FTP)
 			stop_ftpd(0);
@@ -15765,6 +15821,10 @@ retry_wps_enr:
 #if defined(RTCONFIG_QCA_LBD)
 			if (nvram_match("wlc_mode", "1"))
 				start_qca_lbd();
+#endif
+#if defined(RTCONFIG_MTK_BSD)
+			if (nvram_match("wlc_mode", "1"))
+				start_mtk_bs20();
 #endif
 		}
 	}
@@ -15949,6 +16009,10 @@ retry_wps_enr:
 			_dprintf("[%s, %d]start vpnc %d\n", __FUNCTION__, __LINE__, vpnc_unit);
 			start_vpnc_by_unit(vpnc_unit);
 		}
+#if defined(RTCONFIG_BWDPI) && (defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK))
+		/* It's a workaround for QCA / MTK platform due to accelerator / module / vpn can't work together */
+		start_dpi_engine_service();
+#endif
 	}
 	else if (strcmp(script, "default_wan") == 0)	//change default WAN
 	{
@@ -16040,8 +16104,8 @@ retry_wps_enr:
 #if defined(RTCONFIG_OPENVPN)
 			}
 #endif
-#if defined(RTCONFIG_BWDPI) && defined(RTCONFIG_QCA)
-		/* It's a workaround for QCA platform due to accelerator / module / vpn can't work together */
+#if defined(RTCONFIG_BWDPI) && (defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK))
+		/* It's a workaround for QCA / MTK platform due to accelerator / module / vpn can't work together */
 		start_dpi_engine_service();
 #endif
 		}
@@ -16233,9 +16297,9 @@ _dprintf("test 2. turn off the USB power during %d seconds.\n", reset_seconds[re
             rc_ipsec_set(IPSEC_SET,PROF_SVR);
 				start_firewall(wan_primary_ifunit(), 0);
 				start_dnsmasq();
-#if defined(RTCONFIG_BWDPI) && defined(RTCONFIG_QCA)
-		/* It's a workaround for QCA platform due to accelerator / module / vpn can't work together */
-				start_dpi_engine_service();
+#if defined(RTCONFIG_BWDPI) && (defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK))
+		/* It's a workaround for QCA / MTK platform due to accelerator / module / vpn can't work together */
+		start_dpi_engine_service();
 #endif
 #ifdef RTCONFIG_SAMBASRV
 				start_write_smb_conf();
@@ -16244,8 +16308,8 @@ _dprintf("test 2. turn off the USB power during %d seconds.\n", reset_seconds[re
             rc_ipsec_set(IPSEC_START,PROF_SVR);
 				start_firewall(wan_primary_ifunit(), 0);
 				start_dnsmasq();
-#if defined(RTCONFIG_BWDPI) && defined(RTCONFIG_QCA)
-		/* It's a workaround for QCA platform due to accelerator / module / vpn can't work together */
+#if defined(RTCONFIG_BWDPI) && (defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK))
+		/* It's a workaround for QCA / MTK platform due to accelerator / module / vpn can't work together */
 		start_dpi_engine_service();
 #endif
 #ifdef RTCONFIG_SAMBASRV
@@ -16270,8 +16334,8 @@ _dprintf("test 2. turn off the USB power during %d seconds.\n", reset_seconds[re
             rc_ipsec_set(IPSEC_SET,PROF_SVR);
             start_firewall(wan_primary_ifunit(), 0);
             start_dnsmasq();
-#if defined(RTCONFIG_BWDPI) && defined(RTCONFIG_QCA)
-		/* It's a workaround for QCA platform due to accelerator / module / vpn can't work together */
+#if defined(RTCONFIG_BWDPI) && (defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK))
+		/* It's a workaround for QCA / MTK platform due to accelerator / module / vpn can't work together */
 		start_dpi_engine_service();
 #endif
 #ifdef RTCONFIG_SAMBASRV
@@ -16281,8 +16345,8 @@ _dprintf("test 2. turn off the USB power during %d seconds.\n", reset_seconds[re
             rc_ipsec_set(IPSEC_SET,PROF_CLI);
         } else if(0 == strcmp(script, "ipsec_start_cli")){
             rc_ipsec_set(IPSEC_START,PROF_CLI);
-#if defined(RTCONFIG_BWDPI) && defined(RTCONFIG_QCA)
-		/* It's a workaround for QCA platform due to accelerator / module / vpn can't work together */
+#if defined(RTCONFIG_BWDPI) && (defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK))
+		/* It's a workaround for QCA / MTK platform due to accelerator / module / vpn can't work together */
 		start_dpi_engine_service();
 #endif
 #ifdef RTCONFIG_SAMBASRV
@@ -16676,6 +16740,13 @@ _dprintf("test 2. turn off the USB power during %d seconds.\n", reset_seconds[re
 		}
         }
 #endif
+#if defined(RTCONFIG_MTK_BSD)
+	else if (strcmp(script, "mtk_bs20") == 0)
+	{
+		if(action & RC_SERVICE_STOP) stop_mtk_bs20();
+		if(action & RC_SERVICE_START) start_mtk_bs20();
+	}
+#endif
 #if defined(RTCONFIG_QCA_LBD)
 	else if (strcmp(script, "qca_lbd") == 0 || strcmp(script, "bsd") == 0)
 	{
@@ -16793,6 +16864,10 @@ _dprintf("test 2. turn off the USB power during %d seconds.\n", reset_seconds[re
 				update_wgs_client(1, c_unit);
 			}
 		}
+#if defined(RTCONFIG_BWDPI) && (defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK))
+		/* It's a workaround for QCA / MTK platform due to accelerator / module / vpn can't work together */
+		start_dpi_engine_service();
+#endif
 	}
 	else if (strcmp(script, "wgc") == 0) {
 		if (cmd[1]) {
@@ -16804,6 +16879,10 @@ _dprintf("test 2. turn off the USB power during %d seconds.\n", reset_seconds[re
 			if (action & RC_SERVICE_STOP) stop_wgcall();
 			if (action & RC_SERVICE_START) start_wgcall();
 		}
+#if defined(RTCONFIG_BWDPI) && (defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK))
+		/* It's a workaround for QCA / MTK platform due to accelerator / module / vpn can't work together */
+		start_dpi_engine_service();
+#endif
 	}
 #endif
 #ifdef RTCONFIG_CFGSYNC
@@ -17713,6 +17792,10 @@ _dprintf("nat_rule: the nat rule file was not ready. wait %d seconds...\n", retr
 	_dprintf("%s: apply the nat_rules (%s) state %d ret %d\n", __FUNCTION__, fn, nat_state, ret);
 	rule_apply_checking("services", __LINE__, NAT_RULES, ret);
 
+#ifdef RTCONFIG_OPENVPN
+	run_ovpn_fw_nat_scripts();
+#endif
+
 	if (ret != 0)
 		return nvram_get_int("nat_state");
 
@@ -18495,6 +18578,8 @@ void start_ecoguard(void)
 	else {
 		foreach(ifname, nvram_safe_get("wl_ifnames"), next) {
 #if defined(RTCONFIG_RALINK)
+		eval("iwpriv", ifname,"set", "httxstream=1");
+		eval("iwpriv", ifname,"set", "htrxstream=1");
 #elif defined(RTCONFIG_QCA)
 #else /* BCM */
 
@@ -20306,6 +20391,121 @@ void stop_plc_master(void)
 }
 #endif
 
+#if defined(RTCONFIG_MTK_BSD)
+#if defined(RTCONFIG_WLMODULE_MT7915D_AP) && defined(XD4S)
+void stop_mtk_bs20(void)
+{
+	if(pids("wapp"))
+	{	
+		killall_tk("wapp");
+		logmessage("MTK WAPP", "daemon is stopped");
+	}	
+	if(pids("bs20"))
+	{	
+		killall_tk("bs20");
+		unlink(BSD_LOG);
+		unlink(BSD_PATH);
+		unlink("/tmp/client_db.txt");
+		logmessage("MTK BS20", "daemon is stopped");
+	}	
+}
+void start_mtk_bs20(void)
+{
+#ifdef RTCONFIG_WIRELESSREPEATER
+	const int sw_mode = sw_mode();
+#endif
+	const int max_nr_wl_if = min(MAX_NR_WL_IF, WL_5G_2_BAND + 1);
+	int band, no_bs20 = 0, nr_ssid = 0;
+	int radio_on[WL_NR_BANDS] = { 0 };
+	char prefix[sizeof("wlXXXXXX_")], ssid[32 + 1] = { 0 };
+	char tmp[10],iface[30];
+
+	stop_mtk_bs20();
+	if (!nvram_get_int("smart_connect_x") || (!nvram_get_int("x_Setting")
+		|| __repeater_mode(sw_mode) || __mediabridge_mode(sw_mode) || __aimesh_re_node(sw_mode)))
+		no_bs20 = 1;
+
+	/* Both 2G/5G must be enabled. */
+	if (!no_bs20) {
+		for (band = WL_2G_BAND; band < max_nr_wl_if; ++band) {
+			if (absent_band(band))
+				continue;
+
+			snprintf(prefix, sizeof(prefix), "wl%d_", band);
+			if (nvram_pf_match(prefix, "radio", "1"))
+				radio_on[band] = 1;
+		}
+		if (!radio_on[WL_2G_BAND] || (!radio_on[WL_5G_BAND] && !radio_on[WL_5G_2_BAND]))
+			no_bs20 = 1;
+	}
+
+	/* 2G SSID must equal to 5G SSID */
+	if (!no_bs20) {
+		for (band = WL_2G_BAND; band < max_nr_wl_if; ++band) {
+			if (absent_band(band))
+				continue;
+
+			if (aimesh_re_node()) {
+				snprintf(prefix, sizeof(prefix), "wl%d.1_", band);
+			} else {
+				snprintf(prefix, sizeof(prefix), "wl%d_", band);
+#if defined(RTCONFIG_WIRELESSREPEATER)
+				if (sw_mode == SW_MODE_REPEATER
+#if !defined(RTCONFIG_CONCURRENTREPEATER)
+				    && nvram_get_int("wlc_band") == band && nvram_invmatch("wlc_ssid", "")
+#endif
+				   )
+					snprintf(prefix, sizeof(prefix), "wl%d.1_", band);
+#endif
+			}
+
+			if (!strlen(nvram_pf_safe_get(prefix, "ssid")))
+				continue;
+			if (*ssid == '\0') {
+				strlcpy(ssid, nvram_pf_safe_get(prefix, "ssid"), sizeof(ssid));
+				nr_ssid++;
+				continue;
+			}
+			if (strcmp(ssid, nvram_pf_safe_get(prefix, "ssid")))
+				continue;
+			nr_ssid++;
+		}
+		if (nr_ssid < 2)
+			no_bs20 = 1;
+	}
+
+	if (no_bs20) 
+		return;
+
+	if (!gen_bsd_config_file()) 
+	{
+		memset(iface,0,sizeof(iface));
+		for (band = WL_2G_BAND; band < max_nr_wl_if; ++band) 
+		{
+			sprintf(tmp, "-c%s ", get_wifname(band));
+               		strcat(iface, tmp);
+		}
+		eval("wapp","-d1","-v2",iface);
+		logmessage("MTK WAPP", "daemon is started");
+		
+		sleep(3);
+		unlink("/tmp/client_db.txt");
+		eval("touch", "/tmp/client_db.txt");
+
+		if(nvram_get_int("bs20_dbg"))
+			eval("bs20", "-f", BSD_LOG, "-B");
+		else
+			eval("bs20","-q","-B");
+		logmessage("MTK BS20", "daemon is started");
+		//sleep(1);
+		//dis_steer();
+	}	
+}
+#else
+void stop_mtk_bs20(void){}	
+void start_mtk_bs20(void){}
+#endif //RTCONFIG_WLMODULE_MT7915D_AP
+#endif
 #if defined(RTCONFIG_HW_DOG)
 #include <sys/ioctl.h>
 #include <linux/types.h>

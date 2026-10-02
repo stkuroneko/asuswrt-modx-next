@@ -12,7 +12,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if !defined(__GLIBC__) && !defined(__UCLIBC__) /* musl */
+#else
 #include <net/if.h>
+#endif
 #include <linux/ip.h>
 #include <linux/if_link.h>
 #include <arpa/inet.h>

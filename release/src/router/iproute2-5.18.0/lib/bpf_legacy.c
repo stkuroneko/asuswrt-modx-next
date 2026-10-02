@@ -45,6 +45,16 @@
 #include "bpf_elf.h"
 #include "bpf_scm.h"
 
+/* Below definitions should be defined in sys/mount.h of toolchain and older toolchain may not have it. */
+#ifdef RTAX89U
+#ifndef MS_REC
+#define MS_REC         16384
+#endif
+#ifndef MS_PRIVATE
+#define MS_PRIVATE     (1<<18)
+#endif
+#endif
+
 struct bpf_prog_meta {
 	const char *type;
 	const char *subdir;

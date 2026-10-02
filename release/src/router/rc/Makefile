@@ -860,6 +860,11 @@ ifeq ($(RTCONFIG_QCA_LBD),y)
 OBJS += $(if $(wildcard sysdeps/qca/lbd-qca.c),lbd-qca.o,prebuild/lbd-qca.o)
 endif
 
+ifeq ($(RTCONFIG_MTK_BSD),y)
+OBJS += $(if $(wildcard sysdeps/ralink/bsd-ralink.c),bsd-ralink.o,prebuild/bsd-ralink.o)
+endif
+
+
 ifeq ($(BUILD_NAME), RT-AC1200_V2)
 CFLAGS += -DRTAC1200V2
 endif
@@ -973,7 +978,7 @@ rc: $(OBJS) $(if $(RTCONFIG_CONNDIAG),libconn_diag.so,)
 install: all
 	@echo "[rc] Installing..."
 	@install -D rc $(INSTALLDIR)/sbin/rc
-	@$(STRIP) $(INSTALLDIR)/sbin/rc
+	$(if $(RTCONFIG_DEBUG),,@$(STRIP) $(INSTALLDIR)/sbin/rc)
 	@chmod 0500 $(INSTALLDIR)/sbin/rc
 ifeq ($(RTCONFIG_BRCM_HOSTAPD),y)
 	@install $(WPS_PBCD) $(INSTALLDIR)/sbin
@@ -982,7 +987,7 @@ endif
 
 ifeq ($(RTCONFIG_CONNDIAG),y)
 	@install -D libconn_diag.so $(INSTALLDIR)/usr/lib/libconn_diag.so
-	@$(STRIP) $(INSTALLDIR)/usr/lib/libconn_diag.so
+	$(if $(RTCONFIG_DEBUG),,@$(STRIP) $(INSTALLDIR)/usr/lib/libconn_diag.so)
 endif
 
 ifeq ($(RTCONFIG_BCMARM),y)

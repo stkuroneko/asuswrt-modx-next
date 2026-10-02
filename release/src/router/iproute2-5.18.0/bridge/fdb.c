@@ -15,7 +15,10 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/time.h>
+#if !defined(__GLIBC__) && !defined(__UCLIBC__) /* musl */
+#else
 #include <net/if.h>
+#endif
 #include <netinet/in.h>
 #include <linux/if_bridge.h>
 #include <linux/if_ether.h>

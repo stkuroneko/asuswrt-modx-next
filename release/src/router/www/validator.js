@@ -963,7 +963,7 @@ var validator = {
         if(urlregex.test(value)){
 			return true;
 		}
-		alert("It is invalid URL."); /*untranslated*/
+		alert("<#JS_valid_FQDN#>");
 		return false;
 		
 	},	

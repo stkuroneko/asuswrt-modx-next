@@ -196,17 +196,10 @@ int host_addr_info(const char *name, int af, struct sockaddr_storage *buf)
 	return (addrtypes & af);
 }
 
-#if defined(RTCONFIG_HND_ROUTER_AX_6756) || defined(RTCONFIG_MT798X)
 static inline int host_addrtypes(const char *name, int af)
 {
 	return host_addr_info(name, af, NULL);
 }
-#else
-inline int host_addrtypes(const char *name, int af)
-{
-	return host_addr_info(name, af, NULL);
-}
-#endif
 
 int ipt_addr_compact(const char *s, int af, int strict)
 {
@@ -3325,7 +3318,10 @@ filter_setting(int wan_unit, char *lan_if, char *lan_ip, char *logaccept, char *
 	    ":OVPNCI - [0:0]\n"
 	    ":OVPNCF - [0:0]\n"
 #endif
-
+#ifdef RTCONFIG_VPNC
+		":VPNCF - [0:0]\n"
+		":VPNCI - [0:0]\n"
+#endif
 	    ":logaccept - [0:0]\n"
 	    ":logdrop - [0:0]\n");
 
@@ -3361,6 +3357,10 @@ filter_setting(int wan_unit, char *lan_if, char *lan_ip, char *logaccept, char *
 		    ":OVPNSF - [0:0]\n"
 		    ":OVPNCI - [0:0]\n"
 		    ":OVPNCF - [0:0]\n"
+#endif
+#ifdef RTCONFIG_VPNC
+			":VPNCF - [0:0]\n"
+			":VPNCI - [0:0]\n"
 #endif
 		    ":ICMP_V6 - [0:0]\n"
 		    ":ICMP_V6_LOCAL - [0:0]\n"
@@ -4596,6 +4596,12 @@ TRACE_PT("write wl filter\n");
 		fprintf(fp_ipv6, "-A FORWARD -j OVPNCF\n");
 #endif
 
+#ifdef RTCONFIG_VPNC
+	fprintf(fp, "-A FORWARD -j VPNCF\n");
+	// if (ipv6_enabled())
+		// fprintf(fp_ipv6, "-A FORWARD -j VPNCF\n");
+#endif
+
 	// Default rule
 	if (nvram_get_int("fw_enable_x"))
 		fprintf(fp, "-A FORWARD -j %s\n", logdrop);
@@ -4710,7 +4716,10 @@ filter_setting2(char *lan_if, char *lan_ip, char *logaccept, char *logdrop)
 	    ":OVPNCI - [0:0]\n"
 	    ":OVPNCF - [0:0]\n"
 #endif
-
+#ifdef RTCONFIG_VPNC
+		":VPNCI - [0:0]\n"
+		":VPNCF - [0:0]\n"
+#endif
 	    ":logaccept - [0:0]\n"
 	    ":logdrop - [0:0]\n");
 
@@ -4746,6 +4755,10 @@ filter_setting2(char *lan_if, char *lan_ip, char *logaccept, char *logdrop)
 		    ":OVPNSF - [0:0]\n"
 		    ":OVPNCI - [0:0]\n"
 		    ":OVPNCF - [0:0]\n"
+#endif
+#ifdef RTCONFIG_VPNC
+			":VPNCI - [0:0]\n"
+			":VPNCF - [0:0]\n"
 #endif
 		    ":ICMP_V6 - [0:0]\n"
 		    ":ICMP_V6_LOCAL - [0:0]\n"
@@ -6041,6 +6054,12 @@ TRACE_PT("write wl filter\n");
 	fprintf(fp, "-A FORWARD -j OVPNCF\n");
 	if (ipv6_enabled())
 		fprintf(fp_ipv6, "-A FORWARD -j OVPNCF\n");
+#endif
+
+#ifdef RTCONFIG_VPNC
+	fprintf(fp, "-A FORWARD -j VPNCF\n");
+	// if (ipv6_enabled())
+		// fprintf(fp_ipv6, "-A FORWARD -j VPNCF\n");
 #endif
 
 	// Default rule

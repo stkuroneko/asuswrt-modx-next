@@ -10,12 +10,10 @@
 #include <errno.h>
 #include <endian.h>
 #include <dirent.h>
-#if defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
+#if defined(RTCONFIG_QCA)
 #include <net/ethernet.h>	//struct ethjdr
 #include <netinet/if_ether.h>	//struct ethhdr
 #include <netinet/ether.h>	//struct ether_addr
-#elif defined(RTCONFIG_RALINK)
-#include <net/ethernet.h>
 #endif
 #ifndef _LINUX_IF_H
 #include <net/if.h>
@@ -811,6 +809,10 @@ extern void chld_reap(int sig);
 extern int get_wan_proto(char *prefix);
 extern int get_ipv4_service(void);
 extern int get_ipv4_service_by_unit(int unit);
+#ifdef RTCONFIG_SOFTWIRE46
+extern int is_s46_service(void);
+extern int is_s46_service_by_unit(int unit);
+#endif
 #ifdef RTCONFIG_IPV6
 extern char *ipv6_nvname(const char *name);
 extern char *ipv6_nvname_by_unit(const char *name, int unit);
@@ -835,7 +837,7 @@ extern const char *getifaddr(const char *ifname, int family, int flags);
 extern long uptime(void);
 extern float uptime2(void);
 extern int _vstrsep(char *buf, const char *sep, ...);
-#if defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
+#if defined(RTCONFIG_QCA)
 extern char *wl_ether_etoa(const struct ether_addr *n);
 #endif
 extern void shortstr_encrypt(unsigned char *src, unsigned char *dst, unsigned char *shift);
@@ -2335,6 +2337,7 @@ extern int get_ch(int freq);
 extern int get_channel(const char *ifname);
 extern unsigned long long get_bitrate(const char *ifname);
 extern int get_channel_list(const char *ifname, int ch_list[], int size);
+extern uint64_t get_channel_list_mask(enum wl_band_id band);
 extern int has_dfs_channel(void);
 extern int get_radar_channel_list(const char *vphy, int radar_list[], int size);
 extern int get_bw_nctrlsb(const char *ifname, int *bw, int *nctrlsb);
@@ -2602,6 +2605,7 @@ extern int __mt7620_wan_bytecount(int unit, unsigned long long *tx, unsigned lon
 extern int __mt7621_wan_bytecount(int unit, unsigned long long *tx, unsigned long long *rx);
 #endif
 extern int get_channel_list(int unit, int ch_list[], int size);
+extern uint64_t get_channel_list_mask(enum wl_band_id band);
 extern int get_radar_channel_list(int, int radar_list[], int size);
 extern int set_acl_entry(const char *ifname, char *addr);
 extern int set_channel(const char* ifname, int channel);
@@ -3091,6 +3095,7 @@ extern char *get_wl_led_gpio_nv(int band);
 #define CH169_M	(1U << 28)
 #define CH173_M	(1U << 29)
 #define CH177_M	(1U << 30)
+#define DFS_CH_M	(CH52_M | CH56_M | CH60_M | CH64_M | CH68_M | CH96_M | CH100_M | CH104_M | CH108_M | CH112_M | CH116_M | CH120_M | CH124_M | CH128_M | CH132_M | CH136_M | CH140_M | CH144_M)
 extern int ch2g2bit(int ch);
 extern int ch5g2bit(int ch);
 extern uint64_t ch2g2bitmask(int ch);

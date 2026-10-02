@@ -43,7 +43,7 @@ $(function () {
 		}
 	}
 });
-var faq_href = "https://nw-dlcdnet.asus.com/support/forward.html?model=&type=Faq&lang="+ui_lang+"&kw=&num=132";
+var faq_href = "https://nw-dlcdnet.asus.com/support/forward.html?model=&type=Faq&lang="+ui_lang+"&kw=&num=167";
 var switch_time = 0;
 var selected_profile_idx = "";
 var client_upload_icon = new Array();
@@ -1635,13 +1635,12 @@ function check_profile_status(){
 									connect_status_text = "<#usb_initializing#>";
 									break;
 								case "1" :
+								case "7" :
 									connect_error_text = "<#vpn_openvpn_conflict#>";
 									break;
 								case "2" :
 									connect_error_text = "<#qis_fail_desc1#>";
 									break;
-								default :
-									connect_status_text = "<#Adaptive_Others#>";
 							}
 							break;
 						case "1" :

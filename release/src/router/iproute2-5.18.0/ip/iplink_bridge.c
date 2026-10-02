@@ -8,6 +8,9 @@
  *
  * Authors:     Jiri Pirko <jiri@resnulli.us>
  */
+#if !defined(__GLIBC__) && !defined(__UCLIBC__) /* musl */
+#define __UAPI_DEF_ETHHDR					0
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +19,10 @@
 #include <netinet/ether.h>
 #include <linux/if_link.h>
 #include <linux/if_bridge.h>
+#if !defined(__GLIBC__) && !defined(__UCLIBC__) /* musl */
+#else
 #include <net/if.h>
+#endif
 
 #include "rt_names.h"
 #include "utils.h"

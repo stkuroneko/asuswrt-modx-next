@@ -18,7 +18,10 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
+#if !defined(__GLIBC__) && !defined(__UCLIBC__) /* musl */
+#else
 #include <net/if.h>
+#endif
 #include <net/if_arp.h>
 #include <linux/ip.h>
 #include <linux/if_tunnel.h>

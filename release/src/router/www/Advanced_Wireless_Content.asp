@@ -150,6 +150,65 @@ function initial(){
 
 	limit_auth_method();	
 	wl_auth_mode_change(1);
+
+	if(wpa3_support){
+		var confirm_flag = 0;
+		var confirm_content = "";
+		if(!band6g_support || wl_unit != '2'){	// not for 6 GHz
+			confirm_flag=1;
+			confirm_content += "<b>WPA3-Personal</b><br>";
+			confirm_content += "<#WLANConfig11b_AuthenticationMethod_wpa3#><br><br>";
+			confirm_content += "<b>WPA2/WPA3-Personal</b><br>";
+			confirm_content += "<#WLANConfig11b_AuthenticationMethod_wpa32#><br><br>";
+			confirm_content += "<b>WPA2-Personal</b><br>";
+			confirm_content += "<#WLANConfig11b_AuthenticationMethod_wpa2#><br><br>";
+			confirm_content += "<b>WPA-Auto-Personal</b><br>";
+			confirm_content += "<#WLANConfig11b_AuthenticationMethod_wpa21#>";
+
+			$(".setup_help_icon").show();
+			$(".setup_help_icon").click(
+				function() {
+					if(confirm_flag==1){
+						if($(".confirm_block").length > 0){
+							$(".confirm_block").remove();
+						}
+						if(window.scrollTo)
+							window.scrollTo(0,0);
+						htmlbodyforIE = document.getElementsByTagName("html");
+						htmlbodyforIE[0].style.overflow = "hidden";
+
+						$("#Loading").css('visibility', 'visible');
+						$("#loadingBlock").css('visibility', 'hidden');
+
+						confirm_asus({
+							title: "<#WLANConfig11b_AuthenticationMethod_itemname#>",
+							contentA: confirm_content,
+							contentC: "",
+							left_button: "Hidden",
+							left_button_callback: function(){
+							},
+							left_button_args: {},
+							right_button: "<#CTL_ok#>",
+							right_button_callback: function(){
+								confirm_cancel();
+								htmlbodyforIE = document.getElementsByTagName("html");
+								htmlbodyforIE[0].style.overflow = "";
+								$("#Loading").css('visibility', 'hidden');
+								return false;
+							},
+							right_button_args: {},
+							iframe: "",
+							margin: "100px 0px 0px 25px",
+							note_display_flag: 0
+						});
+
+						$(".confirm_block").css( "zIndex", 10001 );
+					}
+				}
+			);
+		}
+	}
+
 	//mbss_display_ctrl();
 	if(optimizeXbox_support){
 		document.getElementById("wl_optimizexbox_span").style.display = "";
@@ -1562,6 +1621,7 @@ function handleMFP(){
 							<option value="wpawpa2" <% nvram_match("wl_auth_mode_x", "wpawpa2","selected"); %>>WPA-Auto-Enterprise</option>
 							<option value="radius"  <% nvram_match("wl_auth_mode_x", "radius", "selected"); %>>Radius with 802.1x</option>
 				  		</select>
+				  		<div class="setup_help_icon" style="display:none;"></div>
 					</td>
 			  	</tr>
 			  	

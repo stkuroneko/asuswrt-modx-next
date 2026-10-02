@@ -2612,6 +2612,10 @@ define RouterOptions
 		sed -i "/RTCONFIG_GDB/d" $(1); \
 		echo "RTCONFIG_GDB=y" >>$(1); \
 	fi;
+	if [ "$(DMALLOC)" = "y" ]; then \
+		sed -i "/RTCONFIG_DMALLOC/d" $(1); \
+		echo "RTCONFIG_DMALLOC=y" >>$(1); \
+	fi;
 	if [ "$(UIDEBUG)" = "y" ]; then \
 		sed -i "/RTCONFIG_UIDEBUG/d" $(1); \
 		echo "RTCONFIG_UIDEBUG=y" >>$(1); \

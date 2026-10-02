@@ -9587,6 +9587,13 @@ wdp:
 		start_qca_lbd();
 #endif
 #endif
+	
+#if defined(RTCONFIG_MTK_BSD)
+#if defined(RTCONFIG_WLMODULE_MT7915D_AP)
+	if (nvram_match("smart_connect_x", "1") && (!pids("bs20") || !pids("wapp")) && f_exists(BSD_PATH))
+		start_mtk_bs20();
+#endif
+#endif	
 
 #if defined(RTCONFIG_SOC_IPQ8074)
 	beacon_counter_monitor();

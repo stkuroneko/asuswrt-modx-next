@@ -13,7 +13,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#if !defined(__GLIBC__) && !defined(__UCLIBC__) /* musl */
+#else
 #include <net/if.h>
+#endif
 #include <linux/limits.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>

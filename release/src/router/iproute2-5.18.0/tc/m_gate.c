@@ -12,6 +12,11 @@
 #include "list.h"
 #include <linux/tc_act/tc_gate.h>
 
+/* Below definitions should be defined in include/time.h of toolchain and older toolchain may not have it. */
+#ifndef CLOCK_BOOTTIME
+#define CLOCK_BOOTTIME           7
+#endif
+
 struct gate_entry {
 	struct list_head list;
 	uint8_t	gate_state;

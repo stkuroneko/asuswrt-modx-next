@@ -843,7 +843,7 @@ var Get_Component_WirelessInput = function(wlArray){
 	wlArray.forEach(function(wl, idx){
 		var wirelessAP = httpApi.nvramCharToAscii(["wl" + wl.ifname + "_ssid", "wl" + wl.ifname + "_wpa_psk", "wl" + wl.ifname + "_auth_mode_x"]);
 		// Do not use default value.
-		if(systemVariable.isDefault){
+		if(systemVariable.isDefault && !systemVariable.keepDefpsk){
 			wirelessAP["wl" + wl.ifname + "_ssid"] = "";
 			wirelessAP["wl" + wl.ifname + "_wpa_psk"] = "";
 		}

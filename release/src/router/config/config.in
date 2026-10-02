@@ -1519,6 +1519,10 @@ config RTCONFIG_DEBUG
 	bool "debug mode"
 	default n
 
+config RTCONFIG_DMALLOC
+	bool "Link with dmalloc that is used to detect memory leak."
+	default n
+
 config RTCONFIG_HAS_5G
 	bool "has 5G band"
 	default y

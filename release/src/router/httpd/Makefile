@@ -329,7 +329,7 @@ httpd: $(OBJS)
 install: all
 	@echo " [httpd] Installing to $(INSTALLDIR)"
 	@install -D httpd $(INSTALLDIR)/usr/sbin/httpd
-	@$(STRIP) $(INSTALLDIR)/usr/sbin/httpd
+	$(if $(RTCONFIG_DEBUG),,@$(STRIP) $(INSTALLDIR)/usr/sbin/httpd)
 	@cd $(INSTALLDIR)/usr/sbin/; ln -sf httpd httpds
 	@chmod 0500 $(INSTALLDIR)/usr/sbin/httpd
 	#@install -m 0755 test_apps $(INSTALLDIR)/usr/sbin

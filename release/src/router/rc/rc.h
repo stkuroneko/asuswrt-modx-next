@@ -497,6 +497,11 @@ extern void setAllLedBrightness(void);
 extern int setATEModeLedOn(void);
 extern int start_wps_method(void);
 extern int stop_wps_method(void);
+#if defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
+extern void runtime_onoff_wps(int onoff);
+extern int start_wps_method_ob(void);
+extern int stop_wps_method_ob(void);
+#endif
 extern int is_wps_stopped(void);
 extern int is_wps_success(void);
 #if defined(RTCONFIG_AMAS) && defined(CONFIG_BCMWL5)
@@ -2906,6 +2911,7 @@ extern int is_wlif(char *ifname);
 
 #ifdef RTCONFIG_AMAS
 extern void init_amas_subunit(void);
+extern int get_wifi_country_code_tmp(char *ori_countrycode, char *output, int len);
 #endif
 
 // traffic_limiter.c
@@ -3228,7 +3234,11 @@ extern void oauth_google_check_token_status(void);
 extern void oauth_google_drive_check_token_status(void);
 #endif
 extern void exec_uu();
-
+#if defined(RTCONFIG_MTK_BSD)
+#define BSD_LOG "/tmp/mtk_mapd.log"
+#define BSD_PATH "/etc/mapd_strng.conf"
+extern int gen_bsd_config_file(void);
+#endif
 #if defined(RTCONFIG_QCA_LBD)
 #define LBD_PATH "/tmp/lbd.conf"
 extern int gen_lbd_config_file(void);
