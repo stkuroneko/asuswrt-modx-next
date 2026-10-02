@@ -42,3 +42,11 @@ make BOARD_PROFILE=KOMI-A8 rt-ax54
 ```
 
 Always pair the profile with the target listed above.
+
+## Prebuilt files
+
+The RT-AX54 profiles use `dhcpfwd` and `dupvif.ko`, extracted from
+`RT-AX54HP_3.0.0.4_386_69195-gfacf08b.trx` (SHA-256:
+`52ff9a9e557a5279b67228a508255be5c5d521debb21cf633dab415`).
+They are stored at `usr/sbin/dhcpfwd` and
+`lib/modules/4.4.198/dupvif.ko` inside the firmware's SquashFS filesystem.
