@@ -1,0 +1,11 @@
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/CMakeFiles/install/strip.dir
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/CMakeFiles/install/local.dir
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/CMakeFiles/install.dir
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/CMakeFiles/list_install_components.dir
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/CMakeFiles/uci-static.dir
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/CMakeFiles/cli-static.dir
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/CMakeFiles/uci-shared.dir
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/CMakeFiles/rebuild_cache.dir
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/CMakeFiles/ucimap.dir
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/CMakeFiles/cli.dir
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/CMakeFiles/edit_cache.dir

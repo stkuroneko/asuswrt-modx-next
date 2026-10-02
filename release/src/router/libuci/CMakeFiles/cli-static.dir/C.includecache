@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/cli.c
+strings.h
+-
+string.h
+-
+stdlib.h
+-
+unistd.h
+-
+uci.h
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/uci.h
+
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/uci.h
+uci_config.h
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/uci_config.h
+stdbool.h
+-
+setjmp.h
+-
+stdio.h
+-
+stdint.h
+-
+
+/repo/Pass_GPL/asuswrt/release/src/router/libuci/uci_config.h
+

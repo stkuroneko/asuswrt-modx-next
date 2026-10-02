@@ -1,0 +1,15 @@
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/CMakeFiles/install/strip.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/CMakeFiles/install/local.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/CMakeFiles/install.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/CMakeFiles/getdns_objects.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/CMakeFiles/getdns.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/CMakeFiles/list_install_components.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/CMakeFiles/edit_cache.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/CMakeFiles/rebuild_cache.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/stubby/CMakeFiles/install/strip.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/stubby/CMakeFiles/edit_cache.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/stubby/CMakeFiles/stubby.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/stubby/CMakeFiles/install.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/stubby/CMakeFiles/rebuild_cache.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/stubby/CMakeFiles/list_install_components.dir
+/repo/Pass_GPL/asuswrt/release/src/router/getdns/build/stubby/CMakeFiles/install/local.dir

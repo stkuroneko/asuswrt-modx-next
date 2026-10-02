@@ -1,0 +1,4 @@
+kernel/net/ipv6/netfilter/ip6table_filter.ko
+kernel/net/ipv6/netfilter/ip6table_mangle.ko
+kernel/net/ipv6/netfilter/nf_reject_ipv6.ko
+kernel/net/ipv6/netfilter/ip6t_REJECT.ko

@@ -1,0 +1,1 @@
+cmd_drivers/usb/host/xhci-plat-hcd.ko := /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-musl-ld -r  -m elf32ltsmip -T ./scripts/module-common.lds --build-id  -o drivers/usb/host/xhci-plat-hcd.ko drivers/usb/host/xhci-plat-hcd.o drivers/usb/host/xhci-plat-hcd.mod.o

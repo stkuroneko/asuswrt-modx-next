@@ -1,0 +1,5 @@
+kernel/drivers/mtd/chips/chipreg.ko
+kernel/drivers/mtd/chips/cfi_probe.ko
+kernel/drivers/mtd/chips/cfi_util.ko
+kernel/drivers/mtd/chips/cfi_cmdset_0002.ko
+kernel/drivers/mtd/chips/gen_probe.ko

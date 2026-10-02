@@ -1,0 +1,2 @@
+kernel/crypto/cmac.ko
+kernel/crypto/crc32c_generic.ko

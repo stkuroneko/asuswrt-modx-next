@@ -1,0 +1,11 @@
+prefix=
+exec_prefix=
+libdir=/repo/Pass_GPL/asuswrt/release/src-ra-openwrt-4210/router/json-c
+includedir=/repo/Pass_GPL/asuswrt/release/src-ra-openwrt-4210/router/json-c
+
+Name: json
+Description: JSON implementation in C
+Version: 0.12.1
+Requires:
+Libs:  -L/repo/Pass_GPL/asuswrt/release/src-ra-openwrt-4210/router/json-c -ljson-c
+Cflags: -I/repo/Pass_GPL/asuswrt/release/src-ra-openwrt-4210/router/json-c

@@ -1,0 +1,10 @@
+kernel/net/ipv6/netfilter/ip6_tables.ko
+kernel/net/ipv6/netfilter/ip6table_nat.ko
+kernel/net/ipv6/netfilter/nf_conntrack_ipv6.ko
+kernel/net/ipv6/netfilter/nf_nat_ipv6.ko
+kernel/net/ipv6/netfilter/nf_nat_masquerade_ipv6.ko
+kernel/net/ipv6/netfilter/nf_defrag_ipv6.ko
+kernel/net/ipv6/netfilter/nf_log_ipv6.ko
+kernel/net/ipv6/netfilter/ip6t_rt.ko
+kernel/net/ipv6/netfilter/ip6t_MASQUERADE.ko
+kernel/net/ipv6/netfilter/ip6t_NPT.ko

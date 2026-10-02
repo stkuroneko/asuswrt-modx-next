@@ -1,0 +1,209 @@
+libcurl_la-sha256.lo: sha256.c \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdc-predef.h \
+ curl_setup.h curl_config.h ../include/curl/curl.h \
+ ../include/curl/curlver.h ../include/curl/system.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/types.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/features.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/glibc-types.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/cdefs.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/alltypes.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/endian.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdint.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/stdint.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/select.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/socket.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/socket.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdio.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/limits.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/limits.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/time.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/time.h \
+ ../include/curl/easy.h ../include/curl/multi.h ../include/curl/curl.h \
+ ../include/curl/urlapi.h ../include/curl/options.h \
+ ../include/curl/header.h ../include/curl/typecheck-gcc.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/assert.h \
+ curl_setup_once.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdlib.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/alloca.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/string.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/strings.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdarg.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/ctype.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/errno.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/errno.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/stat.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/stat.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdbool.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/unistd.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/posix.h \
+ curl_ctype.h warnless.h curl_sha256.h curl_hmac.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/opensslv.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/evp.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/opensslconf.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/ossl_typ.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/e_os2.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/inttypes.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/symhacks.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/bio.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/crypto.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/safestack.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/stack.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/cryptoerr.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/pthread.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sched.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/bioerr.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/evperr.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/objects.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/obj_mac.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/asn1.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/asn1err.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/bn.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/bnerr.h \
+ /repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/objectserr.h \
+ curl_memory.h memdebug.h
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdc-predef.h:
+
+curl_setup.h:
+
+curl_config.h:
+
+../include/curl/curl.h:
+
+../include/curl/curlver.h:
+
+../include/curl/system.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/types.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/features.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/glibc-types.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/cdefs.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/alltypes.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/endian.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdint.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/stdint.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/select.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/socket.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/socket.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdio.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/limits.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/limits.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/time.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/time.h:
+
+../include/curl/easy.h:
+
+../include/curl/multi.h:
+
+../include/curl/curl.h:
+
+../include/curl/urlapi.h:
+
+../include/curl/options.h:
+
+../include/curl/header.h:
+
+../include/curl/typecheck-gcc.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/assert.h:
+
+curl_setup_once.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdlib.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/alloca.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/string.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/strings.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdarg.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/ctype.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/errno.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/errno.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/stat.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/stat.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdbool.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/unistd.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/posix.h:
+
+curl_ctype.h:
+
+warnless.h:
+
+curl_sha256.h:
+
+curl_hmac.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/opensslv.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/evp.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/opensslconf.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/ossl_typ.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/e_os2.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/inttypes.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/symhacks.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/bio.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/crypto.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/safestack.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/stack.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/cryptoerr.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/pthread.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sched.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/bioerr.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/evperr.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/objects.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/obj_mac.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/asn1.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/asn1err.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/bn.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/bnerr.h:
+
+/repo/Pass_GPL/asuswrt/release/src/router/mipsel-musl/stage/usr/include/openssl/objectserr.h:
+
+curl_memory.h:
+
+memdebug.h:

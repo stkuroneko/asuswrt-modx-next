@@ -1,0 +1,125 @@
+kernel/net/bridge/netfilter/ebt_dnat.ko:
+kernel/net/ipv4/netfilter/nf_nat_h323.ko: kernel/net/netfilter/nf_conntrack_h323.ko
+kernel/net/netfilter/xt_NFQUEUE.ko:
+kernel/net/ipv6/netfilter/ip6table_filter.ko:
+kernel/drivers/usb/usb-storage.ko: kernel/drivers/scsi/scsi_mod.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/drivers/usb/usblp.ko: kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/drivers/net/usb/ax88179_178a.ko: kernel/drivers/net/usb/usbnet.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko kernel/drivers/net/mii.ko
+kernel/net/bridge/netfilter/ebt_ip6.ko:
+kernel/net/ipv4/ah4.ko:
+kernel/fs/hfsplus.ko:
+kernel/net/bridge/netfilter/ebt_arpreply.ko:
+kernel/fs/fuse.ko:
+kernel/fs/nls_cp852.ko:
+kernel/net/netfilter/nf_conntrack_proto_gre.ko:
+kernel/drivers/usb/cdc-acm.ko: kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/drivers/net/ppp/ppp_deflate.ko:
+kernel/drivers/usb/common/usb-common.ko:
+kernel/drivers/net/wireless/mediatek/mt_wifi_7915_v7400/mt_wifi_ap/mt_wifi.ko:
+kernel/drivers/usb/ums-datafab.ko: kernel/drivers/usb/usb-storage.ko kernel/drivers/scsi/scsi_mod.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/net/bridge/netfilter/ebt_arp.ko:
+kernel/net/bridge/netfilter/ebtable_filter.ko: kernel/net/bridge/netfilter/ebtables.ko
+kernel/net/ipv4/netfilter/nf_nat_pptp.ko: kernel/net/netfilter/nf_conntrack_pptp.ko kernel/net/netfilter/nf_conntrack_proto_gre.ko kernel/net/ipv4/netfilter/nf_nat_proto_gre.ko
+kernel/net/bridge/netfilter/ebtable_broute.ko: kernel/net/bridge/netfilter/ebtables.ko
+kernel/net/bluetooth/bluetooth.ko:
+kernel/drivers/usb/ums-cypress.ko: kernel/drivers/usb/usb-storage.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko kernel/drivers/scsi/scsi_mod.ko
+kernel/net/netfilter/xt_hashlimit.ko:
+kernel/net/bridge/netfilter/ebt_pkttype.ko:
+kernel/net/ipv4/tunnel4.ko:
+kernel/drivers/usb/option.ko: kernel/drivers/usb/usb_wwan.ko kernel/drivers/usb/usbserial.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/drivers/usb/usbtmc.ko: kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/net/bridge/netfilter/ebt_snat.ko:
+kernel/fs/nls_cp932.ko:
+kernel/net/ipv4/netfilter/ipt_ipp2p.ko:
+kernel/net/netfilter/xt_hl.ko:
+kernel/net/netfilter/nf_conntrack_ftp.ko:
+kernel/drivers/usb/uas.ko: kernel/drivers/usb/usb-storage.ko kernel/drivers/scsi/scsi_mod.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/net/bridge/netfilter/ebtable_nat.ko: kernel/net/bridge/netfilter/ebtables.ko
+kernel/net/ipv4/xfrm4_tunnel.ko: kernel/net/ipv4/tunnel4.ko
+kernel/net/netfilter/xt_condition.ko:
+kernel/fs/hfs.ko:
+kernel/drivers/net/tun.ko:
+kernel/fs/ext2.ko:
+kernel/drivers/usb/usbserial.ko: kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/drivers/net/usb/usbnet.ko: kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko kernel/drivers/net/mii.ko
+kernel/drivers/usb/usbcore.ko: kernel/drivers/usb/common/usb-common.ko
+kernel/net/netfilter/xt_geoip.ko:
+kernel/net/bridge/netfilter/ebt_stp.ko:
+kernel/net/ipv4/esp4.ko:
+kernel/fs/msdos.ko: kernel/fs/fat.ko
+kernel/fs/mbcache.ko:
+kernel/drivers/usb/ums-jumpshot.ko: kernel/drivers/usb/usb-storage.ko kernel/drivers/scsi/scsi_mod.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/net/ipv4/netfilter/ipt_tos.ko:
+kernel/drivers/usb/xhci-mtk.ko: kernel/drivers/usb/xhci-hcd.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/net/bridge/netfilter/ebt_mark_m.ko:
+kernel/drivers/usb/ums-sddr55.ko: kernel/drivers/usb/usb-storage.ko kernel/drivers/scsi/scsi_mod.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/net/netfilter/xt_length.ko:
+kernel/drivers/net/mii.ko:
+kernel/drivers/net/usb/cdc_mbim.ko: kernel/drivers/usb/cdc-wdm.ko kernel/drivers/net/usb/cdc_ncm.ko kernel/drivers/net/usb/usbnet.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko kernel/drivers/net/mii.ko
+kernel/net/netfilter/nf_conntrack_sip.ko:
+kernel/net/netfilter/xt_HL.ko:
+kernel/net/netfilter/xt_quota.ko:
+kernel/drivers/net/usb/huawei_cdc_ncm.ko: kernel/drivers/net/usb/cdc_ncm.ko kernel/drivers/net/usb/usbnet.ko kernel/drivers/net/mii.ko kernel/drivers/usb/cdc-wdm.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/net/ipv6/netfilter/ip6table_mangle.ko:
+kernel/net/bridge/netfilter/ebt_vlan.ko:
+kernel/drivers/usb/xhci-plat-hcd.ko: kernel/drivers/usb/xhci-hcd.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/fs/vfat.ko: kernel/fs/fat.ko
+kernel/drivers/scsi/scsi_mod.ko:
+kernel/drivers/net/usb/rndis_host.ko: kernel/drivers/net/usb/cdc_ether.ko kernel/drivers/net/usb/usbnet.ko kernel/drivers/net/mii.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/net/netfilter/xt_dscp.ko:
+kernel/net/ipv6/netfilter/nf_reject_ipv6.ko:
+kernel/drivers/cdrom/cdrom.ko:
+kernel/drivers/usb/ums-freecom.ko: kernel/drivers/usb/usb-storage.ko kernel/drivers/scsi/scsi_mod.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/fs/nls_cp437.ko:
+kernel/drivers/net/usb/cdc_ncm.ko: kernel/drivers/net/usb/usbnet.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko kernel/drivers/net/mii.ko
+kernel/net/bridge/netfilter/ebt_log.ko:
+kernel/fs/nls_cp950.ko:
+kernel/fs/nls_cp866.ko:
+kernel/fs/nls_cp936.ko:
+kernel/net/netfilter/nf_nat_ftp.ko: kernel/net/netfilter/nf_conntrack_ftp.ko
+kernel/fs/fat.ko:
+kernel/net/ipv4/ipcomp.ko:
+kernel/drivers/usb/ums-usbat.ko: kernel/drivers/usb/usb-storage.ko kernel/drivers/scsi/scsi_mod.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/fs/ext4/ext4.ko: kernel/fs/mbcache2.ko kernel/fs/jbd2/jbd2.ko
+kernel/drivers/net/usb/asix.ko: kernel/drivers/net/usb/usbnet.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko kernel/drivers/net/mii.ko
+kernel/net/xfrm/xfrm_user.ko:
+kernel/drivers/usb/ums-alauda.ko: kernel/drivers/usb/usb-storage.ko kernel/drivers/scsi/scsi_mod.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/net/netfilter/nf_conntrack_pptp.ko: kernel/net/netfilter/nf_conntrack_proto_gre.ko
+kernel/drivers/scsi/sr_mod.ko: kernel/drivers/cdrom/cdrom.ko kernel/drivers/scsi/scsi_mod.ko
+kernel/net/ipv4/ipip.ko: kernel/net/ipv4/tunnel4.ko
+kernel/net/netfilter/nf_conntrack_h323.ko:
+kernel/net/netfilter/xt_recent.ko:
+kernel/net/netfilter/nf_nat_sip.ko: kernel/net/netfilter/nf_conntrack_sip.ko
+kernel/net/bridge/netfilter/ebt_limit.ko:
+kernel/net/ipv6/ip6_tunnel.ko:
+kernel/fs/jbd2/jbd2.ko:
+kernel/drivers/net/ethernet/mediatek/mtk_hnat/mtkhnat.ko:
+kernel/net/bridge/netfilter/ebt_redirect.ko:
+kernel/drivers/usb/usb_wwan.ko: kernel/drivers/usb/usbserial.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/drivers/usb/xhci-hcd.ko: kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/net/ipv6/sit.ko: kernel/net/ipv4/tunnel4.ko
+kernel/net/ipv4/netfilter/ipt_TOS.ko:
+kernel/fs/nls_cp850.ko:
+kernel/net/ipv6/netfilter/ip6t_REJECT.ko: kernel/net/ipv6/netfilter/nf_reject_ipv6.ko
+kernel/net/bridge/netfilter/ebt_mark.ko:
+kernel/fs/nls_iso8859-1.ko:
+kernel/net/bridge/netfilter/ebtables.ko:
+kernel/drivers/usb/xhci-pci.ko: kernel/drivers/usb/xhci-hcd.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/net/netfilter/nf_conntrack_rtsp.ko:
+kernel/drivers/usb/ums-isd200.ko: kernel/drivers/usb/usb-storage.ko kernel/drivers/scsi/scsi_mod.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/drivers/scsi/sd_mod.ko: kernel/drivers/scsi/scsi_mod.ko
+kernel/drivers/usb/cdc-wdm.ko: kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/net/ipv4/netfilter/ipt_web.ko:
+kernel/drivers/net/usb/cdc_ether.ko: kernel/drivers/net/usb/usbnet.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko kernel/drivers/net/mii.ko
+kernel/net/bridge/netfilter/ebt_ip.ko:
+kernel/drivers/usb/ums-sddr09.ko: kernel/drivers/usb/usb-storage.ko kernel/drivers/scsi/scsi_mod.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/drivers/net/usb/qmi_wwan.ko: kernel/drivers/net/usb/usbnet.ko kernel/drivers/net/mii.ko kernel/drivers/usb/cdc-wdm.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/drivers/scsi/sg.ko: kernel/drivers/scsi/scsi_mod.ko
+kernel/fs/mbcache2.ko:
+kernel/drivers/net/usb/ipheth.ko: kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/net/netfilter/xt_DSCP.ko:
+kernel/fs/nls_euc-jp.ko:
+kernel/drivers/usb/ums-karma.ko: kernel/drivers/usb/usb-storage.ko kernel/drivers/scsi/scsi_mod.ko kernel/drivers/usb/usbcore.ko kernel/drivers/usb/common/usb-common.ko
+kernel/drivers/net/vxlan.ko:
+kernel/fs/nls_cp949.ko:
+kernel/net/ipv4/netfilter/nf_nat_proto_gre.ko:
