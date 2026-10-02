@@ -119,7 +119,7 @@ extern int get_wifi_dfs_status(char *output, int len, char *node, char *lan_ipad
 extern void init_check_wifi_channel(void);
 
 /* roamast-PLATFORM.c */
-extern void rast_send_beacon_request(int bssidx, int vifidx, struct ether_addr *sta);
+extern void rast_send_beacon_request(int bssidx, int vifidx, struct ether_addr *sta, int bcn_mode);
 
 /* wps-PLATFORM.c */
 extern int start_wps_method_ob(void);

@@ -69,4 +69,6 @@
 
 extern char *generate_device_desc(int public, char *tnl_sdk_version, char *out_buf, int out_len);
 
+#define AAEDBG(fmt,args...)
+
 #endif

@@ -483,9 +483,6 @@ extern int check_AiMesh_whitelist(char *page);
 #endif
 extern int check_cmd_injection_blacklist(char *para);
 extern void __validate_apply_set_wl_var(char *nv, char *val) __attribute__((weak));
-#ifdef RTCONFIG_BWDPI
-extern int check_bwdpi_status_app_name(char *name);
-#endif
 extern int validate_apply_input_value(char *name, char *value);
 
 /* web-*.c */
@@ -614,4 +611,6 @@ extern int check_lock_status(time_t *dt);
 extern char *wl_nband_to_wlx(char *nv_name, char *wl_name, size_t len);
 extern int gen_asus_token_cookie(char *asus_token, int asus_token_len, char *token_cookie, int cookie_len);
 extern void check_lock_state();
+extern void handle_nvram_modify_log(struct json_object *activity_obj);
+extern int nvram_modify_log(char *name, char *new, char *old, struct json_object *nvram_modify_obj);
 #endif /* _httpd_h_ */

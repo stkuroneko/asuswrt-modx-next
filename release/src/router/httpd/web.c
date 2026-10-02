@@ -2390,7 +2390,12 @@ ej_dump(int eid, webs_t wp, int argc, char_t **argv)
 		}
 	}
 #endif
-
+	else if(!strcmp(file, "security_recored.log")){
+		snprintf(filename, sizeof(filename), "/jffs/%s-1", file);
+		ret += dump_file(wp, filename);
+		snprintf(filename, sizeof(filename), "/jffs/%s", file);
+		ret += dump_file(wp, filename);
+	}
 	return ret;
 }
 
@@ -3313,15 +3318,16 @@ static void convert_mswan_wans_settings(const char *new_wans_dualwan)
 #define NVRAM_MODIFIED_DUALWAN_REMOVEUSB	128	/* ex: {wan, usb}  =>  {wan, none} */
 
 #ifdef RTCONFIG_CFGSYNC
-int validate_instance(webs_t wp, char *name, json_object *root, json_object *cfg_root)
+int validate_instance(webs_t wp, char *name, json_object *root, json_object *cfg_root, json_object *activity_obj)
 #else
-int validate_instance(webs_t wp, char *name, json_object *root)
+int validate_instance(webs_t wp, char *name, json_object *root, json_object *activity_obj)
 #endif
 {
 	char prefix[32], word[100], tmp[100], *next, *value;
 	char prefix1[32], word1[100], *next1;
 	int i=0; /*, j=0;*/
 	int found = 0;
+	int nvram_check_ret = 0;
 #ifdef RTCONFIG_MULTICAST_IPTV
 	int unit = -1;
 #endif
@@ -3354,9 +3360,11 @@ int validate_instance(webs_t wp, char *name, json_object *root)
 						if(strstr(name, "maclist") && check_cmd_injection_blacklist(value))
 							continue;
 
-						nvram_check_and_set_for_prefix(name, tmp, value);
+						nvram_check_ret = nvram_check_and_set_for_prefix(name, tmp, value);
 						//nvram_set(tmp, value);
-						found = NVRAM_MODIFIED_BIT|NVRAM_MODIFIED_WL_BIT;
+						if(nvram_check_ret == 2 || nvram_check_ret == 0){
+							found = NVRAM_MODIFIED_BIT|NVRAM_MODIFIED_WL_BIT;
+						}
 					}
 					memmove(tmp + 3, tmp + 5, strlen(tmp + 5) + 1);
 					if(value)cprintf("%s:%d find %s value=%s\n",__FUNCTION__,__LINE__, tmp,value);
@@ -3373,6 +3381,9 @@ int validate_instance(webs_t wp, char *name, json_object *root)
 #endif
 				if(strstr(name, "maclist") && check_cmd_injection_blacklist(value))
 					continue;
+
+				/* log wlx nvram */
+				nvram_modify_log(tmp, nvram_safe_get(tmp), value, activity_obj);
 
 				nvram_check_and_set_for_prefix(name, tmp, value);
 #ifdef RTCONFIG_LANTIQ
@@ -3763,7 +3774,7 @@ int validate_apply(webs_t wp, json_object *root)
 	memset(acc_action_script, 0, sizeof(acc_action_script));
 	action_script = check_xss_blacklist(action_script, 0) ? "" : action_script;
 #endif
-
+	json_object *activity_obj = json_object_new_object();
 	/* go through each nvram value */
 	for (t = router_defaults; t->name; t++)
 	{
@@ -3773,9 +3784,9 @@ int validate_apply(webs_t wp, json_object *root)
 
 		if(!value || (!strncmp(name, "wan_", 4) && (nvram_match("switch_wantag", "movistar") || nvram_match("switch_wantag", "starhub")))) {
 #ifdef RTCONFIG_CFGSYNC
-			if((ret=validate_instance(wp, name,root, cfg_root)))
+			if((ret=validate_instance(wp, name,root, cfg_root, activity_obj)))
 #else 
-			if((ret=validate_instance(wp, name,root)))
+			if((ret=validate_instance(wp, name,root, activity_obj)))
 #endif
 			{
 				if(ret&NVRAM_MODIFIED_BIT) nvram_modified = 1;
@@ -3858,6 +3869,9 @@ int validate_apply(webs_t wp, json_object *root)
 #endif
 					if(strstr(name, "maclist") && check_cmd_injection_blacklist(value))
 						continue;
+
+					/* log wl with unit */
+					nvram_modify_log(tmp, nvram_safe_get(tmp), value, activity_obj);
 
 					nvram_set(tmp, value);
 					nvram_modified = 1;
@@ -4236,6 +4250,9 @@ int validate_apply(webs_t wp, json_object *root)
 					continue;
 				}
 
+				/* log no prefix nvram */
+				nvram_modify_log(name, nvram_safe_get(name), value, activity_obj);
+
 #ifdef RTCONFIG_CFGSYNC
 				save_changed_param(cfg_root, name);
 #endif                           
@@ -4501,6 +4518,11 @@ int validate_apply(webs_t wp, json_object *root)
 
 		nvram_commit();
 	}
+
+	handle_nvram_modify_log(activity_obj);
+
+	if(activity_obj)
+		json_object_put(activity_obj);
 
 #ifdef RTCONFIG_CFGSYNC
         json_object_put(cfg_root);
@@ -11998,6 +12020,7 @@ apply_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 #ifdef RTCONFIG_LANTIQ
 	wave_app_flag=0;
 #endif
+	char *temp_ip_str = NULL;
 
 	struct json_object *root=NULL;
 
@@ -12222,6 +12245,10 @@ apply_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 	}
 	else if (!strcmp(action_mode," Clear "))
 	{
+		struct in_addr temp_ip_addr;
+		temp_ip_addr.s_addr = login_ip_tmp;
+		temp_ip_str = inet_ntoa(temp_ip_addr);
+		SECURITY_LOG("[LOG]:clear (%s)\n", temp_ip_str);
 		unlink(get_syslog_fname(1));
 		unlink(get_syslog_fname(0));
 		websRedirect(wp, current_url);
@@ -19247,7 +19274,8 @@ login_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 		)
 	{
 		HTTPD_DBG("authpass!\n");
-		logmessage("HTTPD", "[LOGIN][%s][%s] success (%s)\n", (do_ssl)?"https":"http",(fromapp_flag)?"APP":"Web", temp_ip_str);
+		logmessage("HTTPD", "[LOGIN][%s][%s] successed (%s)\n", (do_ssl)?"https":"http",(fromapp_flag)?"APP":"Web", temp_ip_str);
+		SECURITY_LOG("[LOGIN][%s][%s] successed (%s)\n", (do_ssl)?"https":"http",(fromapp_flag)?"APP":"Web", temp_ip_str);
 #ifdef RTCONFIG_CAPTCHA
 		login_fail_num = 0;
 		HTTPD_DBG("authpass: login_fail_num = %d\n", login_fail_num);
@@ -19387,7 +19415,8 @@ login_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 #if defined(RTCONFIG_RGBLED) && defined(GTAC2900)
 		send_aura_event("LoginFail");
 #endif
-		logmessage("HTTPD", "[LOGIN][%s][%s] fail (%s)\n", (do_ssl)?"https":"http", (fromapp_flag)?"APP":"Web", temp_ip_str);
+		logmessage("HTTPD", "[LOGIN][%s][%s] failed (%s)\n", (do_ssl)?"https":"http", (fromapp_flag)?"APP":"Web", temp_ip_str);
+		SECURITY_LOG("[LOGIN][%s][%s] failed (%s)\n", (do_ssl)?"https":"http", (fromapp_flag)?"APP":"Web", temp_ip_str);
 		HTTPD_DBG("authfail: login_error_status = %d\n", login_error_status);
 		if(fromapp_flag != 0){
 			if(login_error_status == LOGINLOCK)
@@ -25913,7 +25942,19 @@ do_sqlite_Stat_hook(int type, webs_t wp)
 	if(type < 0 || type > 2)
 		return 0;
 
-	if(strcmp(client, "all") && !isValidMacAddress(client) && check_cmd_injection_blacklist(client))
+	if(check_cmd_injection_blacklist(client) || check_cmd_injection_blacklist(mode) || check_cmd_injection_blacklist(dura) || check_cmd_injection_blacklist(date))
+		return 0;
+
+	/* check client is app_name */
+	if(type == 0 && !is_safe_app_name(client))
+		return 0;
+
+	/* check client is all or mac */
+	if(type == 1 && strcmp(client, "all") && !isValidMacAddress(client))
+		return 0;
+
+	/* check client is mac */
+	if(type == 2 && !isValidMacAddress(client))
 		return 0;
 
 	if(strcmp(mode, "day") && strcmp(mode, "hour") && strcmp(mode, "detail"))
@@ -25980,7 +26021,7 @@ ej_bwdpi_status(int eid, webs_t wp, int argc, char_t **argv)
 	if(!strcmp(mode, "traffic") || !strcmp(mode, "traffic_wan") || !strcmp(mode, "app") || !strcmp(mode, "client_apps") || !strcmp(mode, "client_web"))
 		mode_pass = 1;
 
-	if(*name == '\0' || isValidMacAddress(name) || check_bwdpi_status_app_name(name))
+	if(*name == '\0' || isValidMacAddress(name) || is_safe_app_name(name))
 		name_pass = 1;
 
 	if(!strcmp(dura, "realtime") || !strcmp(dura, "month") || !strcmp(dura, "week") || !strcmp(dura, "day"))

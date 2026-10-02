@@ -168,3 +168,29 @@ int asus_check_caller()
 	}
 	return 0;
 }
+
+int asus_invalid_mnt_path(const char* path)
+{
+	const char *invalid_path[] = {"/bin", "/usr", "/sbin", "/lib", "/rom", "/www", NULL};
+	int i = 0;
+
+	if(path)
+	{
+		char real_path[PATH_MAX] = {0};
+
+		realpath(path, real_path);
+		if (strncmp(real_path, "/", 1))
+			return 1;
+		if (!strcmp(real_path, "/"))
+			return 1;
+		while(invalid_path[i])
+		{
+			if(!strncmp(real_path, invalid_path[i], sizeof(invalid_path[i])))
+			{
+				return 1;
+			}
+			++i;
+		}
+	}
+	return 0;
+}

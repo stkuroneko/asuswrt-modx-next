@@ -20,7 +20,7 @@
   #else
     #include <sys/atomics.h>
   #endif
-#elif defined(PJ_CONFIG_IPHONE)
+#elif defined(PJ_CONFIG_IPHONE) || defined(PJ_DARWINOS)
   #include<libkern/OSAtomic.h>
 #endif
 
@@ -159,7 +159,7 @@ static INLINE uint_t ec_atomic_inc(uint_t *mem)
     __atomic_inc(mem);
   #endif
   return *mem;
-#elif defined(PJ_CONFIG_IPHONE)
+#elif defined(PJ_CONFIG_IPHONE) || defined(PJ_DARWINOS)
   #if defined(ARM64)
     OSAtomicIncrement64(mem);
   #else
@@ -206,7 +206,7 @@ static INLINE uint_t ec_atomic_inc(uint_t *mem)
 #ifdef _WIN32
 #define issetugid()		  0
 #elif !HAVE_ISSETUGID
-#if !defined(UCLIBC_NG) && !defined(PJ_ANDROID) && !defined(PJ_CONFIG_IPHONE) && !defined(MUSL_LIBC) || (defined(PJ_ANDROID) && defined(ARM64))
+#if !defined(UCLIBC_NG) && !defined(PJ_ANDROID) && !defined(PJ_CONFIG_IPHONE) && !defined(MUSL_LIBC) && !defined(PJ_DARWINOS) || (defined(PJ_ANDROID) && defined(ARM64))
 #define issetugid()       (geteuid() == 0)
 #endif
 #endif

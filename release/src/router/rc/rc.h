@@ -2197,6 +2197,7 @@ extern int dsld_main(int argc, char **argv);
 #endif
 
 //services.c
+extern int write_etc_hosts();
 extern void write_static_leases(FILE *fp);
 #ifdef RTCONFIG_DHCP_OVERRIDE
 extern int restart_dnsmasq(int need_link_DownUp);

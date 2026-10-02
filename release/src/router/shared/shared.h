@@ -4204,4 +4204,7 @@ extern char *make_salt(char *scheme_id, char *buf, size_t size);
 extern int asus_openssl_crypt(char *key, char *salt, char *out, int out_len);
 
 extern int adjust_62_nv_list(char *name);
+
+extern int is_safe_app_name(const char *app_name);
+
 #endif	/* !__SHARED_H__ */

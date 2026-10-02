@@ -2000,6 +2000,7 @@ void bbunit_settestfailed(void);
 
 
 int asus_check_caller(void);
+int asus_invalid_mnt_path(const char* path);
 #define BBUNIT_DEFINE_TEST(NAME) \
 	static void bbunit_##NAME##_test(void); \
 	static struct bbunit_listelem bbunit_##NAME##_elem = { \
