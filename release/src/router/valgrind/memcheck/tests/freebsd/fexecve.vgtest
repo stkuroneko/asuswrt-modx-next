@@ -1,3 +1,0 @@
-prog: fexecve
-vgopts: -q
-stderr_filter: ../filter_dw4

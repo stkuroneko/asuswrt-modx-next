@@ -1,4 +1,0 @@
-#! /bin/sh
-
-../filter_stderr "$@" |
-    sed "s/at .* (posix_fadvise64.c:.*)/.../"

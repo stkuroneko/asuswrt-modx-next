@@ -1,3 +1,0 @@
-prog: simd_v81
-prereq: test -x simd_v81
-vgopts: -q

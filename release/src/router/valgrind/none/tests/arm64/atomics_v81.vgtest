@@ -1,3 +1,0 @@
-prog: atomics_v81
-prereq: test -x atomics_v81
-vgopts: -q

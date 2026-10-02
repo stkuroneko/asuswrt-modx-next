@@ -1,3 +1,0 @@
-prog: proc_pid_file
-vgopts: -q
-

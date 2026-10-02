@@ -24,7 +24,6 @@ else
 endif
 # endif
 	-cp prebuild/trcurrency.conf conf/trcurrency.conf
-	-cp prebuild/tr098.conf conf/tr098.conf
-	-cp prebuild/tr181.conf conf/tr181.conf
+
 endif
 

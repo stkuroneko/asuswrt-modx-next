@@ -1,2 +1,0 @@
-prog: file_locking_wait6
-vgopts: -q --trace-children=yes

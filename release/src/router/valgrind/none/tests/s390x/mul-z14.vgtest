@@ -1,2 +1,0 @@
-prog: mul-z14
-prereq: ../../../tests/s390x_features s390x-mi2

@@ -1,3 +1,0 @@
-prog: hg04_race
-vgopts: --read-var-info=yes --history-backtrace-size=9
-stderr_filter_args: hg04_race.c

@@ -1,3 +1,0 @@
-prog: fmadd_sub
-prereq: test -x fmadd_sub
-vgopts: -q

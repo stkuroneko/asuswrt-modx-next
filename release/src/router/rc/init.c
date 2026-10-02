@@ -117,6 +117,10 @@
 #include <openvpn_config.h>
 #endif
 
+#ifdef RTCONFIG_TCODE
+extern int noasusddns(void);
+#endif
+
 static int fatalsigs[] = {
 	SIGILL,
 	SIGABRT,
@@ -17533,6 +17537,10 @@ int init_nvram2(void)
 #if defined(RTAC68U) || defined(RTCONFIG_FORCE_AUTO_UPGRADE)
 		nvram_set_int("auto_upgrade", 0);
 #endif
+#ifdef RTCONFIG_FTP_SSL
+		// The ftp_tls is enabled by default when upgrading or downgrading the version.
+		nvram_set("ftp_tls", "1");
+#endif
 	}
 
 #ifdef RTCONFIG_AUTO_FW_UPGRADE
@@ -17582,6 +17590,14 @@ int init_nvram2(void)
     nvram_set("webdav_lock_interval", "2");
   }
 #endif
+
+	/* 2024/12/25 stop asuscomm.cn service. reset values of ddns_enable_x and ddns_hostname_x if WWW.ASUS.COM.CN is used. */
+	if(!strcmp(nvram_safe_get("ddns_server_x"), "WWW.ASUS.COM.CN") || ( noasusddns() && !strcmp(nvram_safe_get("ddns_server_x"), "WWW.ASUS.COM"))){
+		nvram_set("ddns_enable_x", "0");
+		nvram_set("ddns_hostname_x", "");
+		nvram_set("ddns_server_x", "");
+		nvram_commit();
+	}
 
 	return 0;
 }

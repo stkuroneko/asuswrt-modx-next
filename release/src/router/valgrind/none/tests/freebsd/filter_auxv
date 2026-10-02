@@ -1,6 +1,0 @@
-#! /bin/sh
-
-./filter_stderr |
-
-sed 's#EXECPATH: .*/none/tests/freebsd/auxv#EXECPATH: BASEDIR/valgrind/none/tests/freebsd/auxv#'
-

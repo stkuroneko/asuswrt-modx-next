@@ -1,5 +1,0 @@
-prereq: test -e ./eventfd1
-prog: eventfd1
-args: 2
-vgopts: -q
-

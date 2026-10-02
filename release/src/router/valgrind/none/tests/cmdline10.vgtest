@@ -1,3 +1,0 @@
-# A boolean arg, bad val
-prog: ../../tests/true
-vgopts: --trace-children=foo

@@ -1,2 +1,0 @@
-p not nullptr after realloc 0
-p2 not nullptr after realloc 0

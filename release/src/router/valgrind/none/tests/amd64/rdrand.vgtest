@@ -1,3 +1,0 @@
-prog: rdrand
-prereq: test -x rdrand && ../../../tests/x86_amd64_features amd64-rdrand
-vgopts: -q

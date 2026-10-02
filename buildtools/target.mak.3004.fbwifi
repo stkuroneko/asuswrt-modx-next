@@ -1,3 +1,0 @@
-export RT-N18U := $(RT-N18U) FBWIFI=y
-export RT-AC68U := $(RT-AC68U) FBWIFI=y
-export DSL-AC68U := $(DSL-AC68U) FBWIFI=y

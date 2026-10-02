@@ -1,3 +1,0 @@
-prog: big
-vgopts: --dhat-out-file=dhat.out
-cleanup: rm dhat.out

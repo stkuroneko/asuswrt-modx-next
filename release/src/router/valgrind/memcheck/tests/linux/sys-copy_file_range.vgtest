@@ -1,2 +1,0 @@
-prereq: test -e sys-copy_file_range
-prog: sys-copy_file_range

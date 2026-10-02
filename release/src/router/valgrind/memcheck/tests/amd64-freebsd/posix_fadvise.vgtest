@@ -1,3 +1,0 @@
-prog: posix_fadvise
-vgopts: -q
-cleanup: rm -f foo

@@ -1,9 +1,0 @@
-Package: system_fapi
-Version: 1.0.0-1
-Depends: libc, libssp, libscapi, switch_cli
-Source: ugw/feeds_ugw/system/system_service/fapi_system
-Section: utils
-Maintainer: Lantiq Beteiligungs-GmbH & Co. KG
-Architecture: lantiq
-Installed-Size: 25840
-Description:  FAPI for system configuration

@@ -1,3 +1,0 @@
-prereq: !(../../../tests/mips_features mipsr6)
-prog: unaligned_load
-vgopts: -q

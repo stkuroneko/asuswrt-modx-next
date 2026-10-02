@@ -1,3 +1,0 @@
-prereq: test -e stack_changes
-prog: stack_changes
-vgopts: -q

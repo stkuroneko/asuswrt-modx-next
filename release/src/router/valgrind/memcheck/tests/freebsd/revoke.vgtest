@@ -1,3 +1,0 @@
-prog: revoke
-vgopts: -q
-cleanup: rm -f revoke.tst

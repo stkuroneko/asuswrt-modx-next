@@ -1,2 +1,0 @@
-prog: realloc_size_zero
-vgopts: -q

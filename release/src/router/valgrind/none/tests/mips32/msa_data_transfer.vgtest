@@ -1,3 +1,0 @@
-prog: msa_data_transfer
-prereq: ../../../tests/mips_features mips-msa
-vgopts: -q

@@ -1,2 +1,0 @@
-prog: static_allocs
-vgopts: -q --leak-check=full

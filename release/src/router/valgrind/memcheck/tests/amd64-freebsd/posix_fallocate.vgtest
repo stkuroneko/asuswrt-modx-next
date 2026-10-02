@@ -1,3 +1,0 @@
-prog: posix_fallocate
-vgopts: -q
-cleanup: rm -f foo

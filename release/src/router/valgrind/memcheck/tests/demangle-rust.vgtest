@@ -1,2 +1,0 @@
-prog: demangle-rust
-vgopts: -q

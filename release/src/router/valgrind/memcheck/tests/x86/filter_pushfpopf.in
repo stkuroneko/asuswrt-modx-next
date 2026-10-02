@@ -1,7 +1,0 @@
-#! /bin/sh
-
-SED=@SED@
-
-./filter_stderr "$@" |
-$SED "s/: fooble ([^)]*)/: fooble (...)/"
-

@@ -1,3 +1,0 @@
-prereq: test -e bug392331
-vgopts: -q --suppressions=bug392331.supp
-prog: bug392331

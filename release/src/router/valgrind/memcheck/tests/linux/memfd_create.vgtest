@@ -1,3 +1,0 @@
-prereq: test -e memfd_create
-vgopts: -q --track-origins=yes
-prog: memfd_create

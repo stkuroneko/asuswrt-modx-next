@@ -1,4 +1,0 @@
-#!/bin/sh
-# DHCP lease fail
-echo "DHCP lease fail falling back to network settings"
-. /etc/init.d/netset

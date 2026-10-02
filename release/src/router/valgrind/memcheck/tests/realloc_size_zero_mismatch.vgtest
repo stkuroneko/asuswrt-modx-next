@@ -1,2 +1,0 @@
-prog: realloc_size_zero_mismatch
-vgopts: -q --realloc-zero-bytes-frees=no

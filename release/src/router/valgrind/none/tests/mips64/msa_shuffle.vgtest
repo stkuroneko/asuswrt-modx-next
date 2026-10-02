@@ -1,3 +1,0 @@
-prog: msa_shuffle
-prereq: ../../../tests/mips_features mips-msa
-vgopts: -q

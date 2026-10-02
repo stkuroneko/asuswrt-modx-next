@@ -1,3 +1,0 @@
-prereq: ./supported_libpthread && [ -e timed_mutex ]
-vgopts: --check-stack-var=yes --read-var-info=yes
-prog: timed_mutex

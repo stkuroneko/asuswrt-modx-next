@@ -1,3 +1,0 @@
-prereq: kldstat -m sctp > /dev/null
-vgopts: -q --trace-children=yes
-prog: sctp

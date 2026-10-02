@@ -1,4 +1,0 @@
-prereq: test -e ./stat
-prog: stat
-vgopts: -q
-stderr_filter: filter_fstat

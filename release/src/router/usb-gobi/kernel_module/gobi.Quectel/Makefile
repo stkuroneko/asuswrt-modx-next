@@ -1,1 +1,0 @@
-../gobi/Makefile
