@@ -57,6 +57,62 @@ struct REPLACE_PRODUCTID_S replace_productid_t[] =
 	{"ZenWiFi_CD6N", "ZenWiFi AC Mini", "global"},
 	{"ZenWiFi_XP4", "ZenWiFi AX Hybrid", "global"},
 	{"ZenWiFi_CV4", "ZenWiFi Voice", "global"},
+#if defined(RTCONFIG_BOARD_C_LIFE_XG1)
+	{"RT-AX53U", "C-Life XG1", "CN"},
+	{"RT-AX53U", "C-Life XG1", "global"},
+	{"RT-AX54HP", "机型设置错误", "CN"},
+	{"RT-AX54HP", "机型设置错误", "global"},
+#elif defined(RTCONFIG_BOARD_H3C_TX180X)
+	{"RT-AX53U", "H3C TX180X", "CN"},
+	{"RT-AX53U", "H3C TX180X", "global"},
+	{"RT-AX54HP", "机型设置错误", "CN"},
+	{"RT-AX54HP", "机型设置错误", "global"},
+#elif defined(RTCONFIG_BOARD_JCG_Q20)
+	{"RT-AX53U", "机型设置错误", "CN"},
+	{"RT-AX53U", "机型设置错误", "global"},
+	{"RT-AX54HP", "JCG Q20", "CN"},
+	{"RT-AX54HP", "JCG Q20", "global"},
+#elif defined(RTCONFIG_BOARD_CMCC_A9)
+	{"RT-AX53U", "机型设置错误", "CN"},
+	{"RT-AX53U", "机型设置错误", "global"},
+	{"RT-AX54HP", "CMCC A9", "CN"},
+	{"RT-AX54HP", "CMCC A9", "global"},
+#elif defined(RTCONFIG_BOARD_CMCC_A9_2)
+	{"RT-AX53U", "机型设置错误", "CN"},
+	{"RT-AX53U", "机型设置错误", "global"},
+	{"RT-AX54HP", "CMCC A9 V2", "CN"},
+	{"RT-AX54HP", "CMCC A9 V2", "global"},
+#elif defined(RTCONFIG_BOARD_CR660X)
+	{"RT-AX53U", "小米 CR660X", "CN"},
+	{"RT-AX53U", "XIAOMI CR660X", "global"},
+	{"RT-AX54HP", "机型设置错误", "CN"},
+	{"RT-AX54HP", "机型设置错误", "global"},
+#elif defined(RTCONFIG_BOARD_XY_C3N)
+	{"RT-AX53U", "小娱 C3(NAND)", "CN"},
+	{"RT-AX53U", "小娱 C3(NAND)", "global"},
+	{"RT-AX54HP", "机型设置错误", "CN"},
+	{"RT-AX54HP", "机型设置错误", "global"},
+#elif defined(RTCONFIG_BOARD_SIM_AX18)
+	{"RT-AX53U", "SIM路由AX18T", "CN"},
+	{"RT-AX53U", "SIMAX1800T", "global"},
+	{"RT-AX54HP", "机型设置错误", "CN"},
+	{"RT-AX54HP", "机型设置错误", "global"},
+#elif defined(RTCONFIG_BOARD_RX6000)
+	{"RT-AX53U", "机型设置错误", "CN"},
+	{"RT-AX53U", "机型设置错误", "global"},
+	{"RT-AX54HP", "ZTT RX6000", "CN"},
+	{"RT-AX54HP", "ZTT RX6000", "global"},
+#elif defined(RTCONFIG_BOARD_G_AX1800)
+	{"RT-AX53U", "G-AX1800", "CN"},
+	{"RT-AX53U", "G-AX1800", "global"},
+	{"RT-AX54HP", "机型设置错误", "CN"},
+	{"RT-AX54HP", "机型设置错误", "global"},
+#elif defined(RTCONFIG_BOARD_KOMI_A8)
+	{"RT-AX53U", "机型设置错误", "CN"},
+	{"RT-AX53U", "机型设置错误", "global"},
+	{"RT-AX54HP", "KOMI-A8", "CN"},
+	{"RT-AX54HP", "KOMI-A8", "global"},
+#endif
 	{NULL, NULL, NULL}
 };
 

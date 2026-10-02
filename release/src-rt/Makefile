@@ -328,6 +328,7 @@ endif
 ifeq ($(OPDBG),y)
 export IMGNAME := $(IMGNAME)_OPDBG
 endif
+NEW_IMGNAME := $(subst $(BUILD_NAME),$(if $(REAL_NAME),$(REAL_NAME),$(BUILD_NAME)),$(IMGNAME))
 
 ifeq ($(DSL_REMOTE),y)
 ifeq ($(BUILD_NAME),DSL-AC68U)
@@ -897,7 +898,7 @@ else ifeq ($(CONFIG_RALINK),y)
 	elif [ "$(BUILD_NAME)" = "4G-AX56" ] || [ "$(BUILD_NAME)" = "RT-AX53U" ] || [ "$(BUILD_NAME)" = "RT-AX54" ] || [ "$(BUILD_NAME)" = "XD4S" ] ; then \
 		asustools/u-boot-2014.10/tools/mkimage -A mips -O linux -T kernel -C lzma -a 0x81001000 -e 0x81001000 -r $${RFSOFFSET} \
 		-n $(BUILD_NAME) -V "$(KERNEL_VER)" "$(FS_VER)"  "$(SERIALNO)" "$(EXTENDNO)" "0" "0" "0" "0" "0" "0"  \
-		-d $(PLATFORMDIR)/zImage.img image/$(IMGNAME).trx ; \
+		-d $(PLATFORMDIR)/zImage.img image/$(NEW_IMGNAME).trx ; \
 	else \
 		asustools/mkimage -A mips -O linux -T kernel -C lzma -a 80000000 -e $${ENTRY} -r $${RFSOFFSET} \
 		-n $(BUILD_NAME) -V "$(KERNEL_VER)" "$(FS_VER)" "$(SERIALNO)" "$(EXTENDNO)" "0" "0" "0" "0" "0" "0" \
@@ -1133,7 +1134,7 @@ endif
 	
 	#@asustools/mkimage -A mips -O linux -d $(RSDKDIR)/image/fw.bin image/$(IMGNAME).trx
 endif
-	md5sum image/$(IMGNAME).trx > image/$(IMGNAME).md5
+	md5sum image/$(NEW_IMGNAME).trx > image/$(NEW_IMGNAME).md5
 
 ifeq ($(DSL_REMOTE),y)
 	$(call dsl_genbintrx_epilog)
@@ -1168,21 +1169,21 @@ ifneq ($(LIVE_UPDATE_RSA),)
 ifneq (,$(wildcard $(KEY_PATH)/private*.pem))
 	for f in $(KEY_PATH)/private*.pem; do \
 		rsa_idx=$$(echo $${f} | sed "s/.*\///" | sed "s/private//" | sed "s/.pem//"); \
-		$$(openssl sha1 -sign $(KEY_PATH)/private$${rsa_idx}.pem -out image/$(IMGNAME)_rsa$${rsa_idx}.zip image/$(IMGNAME).trx); \
+		$$(openssl sha1 -sign $(KEY_PATH)/private$${rsa_idx}.pem -out image/$(NEW_IMGNAME)_rsa$${rsa_idx}.zip image/$(NEW_IMGNAME).trx); \
 	done
 else
 ifneq (,$(wildcard $(SRC_ROOT)/../../buildtools/private.pem))
-	openssl sha1 -sign $(SRC_ROOT)/../../buildtools/private.pem -out image/$(IMGNAME)_rsa.zip image/$(IMGNAME).trx
+	openssl sha1 -sign $(SRC_ROOT)/../../buildtools/private.pem -out image/$(NEW_IMGNAME)_rsa.zip image/$(NEW_IMGNAME).trx
 endif
 endif
 else
 ifeq ($(HTTPS),y)
 ifneq (,$(wildcard $(SRC_ROOT)/../../buildtools/private.pem))
-	openssl sha1 -sign $(SRC_ROOT)/../../buildtools/private.pem -out image/$(IMGNAME)_rsa.zip image/$(IMGNAME).trx
+	openssl sha1 -sign $(SRC_ROOT)/../../buildtools/private.pem -out image/$(NEW_IMGNAME)_rsa.zip image/$(NEW_IMGNAME).trx
 endif
 endif
 endif
-	ln -sf $(IMGNAME).trx image/$(BUILD_NAME).trx
+	ln -sf $(NEW_IMGNAME).trx image/$(if $(REAL_NAME),$(REAL_NAME),$(BUILD_NAME)).trx
 ifeq ($(ARM),y)
 	ln -sf $(LINUXDIR)/vmlinux image/vmlinux
 	ln -sf $(LINUXDIR)/vmlinux.o image/vmlinux.o
@@ -4045,6 +4046,15 @@ define RouterOptions
 		sed -i "/RTCONFIG_SECURE_BY_DEFAULT\>/d" $(1); \
 		echo "RTCONFIG_SECURE_BY_DEFAULT=y" >>$(1); \
 	fi;
+	sed -i '/RTCONFIG_BOARD_/d' $(1); \
+	for board in $(MT7621_BOARD_PROFILES); do \
+		symbol=$$(printf '%s' "$$board" | tr '[:lower:].-' '[:upper:]__'); \
+		if [ "$$board" = "$(BOARD_PROFILE)" ]; then \
+			echo "RTCONFIG_BOARD_$${symbol}=y"; \
+		else \
+			echo "# RTCONFIG_BOARD_$${symbol} is not set"; \
+		fi; \
+	done >>$(1);
 	$(call platformRouterOptions, $(1))
 endef
 

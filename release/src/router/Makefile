@@ -6933,7 +6933,7 @@ libssh2-clean:
 curl/configure:
 	@cd curl && ./buildconf
 
-curl/Makefile: curl/configure
+curl/Makefile: curl/configure shared/rtconfig.h
 	@cd curl && $(CONFIGURE) CC=$(CC) \
 		--prefix=/usr --bindir=/usr/sbin --libdir=/usr/lib \
 		--enable-silent-rules \
@@ -6947,7 +6947,7 @@ curl/Makefile: curl/configure
 		--disable-threaded-resolver --disable-ntlm-wb \
 		--disable-doh --disable-netrc --disable-dnsshuffle \
 		--disable-progress-meter \
-		$(if $(RTCONFIG_TR069),--with-libssh2=$(STAGEDIR)/usr,--without-zlib) \
+		$(if $(RTCONFIG_TR069),--with-libssh2=$(STAGEDIR)/usr,--without-libssh2 --without-zlib) \
 		$(if $(RTCONFIG_OPENSSL11)$(RTCONFIG_OPENSSL10),--with-ssl=$(STAGEDIR)/usr --with-ca-fallback,--without-ssl) \
 		$(if $(RTCONFIG_MBEDTLS),--with-mbedtls=$(STAGEDIR)/usr,--without-mbedtls) \
 		$(if $(RTCONFIG_WOLFSSL),--with-wolfssl=$(STAGEDIR)/usr,--without-wolfssl) \

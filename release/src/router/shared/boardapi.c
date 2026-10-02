@@ -53,8 +53,13 @@ static const struct led_btn_table_s {
 	int *p_val;
 } led_btn_table[] = {
 	/* button */
+	#if defined(RTCONFIG_BOARD_C_LIFE_XG1) || defined(RTCONFIG_BOARD_H3C_TX180X) || defined(RTCONFIG_BOARD_JCG_Q20) || defined(RTCONFIG_BOARD_CMCC_A9) || defined(RTCONFIG_BOARD_CMCC_A9_2) || defined(RTCONFIG_BOARD_CR660X) || defined(RTCONFIG_BOARD_XY_C3N) || defined(RTCONFIG_BOARD_SIM_AX18) || defined(RTCONFIG_BOARD_RX6000) || defined(RTCONFIG_BOARD_G_AX1800) || defined(RTCONFIG_BOARD_KOMI_A8)
+	{ "btn_rst_gpio_1",	&btn_gpio_table[BTN_RESET] },
+	{ "btn_wps_gpio_1",	&btn_gpio_table[BTN_WPS] },
+#else
 	{ "btn_rst_gpio",	&btn_gpio_table[BTN_RESET] },
 	{ "btn_wps_gpio",	&btn_gpio_table[BTN_WPS] },
+#endif
 #ifdef RTCONFIG_SWMODE_SWITCH
 #if defined(PLAC66U)
 	{ "btn_swmode1_gpio",	&btn_gpio_table[BTN_SWMODE_SW_ROUTER] },
@@ -353,7 +358,13 @@ int extract_gpio_pin(const char *gpio)
 
 int init_gpio(void)
 {
-	char *btn_list[] = { "btn_rst_gpio", "btn_wps_gpio", "fan_gpio", "have_fan_gpio"
+	char *btn_list[] = {
+#if defined(RTCONFIG_BOARD_C_LIFE_XG1) || defined(RTCONFIG_BOARD_H3C_TX180X) || defined(RTCONFIG_BOARD_JCG_Q20) || defined(RTCONFIG_BOARD_CMCC_A9) || defined(RTCONFIG_BOARD_CMCC_A9_2) || defined(RTCONFIG_BOARD_CR660X) || defined(RTCONFIG_BOARD_XY_C3N) || defined(RTCONFIG_BOARD_SIM_AX18) || defined(RTCONFIG_BOARD_RX6000) || defined(RTCONFIG_BOARD_G_AX1800) || defined(RTCONFIG_BOARD_KOMI_A8)
+		"btn_rst_gpio_1", "btn_wps_gpio_1",
+#else
+		"btn_rst_gpio", "btn_wps_gpio",
+#endif
+		"fan_gpio", "have_fan_gpio"
 #ifdef RTCONFIG_WIRELESS_SWITCH
 		, "btn_wifi_gpio"
 #endif

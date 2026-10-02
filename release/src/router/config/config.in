@@ -1,6 +1,52 @@
 
 mainmenu "Router Configuration"
 
+# Hardware profiles share the original ASUS firmware bases.
+config RTCONFIG_BOARD_C_LIFE_XG1
+	bool "RTCONFIG_BOARD_C_LIFE_XG1"
+	default n
+
+config RTCONFIG_BOARD_H3C_TX180X
+	bool "RTCONFIG_BOARD_H3C_TX180X"
+	default n
+
+config RTCONFIG_BOARD_JCG_Q20
+	bool "RTCONFIG_BOARD_JCG_Q20"
+	default n
+
+config RTCONFIG_BOARD_CMCC_A9
+	bool "RTCONFIG_BOARD_CMCC_A9"
+	default n
+
+config RTCONFIG_BOARD_CMCC_A9_2
+	bool "RTCONFIG_BOARD_CMCC_A9_2"
+	default n
+
+config RTCONFIG_BOARD_CR660X
+	bool "RTCONFIG_BOARD_CR660X"
+	default n
+
+config RTCONFIG_BOARD_XY_C3N
+	bool "RTCONFIG_BOARD_XY_C3N"
+	default n
+
+config RTCONFIG_BOARD_SIM_AX18
+	bool "RTCONFIG_BOARD_SIM_AX18"
+	default n
+
+config RTCONFIG_BOARD_RX6000
+	bool "RTCONFIG_BOARD_RX6000"
+	default n
+
+config RTCONFIG_BOARD_G_AX1800
+	bool "RTCONFIG_BOARD_G_AX1800"
+	default n
+
+config RTCONFIG_BOARD_KOMI_A8
+	bool "RTCONFIG_BOARD_KOMI_A8"
+	default n
+
+
 config RTCONFIG_FW_JUMP
 	bool "build the jumped firmware"
 	default n

@@ -168,7 +168,7 @@ enum {
 	P7_PORT=7,
 };
 #define MT7621_GSW
-#elif defined(RTAC85P)  || defined(RTACRH26) || defined(TUFAC1750) || defined(RT4GAX56) || defined(RTAX53U) 
+#elif defined(RTAC85P)  || defined(RTACRH26) || defined(TUFAC1750) || defined(RT4GAX56)
 enum {
 	WAN_PORT=0,
 	LAN1_PORT=1,
@@ -187,6 +187,150 @@ enum {
 	LAN2_PORT=0, //not used
 	LAN3_PORT=1, //not used
 	LAN4_PORT=3, //not used
+	P5_PORT=5,
+	CPU_PORT=6,
+	P7_PORT=7,
+};
+#define MT7621_GSW
+#elif defined(RTCONFIG_BOARD_C_LIFE_XG1)
+enum {
+	WAN_PORT=0,
+	LAN1_PORT=1,
+	LAN2_PORT=2,
+	LAN3_PORT=3,
+	LAN4_PORT=4,
+	P5_PORT=5,
+	CPU_PORT=6,
+	P7_PORT=7,
+};
+#define MT7621_GSW
+#elif defined(RTCONFIG_BOARD_H3C_TX180X)
+enum {
+	WAN_PORT=4,
+	LAN1_PORT=3,
+	LAN2_PORT=2,
+	LAN3_PORT=1,
+	LAN4_PORT=0,
+	P5_PORT=5,
+	CPU_PORT=6,
+	P7_PORT=7,
+};
+#define MT7621_GSW
+#elif defined(RTCONFIG_BOARD_JCG_Q20)
+enum {
+	WAN_PORT=0,
+	LAN1_PORT=1,
+	LAN2_PORT=4,
+	LAN3_PORT=2,
+	LAN4_PORT=3,
+	P5_PORT=5,
+	CPU_PORT=6,
+	P7_PORT=7,
+};
+#define MT7621_GSW
+#elif defined(RTCONFIG_BOARD_CMCC_A9)
+enum {
+	WAN_PORT=0,
+	LAN1_PORT=4,
+	LAN2_PORT=2,
+	LAN3_PORT=1,
+	LAN4_PORT=3,
+	P5_PORT=5,
+	CPU_PORT=6,
+	P7_PORT=7,
+};
+#define MT7621_GSW
+#elif defined(RTCONFIG_BOARD_CMCC_A9_2)
+enum {
+	WAN_PORT=1,
+	LAN1_PORT=4,
+	LAN2_PORT=3,
+	LAN3_PORT=2,
+	LAN4_PORT=0,
+	P5_PORT=5,
+	CPU_PORT=6,
+	P7_PORT=7,
+};
+#define MT7621_GSW
+#elif defined(RTCONFIG_BOARD_CR660X)
+enum {
+	WAN_PORT=4,
+	LAN1_PORT=0,
+	LAN2_PORT=1,
+	LAN3_PORT=2,
+	LAN4_PORT=3,
+	P5_PORT=5,
+	CPU_PORT=6,
+	P7_PORT=7,
+};
+#define MT7621_GSW
+#elif defined(RTCONFIG_BOARD_XY_C3N)
+enum {
+	WAN_PORT=4,
+	LAN1_PORT=3,
+	LAN2_PORT=2,
+	LAN3_PORT=1,
+	LAN4_PORT=0,
+	P5_PORT=5,
+	CPU_PORT=6,
+	P7_PORT=7,
+};
+#define MT7621_GSW
+#elif defined(RTCONFIG_BOARD_SIM_AX18)
+enum {
+	WAN_PORT=4,
+	LAN1_PORT=3,
+	LAN2_PORT=2,
+	LAN3_PORT=1,
+	LAN4_PORT=0,
+	P5_PORT=5,
+	CPU_PORT=6,
+	P7_PORT=7,
+};
+#define MT7621_GSW
+#elif defined(RTCONFIG_BOARD_RX6000)
+enum {
+	WAN_PORT=4,
+	LAN1_PORT=3,
+	LAN2_PORT=2,
+	LAN3_PORT=1,
+	LAN4_PORT=0,
+	P5_PORT=5,
+	CPU_PORT=6,
+	P7_PORT=7,
+};
+#define MT7621_GSW
+#elif defined(RTCONFIG_BOARD_G_AX1800)
+enum {
+	WAN_PORT=0,
+	LAN1_PORT=1,
+	LAN2_PORT=2,
+	LAN3_PORT=3,
+	LAN4_PORT=4,
+	P5_PORT=5,
+	CPU_PORT=6,
+	P7_PORT=7,
+};
+#define MT7621_GSW
+#elif defined(RTCONFIG_BOARD_KOMI_A8)
+enum {
+	WAN_PORT=1,
+	LAN1_PORT=4,
+	LAN2_PORT=3,
+	LAN3_PORT=2,
+	LAN4_PORT=0,
+	P5_PORT=5,
+	CPU_PORT=6,
+	P7_PORT=7,
+};
+#define MT7621_GSW
+#elif defined(RTAX53U)
+enum {
+	WAN_PORT=0,
+	LAN1_PORT=1,
+	LAN2_PORT=2,
+	LAN3_PORT=3,
+	LAN4_PORT=4,
 	P5_PORT=5,
 	CPU_PORT=6,
 	P7_PORT=7,
@@ -2440,6 +2584,107 @@ void ATE_mt7621_esw_port_status(void)
 		pS.speed[i] = (value >> 2) & 0x3;
 	}
 
+#if defined(RTCONFIG_BOARD_C_LIFE_XG1)
+#if defined(PORT_W4321)
+	snprintf(buf, sizeof(buf), "W0=%C;L4=%C;L3=%C;L2=%C;L1=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN4_PORT] == 1) ? (pS.speed[LAN4_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X');
+#else
+#if defined(RTCONFIG_CONCURRENTREPEATER) && defined(RPAC87)
+		snprintf(buf, sizeof(buf), "L1=%C",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X');
+#elif defined(RTAX53U)
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X');
+
+#elif defined(XD4S)
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X');
+#else
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;L3=%C;L4=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN4_PORT] == 1) ? (pS.speed[LAN4_PORT] == 2) ? 'G' : 'M': 'X');
+#endif
+#endif
+#elif defined(RTCONFIG_BOARD_H3C_TX180X) || defined(RTCONFIG_BOARD_CR660X) || defined(RTCONFIG_BOARD_SIM_AX18) || defined(RTCONFIG_BOARD_RX6000) || defined(RTCONFIG_BOARD_G_AX1800)
+#if defined(PORT_W4321)
+	snprintf(buf, sizeof(buf), "W0=%C;L4=%C;L3=%C;L2=%C;L1=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN4_PORT] == 1) ? (pS.speed[LAN4_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X');
+#else
+#if defined(RTCONFIG_CONCURRENTREPEATER) && defined(RPAC87)
+		snprintf(buf, sizeof(buf), "L1=%C",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X');
+#elif defined(RTAX53U)
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;L3=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X');
+
+#elif defined(XD4S)
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X');
+#else
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;L3=%C;L4=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN4_PORT] == 1) ? (pS.speed[LAN4_PORT] == 2) ? 'G' : 'M': 'X');
+#endif
+#endif
+#elif defined(RTCONFIG_BOARD_JCG_Q20)
+#if defined(PORT_W4321)
+	snprintf(buf, sizeof(buf), "W0=%C;L4=%C;L3=%C;L2=%C;L1=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN4_PORT] == 1) ? (pS.speed[LAN4_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X');
+#else
+#if defined(RTCONFIG_CONCURRENTREPEATER) && defined(RPAC87)
+		snprintf(buf, sizeof(buf), "L1=%C",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X');
+#elif defined(RTAX53U)
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;L3=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X');
+#elif defined(RTAX54)
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X');
+
+#elif defined(XD4S)
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X');
+#else
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;L3=%C;L4=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN4_PORT] == 1) ? (pS.speed[LAN4_PORT] == 2) ? 'G' : 'M': 'X');
+#endif
+#endif
+#elif defined(RTCONFIG_BOARD_CMCC_A9) || defined(RTCONFIG_BOARD_CMCC_A9_2) || defined(RTCONFIG_BOARD_KOMI_A8)
 #if defined(PORT_W4321)
 	snprintf(buf, sizeof(buf), "W0=%C;L4=%C;L3=%C;L2=%C;L1=%C;",
 		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
@@ -2469,6 +2714,71 @@ void ATE_mt7621_esw_port_status(void)
 		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
 		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X',
 		(pS.link[LAN4_PORT] == 1) ? (pS.speed[LAN4_PORT] == 2) ? 'G' : 'M': 'X');
+#endif
+#endif
+#elif defined(RTCONFIG_BOARD_XY_C3N)
+#if defined(PORT_W4321)
+	snprintf(buf, sizeof(buf), "W0=%C;L4=%C;L3=%C;L2=%C;L1=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN4_PORT] == 1) ? (pS.speed[LAN4_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X');
+#else
+#if defined(RTCONFIG_CONCURRENTREPEATER) && defined(RPAC87)
+		snprintf(buf, sizeof(buf), "L1=%C",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X');
+#elif 0
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;L3=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X');
+
+#elif defined(XD4S)
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X');
+#else
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;L3=%C;L4=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN4_PORT] == 1) ? (pS.speed[LAN4_PORT] == 2) ? 'G' : 'M': 'X');
+#endif
+#endif
+#else
+#if defined(PORT_W4321)
+	snprintf(buf, sizeof(buf), "W0=%C;L4=%C;L3=%C;L2=%C;L1=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN4_PORT] == 1) ? (pS.speed[LAN4_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X');
+#else
+#if defined(RTCONFIG_CONCURRENTREPEATER) && defined(RPAC87)
+		snprintf(buf, sizeof(buf), "L1=%C",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X');
+#elif defined(RTAX53U)
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;L3=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X');
+
+#elif defined(XD4S)
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X');
+#else
+	snprintf(buf, sizeof(buf), "W0=%C;L1=%C;L2=%C;L3=%C;L4=%C;",
+		(pS.link[ WAN_PORT] == 1) ? (pS.speed[ WAN_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN1_PORT] == 1) ? (pS.speed[LAN1_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN2_PORT] == 1) ? (pS.speed[LAN2_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN3_PORT] == 1) ? (pS.speed[LAN3_PORT] == 2) ? 'G' : 'M': 'X',
+		(pS.link[LAN4_PORT] == 1) ? (pS.speed[LAN4_PORT] == 2) ? 'G' : 'M': 'X');
+#endif
 #endif
 #endif
 	puts(buf);

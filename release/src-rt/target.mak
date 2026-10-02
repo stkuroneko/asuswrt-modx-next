@@ -956,3 +956,12 @@ export BLUECAVE := IPV6SUPP=y HTTPS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y SAMBA3=y
 	AMAS=y ETHOBD=y LETSENCRYPT=y UTF8_SSID=y HAPDEVENT=y DWB=y \
 	CONNDIAG=y UUPLUGIN=y \
 	WL_SCHED_V3=y GOOGLE_ASST=y
+
+# Select one legacy hardware profile while retaining its original firmware base.
+MT7621_BOARD_PROFILES := C-Life-XG1 H3C-TX180X JCG-Q20 CMCC-A9 CMCC-A9.2 CR660X XY-C3N SIM-AX18 RX6000 G-AX1800 KOMI-A8
+ifneq ($(BOARD_PROFILE),)
+ifeq ($(filter $(BOARD_PROFILE),$(MT7621_BOARD_PROFILES)),)
+$(error Unsupported BOARD_PROFILE '$(BOARD_PROFILE)'; choose one of: $(MT7621_BOARD_PROFILES))
+endif
+include $(dir $(realpath $(lastword $(MAKEFILE_LIST))))board-profiles/$(BOARD_PROFILE).mak
+endif
