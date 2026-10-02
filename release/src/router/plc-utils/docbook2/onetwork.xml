@@ -1,0 +1,79 @@
+<chapter id='onetwork'>
+	<title>
+		Class onetwork
+		</title>
+	<section id="onetwork-class" >
+		<title>
+			Introduction
+			</title>
+		<para>
+			To be documented.
+			</para>
+		<para>
+			This class is declared in <ulink url='onetwork.hpp.html'>onetwork.hpp</ulink> and defined in <ulink url='onetwork.cpp.html'>onetwork.cpp</ulink>.
+			</para>
+		<section id="onetwork-inheritance">
+			<title>
+				Inheritance
+				</title>
+			<para>
+				None.
+				</para>
+			</section>
+		<section id="onetwork-dependence">
+			<title>
+				Dependence
+				</title>
+			<para>
+				None.
+				</para>
+			</section>
+		</section>
+	<section id="onetwork-properties">
+		<title>
+			Properties
+			</title>
+		<para>
+			None.
+			</para>
+		</section>
+	<section id="onetwork-methods">
+		<title>
+			Methods
+			</title>
+		<para>
+			</para>
+		<section id="onetwork-Bridges">
+			<title>
+				Bridges
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>size_t <function>onetwork::Bridges</function></funcdef>
+					<paramdef>ochannel * <parameter>channel</parameter></paramdef>
+    					<paramdef>void * <parameter>memory</parameter></paramdef>
+					<paramdef>size_t <parameter>extent</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Encode memory with a list of local powerline adapter hardware addresses connected to the specified channel interface. Return the number of local powerline adapters detecteed. Argument <varname>extent</varname> specifies the size of <varname>memory</varname> in bytes. The return value indicates the number of consecutive addresses stored in <varname>memory</varname>. Each address is <constant>ETHER_ADDR_LEN</constant> bytes. In other words, the external declaration of <varname>memory</varname> should look something like <quote><code> byte devices [][<constant>ETHER_ADDR_LEN</constant>]</code></quote>.    
+				</para>
+			</section>
+		<section id="onetwork-Devices">
+			<title>
+				Devices
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>size_t <function>onetwork::Devices</function></funcdef>
+ 					<paramdef>ochannel * <parameter>channel</parameter></paramdef>
+   					<paramdef>void * <parameter>memory</parameter></paramdef>
+					<paramdef>size_t <parameter>extent</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Encode memory with a list of local powerline adapter hardware addresses. Return the number of local powerline adapters detecteed. Argument <varname>extent</varname> specifies the size of <varname>memory</varname> in bytes. The return value indicates the number of consecutive addresses stored in <varname>memory</varname>. Each address is <constant>ETHER_ADDR_LEN</constant> bytes. In other words, the external declaration of <varname>memory</varname> should look something like <quote><code> byte devices [][<constant>ETHER_ADDR_LEN</constant>]</code></quote>.    
+				</para>
+			</section>
+		</section>
+	</chapter>

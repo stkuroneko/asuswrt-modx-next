@@ -1,0 +1,23 @@
+<pib xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="piboffset.xsd">
+<!-- An example xml file to modify PCI values in the PIB; See the pxe program; -->
+	<object name="PCIDeviceID">
+		<offset>01A0</offset>
+		<length>2</length>
+		<dataHex>6000</dataHex>
+		</object>
+	<object name="PCIVendorID">
+		<offset>01A2</offset>
+		<length>2</length>
+		<dataHex>16E5</dataHex>
+		</object>
+	<object name="PCISubsystemID">
+		<offset>01A8</offset>
+		<length>2</length>
+		<dataHex>0000</dataHex>
+		</object>
+	<object name="PCISubsystemVendorID">
+		<offset>01AA</offset>
+		<length>2</length>
+		<dataHex>0000</dataHex>
+		</object>
+	</pib>

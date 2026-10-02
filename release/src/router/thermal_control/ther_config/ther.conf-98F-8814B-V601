@@ -1,0 +1,3 @@
+/*id,    max,  hi,   low,  funcoff, txduty, path, power*/
+wlan0    49    48    47    1        2       0     0
+wlan1    61    60    59    1        1       0     0

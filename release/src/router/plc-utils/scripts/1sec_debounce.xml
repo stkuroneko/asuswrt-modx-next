@@ -1,0 +1,30 @@
+<!--
+
+ 1sec_debounce.xml -
+
+ This file is an example pxe instruction file; it sets two
+ PIB values at offset 0x1F1A and 0x1F1E, respecively; pxe
+ reads a PIB file, edits it, computes a new checksum and
+ re-writes the file;
+
+ This instruction set changes the minimum pushbutton press 
+ time to 1 second;
+
+ -->
+<pib xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="piboffset.xsd">
+  <object name="UseMinButtonPressHoldTime">
+    <!-- If this value is non-zero, use the MinButtonPressHoldTime -->
+    <offset>1F1A</offset>
+    <length>4</length>
+    <dataHex>01000000</dataHex>
+  </object>
+  <object name="MinButtonPressHoldTime">
+     <!-- values of 100, 200, 300 ... 1000 msec -->
+     <!-- 0x64000000 = 100 msec -->
+     <!-- 0xE8030000 = 1 sec -->
+     <offset>1F1E</offset>
+     <length>4</length>
+     <dataHex>E8030000</dataHex>
+   </object>
+</pib>

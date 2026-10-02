@@ -1,0 +1,121 @@
+.TH arpc 1 "Mar 2014" "plc-utils-2.1.6" "Qualcomm Atheros Powerline Toolkit"
+
+.SH NAME
+arpc - Qualcomm Atheros Asynchronous Remote Procedure Call Monitor
+
+.SH SYNOPSIS
+.BR arpc 
+.RI [ options ] 
+
+.SH DESCRIPTION
+Print Atheros VS_ARPC messages on stdout.
+Message display format is determined by the message ARPCID field.
+
+.PP
+Messages having \fBARPCID\fR=\fB1\fR are assumed to have a print format string and variable number of 32-bit arguments.
+The format string and argument list are passed to ANSI C function \fBvfprintf\fR for output.
+The number of arguments printed and their interpretation is determined by the format string.
+
+.PP
+Messages having \fBARPCID\fR=\fB2\fR are assumed to contain raw binary data.
+The message payload is printed as ASCII hexadecimal characters or written as raw binary data depending whether stdout is directed to the console or a file.
+In either case, the payload is prefixed with the number of bytes in the payload.
+
+.PP
+This program is part of the Qualcomm Atheros Powerline Toolkit.
+See the \fBAMP\fR man page for an overview and installation instructions.
+
+.SH COMMENTS
+This is a relatively new program an is still under development.
+The message display format may change from release to release.
+
+.SH OPTIONS
+
+.TP
+-\fBi \fIinterface\fR
+The host ethernet interface to monitor.
+The named interface, such as eth0, eth1 and so on, must be connected to a HomePlug AV ethernet-to-powerline bridge adapter to receive any HomePlug AV traffic.
+The default interface is \fBeth1\fR.
+
+.TP
+.RB - q
+Quiet mode.
+Suppress the printing of the normal message descriptions on \fBstdout\fR.
+
+.TP
+.RB - m 
+Prefix ARPC messages with a timestamp on output.
+The timestamp displays the local time as the number of seconds and microseconds since the Epoch in floating point format (ie; "1327514344.000872") so that events can be synchronized later on.
+When the payload is printed in hex or write as raw binary, the length of the seconds portion of the time may vary depending on the operating system used to print the timestamp.
+For exampe, seconds will probably be expressed using 8 bytes on 64-bit systems but only 4-bytes on 32-bit systems.
+This is a well known issue with the POSIX timval structure.
+Use option \fB-z\fR to determine exactly how your operating system writes the time stamp.
+
+.TP
+.RB - v
+Verbose mode.
+Displays incoming frames in hexadecimal dump format on \fBstdout\fR.
+This option is independent of option \fB-a\fR which prints VS_ARPC message text on stderr.
+
+.TP
+.RB - z 
+Print the current time as both hh:mm:ss (ie; "13:17:03") and seconds.milliseconds (ie; "1327515423.611") and exit the program.
+This option may be used to verify proper timezone and determine how to map against timestamps from other sources.
+
+.TP
+-\fB?\fR, --\fBhelp\fR
+Print program help summary on stdout.
+This option takes precedence over other options on the command line.
+
+.TP
+-\fB!\fR, --\fBversion\fR
+Print program version information on stdout.
+This option takes precedence over other options on the command line.
+Use this option when sending screen dumps to Atheros Technical Support so that they know exactly which version of the Linux Toolkit you are using.
+
+.SH ARPC MESSAGE STRUCTURE
+
+.PP
+All \fBVS_ARPC\fR messages have the following general format where \fBRDATALENGTH\fR is the length of \fBRDATA\fR[] and \fBRDATAOFFSET\fR is where valid data starts within \fBRDATA\fR[].
+
+.PP   
+   struct __packed vs_arpc_ind 
+   {
+      struct ethernet_std ethernet;
+      struct qualcomm_std qualcomm;
+      uint16_t \fBRDATALENGTH\fR;
+      uint8_t \fBRDATAOFFSET\fR;
+      uint8_t \fBRDATA\fR [1];
+   }
+   * indicate = (struct vs_arpc_ind *)(&message);
+
+.PP
+This means that the usable data address is &\fBRDATA\fR[\fBRDATAOFFSET\fR] and usable data length is \fBRDATALENGTH\fR - \fBRDATAOFFSET\fR.
+A handler can be called as follows to interpret and manipulate \fBRDATA\fR[]:
+
+.PP
+   \fBARPCPrint\fR (stdout, &indicate->\fBRDATA\fR[indicate->\fBRDATAOFFSET\fR], indicate->\fBRDATALENGTH\fR - indicate->\fBRDATAOFFSET\fR);  
+
+.PP
+
+.SH EXAMPLES
+
+.PP
+The following example monitors interface \fBeth1\fR for VS_ARPC.IND messages and prints them on the console.
+The program continues to monitor until terminated using \fBctrl-C\fR or terminated by some other means.
+
+.PP
+   # arpc -i eth1
+
+.SH DISCLAIMER
+Atheros HomePlug AV Vendor Specific Management Message structure and content is proprietary to Qualcomm Atheros, Ocala FL USA.
+Consequently, public information is not available.
+Qualcomm Atheros reserves the right to modify management message structure and content in future firmware releases without any obligation to notify or compensate users of this program.
+
+.SH SEE ALSO
+.BR plcsnif ( 1 ),
+.BR hpav ( 1 )
+
+.SH CREDITS
+ Charles Maier <cmaier@qca.qualcomm.com>
+

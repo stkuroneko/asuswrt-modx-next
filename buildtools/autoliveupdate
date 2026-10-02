@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+my $updatedir = "/mnt/tp-fs-11/Software/RT-N66U/Firmware_LiveUpdateTest";
+my $fwdir = "/mnt/tp-fs-11/Software/RT-N66U/Firmware_SQ";
+
+sub genliveupdate
+{
+	my $fwname;
+	my $model;
+	my $version;
+	my $buildno;
+
+	$fwname=$_[0];
+	$model=$_[0];
+	$model=~ s/_.*//; 
+	$version=$_[0];
+	$version=~ s/${model}_//;
+	$version=~ s/_.*//;
+	$version=~ s/\.//;
+	$version=~ s/\.//;
+	$version=~ s/\.//;	
+	$buildno=$_[0];
+	$buildno=~ s/.*_//;
+
+	print "FW:" . $fwname . "\n";
+	print "Model:" . $model . "\n";
+	print "Versioin:" . $version . "\n";
+	print "Buildno:" . $buildno . "\n";
+
+	#compare Firmware version with wlan_update.txt from /mnt/tp-fs-11/Software/RT-N66U/Firmware_LiveUpdateTest/wlan_update.zip
+	system("rm -f wlan_update.*");
+	system("cp -f ${updatedir}/wlan_update.zip ./");
+	system("unzip wlan_update.zip");
+
+	system("cat wlan_update.txt | grep -v \"${model}\" > wlan_update.txt.new");
+	
+	# zip fw file to destination directory
+	print "Update FW file\n";
+
+	# a speciall handle for DSL-N55U Annex A model
+	if ( ${model} =~ /DSL/ ) {
+		if( ${model} =~ /-B/ ) {
+		}
+		else {
+			system("cp -f ${fwdir}/${model}/${fwname}_Annex_A.trx ${fwdir}/${model}/$fwname.trx");
+		}
+	}
+
+	system("zip -j ${updatedir}/${model}_${version}_${buildno}.zip  ${fwdir}/${model}/${fwname}.trx");
+	#update wlan_update.zip to /mnt/tp-fs-11/Software/RT-N66U/Firmware_LiveUpdateTest/.
+	print "Update wlan_update.zip\n";
+	system("echo ${model}#FW${version}${buildno}#UT4208 >> wlan_update.txt.new");
+	system("mv -f wlan_update.txt.new wlan_update.txt");
+	system("zip -m wlan_update.zip wlan_update.txt");
+	system("cp -f wlan_update.zip ${updatedir}/.");
+	system("rm -f wlan_update.*");
+}
+
+if (@ARGV >=1) {
+	# usage autoliveupdate [FW] [FW] ..
+	# ex, autoliveupdate RT-N66U_3.0.0.3_82 RT-N16_3.0.0.3_84 .. ..
+	
+	foreach $fw(@ARGV) 
+	{
+		genliveupdate(${fw});
+	}
+}
+
+
+
+
+
+
+
+
+

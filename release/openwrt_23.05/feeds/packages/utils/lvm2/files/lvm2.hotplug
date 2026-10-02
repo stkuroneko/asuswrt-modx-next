@@ -1,6 +1,0 @@
-
-[ "$ACTION" = "add" ] || return 0
-[ -e "/dev/$DEVNAME" ] || return 0
-
-/sbin/lvm vgscan --mknodes --devices /dev/$DEVNAME || :
-/sbin/lvm vgchange -aly --devices /dev/$DEVNAME || :

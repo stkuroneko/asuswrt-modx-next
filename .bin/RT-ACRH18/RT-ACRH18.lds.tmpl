@@ -1,0 +1,37 @@
+SECTIONS
+{
+  .bootloader @BOOTLOADER_BASE@ :
+  {
+    bootloader_begin = .;
+    @BOOTLOADER@
+  }
+
+  .nvram @NVRAM_BASE@ :
+  {
+    BYTE(0xff)
+  }
+
+  .factory1 @FACTORY1_BASE@ :
+  {
+    factory1_begin = .;
+    @FACTORY1@
+  }
+
+  .factory2 @FACTORY2_BASE@ :
+  {
+    factory2_begin = .;
+    @FACTORY2@
+  }
+
+  .trx1 @TRX1_BASE@ :
+  {
+    trx1_begin = .;
+    @TRX1@
+  }
+
+  .trx2 @TRX2_BASE@ :
+  {
+    trx2_begin = .;
+    @TRX2@
+  }
+}

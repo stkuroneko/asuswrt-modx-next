@@ -1,0 +1,7 @@
+<pib xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="piboffset.xsd">
+	<object name="AVLNMembership">
+		<offset>1E8C</offset>
+		<length>4</length>
+		<dataHex>00000000</dataHex>
+		</object>
+	</pib>

@@ -1,0 +1,5 @@
+   Cap1 any VLANID is 20 add perm
+   DropRX any VLANID is 25 add perm
+   StripRx any VLANID is 5 VLANID is 10 VLANID is 15 add perm
+   StripRx any VLANID is 20 add perm
+   Cap1 any VLANID is 5 VLANID is 10 VLANID is 15 add perm

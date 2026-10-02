@@ -1,0 +1,248 @@
+<chapter id='ointellon'>
+	<title>
+		Class ointellon
+		</title>
+	<section id="ointellon-class">
+		<title>
+			Introduction
+			</title>
+		<para>
+			This class implements a HomePlug AV vendor specific message header encoder/decoder. When instantiated, it provides access the Ethernet header plus the vendor specific version,  message type and OUI. Class methods may be used to encode/decode or import/export a complete header or individual header fields stored in external memory in proper byte order.
+			</para>
+		<para>
+			The <link linkend='ohomeplug-MessageType'>MessageType</link> property and <link linkend='ointellon-SetMessageType'>SetMessageType</link> method perform implicit integer host-to-little-endian and little-endian-to-host conversion. 
+			</para>
+		<para>
+			This class is declared in <ulink url='ointellon.hpp.html'>ointellon.hpp</ulink> and defined in <ulink url='ointellon.cpp.html'>ointellon.cpp</ulink>.
+			</para>
+		<section id="ointellon-inheritance">
+			<title>
+				Inheritance
+				</title>
+			<para>
+				This class inherits the <link linkend='oethernet'>oethernet</link> class to implement the Ethernet portion of the message header.
+				</para>
+			</section>
+		<section id="ointellon-dependence">
+			<title>
+				Dependence
+				</title>
+			<para>
+				This class references static class <link linkend='omemory'>omemory</link> to manipulate memory.
+				</para>
+			</section>
+		</section>
+	<section id="ointellon-properties">
+		<title>
+			Properties
+			</title>
+		<para>
+			Class properties include all <link linkend='oethernet-properties'>oethernet</link> properties plus those described below.
+			</para>
+		<section id="ointellon-HeaderLength">
+			<title>
+				ointellon::HeaderLength
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>unsigned <function>HeaderLength</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the HomePlug AV vendor specific header length in bytes. The header length includes the Ethernet <link linkend='oethernet-HeaderLength'>HeaderLength</link> plus the Atheros <link linkend='ointellon-MessageVersion'>MessageVersion</link>, <link linkend='ointellon-MessageType'>MessageType</link> and <link linkend='ointellon-VendorOUI'>VendorOUI</link> lengths. Use this property to allocate buffer space in application programs. 
+				</para>
+			</section>
+		<section id="ointellon-LocalcastAddress">
+			<title>
+				ointellon::LocalcastAddress
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>const uint8_t * <function>LocalcastAddress</function></funcdef>
+    					<paramdef></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the Atheros localcast address as a constant 48-bit integer in network byte order. The value is <constant>00:B0:52:00:00:01</constant> and the length is <constant>ETHER_ADDR_LEN</constant> bytes. Although shown here as a property, this is implemented as a constant. Parentheses are omitted when referencing it. 
+				</para>
+			</section>
+		<section id="ointellon-MessageType">
+			<title>
+				ointellon::MessageType
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>uint16_t <function>MessageType</function></funcdef>
+					<paramdef>void</paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the vendor specific message type as a 16-bit integer in host byte order. This property is the same as the <varname>MMTYPE</varname> field described in the <citetitle>Firmware Technical Reference Manual</citetitle>. On instantiation, this property constains <constant>oINTELLON_MMTYPE</constant>, as defined in <ulink url='ointellon.hpp.html'>ointellon.hpp</ulink>. 
+				</para>
+			</section>
+		<section id="ointellon-MessageTypeString">
+			<title>
+				ointellon::MessageTypeString
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>uint16_t <function>MessageTypeString</function></funcdef>
+					<paramdef>void</paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the HomePlug AV message type as a string. The length is <constant>6</constant> characters including the <constant>NUL</constant> terminator. The string is formatted as colon-seperated, hexadecimal octets in little-endian order, as in <quote>00:A0</quote>.
+
+				</para>
+			</section>
+		<section id="ointellon-MessageVersion">
+			<title>
+				ointellon::MessageVersion
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>uint8_t <function>MessageVersion</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the message version as an 8-bit integer. The message version indicates the revision of the <citetitle>HomePlug AV Specification</citetitle> that describes the message format. On instantiation, this property contains <constant>oINTELLON_MMV</constant>,  as defined in header file <ulink url='ointellon.hpp'>ointellon.hpp</ulink>. No methods are provided for changing the value.
+				</para>
+			</section>
+		<section id="ointellon-MessageVersionString">
+			<title>
+				ointellon::MessageVersionString
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>char const * <function>MessageVersionString</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the message version as a string. The length is <constant>3</constant> characters including the <constant>NUL</constant> terminator. The string is formatted as one hexadecimal octet.
+				</para>
+			</section>
+		<section id="ointellon-VendorOUI">
+			<title>
+				ointellon::VendorOUI
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>uint8_t <function>VendorOUI</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the vendor OUI as a byte array in network byte order. The length is <constant>ETHER_ADDR_LEN/2</constant> bytes. On instantiation, this property contains <constant>00:B0:52</constant>. No methods are provided for changing the value.
+				</para>
+			</section>
+		<section id="ointellon-VendorOUIString">
+			<title>
+				ointellon::VendorOUIString
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>char const * <function>VendorOUIString</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the vendor OUI as a string. The length is <constant>ETHER_ADDR_LEN*3/2</constant> characters including the <constant>NUL</constant> terminator. The string is formatted as colon-seperated, hexadecimal octets, as in <quote>00:B0:52</quote>.
+				</para>
+			</section>
+		</section>
+	<section id="ointellon-methods">
+		<title>
+			Methods
+			</title>
+		<para>
+			Class methods include all <link linkend='oethernet-methods'>oethernet</link> methods plus those described below.
+			</para>
+		<section id="ointellon-ExportHeader">
+			<title>
+				ointellon::ExportHeader
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>void * <function>ExportHeader</function></funcdef>
+   					<paramdef>void * <parameter>memory</parameter> </paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Encode external memory with a HomePlug AV vendor specific message header. Return the address of the next unencoded memory byte. The number of bytes encoded will equal the <link linkend='ointellon-HeaderLength'>HeaderLength</link> property. The <varname>memory</varname> address is incremented by that amount and returned as the method value for subsequent export operations. The encoded header will include the Ethernet header plus the Atheros specific <link linkend='ointellon-MessageVersion'>MessageVersion</link> and <link linkend='ointellon-MessageType'>MessageType</link>. Instance properties are not modified by the operation.   
+				</para>
+			</section>
+		<section id="ointellon-ImportHeader">
+			<title>
+				ointellon::ImportHeader
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>void const * <function>ImportHeader</function></funcdef>
+   					<paramdef>void const * <parameter>memory</parameter></paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Decode external memory containing a HomePlug AV specific header. Return the address of the next undecoded memory byte. No length argument is required. The number of bytes decoded will be <link linkend='ointellon-HeaderLength'>HeaderLength</link>. The <varname>memory</varname> address is incremented by that amount and returned as the method value for subsequent import operations. External memory is unpacked and stored in Ethernet header properties and the Atheros <link linkend='ointellon-MessageVersion'>MessageVersion</link> and <link linkend='ointellon-MessageType'>MessageType</link> properties.  External memory is not modified by this operation.
+				</para>
+			</section>
+		<section id="ointellon-IsMessageType">
+			<title>
+				ointellon::IsMessageType
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>bool <function>IsMessageType</function></funcdef>
+					<paramdef>uint16_t <parameter>type</parameter></paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return <constant>true</constant> if this instance contains the expected Atheros vendor specific message header having the specified message <varname>type</varname>. This method may be called after importing an unknown message header to verify that the instance now contains the expected <link linkend='ointellon-MessageType'>MessageType</link> of <varname>type</varname> and the default <link linkend='ointellon-MessageVersion'>MessageVersion</link> and <link linkend='ointellon-VendorOUI'>VendorOUI</link>, all in one operation. It is typically used to detect, and possibly ignore, unexpected confirmation and indiction messages.
+				</para>
+			</section>
+		<section id="ointellon-SetMessageVersion">
+			<title>
+				ointellon::SetMessageVersion
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointellon &amp; <function>SetMessageVersion</function></funcdef>
+   					<paramdef>uint8_t <parameter>version</parameter></paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Assign a new value to the message version.
+				</para>
+			</section>
+		<section id="ointellon-SetMessageType">
+			<title>
+				ointellon::SetMessageType
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointellon &amp; <function>SetMessageType</function></funcdef>
+   					<paramdef>uint16_t <parameter>type</parameter></paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Specify the HomePlug AV vendor specific message type as an integer in host byte order. The <varname>type</varname> is stored internally in little-endian order. Valid HomePlug AV vendor specific message types are <constant>0xA000</constant> through <constant>0xBFFC</constant> but this method does not validate the argument so any 16-bit value is permitted. 
+				</para>
+			</section>
+		<section id="ointellon-Print">
+			<title>
+				ointellon::Print
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+					<funcdef>ointellon &amp; <function>Print</function></funcdef>
+					<paramdef>void</paramdef>
+					</funcprototype>
+					</funcsynopsis>
+			<para>
+				Print the HomePlug AV header on stdout in human-friendly format.
+				</para>
+			</section>
+		</section>
+	</chapter>

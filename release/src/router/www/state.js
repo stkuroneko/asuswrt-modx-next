@@ -337,6 +337,7 @@ var is_SG_sku = in_territory_code("SG");
 var is_EU_sku = in_territory_code("EU");
 var is_ISP_incompatible = (in_territory_code("CX") || in_territory_code("CT") || in_territory_code("OP") || in_territory_code("CH"));
 var SG_mode = ('<% nvram_get("SG_mode"); %>' == 1);
+var ID_mode = ('<% nvram_get("ID_mode"); %>' == 1);
 
 var isGundam = in_territory_code("GD") || CoBrand_flag == 1;
 var isKimetsu = (CoBrand_flag == '2');

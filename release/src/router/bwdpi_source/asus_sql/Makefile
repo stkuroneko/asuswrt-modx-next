@@ -4,7 +4,7 @@ ifeq ($(TOP_PLATFORM),)
 TOP_PLATFORM=$(TOP)
 endif
 
-
+CFLAGS += -I$(TOP)/json-c
 CFLAGS += -Os -Wall $(EXTRACFLAGS) -fPIC
 CFLAGS += -I. -I$(TOP)/shared -I$(SRCBASE)/include -I$(TOP)/sqlite -I$(TOP)/rc -I$(TOP)/httpd
 CFLAGS += -I$(TOP)/bwdpi_source/src/tdts_udb_sample

@@ -1,0 +1,258 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <error.h>
+#include <arpa/inet.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <linux/types.h>
+#include <linux/socket.h>
+#include <linux/netlink.h>
+
+#include    <sys/stat.h>
+#include    <time.h>
+
+
+#include "csr_netlink.h"
+#include "csr_table.h"
+
+#define min(a,b) 	( ( a > b) ? b : a )
+
+void help( char* argv0, char* reason)
+{
+printf(""
+"!! ERROR: %s !!\n"
+"\n"
+"Usage: %s [options] address value...\n"
+"  address:\taddress (must be heximal) to read/write the corresponding system register.\n"
+"  value:\tthe value (must be heximal) to be written to the specific corresponding system register.\n"
+"\n"
+"Options:\n"
+"  %s\t\tread system register"
+"  %s\t\twrite system register"
+"  %ssrtest\t\tPerform CSR Test"
+"\n"
+"\n"
+"Example:\n"
+"        %s %s 0xa0300010 \\\n"
+"        %s %s 0xa0300010 0xffff1234\\\n"
+"        %s %s\\\n"
+"\n",
+	reason,
+	argv0,
+	cmd_option[CMD_READ], cmd_option[CMD_WRITE], cmd_option[CMD_CSRTEST],
+	argv0, cmd_option[CMD_READ], argv0, cmd_option[CMD_WRITE], argv0, cmd_option[CMD_CSRTEST]);
+}
+
+/*
+ *  mathStrtol() -- enhanced strtol(), supporting plus and minus operation.
+ *
+ *	Return: uint32   -- converted value
+ *
+ */
+unsigned int mathStrtol( char* szSrc )
+{
+	char szTemp[4096];
+	char *pszToken;
+	unsigned int retVal = 0;
+	char prevOperator = '\0';
+
+	strncpy( szTemp, szSrc, min( strlen(szSrc), sizeof(szTemp)-1 ) + 1 );
+
+	for( pszToken = strtok( szTemp, "+-" );
+	     pszToken;
+	     pszToken = strtok( NULL, "+-" ) )
+	{
+		char chDeletedChar;
+
+		/* find out what character was deleted by strtok(). */
+		chDeletedChar = szSrc[pszToken-szTemp+strlen(pszToken)];
+		
+		switch( prevOperator )
+		{
+			case '+':
+				retVal += strtol( pszToken, NULL, 16 );
+				break;
+			case '-':
+				retVal -= strtol( pszToken, NULL, 16 );
+				break;
+			default:
+				/* initial value */
+				retVal = strtol( pszToken, NULL, 16 );
+				break;
+		}
+
+		prevOperator = chDeletedChar;
+	}
+
+	return retVal;
+}
+
+unsigned int hard_csr_rw_test(RT2880_CSR_MSG* csrmsg)
+{
+	int test;
+	int reg_addr = 0;
+	unsigned int reg_value = 0;
+	pid_t pid, main;
+	main = getpid();
+	switch (pid = fork())
+	{
+		case -1:
+			perror("Error process creation!\n");
+			break;
+		case 0:
+			// for ( test = 0; test < 3; test++);
+			csr_msg_send(csrmsg);
+			_exit(0);	
+		default:
+			reg_value = csr_msg_recv(csrmsg);
+	//		printf("pid : %d, getpid : %d\n", pid, main);
+	}
+	for ( test = 0; test < 10; test++);
+	return reg_value;
+}
+
+unsigned int reg_rw_test(RT2880_CSR_MSG* read_csrmsg)
+{
+		int counter, test;
+		unsigned int csr_reg[3], reg_value;
+		for ( counter  = 0; counter < 3; counter++) {
+			csr_reg[counter] = hard_csr_rw_test(read_csrmsg);
+		}
+		if (csr_reg[0] == csr_reg[1]) {
+			// printf("csr_test : address - 0x%08x, value - 0x%08x\n-----\n", read_csrmsg->address, csr_reg[0]);
+			reg_value = csr_reg[0];
+		}
+		else if (csr_reg[1] == csr_reg[2]) {
+			// printf("csr_test : address - 0x%08x, value - 0x%08x\n-----\n", read_csrmsg->address, csr_reg[1]);
+			reg_value = csr_reg[1];
+		} else {
+			// printf("csr_test : address - 0x%08x, value - 0x%08x\n-----\n", read_csrmsg->address, csr_reg[2]);
+			reg_value = csr_reg[2];
+		}
+
+		// delay some time to wait result		
+		for ( test = 0; test < 1000; test++);	
+		return reg_value;
+}
+
+unsigned int set_xor_reg(unsigned int address, unsigned int value, unsigned int mask)
+{
+	RT2880_CSR_MSG csr_msg;
+	unsigned int set_value = (value ^ mask);
+	
+	csr_msg.enable = CSR_WRITE;
+	csr_msg.address = address;
+	csr_msg.default_value = set_value;
+	printf(" --0x%08x--\t", set_value);
+	
+	csr_msg_send(&csr_msg);
+	return set_value;
+}
+
+
+int main(int argc, char* argv[])
+{
+	int parsingArgc;
+	char* parsingArgv;
+	unsigned int csr_reg_value;
+	int i, test, counter = 0;
+	int cmd = 0;
+	unsigned int n_addr = 0, n_val = 0;
+	
+	
+	RT2880_CSR_MSG read_csrmsg;
+
+#if 0
+			for ( i = 0; i < MAX; i++) {
+				read_csrmsg = csr_msg_table[i];
+				csr_reg_value = reg_rw_test(&read_csrmsg);
+				printf("[%s]\t : address - 0x%08x, value - 0x%08x ", csr_msg_table[i].reg_name,read_csrmsg.address, csr_reg_value);
+				if ( csr_msg_table[i].write_mask != 0 ) {
+					set_xor_reg( csr_msg_table[i].address, csr_reg_value, csr_msg_table[i].write_mask);
+					read_csrmsg = csr_msg_table[i];		
+					csr_reg_value = reg_rw_test(&read_csrmsg);
+					printf("\t0x%08x", csr_reg_value);
+				}
+				printf("\n");
+			}	// csr table traversal		
+#endif
+
+
+				
+	if ( argc == 1 ) {
+		help(argv[0], "input option muse be given!");
+		return -1;
+	}
+	
+		if ( argc == 2 ) {
+			if ( strncmp( "-r", argv[1], 2)  == 0)
+				cmd = CMD_READ;
+			else if ( strncmp( "-w" , argv[1], 2) == 0 )
+				cmd = CMD_WRITE;
+			else if ( !strncmp( cmd_option[CMD_CSRTEST] , argv[1], 2) )
+				cmd = CMD_CSRTEST;
+			else {
+				help(argv[0], "input option incorrect!");
+				return -1;	
+			}
+		} else if ( argc == 3 ) {
+			if (( cmd == CMD_READ ) || (cmd == CMD_WRITE) ) {
+				n_addr = mathStrtol(argv[3]);
+			} else {
+				help(argv[0], "input option incorrect!");
+				return -1;	
+			}
+		} 
+
+	printf("CMD is %d\n", cmd);
+#if 0
+else if (( parsingArgc == 4) & (cmd == CMD_WRITE)) {
+			n_val = mathStrtol(argv[4]);
+		}
+#endif
+
+#if 0
+	switch (cmd ) {
+		case CMD_CSRTEST:
+			for ( i = 0; i < MAX; i++) {
+				read_csrmsg = csr_msg_table[i];
+				csr_reg_value = reg_rw_test(&read_csrmsg);
+				printf("[%s]\t : address - 0x%08x, value - 0x%08x ", csr_msg_table[i].reg_name,read_csrmsg.address, csr_reg_value);
+				if ( csr_msg_table[i].write_mask != 0 ) {
+					set_xor_reg( csr_msg_table[i].address, csr_reg_value, csr_msg_table[i].write_mask);
+					read_csrmsg = csr_msg_table[i];		
+					csr_reg_value = reg_rw_test(&read_csrmsg);
+					printf("\t0x%08x", csr_reg_value);
+				}
+				printf("\n");
+			}	// csr table traversal		
+				break;
+		case CMD_READ:
+				read_csrmsg.enable = CSR_READ;
+				read_csrmsg.address = n_addr;
+				n_val = reg_rw_test(&read_csrmsg);
+				printf("\n 0x%08x(address) : 0x%08x", n_addr, n_val);
+				
+				break;
+		case CMD_WRITE:
+				printf("register write 0x%08x(address) : 0x%08x ", n_addr, n_val);
+				read_csrmsg.enable = CSR_WRITE;
+				read_csrmsg.address = n_addr;
+				n_val = reg_rw_test(&read_csrmsg);
+				printf("Done!");
+				
+				break;		
+		default :
+			printf("Format not correct!\n");
+			break;
+	};
+#endif
+	return 0;
+}

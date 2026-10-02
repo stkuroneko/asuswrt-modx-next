@@ -1,0 +1,358 @@
+<chapter id='ointerfaces'>
+	<title>
+		Class ointerfaces
+		</title>
+	<section id="ointerfaces-class">
+		<title>
+			Introduction
+			</title>
+		<para>
+			This class implements a collection of host Ethernet interfaces. Class properties,  methods and operators are used to iterate through the collection and obtain copies of individual interface instances. Interface instances are implemented using the <link linkend='ointerface'>ointerface</link> class. 
+			</para>
+		<para>
+			This class is designed to be platform independent. Presently, it supports Microsoft <productname>Windows</productname>, Apple <productname>Mac OSX</productname> and Linux. The principle benefit of this class is the simplicity. Applications instantiate it then iterate through it. All member interfaces are valid and interface details are directly accessible. 
+			</para>
+		<para>
+			This class is declared in <ulink url='ointerfaces.hpp.html'>ointerfaces.hpp</ulink> and implemented in <ulink url='ointerfaces.cpp.html'>ointerfaces.cpp</ulink>.
+			</para>
+		<section id="ointerfaces-inheritance">
+			<title>
+				Inheritance
+				</title>
+			<para>
+				None.
+				</para>
+			</section>
+		<section id="ointerfaces-dependence">
+			<title>
+				Dependence
+				</title>
+			<para>
+				This class depends on static class <link linkend='oerror-class'>oerror</link>.
+				</para>
+			</section>
+		</section>
+	<section id="ointerfaces-properties">
+		<title>
+			Properties
+			</title>
+		<para>
+			</para>
+		<section id="ointerfaces-Count">
+			<title>
+				ointerfaces::Count
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+					<funcdef>unsigned <function>Count</function></funcdef>
+  					<paramdef>void</paramdef>
+  					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the number of host interfaces detected on this computer. This property does not change over the instance lifetime and is he upper bound when iterating through collection interfaces.
+				</para>
+			</section>
+		<section id="ointerfaces-Empty">
+			<title>
+				ointerfaces::Empty
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>bool <function>Empty</function></funcdef>
+    					<paramdef>void</paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return logical <constant>true</constant> if the collection is empty. The collection is empty only if the <link linkend='ointerfaces-Count'>Count</link> property is <constant>0</constant>.
+				</para>
+			</section>
+		<section id="ointerfaces-End">
+			<title>
+				ointerfaces::End
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>bool <function>End</function></funcdef>
+    					<paramdef>void</paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return logical <constant>true</constant> if the collection is exhausted. The collection is exhausted if the <link linkend='ointerfaces-Index'>Index</link> property equals or exceeds the <link linkend='ointerfaces-Count'>Count</link> property.
+				</para>
+			</section>
+		<section id="ointerfaces-Index">
+			<title>
+				ointerfaces::Index
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>unsigned <function>Index</function></funcdef>
+    					<paramdef>void</paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the index of the selected interface. The index ranges from <constant>0</constant> up to (but excluding) the value the <link linkend='ointerfaces-Count'>Count</link> property. Class <link linkend='ointerfaces-methods'>methods</link> and <link linkend='ointerfaces-operators'>operators</link> may be used to alter the value of this property.
+				</para>
+			<para> 
+				This property should not be confused with the <link linkend='ointerface-Index'>ointerface::Index</link> property assigned by the operating system.
+				</para>
+			</section>
+		<section id="ointerfaces-Interface">
+			<title>
+				ointerfaces::Interface
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerface &amp; <function>Interface</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the selected <link linkend='ointerface'>ointerface</link> object instance. This property is the same as the <link linkend='ointerfaces-Selected'>Selected</link> property.
+				</para>
+			</section>
+		<section id="ointerfaces-Selected">
+			<title>
+				ointerfaces::Selected
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerface &amp; <function>Selected</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the selected <link linkend='ointerface'>ointerface</link> object instance. The selected instance is determined by the <link linkend='ointerfaces-Index'>Index</link> property. All <link linkend='ointerface'>ointerface</link> class constants,  properties, methods and operators are available to the application through this instance. 
+				</para>
+			</section>
+		</section>
+	<section id="ointerfaces-methods">
+		<title>
+			Methods
+			</title>
+		<para>
+			</para>
+		<section id="ointerfaces-Enumerate">
+			<title>
+				ointerfaces::Enumerate
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerface &amp; <function>Enumerate</function></funcdef>
+   					<paramdef>void</paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Prints the <link linkend='ointerface-Index'>Index</link>, <link linkend='ointerface-HardwareAddress'>HardwareAddress</link>,  <link linkend='ointerface-InternetAddress'>InternetAddress</link>,  <link linkend='ointerface-Name'>Name</link> and <link linkend='ointerface-Description'>Description</link> for each available interface on <varname>stdout</varname>. This method is provided for convenience and debugging purposes. Application developers may prefer to iterate through the available devices using the other class methods and print only those properties of interest to them.
+				</para>
+			<example>
+				<title>
+					Interface Enumeration on Linux
+					</title>
+<screen>
+0 00:00:00:00:00:00 127.000.000.001 lo lo
+1 00:50:04:A5:D8:98 192.168.099.003 eth4 eth4
+2 00:0F:EA:4B:98:CB 192.168.170.179 eth3 eth3
+</screen>
+				</example>
+			<example>
+				<title>
+					Interface Enumeration on Windows
+					</title>
+<screen>
+0 00:00:00:00:00:00 000.000.000.000 \Device\NPF_GenericDialupAdapter Adapter for generic dialup and VPN capture
+1 00:0E:2E:03:5F:B8 192.168.099.033 \Device\NPF_{4CFAABD5-C929-4942-914B-BDFE72B13611} Realtek RTL8139 Family Fast Eth
+2 00:C0:49:D5:CB:14 102.168.199.005 \Device\NPF_{73E0D2EF-6069-4831-B379-507025F2BDCD} Realtek RTL8139 Family Fast Eth
+3 00:0C:76:87:3E:3D 192.168.200.001 \Device\NPF_{86B96905-3AA7-46F1-969A-6C23E3BBBA8B} Broadcom NetXtreme Gigabit Ethe
+</screen>
+				</example>
+			</section>
+		<section id="ointerfaces-Select">
+			<title>
+				ointerfaces::Select
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerfaces &amp; <function>Select</function></funcdef>
+   					<paramdef>unsigned <parameter>index</parameter></paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Select an interface by <varname>index</varname>. This sets the <link linkend='ointerfaces-Index'>Index</link> property and determines the <link linkend='ointerface'>ointerface</link> interface will be returned by the <link linkend='ointerfaces-Selected'>Selected</link> and <link linkend='ointerfaces-Interface'>Interface</link> properties. 
+				</para>
+			<para> 
+				Remember that the <varname>index</varname> argument used here is not the same as the <link linkend='ointerface-Index'>ointerface::Index</link> property of the selected interface.
+				</para>
+			</section>
+		<section id="ointerfaces-SelectFirst">
+			<title>
+				ointerfaces::SelectFirst
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerfaces &amp; <function>SelectFirst</function></funcdef>
+   					<paramdef>void</paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Set the <link linkend='ointerfaces-Index'>Index</link> property to <constant>0</constant>.
+				</para>
+			</section>
+		<section id="ointerfaces-SelectFinal">
+			<title>
+				ointerfaces::SelectFinal
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerfaces &amp; <function>SelectFinal</function></funcdef>
+   					<paramdef>void</paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Set the <link linkend='ointerfaces-Index'>Index</link> property to one less than the <link linkend='ointerfaces-Count'>Count</link> property. 
+				</para>
+			</section>
+		<section id="ointerfaces-SelectNext">
+			<title>
+				ointerfaces::SelectNext
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerfaces &amp; <function>SelectNext</function></funcdef>
+   					<paramdef>void</paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Increment the <link linkend='ointerfaces-Index'>Index</link> property if it is less than the <link linkend='ointerfaces-Count'>Count</link> property.
+				</para>
+			</section>
+		<section id="ointerfaces-SelectPrev">
+			<title>
+				ointerfaces::SelectPrev
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerfaces &amp; <function>SelectPrev</function></funcdef>
+   					<paramdef>void</paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Decrement the <link linkend='ointerfaces-Index'>Index</link> property if it is greater than <constant>0</constant>.				</para>
+			</section>
+		</section>
+	<section id="ointerfaces-operators">
+		<title>
+			Operators
+			</title>
+		<section id="ointerfaces-member">
+			<title>
+				ointerfaces::operator []
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerface &amp; <function>operator []</function></funcdef>
+   					<paramdef>unsigned <parameter>index</parameter></paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Select a host interface and return an instance of it. This operator has the same effect as calling the <link linkend='ointerfaces-Select'>Select</link> method with <varname>index</varname> then reading either the <link linkend='ointerfaces-Selected'>Selected</link> or the <link linkend='ointerfaces-Interface'>Interface</link> property.
+				</para>
+			</section>
+		<section id="ointerfaces-assign">
+			<title>
+				ointerfaces::operator =
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerfaces &amp; <function>operator =</function></funcdef>
+   					<paramdef>unsigned <parameter>index</parameter></paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Select a host interface by interface index. This operator has the same effect as the <link linkend='ointerfaces-Select'>Select</link> method with <varname>index</varname>.
+				</para>
+			</section>
+		</section>
+	<section id="ointerfaces-constructors">
+		<title>
+			Constructors
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+  				<funcdef><function>ointerfaces</function></funcdef>
+   				<paramdef></paramdef>
+   				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Instantiate a collection of host interfaces. No arguments are required. Class properties and methods are used to iterate through the collection obtain copies of individual host interfaces.
+			</para>
+		</section>
+	<section id="ointerfaces-examples">
+		<title>
+			Examples
+			</title>
+		<example>
+			<title>
+				Enumerate Host Interfaces
+				</title>
+			<para>
+				The following example instantiates the <link linkend='ointerfaces'>ointerfaces</link> class and prints information about each host interface on <varname>stdout</varname> using the <link linkend='ointerfaces-Enumerate'>Enumerate</link> method. Several code variations are shown.
+				</para>
+<programlisting>
+ointerfaces <varname>interfaces</varname>; 
+<varname>interfaces</varname>.<function>Enumerate</function>(); 
+</programlisting>
+			<para>
+				The output might look something like this depending on the operating system and the available host interfaces:
+				</para>
+<screen>
+0 00:00:00:00:00:00 127.000.000.001 lo lo
+1 00:50:04:A5:D8:98 192.168.099.001 eth4 eth4
+2 00:0F:EA:4B:98:CB 192.168.170.179 eth3 eth3
+</screen>
+			</example>
+		<example>
+			<title>
+				Enumerate Host Interfaces Using Class Methods
+				</title>
+			<para>
+				The next example does the same thing as the first example but uses class methods to iterate through the host interfaces and print interface properties in the desired order or format.
+				</para>
+<programlisting>
+for (<varname>interfaces</varname>.<function>SelectFirst</function> (); <varname>interfaces</varname>.<function>Index</function> () &lt; <varname>interfaces</varname>.<function>Count</function> (); <varname>interfaces</varname>.<function>SelectNext</function> ())
+{
+        ointerface <varname>ifp</varname> = <varname>interfaces</varname>.Selected ();
+        std::cout &lt;&lt; &quot;index=&quot; &lt;&lt; <varname>ifp</varname>.<function>Index</function> () &lt;&lt; std::endl;
+        std::cout &lt;&lt; &quot;hwaddr=&quot; &lt;&lt; <varname>ifp</varname>.<function>HardwareAddressString</function> () &lt;&lt; std::endl;
+        std::cout &lt;&lt; &quot;ipaddr=&quot; &lt;&lt; <varname>ifp</varname>.<function>InternetAddressString</function> () &lt;&lt; std::endl;
+        std::cout &lt;&lt; &quot;name=&quot; &lt;&lt; <varname>ifp</varname>.<function>Name</function> () &lt;&lt; std::endl;
+        std::cout &lt;&lt; &quot;text=&quot; &lt;&lt; <varname>ifp</varname>.<function>Text</function> () &lt;&lt; std::endl;
+        std::cout &lt;&lt; std::endl;
+}
+</programlisting>
+			<para>
+				The output would look something like this:
+				</para>
+<screen>
+Enumerate interfaces (again)
+index=0
+hwaddr=00:00:00:00:00:00
+ipaddr=127.000.000.001
+name=lo
+text=lo
+
+index=1
+hwaddr=00:50:04:A5:D8:98
+ipaddr=192.168.099.001
+name=eth4
+text=eth4
+
+index=2
+hwaddr=00:0F:EA:4B:98:CB
+ipaddr=192.168.170.179
+name=eth3
+text=eth3
+</screen>
+			</example>
+		</section>
+	</chapter>

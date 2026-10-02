@@ -1,0 +1,184 @@
+<chapter id='CPLParameters'>
+	<title>
+		Class CPLParameters
+		</title>
+	<section id="CPLParameters-class">
+		<title>
+			Introduction
+			</title>
+		<para>
+			This class implements one instance of a runtime parameter block image. Class methods permit reading and writing a parameter block image from and to powerline devices or local host files. Class properties permit direct access to the parameter block but expose only a few parameter block elements. Application that must access specific parameter block elements should inherit this class.
+			</para>
+		<para>
+			This class is declared in <ulink url='CPLParameters.hpp.html'>CPLParameters.hpp</ulink> and defined in <ulink url='CPLParameters.cpp.html'>CPLParameters.cpp</ulink>.
+			</para>
+		<section id="CPLParameters-inheritance">
+			<title>
+				Inheritance
+				</title>
+			<para>
+				None.
+				</para>
+			</section>
+		<section id="CPLParameters-dependence">
+			<title>
+				Dependence
+				</title>
+			<para>
+				</para>
+			</section>
+		</section>
+	<section id="CPLParameters-properties">
+		<title>
+			Properties
+			</title>
+		<para>
+			</para>
+		<section id="CPLParameters-Data">
+			<title>
+				CPLParameters::Data
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>void * <function>Data</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the absolute address of the parameter block image. 
+				</para>
+			</section>
+		<section id="CPLParameters-IsValid">
+			<title>
+				CPLParameters::IsValid
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>bool <function>IsValid</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return <constant>true</constant> if the current parameter block image appears valid. Validity is determined by comparing the parameter block length and checksum to the values stored in the parameter block header.
+				</para>
+			</section>
+		<section id="CPLParameters-Size">
+			<title>
+				CPLParameters::Size
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>size_t <function>Size</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the size of the parameter block image last read from a powerline device or host file. This will be the sum of all bytes read and should equal the PIBLength value stored in the parameter block header. This class does not 
+				</para>
+			</section>
+		</section>
+	<section id="CPLParameters-methods">
+		<title>
+			Methods
+			</title>
+		<para>
+			</para>
+		<section id="CPLParameters-ReadFile">
+			<title>
+				CPLParameters::Read
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>Read</function></funcdef>
+    					<paramdef>char const * <parameter>filename</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Read the parameter block image from the named host file.
+				</para>
+			</section>
+		<section id="CPLParameters-ReadChannel">
+			<title>
+				CPLParameters::Read
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>Read</function></funcdef>
+    					<paramdef>CPLChannel * <parameter>channel</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Read the parameter block image from the powerline device assigned to the given <varname>channel</varname>. This method will fetch the working parameter block image if the parameter block scratch buffer on the device is empty.
+				</para>
+			</section>
+		<section id="CPLParameters-WriteFile">
+			<title>
+				CPLParameters::Write
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>Write</function></funcdef>
+    					<paramdef>char const * <parameter>filename</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Write the parameter block image to the named host file.
+				</para>
+			</section>
+		<section id="CPLParameters-WriteChannel">
+			<title>
+				CPLParameters::Write
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>Write</function></funcdef>
+    					<paramdef>CPLChannel * <parameter>channel</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Write the parameter block image to the powerline device assigned to the given <varname>channel</varname>. This methods fills or over-write the parameter block image buffer on the powerline device.
+				</para>
+			</section>
+		</section>
+	<section id="CPLParameters-operators">
+		<title>
+			Operators
+			</title>
+		<para>
+			None.
+			</para>
+		</section>
+	<section id="CPLParameters-constructors">
+		<title>
+			Constructors
+			</title>
+		<para>
+			</para>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef><function>CPLParameters</function></funcdef>
+				<paramdef>CPLChannel * <parameter>channel</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Initialize the instance by reading the parameter block image from the powerline device assigned by the given channel.
+			</para>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef><function>CPLParameters</function></funcdef>
+				<paramdef>char const * <parameter>filename</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Initialize the instance by reading the parameter block image from the named host file.
+			</para>
+		</section>
+	<section id="CPLParameters-examples">
+		<title>
+			Examples
+			</title>
+		<para>
+			To be written.
+			</para>
+		</section>
+	</chapter>

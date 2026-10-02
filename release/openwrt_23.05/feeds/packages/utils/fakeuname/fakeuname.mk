@@ -1,1 +1,0 @@
-FAKEUNAME_PATH=$(STAGING_DIR_HOSTPKG)/lib/fakeuname

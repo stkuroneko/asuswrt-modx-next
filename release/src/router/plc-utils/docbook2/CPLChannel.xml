@@ -1,0 +1,245 @@
+<chapter id='CPLChannel'>
+	<title>
+		Class CPLChannel
+		</title>
+	<section id="CPLChannel-class" >
+		<title>
+			Introduction
+			</title>
+		<para>
+			This class implements the low-level, Layer 2 Ethernet interface for powerline network device management. A typical sequence of management events involves selecting the host interface, discovering local and remote powerline network bridges and exchanging messages with them.
+			</para>
+		<para>
+			This class includes most properties and methods needed to perform Layer 2 Ethernet communications. Class defaults are set for Atheros vendor specific management messages. The application must allocate, encode and decode the Ethernet frames that are sent and received using this class. The application must also derive the powerline network topology from the <link linkend='CPLChannel-Bridges'>Bridges</link> and <link linkend='CPLChannel-Neighbors'>Neighbors</link> methods which are included for convenience.  
+			</para>
+		<para>
+			This class includes a template Ethernet header. Experience has shown that outgoing frame headers are basically static, except for the peer address. The host address and protocol do not change often and both these values are used to filter incoming frames. To minimize duplication of information, the values are all co-located here. This takes some getting-used-to but it makes logistical sense. 
+			</para>
+		<para>
+			This class is declared in <ulink url='CPLChannel.hpp.html'>CPLChannel.hpp</ulink> and defined in <ulink url='CPLChannel.cpp.html'>CPLChannel.cpp</ulink>.
+			</para>
+		<section id="CPLChannel-inheritance">
+			<title>
+				Inheritance
+				</title>
+			<para>
+				This class inherits the <link linkend='oflagword'>oflagword</link> class to implement the channel flagword. All public flagword properties and methods are accessible to applications.
+				</para>
+			<para>
+				This class inherits the <link linkend='oethernet'>oethernet</link> class to implemment a template Ethernet header. All public Ethernet header properties and methods are accessible to applications.
+				</para>
+			<para>
+				This class inherits the <link linkend='ointerface'>ointerface</link> class to implement the channel Ethernet interface. All public class properties and methods are accessible to applications.
+				</para>
+			</section>
+		<section id="CPLChannel-dependence">
+			<title>
+				Dependence
+				</title>
+			<para>
+				This class references static class <link linkend='omemory'>omemory</link> to print outgoing and incoming frames.
+				</para>
+			<para>
+				This class references static class <link linkend='oerror'>oerror</link> to report errors.
+				</para>
+			</section>
+		</section>
+	<section id="CPLChannel-properties">
+		<title>
+			Properties
+			</title>
+		<para>
+			Class properties include all <link linkend='oflagword-properties'>oflagword</link>, <link linkend='oethernet-properties'>oethernet</link> and <link linkend='ointerface-properties'>ointerface</link> properties plus those described below.
+			</para>
+		<section id="CPLChannel-Timeout">
+			<title>
+				CPLChannel::Timeout
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>unsigned <function>Timeout</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the channel timeout value. 
+				</para>
+			</section>
+		</section>
+	<section id="CPLChannel-methods">
+		<title>
+			Methods
+			</title>
+		<para>
+			Class methods include all <link linkend='oflagword-methods'>oflagword</link>, <link linkend='oethernet-methods'>oethernet</link> and <link linkend='ointerface-methods'>ointerface</link> methods plus those described below.
+			</para>
+		<section id="CPLChannel-Bridges">
+			<title>
+				CPLChannel::Bridges
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>Bridges</function></funcdef>
+    					<paramdef>void * <parameter>memory</parameter></paramdef>
+					<paramdef>size_t <parameter>extent</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Encode memory with a list of local stations connected directly to the channel interface over Ethernet.  Return the number of bridge stations detected. Detected stations are stored in <varname>memory</varname> as a series of consecutive Ethernet hardware addresses where each address is <constant>ETHER_ADDR_LEN</constant> bytes. Argument <varname>extent</varname> specifies the size of <varname>memory</varname> in bytes. The return value is the number of consecutive addresses stored in <varname>memory</varname>. A return value of <constant>-1</constant> indicates insufficient <varname>memory</varname> to store all detected bridge stations.				
+				</para>
+			</section>
+		<section id="CPLChannel-Neighbors">
+			<title>
+				CPLChannel::Neighbors
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>Neighbors</function></funcdef>
+   					<paramdef>void * <parameter>memory</parameter></paramdef>
+					<paramdef>size_t <parameter>extent</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Encode memory with a list of stations connected to some reference station over powerline or coax. Return the number of neighbor stations detected. The reference station is identified by the instance <link linkend='oethernet-PeerAddress'>PeerAddress</link> property when this method is called. The reference station is excluded from the list. Detected stations are stored in <varname>memory</varname> as a series of consecutive Ethernet hardware addresses where each address is <constant>ETHER_ADDR_LEN</constant> bytes. Argument <varname>extent</varname> specifies the size of <varname>memory</varname> in bytes. The return value is the number of consecutive addresses stored in <varname>memory</varname>. A return value of <constant>-1</constant> indicates insufficient <varname>memory</varname> to store all detected neighbor stations.				
+				</para>
+			<para>	
+				This method is provided in this class for convenience. Use the <link linkend='CPLNetwork'>CPLNetwork</link> class to obtain detailed information about local and remote network bridges.
+				</para>
+			</section>
+		<section id="CPLChannel-ReadMessage">
+			<title>
+				CPLChannel::ReadMessage
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>ReadMessage</function></funcdef>
+    					<paramdef>void const * <parameter>memory</parameter></paramdef> 
+    					<paramdef>signed <parameter>extent</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Receive an Ethernet frame through the channel interface. Return the number of bytes received. Return <constant>-1</constant> on error, <constant>0</constant> on timeout. On success, the return value will often be less than <varname>extent</varname>. Incoming frames are filtered. Only valid HomePlug AV frames that are addressed to the host will be returned by this method.
+				</para>
+			</section>
+		<section id="CPLChannel-SendMessage">
+			<title>
+				CPLChannel::SendMessage
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>SendMessage</function></funcdef>
+    					<paramdef>void const * <parameter>memory</parameter></paramdef> 
+    					<paramdef>signed <parameter>extent</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Transmit an Ethernet frame through the channel interface. Return the number of bytes transmitted. Return <constant>-1</constant> on error, <constant>0</constant> on timeout. On success, the return value will equal <varname>extent</varname>. Outgoing frames are not filtered. Any valid Ethernet frame may be passed to this method.
+				</para>
+			</section>
+		<!-- section id="CPLChannel-SetTimeout">
+			<title>
+				CPLChannel::SetTimeout
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>unsigned <function>SetTimeout</function></funcdef>
+    					<paramdef>unsigned <parameter>timer</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Replace the channel timer value. 
+				</para>
+			<para>
+				On <application>WinPcap</application> systems, the timer value specifies the packet capture duration. The <link linkend='CPLChannel-ReadMessage'>ReadMessage</link> operation will not return until the capture period expires. This means that larger timer values may slow performace while smaller values may result in missed frames on busy networks.
+				</para>
+			<para>
+				On Linux, MacOS x and similar systems, the timer value specifies the maximum time to wait for an incoming frame. The <link linkend='CPLChannel-ReadMessage'>ReadMessage</link> operation will return immediately when a frame arrives. In this sense, the channel timer controls the timeout. This means that large timer values do not significantly affect performance.
+				</para>
+			</section -->
+		</section>
+	<section id="CPLChannel-constructors">
+		<title>
+			Constructors
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef><function>CPLChannel</function></funcdef>
+				<paramdef>unsigned <parameter>ifindex</parameter></paramdef> 
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Open a raw Ethernet socket, bind it to the numbered interface and activate packet filters. Terminate the application if the socket cannot be opened or the interface does not exist or cannot be accessed. Do not use this constructor unless you are sure that the interface exists and is available. The socket is closed and the interface is released by the class destructor.
+			</para>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef><function>CPLChannel</function></funcdef>
+				<paramdef>const char * <parameter>ifname</parameter></paramdef> 
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Open a raw Ethernet socket, bind it to the named interface and activate packet filters. Terminate the application if the socket cannot be opended or the interface does not exist or cannot be accessed. Do not use this constructor unless you are sure that the interface exists. The socket is closed and the interface is released by the class destructor.
+			</para>
+		</section>
+	<section id="CPLChannel-examples">
+		<title>
+			Examples
+			</title>
+		<example>
+			<title>
+				Enumerating Local Powerline Devices
+				</title>
+<programlisting>
+CPLChannel <varname>channel</varname> (<constant>&quot;eth2&quot;</constant>); 
+byte <varname>bridgelist</varname> [<constant>255</constant>][<constant>ETHER_ADDR_LEN</constant>]; 
+signed <varname>bridges</varname> = <varname>channel</varname>.<function>Bridges</function> (<varname>bridgelist</varname>, sizeof (<varname>bridgelist</varname>)); 
+signed <varname>bridge</varname> = <constant>0</constant>; 
+while (<varname>bridge</varname> &lt; <varname>bridges</varname>) 
+{
+	do something with <varname>bridgelist</varname> [<varname>bridge</varname>]; 	
+	<varname>bridge</varname>++;
+}
+</programlisting>
+			<para>
+				This example instantiates <varname>channel</varname> with interface name <constant>"eth2"</constant>. It then allocates <varname>bridgelist</varname> to allow a maximum of <constant>255</constant> possible hardware device addresses. Integer <varname>bridges</varname> is initialized to the number of detected bridges by the <link linkend='CPLChannel-Bridges'>Bridges</link> method. Integer <varname>bridge</varname> is the used to iterate through <varname>bridgelist</varname>. 
+				</para>
+			<para>
+				Normally there will be one powerline bridge connected to a given host interface but there could be more connected through a network switch or hub. Each local bridge can support an seperate powerline network consisting of other, remote powerline bridges. Consequently, we must ask each local bridge, in turn, to list any remote powerline devices. 
+				</para>
+			</example>
+		<example>
+			<title>
+				Enumerating Remote Powerline Devices
+				</title>
+<programlisting>
+CPLChannel <varname>channel</varname> (<constant>3</constant>); 
+byte <varname>bridgelist</varname> [<constant>255</constant>][<constant>ETHER_ADDR_LEN</constant>]; 
+byte <varname>devicelist</varname> [<constant>255</constant>][<constant>ETHER_ADDR_LEN</constant>]
+signed <varname>bridges</varname> = <varname>channel</varname>.<function>Bridges</function> (<varname>bridgelist</varname>, sizeof (<varname>bridgelist</varname>)); 
+signed <varname>devices</varname>; 
+signed <varname>bridge</varname> = <constant>0</constant>;
+signed <varname>device</varname> = <constant>0</constant>; 
+while (<varname>bridge</varname> &lt; <varname>bridges</varname>) 
+{
+	<varname>channel</varname>.<function>ImportPeerAddress</function> (<varname>bridgelist</varname> [<varname>bridge</varname>])
+	<varname>devices </varname> = <varname>channel</varname>.<function>Neighbors</function> (<varname>devicelist</varname>,  sizeof(<varname>devicelist</varname>)); 
+	while (<varname>device</varname> &lt; <varname>devices</varname>)
+	{
+		do something with <varname>devicelist</varname> [<varname>device</varname>]; 
+		<varname>device</varname>++;
+	}	
+	<varname>bridge</varname>++;
+}
+</programlisting>
+			<para>
+				The example above instantiates <varname>channel</varname> with interface number <constant>3</constant>,  this time. It allocates <varname>bridgelist</varname> and <varname>devicelist</varname> to allow a maximum of <constant>255</constant> possible hardware device addresses each. Integer <varname>bridges</varname> is initialized and <varname>bridgelist</varname> is searched (as before).
+				</para> 
+			<para>
+				The <link linkend='oethernet-ImportPeerAddress'>ImportPeerAddress</link> method is called to establish each bridge as the destination address before calling the <link linkend='CPLChannel-Neighbors'>Neighbors</link> method to find neighboring powerline devices. 
+				</para>
+			<para>
+				The list of all channel bridges and their neighbors forms a complete list of powerline devices that are accessible via the channel interface. Such a list can be used to populate drop-down menus for GUI applications. The two operations of finding bridges and finding neighbors are kept seperate for reasons that may not be obvious at first.
+				</para>
+
+			</example>
+		</section>
+	</chapter>

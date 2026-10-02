@@ -10,8 +10,6 @@ all:
 	-cp prebuild/sendtocli test/sendtocli
 	-cp prebuild/notify test/notify
 	-cp prebuild/udpclient test/udpclient
-	-cp prebuild/tr098.conf conf/
-	-cp prebuild/tr181.conf conf/
 # ifeq ($(RTCONFIG_TR181),y)
 ifeq ($(RTCONFIG_DSL),y)
 	-cp prebuild/tr_181.xml.dsl conf/ASUSWRT/tr_181.xml.dsl
@@ -26,6 +24,7 @@ else
 endif
 # endif
 	-cp prebuild/trcurrency.conf conf/trcurrency.conf
-
+	-cp prebuild/tr098.conf conf/tr098.conf
+	-cp prebuild/tr181.conf conf/tr181.conf
 endif
 

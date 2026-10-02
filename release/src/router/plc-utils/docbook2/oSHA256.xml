@@ -1,0 +1,132 @@
+<chapter id='oSHA256'>
+	<title>
+		Class oSHA256
+		</title>
+	<section id="oSHA256-class" >
+		<title>
+			Introduction
+			</title>
+		<para>
+			This class implements 256-bit encryption according to FIPS180-2 sec 5.3.2 by converting variable-length input to a fixed-length, 32-byte digest. The class is analagous to a file, allowing an unlimited amount of data may be written but only a fixed-length amount of data may be read and each read rewinds the file.
+			</para>
+		<para>
+			This class is declared in <ulink url='oSHA256.hpp.html'>oSHA256.hpp</ulink> and defined in <ulink url='oSHA256.cpp.html'>oSHA256.cpp</ulink>.
+			</para>
+		<section id="oSHA256-inheritance">
+			<title>
+				Inheritance
+				</title>
+			<para>
+				None.
+				</para>
+			</section>
+		<section id="oSHA256-dependence">
+			<title>
+				Dependence
+				</title>
+			<para>
+				None.
+				</para>
+			</section>
+		</section>
+	<section id="oSHA256-properties">
+		<title>
+			Properties
+			</title>
+		<para>
+			</para>
+		<section id="oSHA256-DigestLength">
+			<title>
+				oSHA256::DigestLength
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>unsigned <function>DigestLength</function></funcdef>
+   					<paramdef></paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the digest length in bytes. The digest length is <constant>32</constant>. This property is implemented as a constant and so parenthesis should be omitted when referencing it, despite what is shown.  
+				</para>
+			</section>
+		</section>
+	<section id="oSHA256-methods">
+		<title>
+			Methods
+			</title>
+		<para>
+			</para>
+		<section id="oSHA256-Fetch">
+			<title>
+				oSHA256::Fetch
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>oSHA256 &amp; <function>Fetch</function></funcdef>
+   					<paramdef>void * <parameter>memory</parameter></paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				End the current encryption cycle and copy the <varname>digest</varname> to external memory. The digest length is <link linkend='oSHA256-DigestLength'>DigestLength</link> bytes so no length argument is needed. Automatically, initialize the object instance for another encryption cycle once the digest has been copied.
+				</para>
+			</section>
+		<section id="oSHA256-Write">
+			<title>
+				oSHA256::Write
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>oSHA256 &amp; <function>Write</function></funcdef>
+   					<paramdef>void const * <parameter>memory</parameter></paramdef>
+					<paramdef>size_t <parameter>extent</parameter></paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Encrypt a block of <varname>memory</varname>. Return the object instance address. This method may be called any number of times with any data of any length. Data encryption is cumulative such that data may be encrypted in one large block or many small ones. All writes prior to a <link linkend='oSHA256-Fetch'>Fetch</link> comprise an <quote>encryption cycle</quote>  
+				</para>
+			</section>
+		<section id="oSHA256-Reset">
+			<title>
+				oSHA256::Reset
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>oSHA256 &amp; <function>Reset</function></funcdef>
+					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Initialize the class instance in preparation for another encryption cycle. Return the object instance reference. This discards the computed digest in the process. If the digest is needed then call method <link linkend='oSHA256-Fetch'>Fetch</link>, instead.    
+				</para>
+			</section>
+		</section>
+	<section id="oSHA256-examples">
+		<title>
+			Examples
+			</title>
+		<example>
+			<title>
+				Computing an SHA256 Digest
+				</title>
+
+<programlisting>
+oSHA256 <varname>encoder</varname>; 
+uint8_t <varname>digest</varname> [<varname>encoder</varname>.<function>DigestLength</function>];  
+char <varname>buffer</varname> [<constant>1024</constant>];
+signed <varname>length</varname>;
+signed <varname>fd</varname>; 
+while ((<varname>length</varname> = read (<varname>fd</varname>,  <varname>buffer</varname>, sizeof (<varname>buffer</varname>))) &gt; <constant>0</constant>)
+{
+	<varname>encoder</varname>.<function>Write</function> (<varname>buffer</varname>, <varname>length</varname>); 
+} 
+<varname>encoder</varname>.<function>Fetch</function> (<varname>digest</varname>); 
+</programlisting>
+			<para>
+				This example computes the SHA256 digest for an entire file. An <varname>encoder</varname> is instantiated and a <varname>digest</varname> buffer is reserved. As each <varname>buffer</varname> is read from file, it is encrypted using the <link linkend='oSHA256-Write'>Write</link> method and, at the end, the <varname>digest</varname> is obtained using the <link linkend='oSHA256-Fetch'>Fetch</link> method.
+				</para>
+			<para>
+				The file content is not important. It may be either text or a binary. The computed <varname>digest</varname> will, for all practical purposes, be unique and may serve as the file <quote>finger-print</quote>. Therefore, two files having the same <varname>digest</varname> are, in all probability, identical.
+				</para>
+			</example>
+		</section>
+	</chapter>

@@ -1,0 +1,171 @@
+.TH plcsnif 1 "Mar 2014" "plc-utils-2.1.6" "Qualcomm Atheros Powerline Toolkit"
+
+.SH NAME
+plcsnif - Qualcomm Atheros AR7x00 Powerline Traffic Sniffer
+
+.SH SYNOPSIS
+.BR plcsnif
+.RI [ options ] 
+
+.SH DESCRIPTION
+Enable or disable powerline packet sniffing on the local powerline device.
+Special PIB settings are required for this feature to work and special tools are required to interpret the output.
+This program is not for general Atheros customers.
+
+.PP
+This program is part of the Qualcomm Atheros Powerline Toolkit.
+See the \fBAPT\fR man page for an overview and installation instructions.
+
+.SH COMMENTS
+Enabling the sniffer mode on Atheros Powerline Devices will introduce high processor overheads on the device and flood the local Ethernet subnet with traffic destined for the local host.
+This may affect both local Ethernet and powerline data rates.
+Do not enable sniffer mode on powerline devices connected to operational powerline or Ethernet networks recklessly.
+
+.SH OPTIONS
+
+.TP
+.RB - d
+Dump sniffer data on the console.
+Sniffer data is printed as one or more hexadecimal fields seperated by one space.
+The first field is direction displayed as two hex digits.
+The next field is powerline device system time displayed as 16 hex digits.
+The next field is powerline beacon time displayed as 8 hex digits.
+The next field is frame control displayed as 32 hex digits.
+The last field is the beacon body displayed as 272 hex digits.
+
+.TP
+-\fBm \fImode\fR
+Enable, disable or inspect the powerline packet sniffer mode on the local powerline device.
+Valid modes are \fB0\fR=\fBoff\fR, \fB1\fR=\fBon\fR and \fB2\fR=\fBinspect\fR.
+
+.TP
+-\fBi\fR \fIinterface\fR
+Select the host Ethernet interface.
+All requests are sent via this host interface and only reponses received via this host interface are recognized.
+The default interface is \fBeth1\fR because most people use \fBeth0\fR as their principle network connection; however, if environment string "PLC" is defined then it takes precedence over the default interface.
+This option then takes precedence over either default.
+
+.TP
+.RB - q
+Suppresses normal progress and status messages.
+
+.TP
+.RB - v
+Print additional information on stdout.
+
+.TP
+-\fB?\fR, --\fBhelp\fR
+Print program help summary on stdout.
+This option takes precedence over other options on the command line.
+
+.TP
+-\fB!\fR, --\fBversion\fR
+Print program version information on stdout.
+This option takes precedence over other options on the command line.
+Use this option when sending screen dumps to Atheros Technical Support so that they know exactly which version of the Linux Toolkit you are using.
+
+.SH ARGUMENTS
+
+.TP
+.IR device
+The Ethernet hardware address of some powerline device.
+More than one address may be specified.
+If more than one address is specified then operations are performed on each device in turn.
+The default address is \fBlocal\fR.
+See \fBDEVICES\fR for information about symbolic device addresses.
+
+.SH DEVICES
+Powerline devices use Ethernet hardware addresses.
+Hardware addresses are 12 hexadecimal digits in upper, lower or mixed case.
+Individual octets may be separated by colons, for clarity, but not all octets need to be seperated.
+For example, "00b052000001", "00:b0:52:00:00:01" and "00b052:000001" are valid and equivalent.
+
+.PP
+The following addresses are special and may be expressed by name instead of number.
+
+.TP
+.BR all
+Equivalent to "broadcast", described next.
+
+.TP
+.BR broadcast
+A synonym for the standard Ethernet broadcast address, \fBFF:FF:FF:FF:FF:FF\fR.
+All devices, whether local, remote or foreign will respond to this address.
+
+.TP
+.BR local
+A synonym for the Qualcomm Atheros vendor specific Local Management Address (LMA), \fB00:B0:52:00:00:01\fR.
+All local Atheros devices will recognize this address but remote and foreign devices will not.
+A remote device is any device at the far end of a powerline connection.
+A foreign device is any device not manufactured by Atheros.
+
+.SH DISCLAIMER
+Atheros HomePlug AV Vendor Specific Management Message structure and content is proprietary to Qualcomm Atheros, Ocala FL USA.
+Consequently, public information is not available.
+Qualcomm Atheros reserves the right to modify message structure or content in future firmware releases without any obligation to notify or compensate users of this program.
+
+.PP
+This program is provided for engineering purposes only and is not required for normal powerline device operation.
+Qualcomm Atheros shall not be responsible for any adverse consequences resulting from the use of this program in an operational environment by anyone for any reason.
+
+.SH EXAMPLES
+The following example enables the sniffer mode on all local powerline devices connected to interface \fBeth1\fR because the program default address is \fB00:B0:52:00:00:01\fR.
+Remote powerline devices are not affected.
+If you only want to enable sniffer mode on one local powerline device then specify the address on the command line.
+
+.PP
+   # plcsnif -m 1 -i eth1
+   eth1 00:07:CB:E0:00:68 SNIFFER ON
+   eth1 00:B0:52:DA:DA:01 SNIFFER ON
+
+.PP
+The program will return immediately but VS_SNIFFER.IND messages are continuously sent to the local host, in background, until the device is reset or the sniffer mode is diabled.
+You can use a packet sniffer, such as Wireshare, or run program \fBHPAV\fR or \fBsnif\fR in another console window, to observe the messages.
+Be sure to select the correct Ethernet interface.
+
+.PP
+The next example disables the sniffer mode on the local device \fB00:B0:52:DA:DA:01\fR connected to interface \fBeth1\fR.
+
+.PP
+   # plcsnif -i eth1 -m 0 00:B0:52:DA:DA:01
+   eth1 00:B0:52:DA:DA:01 SNIFFER OFF
+
+.PP
+The following example queries local devices to report their sniffer state.
+Observe that each local device, in this case, is in a different state.
+
+.PP
+   # plcsnif -m 2 -i eth1
+   eth1 00:07:CB:E0:00:68 SNIFFER ON
+   eth1 00:B0:52:DA:DA:01 SNIFFER OFF
+
+.PP
+The following example disables the sniffer state on all local powerline devices connected to interface \fBeth1\fR.
+The \fBlocal\fR keyword is shorthand for \fB00:B0:52:00:00:001\fR as in the DEVICES section.
+It is the default device address.
+
+.PP
+   # plcsnif -m 0 -i eth1 local
+   eth1 00:07:CB:E0:00:68 SNIFFER OFF
+   eth1 00:B0:52:DA:DA:01 SNIFFER OFF
+
+.PP
+The following example prints sniffer data on the console.
+The fields in this example are direction, system time, beacon time, frame control and beacon data.
+Observe that data is displayed in little-endian format.
+
+.PP
+   # plcsnif -d
+   00\ 030A6B2A06000000\ 1E0D0000\ F0AFF7F428F200F500F800F600000000\ B0F2E695666B8301000100020501060001FD3480CB020502450381CB030600B0520002EC06031E0D00FF0700B0520201807B00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000CCCCCCCC
+   00\ 68C2772A06000000\ 5B0D0000\ F014B00129F500F800F600F100000000\ B0F2E695666B8301000100020501060001FD3480CB020502450381CB030600B0520002EC06035B0D00FF0700B0520201817B00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000CCCCCCCC
+   00\ 9C7A842A06000000\ 640D0000\ F048680E29F800F600F100F100000000\ B0F2E695666B8301000100020501060001FD3480CB020502450381CB030600B0520002EC0603640D00FF0700B0520201827B00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000CCCCCCCC
+   00\ 8D32912A06000000\ 270D0000\ F039201B29F600F100F100F300000000\ B0F2E695666B8301000100020501060001FD3480CB020502450381CB030600B0520002EC0603270D00FF0700B0520201837B00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000CCCCCCCC
+   00\ F5EA9D2A06000000\ 630D0000\ F0A1D82729F100F100F300F400000000\ B0F2E695666B8301000100020501060001FD3480CB020502450381CB030600B0520002EC0603630D00FF0700B0520201847B00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000CCCCCCCC
+
+.SH SEE ALSO
+.BR arpc ( 1 ),
+.BR hpav ( 1 )
+
+.SH CREDITS
+ Charles Maier <cmaier@qca.qualcomm.com>
+

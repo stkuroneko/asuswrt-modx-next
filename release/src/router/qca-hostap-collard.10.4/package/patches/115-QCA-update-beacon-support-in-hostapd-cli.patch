@@ -1,0 +1,25 @@
+diff --git a/hostapd/hostapd_cli.c b/hostapd/hostapd_cli.c
+index e299183..269085c 100644
+--- a/hostapd/hostapd_cli.c
++++ b/hostapd/hostapd_cli.c
+@@ -1010,6 +1019,12 @@ static int hostapd_cli_cmd_erp_flush(struct wpa_ctrl *ctrl, int argc,
+ }
+ 
+ 
++static int hostapd_cli_cmd_update_beacon(struct wpa_ctrl *ctrl, int argc, char *argv[])
++{
++	return wpa_ctrl_command(ctrl, "UPDATE_BEACON");
++}
++
++
+ struct hostapd_cli_cmd {
+ 	const char *cmd;
+ 	int (*handler)(struct wpa_ctrl *ctrl, int argc, char *argv[]);
+@@ -1140,6 +1140,7 @@ static const struct hostapd_cli_cmd hostapd_cli_commands[] = {
+ 	{ "disable", hostapd_cli_cmd_disable },
+ 	{ "erp_flush", hostapd_cli_cmd_erp_flush },
+	{ "log_level", hostapd_cli_cmd_log_level },
++	{ "update_beacon", hostapd_cli_cmd_update_beacon },
+ 	{ NULL, NULL }
+ };
+ 

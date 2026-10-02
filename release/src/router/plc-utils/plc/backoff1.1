@@ -1,0 +1,180 @@
+.TH backoff1 1 "October 2018" "plc-utils-2.1.12" "Qualcomm Atheros Powerline Toolkit"
+
+.SH NAME
+backoff1 - Transmit power backoff utility for 75xx devices
+
+.SH SYNOPSIS
+.BR backoff1
+.RI [ options ] 
+.RI [ device ] 
+.RI [ device ] 
+[...]
+
+.SH DESCRIPTION
+The Transmit power backoff utility reduces the transmit power of the device using VS_SET_PRESCALER_BACKOFF messages and prints the power backoff applied to the frequency bands.
+This utility can also be used to retrieve the power backoff applied to the frequency bands using  VS_GET_PRESCALER_BACKOFF messages and prints it in the console.
+Output is column-oriented and suitable for loading into a spreadsheet or being read by a simple program.
+
+.PP
+This program is part of the Qualcomm Atheros Powerline Toolkit.
+See the \fBplc\fR man page for an overview and installation instructions.
+
+.SH CHIPSETS
+QCA75xx 
+
+.SH OPTIONS
+
+-\fBa \fItraffic_rate\fR
+The rate (Mbps) at which traffic is sent to peer device. 
+The minimum value is \fB0\fR and the maximum value is \fB50\fR .
+If the value is 0, this utility sends traffic at approximately 50Mbps
+
+.TP
+-\fBb\fI band_descriptor\fR
+Reduces transmit power in the given frequency bands with VS_SET_PRESCALER_BACKOFF. It also displays the power backoff applied to the frequency bands.
+band_descriptor format is [SF,EF,SB,EB], where
+        SF-Start Frequency (MHz)        SB-Start Backoff (dB)
+        EF-End Frequency (MHz)          EB-End Backoff (dB)
+
+.PP
+This option can be used for a maximum of 16 times to perform backoff in multiple frequency bands. See \fBEXAMPLES\fR for more information.
+		
+.TP
+-\fBc\fI coupling\fR
+Tonemap coupling.
+Use the number \fB0\fR or the string "\fBpri\fR" for SISO primary coupling.
+Use the number \fB1\fR or the string "\fBalt\fR" for SISO alternate coupling.
+Use the number \fB2\fR or the string "\fBmimo\fR" for MIMO coupling.
+This program will accept any numeric value from \fB0\fR through \fB255\fR but runtime firmware will reject out-of-range values.
+
+.TP
+-\fBd\fI timeout\fR
+Duration (seconds) for which the new backoff configuration needs to be applied.
+After the specfied timeout, previous backoff configuration will be restored by the firmware.
+This program will accept any numeric value from \fB0\fR through \fB60\fR.
+
+.TP
+.RB - e
+Redirects stderr messages to stdout.
+By convention status and error messages are printed on stderr while primary program output is printed on stdout.
+This option prints all output on stdout in cases where this is desired.
+
+.TP
+.RB - g
+Read and display transmit power backoff values with VS_GET_PRESCALER_BACKOFF.
+Output is identical to set prescaler backoff values.
+
+.TP
+-\fBi \fIinterface\fR
+Select the host Ethernet interface.
+All requests are sent via this host interface and only reponses received via this host interface are recognized.
+The default interface is \fBeth1\fR because most people use \fBeth0\fR as their principle network connection; however, if environment string "PLC" is defined then it takes precedence over the default interface.
+This option then takes precedence over either default.
+
+.TP
+.RB - q
+Enter quiet mode.
+Progress messages are suppressed.
+
+.TP
+.RB - r
+Restores the actual transmit power of all the frequencies in the given coupling "\fB-c\fR".
+This option and option \fB-b\fR and \fB-g\fR are mutually exclusive.
+
+.TP
+-\fBt \fImilliseconds\fR
+Read timeout in milliseconds.
+Values range from 0 through UINT_MAX.
+This is the maximum time allowed for a response.
+The default is shown in brackets on the program menu.
+
+.TP
+.RB - T
+Generate Unidirectional traffic from node to peer for the duration specified through option \fB-d\fR.
+This program will not accept this option if node or peer mac address not specified.
+The first mac address given by user will be considered as node and the second mac address given by user will be considered as peer.
+Any additional mac address given by user will be ignored by this program.
+
+.TP
+.RB -v
+Enter verbose mode.
+All Etherenet frames sent or received by the program are displayed on stdout.
+
+.TP
+.RB - x
+Exit program on first error with a non-zero exit code.
+This option allows shell scripts to detect failed or incomplete operations and take the appropriate action.
+
+.TP
+.RB - ? ,-- help
+Print program help summary on stdout.
+This option takes precedence over other options on the command line.
+
+.TP
+.RB - ! ,-- version
+Print program version information on stdout.
+This option takes precedence over other options on the command line.
+Use this option when sending screen dumps to Atheros Technical Support so that they know exactly which version of the Linux Toolkit you are using.
+
+.SH REFERENCES
+See the Qualcomm Atheros HomePlug AV Firmware Technical Reference Manual for more information.
+
+.SH EXAMPLES
+The following example displays the transmit power backoff applied to the given frequency bands.
+
+.PP
+   # backoff1 -ieth1 -c0 -b[1.80,5.90,5,5]
+   Back-off Applied Successfully
+   Back-off bands in Primary chain
+   Band | Start frequency(MHz) | Start back off(dB) | End frequency(MHz) | End back off(dB)
+   0       1.800000                   5                 5.900000              5
+   No Back-off bands in Alternate chain
+
+.PP
+   # backoff1 -ieth1 -c2 -b[1.80,5.90,5,5]
+   Back-off Applied Successfully
+   Back-off bands in Primary chain
+   Band | Start frequency(MHz) | Start back off(dB) | End frequency(MHz) | End back off(dB)
+   0       1.800000                   5                 5.900000              5
+   Back-off bands in Alternate chain
+   Band | Start frequency(MHz) | Start back off(dB) | End frequency(MHz) | End back off(dB)
+   0       1.800000                   5                 5.900000              5
+
+.PP
+   # backoff1 -ieth1 -c2 -b[1.80,5.90,5,5] -b[7.86,9.03,10,10]
+   Back-off Applied Successfully
+   Back-off bands in Primary chain
+   Band | Start frequency(MHz) | Start back off(dB) | End frequency(MHz) | End back off(dB)
+   0       1.800000                   5                 5.900000              5
+   1       7.800000                  10                 9.000000             10
+   Back-off bands in Alternate chain
+   Band | Start frequency(MHz) | Start back off(dB) | End frequency(MHz) | End back off(dB)
+   0       1.800000                   5                 5.900000              5
+   1       7.800000                  10                 9.000000             10
+   
+.PP
+   # backoff1 -ieth1 -c2 -g
+   Back-off bands in Primary chain
+   Band | Start frequency(MHz) | Start back off(dB) | End frequency(MHz) | End back off(dB)
+   0       1.800000                   5                 5.900000              5
+   1       7.800000                  10                 9.000000             10
+   Back-off bands in Alternate chain
+   Band | Start frequency(MHz) | Start back off(dB) | End frequency(MHz) | End back off(dB)
+   0       1.800000                   5                 5.900000              5
+   1       7.800000                  10                 9.000000             10
+   
+.SH DISCLAIMER
+Atheros HomePlug AV Vendor Specific Management Message Entry structure and content is proprietary to Qualcomm Atheros, Ocala FL USA.
+Consequently, public information may not be available.
+Qualcomm Atheros reserves the right to modify message structure and content in future firmware releases without any obligation to notify or compensate users of this program.
+
+.SH SEE ALSO
+.BR PLC ( 1 ), 
+.BR backoff ( 1 ), 
+
+.SH CREDITS
+ Nisha K <nishk@qti.qualcomm.com>
+ Kalaivani Somasundaram <kalaivan@qti.qualcomm.com>
+'
+'
+

@@ -1,4 +1,0 @@
-config tang 'config'
-	option port '9090'
-	option enabled '0'
-

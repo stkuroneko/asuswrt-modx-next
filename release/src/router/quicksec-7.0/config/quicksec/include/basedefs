@@ -1,0 +1,219 @@
+########################################################################
+
+class basedefs
+
+  ## This is defined only in ``inplace'' compilations!
+  undefine SSHDIST_INPLACE
+
+  ## Internal instructions for testing is not included by default
+  undefine SSHDIST_TEST_INSTRUCTIONS
+
+  ## Nothing is included by default from the top level Makefile
+  undefine SSHDIST_IPSEC
+  undefine SSHDIST_IPSEC_HWACCEL
+  undefine SSHDIST_APPS
+
+  # Nothing is included by default from the lib directory
+  undefine SSHDIST_ZLIB
+  undefine SSHDIST_ZLIB_LEVEL_DETECTION
+  undefine SSHDIST_CRYPT
+  undefine SSHDIST_CRYPTO
+  undefine SSHDIST_CRYPTO_RANDOM
+  undefine SSHDIST_CRYPTO_RANDOM_POLL
+  undefine SSHDIST_RADIUS
+  undefine SSHDIST_LDAP
+  undefine SSHDIST_DIRECTORY_HTTP
+  undefine SSHDIST_HTTP_CLIENT
+  undefine SSHDIST_HTTP_SERVER
+  undefine SSHDIST_CERT
+  undefine SSHDIST_DIRECTORY_TLS
+  undefine SSHDIST_FUNCTIONALITY_TLS
+  undefine SSHDIST_TLS_UTILS
+  undefine SSHDIST_APPUTIL
+  undefine SSHDIST_EXTERNALKEY
+  undefine SSHDIST_IKEV1
+  undefine SSHDIST_IKEV2
+  undefine SSHDIST_EAP
+  undefine SSHDIST_EAP_SRP
+  undefine SSHDIST_EAP_MSCHAPV2
+  undefine SSHDIST_EAP_AKA_DASH
+  undefine SSHDIST_EAP_AKA
+  undefine SSHDIST_EAP_SIM
+  undefine SSHDIST_SIM
+  undefine SSHDIST_SIM_SAMPLE
+  undefine SSHDIST_EAP_TLS
+  undefine SSHDIST_L2TP
+  undefine SSHDIST_XML
+  undefine SSHDIST_ASN1
+
+  # Nothing is included from the src/lib/sshmath directory by default.
+  undefine SSHDIST_MATH
+  undefine SSHDIST_MATH_SIEVE
+  undefine SSHDIST_MATH_ARITHMETIC
+  undefine SSHDIST_MATH_2ADIC
+  undefine SSHDIST_MATH_MONTGOMERY
+  undefine SSHDIST_MATH_MINIMAL
+  undefine SSHDIST_MATH_INTMOD
+  undefine SSHDIST_MATH_RATIONAL
+  undefine SSHDIST_MATH_FLOAT
+  undefine SSHDIST_MATH_COMPLEX
+  undefine SSHDIST_MATH_POWM
+  undefine SSHDIST_MATH_GF2N
+  undefine SSHDIST_MATH_GF2NX
+  undefine SSHDIST_MATH_NAF
+  undefine SSHDIST_MATH_ECP
+  undefine SSHDIST_MATH_EC2N
+  undefine SSHDIST_MATH_DOUBLE
+
+  # Some things are excluded from the src/lib/sshutil directory by default.
+  undefine SSHDIST_UTIL
+  undefine SSHDIST_UTIL_AUDIT
+
+  # Internal unit test programs are included only in internal distributions.
+  undefine SSHDIST_TESTS_INPLACE
+  undefine SSHDIST_QUICKSEC_TESTS
+
+  # Nothing is included from the src/apps directory by default.
+  undefine SSHDIST_APPS_LDAPUTILS
+  undefine SSHDIST_APPS_CRYPTUTILS
+  undefine SSHDIST_APPS_PERFUTILS
+
+######################################################################
+  # RNG's
+  undefine SSHDIST_CRYPT_NIST_SP_800_90
+
+  # Hash functions.
+  undefine SSHDIST_CRYPT_MD5
+  undefine SSHDIST_CRYPT_SHA
+  undefine SSHDIST_CRYPT_SHA256
+  undefine SSHDIST_CRYPT_SHA512
+
+  # Symmetric ciphers.
+  undefine SSHDIST_CRYPT_DES    # includes both des and 3des
+  undefine SSHDIST_CRYPT_RIJNDAEL
+  undefine SSHDIST_CRYPT_CAMELLIA
+
+  undefine SSHDIST_CRYPT_EXPORT
+
+  undefine SSHDIST_CRYPT_SELF_TESTS
+  undefine SSHDIST_CRYPT_GENPKCS
+  undefine SSHDIST_CRYPT_GENPKCS_DH
+  undefine SSHDIST_CRYPT_GENPKCS_PUBLIC
+  undefine SSHDIST_CRYPT_GENPKCS_PRIVATE
+
+  undefine SSHDIST_CRYPT_MODE_GCM
+
+  # MAC (Message Authentication Code) algorithms.
+  undefine SSHDIST_CRYPT_HMAC
+  undefine SSHDIST_CRYPT_SSHMACS
+  undefine SSHDIST_CRYPT_XCBCMAC
+  undefine SSHDIST_CRYPT_CMAC
+
+  # Public key algorithms.
+  undefine SSHDIST_CRYPT_PROXYKEY
+  undefine SSHDIST_CRYPT_RSA
+
+  # Discrete logarithm algorithms.  DL needed if any supported
+  undefine SSHDIST_CRYPT_DL
+  undefine SSHDIST_CRYPT_DL_GENERATE
+  # DL parameters defined in IKE.
+  undefine SSHDIST_CRYPT_DL_IKE_GROUPS
+  undefine SSHDIST_CRYPT_DSA
+  undefine SSHDIST_CRYPT_DH
+  # Elliptic curves in prime fields
+  undefine SSHDIST_CRYPT_ECP
+  undefine SSHDIST_CRYPT_BRAINPOOL_ECP
+  undefine SSHDIST_CRYPT_EC2N
+
+  # Include compression support in crypto library
+  undefine SSHDIST_CRYPT_COMPRESS
+  undefine SSHDIST_CRYPT_COMPRESS_LZS
+
+  # Crypto library namelist
+  undefine SSHDIST_UTIL_TCP
+  undefine SSHDIST_UTIL_DNS_RESOLVER
+
+  undefine SSHDIST_MEMORY_LEAK_CHECKS
+  undefine SSHDIST_ENCODE_FAIL
+
+  # Platform support
+  undefine SSHDIST_WINDOWS      # Applies to all Windows versions
+  undefine SSHDIST_PLATFORM_NETBSD
+  undefine SSHDIST_PLATFORM_LINUX
+  undefine SSHDIST_PLATFORM_WIN32
+  undefine SSHDIST_PLATFORM_VXWORKS
+
+  # Isakmp defines
+  undefine SSHDIST_ISAKMP_CFG_MODE
+  undefine SSHDIST_ISAKMP_CFG_MODE_RULES
+  undefine SSHDIST_IKE_ID_LIST
+  undefine SSHDIST_IKE_XAUTH
+
+  # IKEv1 and IKEv2 defines
+  undefine SSHDIST_IKE_CERT_AUTH
+  undefine SSHDIST_IKE_EAP_AUTH
+
+  # IKEv2 defines
+  undefine SSHDIST_IKE_MOBIKE
+
+  # External key interface.
+  undefine SSHDIST_EXTKEY_SOFT_ACCELERATOR_PROV
+  undefine SSHDIST_EXTKEY_PKCS11_PROV
+
+  undefine SSHDIST_USE_BMP_STRINGS
+
+  # PKCS
+  undefine SSHDIST_PKCS_7
+  undefine SSHDIST_PKCS_7_SIMPLE
+
+  # Certificate Manager
+  undefine SSHDIST_VALIDATOR
+  undefine SSHDIST_VALIDATOR_OCSP
+  undefine SSHDIST_VALIDATOR_LDAP
+  undefine SSHDIST_VALIDATOR_HTTP
+  undefine SSHDIST_VALIDATOR_PKCS
+
+  # Enrollment protocols
+  undefine SSHDIST_CERT_PKCS10
+  undefine SSHDIST_CERT_CRMF
+  undefine SSHDIST_CERT_OCSP
+
+  ## Apputil library (XXX most of te stuff not here yet)
+  undefine SSHDIST_APPUTIL_KEYUTIL
+  undefine SSHDIST_APPUTIL_SSH1ENCODE
+
+  ######################################################################
+  # ipsec directory distdefs
+
+  # ipsec options
+  undefine SSHDIST_IPSEC_COMPRESSION_DEFLATE
+  undefine SSHDIST_IPSEC_COMPRESSION_LZS
+  undefine SSHDIST_IPSEC_DHCP
+  undefine SSHDIST_IPSEC_FIREWALL
+  undefine SSHDIST_IPSEC_HWACCEL_OCF
+  undefine SSHDIST_IPSEC_HWACCEL_OCTEON
+  undefine SSHDIST_IPSEC_IPCOMP
+  undefine SSHDIST_IPSEC_SA_EXPORT
+  undefine SSHDIST_IPSEC_DNSPOLICY
+  undefine SSHDIST_IPSEC_NAT
+  undefine SSHDIST_IPSEC_NAT_TRAVERSAL
+  undefine SSHDIST_IPSEC_SCTP_MULTIHOME
+  undefine SSHDIST_IPSEC_VIRTUAL_ADAPTERS
+  undefine SSHDIST_IPSEC_REMOTE_ACCESS_CLIENT
+  undefine SSHDIST_IPSEC_REMOTE_ACCESS_SERVER
+  undefine SSHDIST_IPSEC_XAUTH_CLIENT
+  undefine SSHDIST_IPSEC_XAUTH_SERVER
+  undefine SSHDIST_IPSEC_MOBIKE
+
+  ######################################################################
+
+  # By default we are not building QuickSec
+  undefine SSHDIST_QUICKSEC
+  undefine SSHDIST_QUICKSEC_INTERNAL
+  undefine SSHDIST_QUICKSECPM
+
+  ######################################################################
+
+  # AUTOTEST excluded
+  undefine SSHDIST_AUTOTEST
+

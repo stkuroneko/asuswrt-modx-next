@@ -1,0 +1,71 @@
+/*====================================================================*
+*
+*   Copyright (c) 2013 Qualcomm Atheros, Inc.
+*
+*   All rights reserved.
+*
+*====================================================================*/
+
+/*====================================================================*
+ *
+ *   int HostActionResponse (struct plc * plc);
+ *
+ *   plc.h
+ *
+ *   respond to a VS_HOST_ACTION.IND message sent from a device to
+ *   the local host using a VS_HOST_ACTION.RSP message; this tells
+ *   the bootloader to stop sending VS_HOST_ACTION.IND messages;
+ *
+ *   Contributor(s):
+ *      Charles Maier <cmaier@qca.qualcomm.com>
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef HOSTACTIONRESPONSE_SOURCE
+#define HOSTACTIONRESPONSE_SOURCE
+
+#include <stdint.h>
+#include <memory.h>
+
+#include "../plc/plc.h"
+#include "../tools/error.h"
+#include "../tools/memory.h"
+
+signed HostActionResponse (struct plc * plc)
+
+{
+	struct channel * channel = (struct channel *) (plc->channel);
+	struct message * message = (struct message *) (plc->message);
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_host_action_rsp
+	{
+		struct ethernet_hdr ethernet;
+		struct qualcomm_hdr qualcomm;
+		uint8_t MSTATUS;
+	}
+	* response = (struct vs_host_action_rsp *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	memset (message, 0, sizeof (* message));
+	EthernetHeader (& response->ethernet, channel->peer, channel->host, channel->type);
+	QualcommHeader (& response->qualcomm, 0, (VS_HOST_ACTION | MMTYPE_RSP));
+	plc->packetsize = (ETHER_MIN_LEN - ETHER_CRC_LEN);
+	if (SendMME (plc) <= 0)
+	{
+		error (PLC_EXIT (plc), errno, CHANNEL_CANTSEND);
+		return (-1);
+	}
+	return (0);
+}
+
+#endif
+
+
+

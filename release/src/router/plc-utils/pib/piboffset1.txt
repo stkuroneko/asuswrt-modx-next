@@ -1,0 +1,42 @@
+#!/usr/local/bin/cmassoc/offset
+
+# This offset file demonstrates PIB offsets for the older Thunderbolt/
+# Lightning parameter blocks; Use this file with program odd and odc
+# to visualize parameter block header content; 
+
+# ===================================================================
+#
+# -------------------------------------------------------------------
+
+0 Version Header 
+1 FWMajorVersion 
+1 PIBMinorVersion 
+2 RSVD
+2 PIBLength Length in bytes
+2 RSVD
+4 Checksum The one's complement of the 32-bit XOR of all words, including checksum
+
+# ===================================================================
+#
+# -------------------------------------------------------------------
+
+0 Local Device Configuration 
+6 MACAddress Ethernet hardware address; default is 00:B0:52:00:00:01
+16 DAK Device Access Key; Single 128 bit value; set by vendor at factory and preserved by the firmware
+2 RSVD    
+64 HFID_Manufacturer Manufacture identification string; NUL terminated; set by vendor at factory and preserved by the firmware
+16 NMK  Network Membership Key; Single 128 bit value
+64 HFID_User User identification string; NUL terminated; set by user as desired
+64 HFID_AVLN Network identification string; NUL terminated; set by user as desired
+1 CCoSelection  0=AutoCCo, 1=NeverCCo, 2=AlwaysCCo, 3=User Assigned
+1 CoexistSelection
+1 PLFreqSelection
+1 RSV
+7 PreferredNID Encrypted NMK; must be re-computed when NMK changes; see HomePlug AV specification section 4.4.3.1 Network Identifier (NID) for more information
+1 AutoFWUpgradeable Deprecated; now reserved
+1 MDUConfiguration 0=Disable, 1=Enable
+1 MDURole 0=Slave, 1=Master
+1 SnifferEnable 0=Disable, 1=Enable
+6 SnifferReturnMACAddress Single 48 bit value
+3 RSVD
+

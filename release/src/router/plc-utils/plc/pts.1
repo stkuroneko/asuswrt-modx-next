@@ -1,0 +1,139 @@
+.TH pts 1 "August 2016" "freeplug-0.3.3.2" "Freeplug Powerline Toolkit"
+
+.SH NAME
+pts - Qualcomm Atheros Command Line Production Test Utility
+
+.SH SYNOPSIS
+.BR pts
+.RI [ options ] 
+.RI [ device ] 
+.RI 
+
+.SH DESCRIPTION
+The Qualcomm Atheros Command Line Production Test Utility transmits and receives data between the local device or Gloden Node (GN) and a remote device (DUT). PHY rates are calculated and compared against the minimum PHY rate specified in the command. If the minimum PHY rate is obtained within the maximum runtime specified the program exits with a PASS indication exit(0). If the minimum PHY rate is not obtained within the maximum runtime specified the program exits with a FAILURE indication exit(1).
+
+
+.SH CHIPSETS
+QCA6410, 
+QCA7420, QCA7500, QCA7520, QCA7550
+
+.SH OPTIONS
+.TP
+-\fBc \fIn\fR
+Supress clearing the tonemaps between the Golden node (GN) and the device under test (DUT). The pts normallay clears the tonemaps between the (GN) and the (DUT) before sending traffic. This effectivly "speeds-up" the testing of devices since the devices do not need to be reset in order to reset their tonemaps.Setting this option (-c1) will prevent pts from clearing the tonemaps between the GN and DUT.
+
+.TP
+-\fBd \fIn\fR
+Traffic direction. The -d option controls the direction of the traffic between the GN and the DUT. Traffic can be sent from the GN to the DUT by setting (-d0), from the (DUT) to the (GN) by setting (-d1) or bi-directional between the GN and the DUT by setting (-d2).
+.TP
+-\fBe \fIn\fR
+Force PASS return status.
+Normal return status for pts is "0" for a test PASS and "1" for a test FAILURE.Setting this option (-e1) will force pts to always return a PASS value even if the minimum PHY rate is \fbNOT\fR obtained during the maximum test duration.
+.TP
+-\fBf\fI file\fR
+The name of the serial port for optionally programming the attenuator.
+On Linux, the name is usually "/dev/ttyS[0-4]".
+On OS/X, the name is usually "/dev/cua[0-4]".
+On Windows, the name is "com[0-9]:".
+The default is "/dev/ttyS0" on Linux and "com1:" on Windows.
+If environment string "\fBPTSCTL\fR" is defined then it takes precedence over the default serial port.
+This option then takes precedence over either default.
+.TP
+-\fBg\fI attenuation\fR
+The desired line/ground attenation in Decibels.
+The value may be expressed in decimal, binary, or hexadecimal.
+Binary values start with "\fB0b\fR" and hexadecimal values start with "\fB0x\fR".
+The default for this option is \fB127\fR dB.
+.TP
+-\fBi\fR \fIinterface\fR
+Select the host Ethernet interface that the Golden Node (GN) is connectted to.
+All requests are sent via this host interface and only reponses received via this host interface are recognized.
+The default interface is \fBeth1\fR because most people use \fBeth0\fR as their principle network connection; however, if environment string "PLC" is defined then it takes precedence over the default interface.
+This option then takes precedence over either default.
+
+.TP
+-\fBn\fI attenuation\fR
+The desired line/neutral attenation in Decibels.
+The value may be expressed in decimal, binary, or hexadecimal.
+Binary varues start with "0b" and hexadecimal values start with "0x".
+The default for this option is \fB127\fR dB.
+
+.TP
+-\fBp \fIn\fR
+Minimum PHY rate limit. This value specifies the minimum PHY rate limit that must be obtained before the maximum test duration time (-t).
+.TP
+-\fBt \fIn\fR
+Maximum test duration time. This value specifies the maximum time to send traffic before the minimum PHY rate limit is obtained. If the minimum PHY rate is NOT obtained (-p) before this time, pts will exit and return the value of "1". 
+
+.TP
+.RB -v
+Enter verbose mode.
+Output pts progress messages on stdout.
+
+
+.TP
+.RB - ? ,-- help
+Print program help summary on stdout.
+This option takes precedence over other options on the command line.
+
+.TP
+.RB - ! ,-- version
+Print program version information on stdout.
+This option takes precedence over other options on the command line.
+Use this option when sending screen dumps to Atheros Technical Support so that they know exactly which version of the Linux Toolkit you are using.
+
+.SH ARGUMENTS 
+
+.TP
+.B device
+The MAC address of the Device Under Test (DUT)
+
+
+
+.SH REFERENCES
+See the Qualcomm Atheros HomePlug AV Firmware Technical Reference Manual for more information.
+
+.SH EXAMPLES
+The following example transmits data from the Golden Node (GN) connectted to the interface "eth5" to the Device Under Test (DUT) with the mac address of 00;B0:52:00:00:22. The test is run for a maximum time of 60 seconds, traffic is sent from the GN to the DUT and the minimum PHY rate that must be obtained is 700 Mbps.
+
+
+.PP
+   # pts -i eth5 -p700 -t60 -d0 -v 00b052000022
+   GN = 00:B0:52:00:00:11 DUT = 00:B0:52:00:00:22
+   Clearing tonemaps between GN and DUT
+   Sending traffic from GN to DUT...
+   Test PASSED Minimum PHY Rate Expected = 700Mbps
+   Actual DUT PHY Rate = 729Mbps
+   Test PASSED returning 0
+   
+   
+The following example runs the pts between a Golden Node (GN) connectted to the interface "eth5" and a Device Under Test (DUT) with the mac address of 00;B0:52:00:00:22. The test is run for a maximum time of 60 seconds, traffic is sent in both directions and the minimum PHY rate that must be obtained is 700 Mbps.
+
+
+.PP
+   # pts -i eth5 -p700 -t60 -d2 -v 00b052000022
+   GN = 00:B0:52:00:00:11 DUT = 00:B0:52:00:00:22
+   Clearing tonemaps between GN and DUT
+   Sending traffic between GN and DUT
+   Test PASSED...Minimum PHY Rate Expected = 700Mbps
+   Actual GN PHY Rate = 712Mbps Actual DUT PHY Rate = 711Mbps
+   Test PASSED returning 0
+   
+
+
+.SH DISCLAIMER
+Atheros HomePlug AV Vendor Specific Management Message Entry structure and content is proprietary to Qualcomm Atheros, Ocala FL USA.
+Consequently, public information may not be available.
+Qualcomm Atheros reserves the right to modify message structure and content in future firmware releases without any obligation to notify or compensate users of this program.
+
+.SH SEE ALSO
+.BR PLC ( 1 ), 
+.BR plcrate ( 1 ), 
+.BR int6krate ( 1 ) 
+
+.SH CREDITS
+ Frank Aiello <aiello@qca.qualcomm.com>
+ Charles Maier <cmaier@qca.qualcomm.com>
+'
+'
+

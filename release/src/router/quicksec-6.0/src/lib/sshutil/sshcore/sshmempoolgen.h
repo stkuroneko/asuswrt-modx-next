@@ -1,0 +1,58 @@
+/**
+   @copyright
+   Copyright (c) 2002 - 2014, INSIDE Secure Oy. All rights reserved.
+*/
+
+/**
+   Definitions of SANA assigned memory pools.
+*/
+
+#ifndef SSHMEMPOOLGEN_H
+#define SSHMEMPOOLGEN_H
+
+#define SSH_MEMPOOL_ANY 0
+#ifdef SSHDIST_CRYPT
+#define SSH_MEMPOOL_CRYPTO 1
+#endif /* SSHDIST_CRYPT */
+#ifdef SSHDIST_MATH
+#define SSH_MEMPOOL_MATH 2
+#endif /* SSHDIST_MATH */
+#ifdef SSHDIST_CERT
+#define SSH_MEMPOOL_CERT 3
+#endif /* SSHDIST_CERT */
+#ifdef SSHDIST_IKEV1
+#define SSH_MEMPOOL_IKE 4
+#endif /* SSHDIST_IKEV1 */
+#ifdef SSHDIST_IPSEC
+#define SSH_MEMPOOL_IPM 5
+#endif /* SSHDIST_IPSEC */
+#define SSH_MEMPOOL_STREAM 6
+
+
+
+#ifdef SSHDIST_FUNCTIONALITY_TLS
+#define SSH_MEMPOOL_TLS 8
+#endif /* SSHDIST_FUNCTIONALITY_TLS */
+#ifdef SSHDIST_DIRECTORY_HTTP
+#define SSH_MEMPOOL_HTTP 9
+#endif /* SSHDIST_DIRECTORY_HTTP */
+#ifdef SSHDIST_LDAP
+#define SSH_MEMPOOL_LDAP 10
+#endif /* SSHDIST_LDAP */
+#define SSH_MEMPOOL_ADT 11
+#ifdef SSHDIST_IPSEC
+#define SSH_MEMPOOL_APF 12
+#endif /* SSHDIST_IPSEC */
+#define SSH_MEMPOOL_TEST 65537
+#define SSH_MEMPOOL_TEST1 65538
+#define SSH_MEMPOOL_TEST2 65539
+#define SSH_MEMPOOL_TEST3 65540
+#define SSH_MEMPOOL_TEST4 65541
+#define SSH_MEMPOOL_TEST5 65542
+#define SSH_MEMPOOL_TEST6 65543
+#define SSH_MEMPOOL_TEST7 65544
+#define SSH_MEMPOOL_TEST8 65545
+#define SSH_MEMPOOL_TEST9 65546
+
+#endif /* ! SSHMEMPOOLGEN_H */
+/* eof (sshmempoolgen.h) */

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+	<!ENTITY ethernet SYSTEM "oethernet.xml">
+	<!ENTITY intellon SYSTEM "ointellon.xml">
+	<!ENTITY homeplug SYSTEM "ohomeplug.xml">
+	<!ENTITY interface SYSTEM "ointerface.xml">
+	<!ENTITY interfaces SYSTEM "ointerfaces.xml">
+	<!ENTITY flagword SYSTEM "oflagword.xml">
+	<!ENTITY memory SYSTEM "omemory.xml">
+	<!ENTITY error SYSTEM "oerror.xml">
+	<!ENTITY sha256 SYSTEM "oSHA256.xml">
+	<!ENTITY hpavkey SYSTEM "oHPAVKey.xml">
+	<!ENTITY channel SYSTEM "CPLChannel.xml">
+	<!ENTITY network SYSTEM "CPLNetwork.xml">
+	<!ENTITY networks SYSTEM "CPLNetworks.xml">
+	<!ENTITY station SYSTEM "CPLStation.xml">
+	<!ENTITY parameters SYSTEM "CPLParameters.xml">
+	<!ENTITY firmware SYSTEM "CPLFirmware.xml">
+	<!ENTITY message SYSTEM "CPLMessage.xml">
+]>
+<book lang='en'>
+	<bookinfo>
+		<title>
+			Atheros Powerline Class Library
+			</title>
+		<authorgroup>
+			<corpauthor>
+				Atheros Communications, Ocala FL USA
+				</corpauthor>
+			<editor>
+				<firstname>
+					Charles 
+					</firstname>
+				<surname>
+					Maier 
+					</surname>
+				</editor>
+			</authorgroup>
+		<date>
+			NOV 2009
+			</date>
+		<releaseinfo>
+			plc-utils-2.1.2 
+			</releaseinfo>
+		<abstract>
+			<para>
+				Atheros Communications, Ocala FL USA, offers the Atheros <application>Application Development Package</application> to customers free of charge. The package contains C++ Language source code, GNU makefiles and Microsoft Visual Studio solution files that may be used to create useful end-user,  HomePlug AV specific,  powerline applications having graphical user interfaces. This package may not be suitable for embedded applications due to high overheads and compiled image sizes. 
+				</para>
+			<para>
+				Unlike the Atheros Linux Toolkit, this package implements a software abstraction layer that encapsulates almost all platform specific, ISO Layer 2 networking details. Like the Atheros Linux Toolkit, it requires <productname>WinPcap</productname> to perform raw Ethernet I/O on Microsoft <productname>Windows</productname> but runs natively on <productname>Linux</productname> and <productname>Mac OSX</productname>.
+				</para>
+			<para>
+				New users should read the entire first chapter of this document before trying to use the package because it will answer many questions about installation, organization, content and application. Readers familiar with object oriented programming in C++, basic ISO Layer 2 networking concepts,  HomePlug AV powerline networking and the Atheros <citetitle>Firmware Technical Reference Manual</citetitle> will find the remaining chanpters helpful when developing application.
+				</para>
+			<para>
+				<trademark class='registered'>HomePlug</trademark> AV is a registered trademark of the HomePlug Powerline Aliance. <trademark>Linux</trademark> is a trademark of Linus Tovalds. <trademark class='registered'>Windows</trademark> is a registered trademark of Microsoft Communications. 
+				</para>
+			<para>
+				<productname>INT6000</productname>, <productname>INT6300</productname> and <productname>INT6400</productname> are products of Atheros Communications. 
+				</para>
+			</abstract>
+		<keywordset>
+			<keyword>
+				int6k 
+				</keyword>
+			<keyword>
+				powerline 
+				</keyword>
+			</keywordset>
+		</bookinfo>
+	&channel;
+	&firmware;
+	&message;
+	&network;
+	&networks;
+	&station;
+	&parameters;
+	&ethernet; 
+	&error;
+	&flagword;
+	&homeplug; 
+	&hpavkey;
+	&intellon; 
+	&interface; 
+	&interfaces; 
+	&memory;
+	&sha256;
+	</book>

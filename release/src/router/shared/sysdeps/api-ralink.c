@@ -1302,8 +1302,13 @@ int get_channel_info(const char *ifname, int *channel, int *bw, int *nctrlsb)
 		return -1;
 	}
 
+	if (channel == NULL)
+		goto next_bw;
 	*channel = (int)info.channel;
 
+next_bw:
+	if (bw == NULL)
+		goto next_nctrlsb;
 	switch (info.bandwidth) {
 		case 0:
 			*bw = 20;
@@ -1322,6 +1327,9 @@ int get_channel_info(const char *ifname, int *channel, int *bw, int *nctrlsb)
 			break;
 	}
 
+next_nctrlsb:
+	if (nctrlsb == NULL)
+		goto next_done;
 	if (info.bandwidth == 1) {
 		switch (info.extrach) {
 			case 1:
@@ -1336,7 +1344,15 @@ int get_channel_info(const char *ifname, int *channel, int *bw, int *nctrlsb)
 		}
 	}
 
+next_done:
         return 0;
+}
+
+int get_channel(const char *ifname)
+{
+	int ch;
+	get_channel_info(ifname, &ch, NULL, NULL);
+	return ch;
 }
 
 int get_regular_class(const char* ifname)

@@ -1,7 +1,0 @@
-if PACKAGE_dbus
-
-config DBUS_VERBOSE
-	bool "Enable verbose error strings"
-	default n
-
-endif

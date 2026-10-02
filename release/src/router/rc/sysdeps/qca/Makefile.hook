@@ -1,0 +1,31 @@
+#
+# This Makefile is used to place detail information of non-GPL source code and
+# should not exist in GPL archives!
+# This file is included by src/router/rc/Makefile
+#
+
+ifeq ($(RTCONFIG_SPF8_QSDK),y)
+QSDK_BD_DIR := SPF8
+else ifeq ($(RTCONFIG_SPF10_QSDK),y)
+QSDK_BD_DIR := SPF10
+else ifeq ($(RTCONFIG_SPF11_QSDK),y)
+QSDK_BD_DIR := SPF11
+else ifeq ($(RTCONFIG_SPF11_1_QSDK),y)
+QSDK_BD_DIR := SPF11.1
+else ifeq ($(RTCONFIG_SPF11_3_QSDK),y)
+QSDK_BD_DIR := SPF11.3
+else ifeq ($(RTCONFIG_SPF11_4_QSDK),y)
+QSDK_BD_DIR := SPF11.4
+else
+QSDK_BD_DIR := .
+endif
+
+MODEL_BINS := $(wildcard sysdeps/qca/$(BUILD_NAME)/$(QSDK_BD_DIR)/*.bin)
+MODEL_OBJS := $(if $(MODEL_BINS),$(MODEL_BINS:.bin=.obj),$(wildcard prebuild/$(BUILD_NAME)/$(QSDK_BD_DIR)/*.obj))
+
+sysdeps/qca/$(BUILD_NAME)/$(QSDK_BD_DIR)/%.obj: sysdeps/qca/$(BUILD_NAME)/$(QSDK_BD_DIR)/%.bin
+	@$(MAKE) -C sysdeps/qca/$(BUILD_NAME)/$(QSDK_BD_DIR) $(subst sysdeps/qca/$(BUILD_NAME)/$(QSDK_BD_DIR)/,,$@)
+
+ctl.obj: ctl.c $(MODEL_OBJS)
+	$(CC) $(CFLAGS) -o ctl.o -c $<
+	$(LD) -r -o $@ ctl.o $(MODEL_OBJS)

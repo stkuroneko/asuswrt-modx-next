@@ -1,7 +1,0 @@
-#!/bin/sh
-
-[ -e /etc/apinger.user ] && {
-	sh /etc/apinger.user
-}
-
-exit 0

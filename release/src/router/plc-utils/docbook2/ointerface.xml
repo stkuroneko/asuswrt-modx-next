@@ -1,0 +1,253 @@
+<chapter id='ointerface'>
+	<title>
+		Class ointerface
+		</title>
+	<section id="ointerface-class" >
+		<title>
+			Introduction
+			</title>
+		<para>
+			This class stores information about a named host Ethernet interface. Instantiating it with either the interface index or the interface name causes it to collect the remaining information about the interfaces and make it available to your application. Once  instantiated, you can access the interface <link linkend='ointerface-Index'>Index</link>, <link linkend='ointerface-Name'>Name</link>, <link linkend='ointerface-Description'>Description</link>, <link linkend='ointerface-HardwareAddress'>HardwareAddress</link> and <link linkend='ointerface-InternetAddress'>InternetAddress</link> properties.  
+			</para>
+		<para>
+			This class is declared in <ulink url='ointerface.hpp.html'>ointerface.hpp</ulink> and defined in <ulink url='ointerface.cpp.html'>ointerface.cpp</ulink>. Application developers can access a collection of <link linkend='ointerface'>ointerface</link> objects via the <link linkend='ointerfaces'>ointerfaces</link> class.
+			</para>
+		<section id="ointerface-inheritance">
+			<title>
+				Inheritance
+				</title>
+			<para>
+				None.
+				</para>
+			</section>
+		<section id="ointerface-dependence">
+			<title>
+				Dependence
+				</title>
+			<para>
+				This class depends on static classes <link linkend='omemory'>omemory</link> and <link linkend='oerror'>oerror</link>.
+				</para>
+			<para>
+				This class references interface adapter related constants defined in header file <filename>net/if.h</filename> which should be available on most systems. An abridged version is provided in <ulink url='if.h.html'>VisualStudioNET/include/net/if.h</ulink> for systems that may not have it.
+				</para>
+			<para>
+				This class references Ethernet related constants defined in header file <filename>net/ethernet.h</filename> which should be available on most systems. An abridged version is provided in <ulink url='ethernet.h.html'>VisualStudioNET/include/net/ethernet.h</ulink> for systems that may not have it.
+				</para>
+			</section>
+		</section>
+	<section id="ointerface-properties">
+		<title>
+			Properties
+			</title>
+		<para>
+			</para>
+		<section id="ointerface-Description">
+			<title>
+				ointerface::Description
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>char const * <function>Description</function></funcdef>
+					<paramdef>void</paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the interface description string. On Linux, this property defaults to the interface <link linkend='ointerface-Name'>Name</link> property. On Windows, this property contains the hardware manufacturer name string, such as <quote>Realtek RTL83 Ethernet Adapter (Microsoft Packet Scheduler)</quote>. On instantiation, this property contains an empty string.
+
+				</para>
+			</section>
+		<section id="ointerface-Index">
+			<title>
+				ointerface::Index
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>unsigned <function>Index</function></funcdef>
+					<paramdef>void</paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the interface index. This is the number assigned to the interface by the operating system when it was discovered. It should not be confused with the <link linkend='ointerfaces-Index'>ointerfaces::Index</link> property. An index of <constant>0</constant> indicates that the interface is invalid. On instantiation, this property contains <constant>0</constant>.
+				</para>
+			</section>
+		<section id="ointerface-Name">
+			<title>
+				ointerface::Name
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>char const * <function>Name</function></funcdef>
+					<paramdef>void</paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the interface name string. On Linux, name strings are short, as in <quote>eth0</quote>, and do exceed <constant>IF_NAMESIZE</constant> characters. On Windows, name strings are longer, as in <quote>\Device\NPF_{4CFAABD5-C929-4942-914B-BDFE72B13611}</quote>, but do not exceed <constant>255</constant> characters. On instantiation, this property contains an empty string.
+				</para>
+			</section>
+		<section id="ointerface-HardwareAddress">
+			<title>
+				ointerface::HardwareAddress
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>uint8_t const * <function>HardwareAddress</function></funcdef>
+					<paramdef>void</paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the location of the interface hardware address. The hardware address is <constant>ETHER_ADDR_LEN</constant> binary bytes long. The hardware address is the same as the physical address,  Ethernet address and <acronym>MAC</acronym> address.The hardware address location remains valid for the life of the object but the content may change if the <link linkend='ointerface-Index'>Index</link> or <link linkend='ointerface-Name'>Name</link> property changes. On instantiation, this property contains zeros.
+
+				</para>
+			</section>
+		<section id="ointerface-HardwareAddressString">
+			<title>
+				ointerface::HardwareAddressString
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>char const * <function>HardwareAddressString</function></funcdef>
+					<paramdef>void</paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the location of the interface hardware address as a string. The string is <constant>18</constant> characters long including the <constant>NUL</constant> terminator,  as in <quote>00:B0:52:BA:BE:01</quote>. This property may be used anywhere that a <constant>NUL</constant> terminated string is permitted. The string address remains valid for the life of the object but the content may change if the <link linkend='ointerface-Index'>Index</link> or <link linkend='ointerface-Name'>Name</link> property is changed.
+
+				</para>
+			</section>
+		<section id="ointerface-InternetAddress">
+			<title>
+				ointerface::InternetAddress
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>uint8_t const * <function>InternetAddress</function></funcdef>
+    					<paramdef>void</paramdef>
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the location of the interface internet address. The internet address is <constant>4</constant> binary bytes long. The internet address is the same as the <acronym>IPv4</acronym> address. The internet address location remains valid for the life of the object but the content may change if the <link linkend='ointerface-Index'>Index</link> or <link linkend='ointerface-Name'>Name</link> property is changed. On instantiation, this property contains zeros.
+				</para>
+			</section>
+		<section id="ointerface-InternetAddressString">
+			<title>
+				ointerface::InternetAddressString
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>char const * <function>InternetAddressString</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the location of the interface internet address string. The string is <constant>16</constant> characters long including the <constant>NUL</constant> terminator,  as in <quote>192.168.099.001</quote>. This property may be used anywhere that a <constant>NUL</constant> terminated string is permitted. The string address remains valid for the life of the object but the content may change if the <link linkend='ointerface-Index'>Index</link> or <link linkend='ointerface-Name'>Name</link> property changes. 
+				</para>
+			</section>
+		</section>
+	<section id="ointerface-methods">
+		<title>
+			Methods
+			</title>
+		<para>
+			</para>
+		<section id="ointerface-ExportHardwareAddress">
+			<title>
+				ointerface::ExportHardwareAddress
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerface &amp; <function>ExportHardwareAddress</function></funcdef>
+   					<paramdef>void * <parameter>memory</parameter></paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Copy the interface hardware address to external memory in binary format. The hardware address is <constant>ETHER_ADDR_LEN</constant> bytes so length argument is needed.
+				</para>
+			</section>
+		<section id="ointerface-ExportInternetAddress">
+			<title>
+				ointerface::ExportInternetAddress
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerface &amp; <function>ExportInternetAddress</function></funcdef>
+   					<paramdef>void * <parameter>memory</parameter></paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Copy the interface internet address to external memory in binary format. The internet address is <constant>4</constant> bytes so length argument is needed.
+				</para>
+			</section>
+		<section id="ointerface-Print">
+			<title>
+				Print
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerface &amp; <function>Print</function></funcdef>
+   					<paramdef>void</paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Print instance properties on <varname>stdout</varname> in human-readable format. Output conisists of the index, hardware address string, internet address string, name and description properties, in that order.
+				</para>
+			<example>
+				<title>
+					Print ointerface properties on stdout
+					</title>
+<screen>
+2 00:0F:EA:4B:98:CB 192.168.170.179 eth3 eth3
+</screen>
+				<para>
+					This is typical output on a <productname>Linux</productname> or <productname>Mac OSX</productname> system. The device name (field 4) is short and the description (field 5) is the same as the device name.
+					</para>
+<screen>
+1 00:0E:2E:03:5F:B8 192.168.099.033 \Device\NPF_{4CFAABD5-C929-4942-914B-BDFE72B13611} Realtek RTL8139 Family Fast Eth
+</screen>
+				<para>
+					This is typical output on a Microsoft <productname>Windows</productname> system. The device name (field 4) is long and the description (field 5) is not the same as device name.
+					</para>
+				</example>
+			</section>
+		<section id="ointerface-SetDescription">
+			<title>
+				SetDescription
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>ointerface &amp; <function>SetDescription</function></funcdef>
+   					<paramdef>char const * <parameter>string</parameter></paramdef>
+   					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Copy the interface text description from external memory. The <varname>string</varname> argument is truncated to <constant>255</constant> characters. The text description will change whenever the <link linkend='ointerface-Index'>Index</link> or <link linkend='ointerface-Name'>Name</link> properties change but changing the text description change the other properties.
+				</para>
+			</section>
+		</section>
+	<section id="ointerface-Constructors">
+		<title>
+			Constructors
+			</title>
+		<para>
+			This class must be instantiated using either an interface number or interface name.
+			</para>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef><function>ointerface</function></funcdef>
+				<paramdef>unsigned <parameter>index</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Instantiate the class as the numbered interface. Terminate the program if the numbered interface does not exist.
+			</para>
+		<funcsynopsis>
+			<funcprototype>
+  				<funcdef><function>ointerface</function></funcdef>
+				<paramdef>char const * <parameter>name</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Instantiate the class as the named interface. Terminate the program if the named interfaces does not exist.
+			</para>
+		</section>
+
+	</chapter>

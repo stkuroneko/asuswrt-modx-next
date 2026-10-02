@@ -1,0 +1,239 @@
+<chapter id='ochannel'>
+	<title>
+		Class ochannel
+		</title>
+	<section id="ochannel-class" >
+		<title>
+			Introduction
+			</title>
+		<para>
+			This class implements a Layer 2 Ethernet interface with special features that support Atheros powerline device management. A typical sequence of management events involves selecting the host interface, opening it, finding powerline devices available through it, exchanging messages with those devices then closing the interface.
+			</para>
+		<para>
+			Essentially, this class stores all information and includes most methods needed to perform Layer 2 Ethernet communications. The application must allocate, encode and decode the frame buffers that are sent and received by this class. The application must also derive powerline network topology from the <link linkend='ochannel-Bridges'>Bridges</link> and <link linkend='ochannel-Neighbors'>Neighbors</link> methods which are included for convenience.  
+			</para>
+		<para>
+			This class includes a template Ethernet header. Experience has shown that outgoing frame headers are basically static, except for the peer address. The host address and protocol do not change often and both these values are used to filter incoming frames. To minimize duplication of information, the values are all co-located here. This takes some getting-used-to but it makes logistical sense. 
+			</para>
+		<para>
+			This class is declared in <ulink url='ochannel.hpp.html'>ochannel.hpp</ulink> and defined in <ulink url='ochannel.cpp.html'>ochannel.cpp</ulink>.
+			</para>
+		<section id="ochannel-inheritance">
+			<title>
+				Inheritance
+				</title>
+			<para>
+				This class inherits the <link linkend='oflagword'>oflagword</link> class to implement the channel flagword. All public flagword properties and methods are accessible.
+				</para>
+			<para>
+				This class inherits the <link linkend='oethernet'>oethernet</link> class to implemment a template Ethernet header. All public Ethernet header properties and methods are public.
+				</para>
+			<para>
+				This class inherits the <link linkend='ointerface'>ointerface</link> class to implement the channel Ethernet interface. All class properties and methods are private.
+				</para>
+			</section>
+		<section id="ochannel-dependence">
+			<title>
+				Dependence
+				</title>
+			<para>
+				This class references static class <link linkend='omemory'>omemory</link> to print outgoing and incoming frames.
+				</para>
+			<para>
+				This class references static class <link linkend='oerror'>oerror</link> to report errors.
+				</para>
+			</section>
+		</section>
+	<section id="ochannel-properties">
+		<title>
+			Properties
+			</title>
+		<para>
+			Class properties include all <link linkend='oflagword-properties'>oflagword</link>, <link linkend='oethernet-properties'>oethernet</link> and <link linkend='ointerface-properties'>ointerface</link> properties plus those described below.
+			</para>
+		<section id="ochannel-Timeout">
+			<title>
+				Timeout
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>unsigned <function>Timeout</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the channel timeout value. 
+				</para>
+			</section>
+		</section>
+	<section id="ochannel-methods">
+		<title>
+			Methods
+			</title>
+		<para>
+			Class methods include all <link linkend='oflagword-methods'>oflagword</link>, <link linkend='oethernet-methods'>oethernet</link> and <link linkend='ointerface-methods'>ointerface</link> methods plus those described below.
+			</para>
+		<section id="ochannel-Bridges">
+			<title>
+				Bridges
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>Bridges</function></funcdef>
+    					<paramdef>void * <parameter>memory</parameter></paramdef>
+					<paramdef>size_t <parameter>extent</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Encode memory with a list of the hardware addresses of powerline adapters connected to the channel interface. Return the number of addresses encoded. Argument <varname>extent</varname> specifies the size of <varname>memory</varname> in bytes. The return value indicates the number of consecutive addresses actually stored in <varname>memory</varname> where each address is <constant>ETHER_ADDR_LEN</constant> bytes. This method will not return more addresses than <varname>memory</varname> can hold but will return <constant>-1</constant> on overflow.				
+				</para>
+			</section>
+		<section id="ochannel-Neighbors">
+			<title>
+				Neighbors
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>Neighbors</function></funcdef>
+   					<paramdef>void * <parameter>memory</parameter></paramdef>
+					<paramdef>size_t <parameter>extent</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Encode memory with a list of the hardware addresses of powerline adapters associated with a specific adapter. Return the number of addresses encoded. The subject powerline adapter is determined by the <link linkend='ochannel-PeerAddress'>PeerAddress</link> property when this method is called. Argument <varname>extent</varname> specifies the size of <varname>memory</varname> in bytes. The return value indicates the number of consecutive addresses actually stored in <varname>memory</varname> where each address is <constant>ETHER_ADDR_LEN</constant> bytes. This method will not return more addresses than <varname>memory</varname> can hold but will return <constant>-1</constant> on overflow.
+				</para>
+			</section>
+		<section id="ochannel-ReadMessage">
+			<title>
+				ReadMessage
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>ReadMessage</function></funcdef>
+    					<paramdef>void const * <parameter>memory</parameter></paramdef> 
+    					<paramdef>signed <parameter>extent</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Receive an Ethernet frame through the channel interface. Return the number of bytes received. Return <constant>-1</constant> on error, <constant>0</constant> on timeout. On success, the return value will often be less than <varname>extent</varname>. Incoming frames are filtered. Only valid HomePlug AV frames that are addressed to the host will be returned by this method.
+				</para>
+			</section>
+		<section id="ochannel-SendMessage">
+			<title>
+				SendMessage
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>SendMessage</function></funcdef>
+    					<paramdef>void const * <parameter>memory</parameter></paramdef> 
+    					<paramdef>signed <parameter>extent</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Transmit an Ethernet frame through the channel interface. Return the number of bytes transmitted. Return <constant>-1</constant> on error, <constant>0</constant> on timeout. On success, the return value will equal <varname>extent</varname>. Outgoing frames are not filtered. Any valid Ethernet frame may be passed to this method.
+				</para>
+			</section>
+		<section id="ochannel-SetTimeout">
+			<title>
+				SetTimeout
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>unsigned <function>SetTimeout</function></funcdef>
+    					<paramdef>unsigned <parameter>timer</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Replace the channel timer value. 
+				</para>
+			<para>
+				On <application>WinPcap</application> systems, the timer value specifies the packet capture duration. The <link linkend='ochannel-ReadMessage'>ReadMessage</link> operation will not return until the capture period expires. This means that larger timer values may slow performace while smaller values may result in missed frames on busy networks.
+				</para>
+			<para>
+				On Linux, MacOS x and similar systems, the timer value specifies the maximum time to wait for an incoming frame. The <link linkend='ochannel-ReadMessage'>ReadMessage</link> operation will return immediately when a frame arrives. In this sense, the channel timer controls the timeout. This means that large timer values do not significantly affect performance.
+				</para>
+			</section>
+		</section>
+	<section id="ochannel-constructors">
+		<title>
+			Constructors
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef><function>ochannel</function></funcdef>
+				<paramdef>unsigned <parameter>ifindex</parameter></paramdef> 
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Open a raw Ethernet socket, bind it to the numbered interface and activate packet filters. Terminate the application if the socket cannot be opened or the interface does not exist or cannot be accessed. Do not use this constructor unless you are sure that the interface exists and is available. The socket is closed and the interface is released by the class destructor.
+			</para>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef><function>ochannel</function></funcdef>
+				<paramdef>const char * <parameter>ifname</parameter></paramdef> 
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Open a raw Ethernet socket, bind it to the named interface and activate packet filters. Terminate the application if the socket cannot be opended or the interface does not exist or cannot be accessed. Do not use this constructor unless you are sure that the interface exists. The socket is closed and the interface is released by the class destructor.
+			</para>
+		</section>
+	<section id="ochannel-examples">
+		<title>
+			Examples
+			</title>
+		<example>
+			<title>
+				Enumerating Local Powerline Devices
+				</title>
+<programlisting>
+ochannel <varname>channel</varname> (&quot;eth2&quot;); 
+byte <varname>bridgelist</varname> [<constant>255</constant>][<constant>ETHER_ADDR_LEN</constant>]; 
+signed <varname>bridges</varname> = <varname>channel</varname>.<function>Bridges</function> (<varname>bridgelist</varname>, sizeof (<varname>bridgelist</varname>)); 
+signed <varname>bridge</varname> = <constant>0</constant>; 
+while (<varname>bridge</varname> &lt; <varname>bridges</varname>) 
+{
+	do something with bridgelist [bridge]; 	
+}
+</programlisting>
+			<para>
+				This example instantiates <varname>channel</varname> with interface name <constant><quote>eth2</quote></constant>. It then allocates <varname>bridgelist</varname> to allow a maximum of <constant>255</constant> possible hardware device addresses. Integer <varname>bridges</varname> is initialized to the number of available <varname>channel</varname> bridges using method <link linkend='ochannel-Bridges'>Bridges</link>. Integer <varname>bridge</varname> is the used to iterate through <varname>bridgelist</varname>. 
+				</para>
+			<para>
+				Normally there will only be one powerline device connected to an interface but there could be more connected through a network switch or hub. Since each adapter is also connected to the powerline, each could be part of a different powerline network consisting of more, remote powerline devices. Consequently, we need to ask each bridge, in turn, to identify it's network neighbors. 
+				</para>
+			</example>
+		<example>
+			<title>
+				Enumerating Remote Powerline Devices
+				</title>
+<programlisting>
+ochannel <varname>channel</varname> (<constant>3</constant>); 
+byte <varname>bridgelist</varname> [<constant>255</constant>][<constant>ETHER_ADDR_LEN</constant>]; 
+byte <varname>devicelist</varname> [<constant>255</constant>][<constant>ETHER_ADDR_LEN</constant>]
+signed <varname>bridges</varname> = <varname>channel</varname>.<function>Bridges</function> (<varname>bridgelist</varname>, sizeof (<varname>bridgelist</varname>)); 
+signed <varname>devices</varname>; 
+signed <varname>bridge</varname> = <constant>0</constant>;
+signed <varname>device</varname> = <constant>0</constant>; 
+while (<varname>bridge</varname> &lt; <varname>bridges</varname>) 
+{
+	<varname>channel</varname>.<function>ImportPeerAddress</function> (<varname>bridgelist</varname> [<varname>bridge</varname>])
+	<varname>devices </varname> = <varname>channel</varname>.<function>Neighbors</function> (<varname>devicelist</varname>,  sizeof(<varname>devicelist</varname>)); 
+	while (<varname>device</varname> &lt; <varname>devices</varname>)
+	{
+		do something with devicelist [device]; 
+	}	
+}
+</programlisting>
+			<para>
+				The example above instantiates <varname>channel</varname> with interface number <constant>3</constant>, this time. It allocates <varname>bridgelist</varname> and <varname>devicelist</varname> to allow a maximum of <constant>255</constant> possible hardware device addresses each. Integer <varname>bridges</varname> is initialized and <varname>bridgelist</varname> is searched (as before).
+				</para> 
+			<para>
+				Class method <link linkend='oethernet-ImportPeerAddress'>ImportPeerAddress</link> is called to specify each bridge as the destination device before calling method <link linkend='ochannel-Neighbors'>Neighbors</link> to find the neighboring powerline adapters. 
+				</para>
+			<para>
+				The list of all channel bridges and their neighbors forms a complete list of powerline adapter accessible through the channel interface. Such a list can be used to populate a drop-down menu for GUI applications. The two operations of finding bridges and finding devices are kept seperate for reasons that may not be obvious at first.
+				</para>
+
+			</example>
+		</section>
+	</chapter>

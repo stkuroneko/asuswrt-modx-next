@@ -1,0 +1,41 @@
+This is the Qualcomm Atheros Powerline Toolkit. It is distributed as 
+gzip and bzip2 tarballs that contain complete source code and build
+streams for Linux, OpenBSD, MacOSX and Microsoft Windows plus Windows
+executable and installation files and documentation in docbook XML, 
+HTML, plain text and PDF format. Windows executable and installation 
+files are also included individually for experienced users who want 
+load and run the tools.
+
+Some documentation and correspondence incorrectly refer to the this
+as the Linux Toolkit. That is incorrect bacause information for all 
+platforms is distributed in one package. The open source version of
+of this toolkit is available from github.com/qca/open-plc-utils.git.
+
+We recommend that you unpack the archive and add docbook/index.html 
+and docbook/toolkit.html to your browser favorites then read chapter
+1 before attempting to install or use the toolkit. Deveb uwith a web browser 
+the read Chapter 1 before attempting to install or use the toolkit 
+but the impatient may do the following and survive ...
+
+When you download directly from a respositiory, tarballs and folders 
+have no version number. Instead, the version number appears in file
+tools/version.h.
+
+TO INSTALL
+----------
+
+1. Unpack tarball using "tar -vzxf plc-utils-x.x.x.tar.gz".
+2. Enter package folder using "cd plc-utils-x.x.x".
+3. Compile and install all tools in /usr/local/bin using "make install". 
+4. Compile and install man pages in  /usr/share/man/man7 using "make manuals".
+5  Change to the documentation folder using "cd docbook".
+6. Add page index.html to your browser favorites.
+7. Add page toolkit.html to your browser favorites.
+
+TO UNINSTALL
+------------
+
+1. Enter package folder using "cd plc-utils-x.x.x".
+2. Remove installed programs using "make uninstall".
+3. Remove all package files using "rm -r *".
+

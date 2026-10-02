@@ -1,0 +1,184 @@
+<chapter id='CPLFirmware'>
+	<title>
+		Class CPLFirmware
+		</title>
+	<section id="CPLFirmware-class">
+		<title>
+			Introduction
+			</title>
+		<para>
+			This class implements one instance of a runtime formware image chain. Class methods permit reading and writing a firmware image chain from and to powerline devices or local host files. Class properties permit direct access to the chain but do not expose any chain elements. Application that must access specific image chain elements should inherit this class.
+			</para>
+		<para>
+			This class is declared in <ulink url='CPLFirmware.hpp.html'>CPLFirmware.hpp</ulink> and defined in <ulink url='CPLFirmware.cpp.html'>CPLFirmware.cpp</ulink>.
+			</para>
+		<section id="CPLFirmware-inheritance">
+			<title>
+				Inheritance
+				</title>
+			<para>
+				None.
+				</para>
+			</section>
+		<section id="CPLFirmware-dependence">
+			<title>
+				Dependence
+				</title>
+			<para>
+				</para>
+			</section>
+		</section>
+	<section id="CPLFirmware-properties">
+		<title>
+			Properties
+			</title>
+		<para>
+			</para>
+		<section id="CPLFirmware-Data">
+			<title>
+				CPLFirmware::Data
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>void * <function>Data</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the absolute address of the firmware image chain. This will be the address of the first header in the firmware image chain.
+				</para>
+			</section>
+		<section id="CPLFirmware-IsValid">
+			<title>
+				CPLFirmware::IsValid
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>bool <function>IsValid</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return <constant>true</constant> if the current firmware image chain appears valid. Validity is determined by walking the image header chain to confirm that stored lengths, offsets, checksums and so forth are correct.
+				</para>
+			</section>
+		<section id="CPLFirmware-Size">
+			<title>
+				CPLFirmware::Size
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>size_t <function>Size</function></funcdef>
+    					<paramdef>void</paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Return the size of the firmware image chain last read from a powerline device or host file. This will be the sum of all bytes read and should equal the sum of all image headers plus all firmware images in the chain.
+				</para>
+			</section>
+		</section>
+	<section id="CPLFirmware-methods">
+		<title>
+			Methods
+			</title>
+		<para>
+			</para>
+		<section id="CPLFirmware-ReadFile">
+			<title>
+				CPLFirmware::Read
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>Read</function></funcdef>
+    					<paramdef>char const * <parameter>filename</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Read the firmware image chain from the named host file.
+				</para>
+			</section>
+		<section id="CPLFirmware-ReadChannel">
+			<title>
+				CPLFiremare::Read
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>Read</function></funcdef>
+    					<paramdef>CPLChannel * <parameter>channel</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Read the firmware image chain from the powerline device assigned to the given channel. 
+				</para>
+			</section>
+		<section id="CPLFirmware-WriteFile">
+			<title>
+				CPLFirmware::Write
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>Write</function></funcdef>
+    					<paramdef>char const * <parameter>filename</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Write the firmware image chain to the named host file.
+				</para>
+			</section>
+		<section id="CPLFirmware-WriteChannel">
+			<title>
+				CPLFirmware::Write
+				</title>
+			<funcsynopsis>
+				<funcprototype>
+  					<funcdef>signed <function>Write</function></funcdef>
+    					<paramdef>CPLChannel * <parameter>channel</parameter></paramdef> 
+					</funcprototype>
+				</funcsynopsis>
+			<para>
+				Write the firmware image chain to the powerline device assigned to the given <varname>channel</varname>. This method fills or over-writes the firmware image buffer on the powerline device.
+				</para>
+			</section>
+		</section>
+	<section id="CPLFirmware-operators">
+		<title>
+			Operators
+			</title>
+		<para>
+			None.
+			</para>
+		</section>
+	<section id="CPLFirmware-constructors">
+		<title>
+			Constructors
+			</title>
+		<para>
+			</para>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef><function>CPLFirmware</function></funcdef>
+				<paramdef>CPLChannel * <parameter>channel</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Initialize the instance by reading the firmware image chain from the powerline device assigned by the given channel. This constructor may be used to fetch firmware that has been downloaded as a module by the local host or some remote host.
+			</para>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef><function>CPLFirmware</function></funcdef>
+				<paramdef>char const * <parameter>filename</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Initialize the instance by reading the firmware image chain from the named host file.
+			</para>
+		</section>
+	<section id="CPLFirmware-examples">
+		<title>
+			Examples
+			</title>
+		<para>
+			To be written.
+			</para>
+		</section>
+	</chapter>

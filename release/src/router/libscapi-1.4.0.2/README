@@ -1,0 +1,4 @@
+SCAPI Library
+=============
+System Configuration API's , These API's used to call system calls like reboot, insmod, ifconfig etc.
+

@@ -1,0 +1,145 @@
+# ====================================================================
+#
+#   Copyright (C) 2013 Qualcomm Atheros, Inc.
+#   
+#   Permission to use, copy, modify, and/or distribute this software 
+#   for any purpose with or without fee is hereby granted, provided 
+#   that the above copyright notice and this permission notice appear 
+#   in all copies.
+#   
+#   THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL 
+#   WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED 
+#   WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL  
+#   THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR 
+#   CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM 
+#   LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, 
+#   NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN 
+#   CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#   
+# --------------------------------------------------------------------
+
+include $(TOPDIR)/rules.mk
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+PKG_NAME:=plc-utils
+PKG_VERSION:=2.1.5
+PKG_RELEASE:=61a5fd6dd8334b7b84436acbf3943bfdd0111a60
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=git://github.qualcomm.com/cmaier/plc-utils.git
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE_VERSION:=$(PKG_RELEASE)
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+PKG_BUILD_PARALLEL:=1
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+include $(INCLUDE_DIR)/package.mk
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+define Package/$(PKG_NAME)/Default
+ SECTION:=utils
+ CATEGORY:=Utilities
+ TITLE:=Qualcomm Atheros Powerline Communication utilities
+ URL:=https://github.qualcomm.com/cmaier/plc-utils/blob/master/README
+ MAINTAINER:=Qualcomm Atheros, Ocala FL USA
+endef
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+define Package/$(PKG_NAME)
+ $(call Package/$(PKG_NAME)/Default)
+ MENU:=1
+endef
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+define GenPlugin
+ define Package/plc-utils-$(1)
+  $(call Package/$(PKG_NAME)/Default)
+  DEPENDS:=$(PKG_NAME)
+  TITLE:=Utility $(2) from the PLC utilities
+ endef
+ define Package/plc-utils-$(1)/description
+  Utility $(2) from the Open PLC utilities package.
+ endef
+endef
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+OPEN_PLC_UTILS_APPS:=CMEncrypt ampID ampboot amphost ampinit amplist amprate ampstat amptest amptone amptool ampwait chknvm chknvm2 chkpib chkpib2 config2cfg coqos_add coqos_info coqos_man coqos_mod coqos_rel edru edsu efbu efeu efru efsu getpib hpav hpavkey hpavkeys int64host int6k int6kbaud int6kboot int6keth int6kf int6khost int6kid int6klist int6klog int6kmdio int6kmdio2 int6kmod int6kp int6krate int6krule int6kstat int6ktest int6ktone int6kuart int6kwait mac2pw mac2pwd mdioblock mdioblock2 mdiodump mdiogen mdustats mme modpib nvmmerge nvmsplit pib2xml pibcomp pibdump pibruin plcID plcboot plcfwd plcget plchost plchostd plcinit plclist plclog plcmdio16 plcmdio32 plcotst plcrate plcrule plcset plcstat plctest plctone plctool plcwait ptsctl rkey sada setpib ttycat ttyrecv ttysend ttysig weeder xml2pib
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+$(foreach a,$(OPEN_PLC_UTILS_APPS),$(eval $(call GenPlugin,$(a))))
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+define Build/Compile
+	$(MAKE) -C $(PKG_BUILD_DIR) \
+		EXTRA_CFLAGS="$(TARGET_CPPFLAGS) $(TARGET_CFLAGS)" \
+		CROSS="$(TARGET_CROSS)" \
+		ROOTFS="$(PKG_INSTALL_DIR)" \
+		OWNER="$(shell id -u $(shell whoami))" \
+		GROUP="$(shell id -g $(shell whoami))" \
+		all install
+endef
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+define Package/$(PKG_NAME)/install
+endef
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+define BuildPlugin
+ define Package/$(1)/install
+	$(INSTALL_DIR) $$(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/local/bin/$(1) $$(1)/usr/bin/
+ endef
+ $$(eval $$(call BuildPackage,$(1)))
+endef
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+$(eval $(call BuildPackage,$(PKG_NAME)))
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+$(foreach a,$(OPEN_PLC_UTILS_APPS),$(eval $(call BuildPlugin,plc-utils-$(a))))
+

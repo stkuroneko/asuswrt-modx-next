@@ -1,7 +1,0 @@
-/* Generated automatically. */
-static const char configuration_arguments[] = "/home/trista/project/toolchain/mtk-openwrt-lede-4.2.0.0/build_dir/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.16/gcc-5.4.0/configure --with-bugurl=http://www.lede-project.org/bugs/ --with-pkgversion='LEDE GCC 5.4.0 r0-22e5567' --prefix=/home/trista/project/toolchain/mtk-openwrt-lede-4.2.0.0/staging_dir/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.16 --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=mipsel-openwrt-linux-musl --with-gnu-ld --enable-target-optspace --disable-libgomp --disable-libmudflap --disable-multilib --disable-libmpx --disable-nls --without-isl --without-cloog --with-host-libstdcxx=-lstdc++ --with-float=soft --with-gmp=/home/trista/project/toolchain/mtk-openwrt-lede-4.2.0.0/staging_dir/host --with-mpfr=/home/trista/project/toolchain/mtk-openwrt-lede-4.2.0.0/staging_dir/host --with-mpc=/home/trista/project/toolchain/mtk-openwrt-lede-4.2.0.0/staging_dir/host --disable-decimal-float --with-mips-plt --with-diagnostics-color=auto-if-env --disable-libssp --enable-__cxa_atexit --with-newlib --with-sysroot=/home/trista/project/toolchain/mtk-openwrt-lede-4.2.0.0/staging_dir/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.16 --enable-languages=c --disable-shared --disable-threads";
-static const char thread_model[] = "single";
-
-static const struct {
-  const char *name, *value;
-} configure_default_options[] = { { "float", "soft" }, { "llsc", "llsc" }, { "mips-plt", "plt" } };

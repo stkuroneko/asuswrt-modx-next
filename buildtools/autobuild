@@ -1,0 +1,754 @@
+#!/usr/bin/perl
+
+my $versioninfo;
+my $oldversioninfo;
+my $commit;
+my $year = (localtime)[5] + 1900;
+my $month = (localtime)[4] + 1;
+my $day = (localtime)[3];
+my $hour = (localtime)[2];
+my $min = (localtime)[1];
+my $kernel_ver;
+my $fs_ver;
+my $serialno;
+my $extendno;
+my $releasedir = $ENV{'ASUSWRTRELEASEDIR'};
+my $backupdir = $ENV{'ASUSWRTBACKUPDIR'};
+my $localreleasedir = $ENV{LOCALRELEASEDIR};
+my $localbackupdir = $ENV{LOCALBACKUPDIR};
+my $modeldir;
+my $pbprefix = "asuswrt.prebuilt";
+my $pbdir;
+my $logprefix = "asuswrt.log";
+my $logdir;
+my $asuswrtdir = $ENV{'ASUSWRTDIR'};
+my $versionconfdir = $ENV{'ASUSWRTVERSIONCONFDIR'};
+my $versionconf;
+my $fwsizelimit;
+
+sub chrealdir
+{
+	my $fhandle;
+	my $fexclude;
+	my $mdir = "";
+	my $model_gpl = "";
+	my $uc_model;
+
+	chdir "$builddir";
+
+	$uc_model=uc($_[0]);
+	$model_gpl = $_[0];
+	# found model and included src-xx
+
+	$fwsizelimit = "0";
+	if(open($fhandle, "./${asuswrtdir}/release/models")) {
+		while (<$fhandle>) {
+			chomp;
+			if(/^\[/) {
+				s/\[//g;
+				s/\]//g;
+				$mdir = $_;
+			}
+			else {
+				$line=$_;
+				s/\ *;.*//;
+				chomp;
+				if($model_gpl eq $_) {
+					$modeldir = $mdir;
+					if ( $line =~ /\"fwsize\"/ ) { 
+						$line=~ s/.*{//;
+						$line=~ s/}.*//;
+						$line=~ s/.*\"fwsize\"//;
+						$line=~ s/.*?\"//;
+						$line=~ s/\".*//;
+						$fwsizelimit=$line;
+					}
+				}
+			}
+		}
+	}
+	close($fhandle);
+
+	if( $modeldir eq "" ) {
+		print "no model found\n";
+		exit;
+	}
+
+	chdir "$builddir/${asuswrtdir}/release/$modeldir/";
+}
+
+sub autosync
+{
+	my $f,$s;
+
+	# generate version
+	open($f, "${versionconf}");
+
+	while (<$f>) {
+		chomp;
+		if (/KERNEL_VER=/) {
+			s/KERNEL_VER=//;
+			$kernel_ver = $_;
+		}
+		if (/FS_VER/) {
+			s/FS_VER=//;
+			$fs_ver = $_;
+		}
+		if (/SERIALNO/) {
+			s/SERIALNO=//;
+			$serialno = $_;
+		}
+		if (/RCNO/) {
+			s/RCNO=//;
+			$rcno = $_;
+		}
+	}
+	close ($f);
+
+	if ( $ARGV[0] =~ /tag/ ) {
+		$oldversioninfo = "${kernel_ver}.${fs_ver}.${serialno}";
+		$versioninfo = "${kernel_ver}.${fs_ver}.${serialno}";
+
+		# add tag
+		chdir "$builddir/${asuswrtdir}";
+
+		# if in a swpj branch, add sw branch tag
+		system("swpj=`git branch | grep \"*\" | grep \"swpj-\" | sed 's/.*swpj-//g'`; swpjver=`cat ./release/src/router/APP-IPK/\$swpj/CONTROL/control | grep \"Version:\" | sed 's/Version: //g'`; echo \"SWPJ=\$swpj\" > swpj.conf; echo \"SWPJVER=\$swpjver\" >> swpj.conf");
+		if(open($s, "swpj.conf")) {
+			while (<$s>) {
+				chomp;
+				if (/SWPJ=/) {
+					s/SWPJ=//;
+					$swpj = $_;
+				}
+				if (/SWPJVER=/) {
+					s/SWPJVER=//;
+					$swpj_ver = $_;
+				}
+			}
+			close($s);
+		}
+		else {
+			$swpj = "";
+			$swpj_ver = "";
+		}
+		system("rm -f swpj.conf");
+
+		if (length($swpj)!=0 && length($swpj_ver)!=0) {
+			system("git tag -fa swpj_${swpj}_${swpj_ver} -m \"swpj ${swpj} release ${swpj_ver}\"");
+			system("git tag -fa swpj_${swpj}_${swpj_ver}_latest -m \"the latest swpj ${swpj} release ${swpj_ver}\"");
+		}
+		else {
+			system("git tag -fa asuswrt_${versioninfo} -m \"release ${versioninfo}\"");
+			system("git tag -fa asuswrt_${versioninfo}_latest -m \"the latest release ${versioninfo}\"");
+		}
+	}
+	else {
+		$oldversioninfo = "${kernel_ver}.${fs_ver}.${serialno}";
+		$versioninfo = "${kernel_ver}.${fs_ver}.${serialno}";
+	}
+
+	system("[ ! -f ${builddir}/${asuswrtdir}/release/src/router/extendno.conf ] && cd ${builddir}/${asuswrtdir}/release/src/router && echo EXTENDNO=`git log --pretty=oneline asuswrt_${kernel_ver}.${fs_ver}.${serialno}..HEAD | wc -l`-g`git log --pretty=format:'%h' -n 1` > extendno.conf");
+	my @cmd = ('perl', '-pi', '-e', 's,([0-9a-f]{7})[0-9a-f]*,\1,', "${builddir}/${asuswrtdir}/release/src/router/extendno.conf");
+	system(@cmd);
+
+	$extendno="0";
+	open($f, "$builddir/${asuswrtdir}/release/src/router/extendno.conf");
+	while (<$f>) {
+		chomp;
+		if (/EXTENDNO/) {
+			s/EXTENDNO=//;
+			$extendno = $_;
+		}
+	}
+	close($f);
+}
+
+sub creategpl
+{
+	my $fhandle;
+	my $dhandle;
+	my $fexclude;
+	my $mdir="";
+	my $model_gpl="";
+	my $uc_model;
+
+	$uc_model=uc($_[0]);
+	if($ARGV[0]=~/gpl/) {
+		autoclean();
+
+		# assign correct target.mak
+		if( $versionconfdir ne "" ) {
+			system("cp -f $versionconfdir/target.mak ./${asuswrtdir}/release/${modeldir}/target.mak");
+		}
+
+		$pbdir = "${builddir}/${pbprefix}/${uc_model}.${kernel_ver}.${fs_ver}.${serialno}.${extendno}";
+		if (open($fhandle, "${pbdir}")) {
+			close($fhandle);
+		} else {
+			printf "$pbdir not exist!!!\n";
+		}
+
+		# Copy prebuilt binary
+		printf "Copy pre-built binary from ${pbdir} to ${builddir}/${asuswrtdir}\n";
+		system("cd ${pbdir}; tar cf - . | tar xf - -C ${builddir}/${asuswrtdir}");
+
+		chdir "$builddir";
+
+		# remark because of putting utf8 header into code
+		#system("sh asuswrt/buildtools/codeprep.sh $builddir");
+
+		#Add exclusive file when building GPL
+		# rules for kernel release
+		# src-ra exclude linux in src/src-rt
+		# src-rt/src-rt-5.70 exlude linux in src/src-ra/
+		# src exclude linux in src-rt/src-rra
+		unlink("./excludes");
+		system("touch ./excludes");
+		open($fexclude, ">./excludes");
+
+		# model related exclude is controlled by .gpl_excludes now
+		# if(open($fhandle, "./${asuswrtdir}/release/models")) {
+		# 	while (<$fhandle>) {
+		# 		chomp;
+		# 		if(/^\[/) {
+		# 			s/\[//g;
+		#			s/\]//g;
+		#			if ($_ ne $modeldir) {
+		#				print $fexclude "./${asuswrtdir}/release/$_\n";
+		#			}
+		#		}
+		#	}
+		# }
+		# close($fhandle);
+
+		if (open($fhandle, "./${asuswrtdir}/.gpl_excludes")) {
+			while (<$fhandle>) {
+				if ( $_ ne "" ) {
+					print $fexclude "${asuswrtdir}/$_";
+				}
+			}
+			close($fhandle);
+		}
+
+		if ( -e "./${asuswrtdir}/release/${modeldir}/.gpl_excludes.pl" ) {
+			# append model dep exlude list here
+			system("cd ./${asuswrtdir}/release/${modeldir} && ./.gpl_excludes.pl $uc_model release/${modeldir}");
+			if(open($fhandle, "./${asuswrtdir}/release/${modeldir}/.gpl_excludes.sysdeps")) {
+				while (<$fhandle>) {
+					if ( $_ ne "" ) {
+						print $fexclude "${asuswrtdir}/$_";
+					}
+				}
+				close($fhandle);
+				unlink("./${asuswrtdir}/release/${modeldir}/.gpl_excludes.sysdeps");
+			}
+
+		}
+
+		if(open($fhandle, "./${asuswrtdir}/release/${modeldir}/.gpl_excludes")) {
+			while (<$fhandle>) {
+				if ( $_ ne "" ) {
+					print $fexclude "${asuswrtdir}/$_";
+				}
+			}
+			close($fhandle);
+		}
+
+		if(open($fhandle, "./${asuswrtdir}/release/.gpl_excludes_router")) {
+			while (<$fhandle>) {
+				if ( $_ ne "" ) {
+					print $fexclude "${asuswrtdir}/$_";
+				}
+			}
+			close($fhandle);
+		}
+
+		# default include src/src-rt/${modeldir} only 
+		if(opendir ($dhandle, "./${asuswrtdir}/release")) {
+			while (my $dir=readdir($dhandle)) {
+				if ( $dir =~ /src/ ) {
+					$tmpmodeldir = $modeldir;
+					$tmpmodeldir =~ s/\/.*//;
+					if ( $dir ne "${tmpmodeldir}" && $dir ne "src-rt" && $dir ne "src" ) {
+						print $fexclude "${asuswrtdir}/release/$dir\n";
+					}
+				}
+			}
+			closedir($dhandle);
+		}
+
+		system("find ${asuswrtdir} -maxdepth 3 -type f -name .gpl_excludes -print >> ./excludes");
+		system("find ${asuswrtdir} -type f -name .gitignore -print >> ./excludes");
+
+		open($fhandle, "${versionconf}");
+		while (<$fhandle>) {
+			chomp;
+			if (/KERNEL_VER=/) {
+				s/KERNEL_VER=//;
+				$kernel_ver = $_;
+			}
+			if (/FS_VER/) {
+				s/FS_VER=//;
+				$fs_ver = $_;
+			}
+			if (/SERIALNO/) {
+				s/SERIALNO=//;
+				$serialno = $_;
+			}
+			if (/RCNO/) {
+				s/RCNO=//;
+				$rcno = $_;
+			}
+		}
+		close($fhandle);
+
+		system("[ ! -f ${builddir}/${asuswrtdir}/release/src/router/extendno.conf ] && cd ${builddir}/${asuswrtdir}/release/src/router && echo EXTENDNO=`git log --pretty=oneline asuswrt_${kernel_ver}.${fs_ver}.${serialno}..HEAD | wc -l`-g`git log --pretty=format:'%h' -n 1` > extendno.conf");
+		my @cmd = ('perl', '-pi', '-e', 's,([0-9a-f]{7})[0-9a-f]*,\1,', "${builddir}/${asuswrtdir}/release/src/router/extendno.conf");
+		system(@cmd);
+		$extendno = "0";
+		open($fhandle,"${builddir}/${asuswrtdir}/release/src/router/extendno.conf");
+		while (<$fhandle>) {
+			chomp;
+			if (/EXTENDNO=/) {
+				s/EXTENDNO=//;
+				$extendno = $_;
+			}
+		}
+		close($fhandle);
+
+		close($fexclude);
+
+		unlink("./excludefiles");
+		system("touch ./excludefiles");
+
+		if(open($fexclude, "./excludes")) {
+			while (<$fexclude>) {
+				chomp;
+				#print "find $_";
+				if($_ ne "") {
+					system("find ${_} -print >> ./excludefiles");
+				}
+			}
+		}
+		close($fexclude);
+
+		printf "Processing *.gpl\n";
+		system("for f in `find ./${asuswrtdir} -type f -name \"*.gpl\"`; do g=`echo \$f|sed -e 's,\\.gpl\$,,'`; echo \"=> Replace \$g with \$f\"; mv \$f \$g ; done");
+
+		if(open($fhandle, "./${asuswrtdir}/release/${modeldir}/update_licenses.pl")) {
+			system("cd ./${asuswrtdir}/release/${modeldir} ; echo \"`pwd`\"; ./update_licenses.pl . --stage=2; cd -");
+		}
+
+		print "Generate GPL_${uc_model}_${kernel_ver}.${fs_ver}.${serialno}.${extendno}.tgz\n";
+		# FILES parameter of tar command MUST be last parameter.
+		# If not, tar of Fedora 25 won't exclude files in ./excludes and won't transform directory path.
+		system("tar cvf GPL_${uc_model}_${kernel_ver}.${fs_ver}.${serialno}.${extendno}.tar -X ./excludes --transform 's,^\./${asuswrtdir}/*,asuswrt/,' --exclude-vcs ./${asuswrtdir} > GPL_${uc_model}_${kernel_ver}.${fs_ver}.${serialno}.${extendno}.lst");
+		
+		if(open($fhandle, "./${asuswrtdir}/release/${modeldir}/.gpl_includes")) {
+			while (<$fhandle>) {
+				chomp;
+				if ( $_ ne "" ) {
+					printf "include ${_} into tarball\n";
+					system("tar rvf GPL_${uc_model}_${kernel_ver}.${fs_ver}.${serialno}.${extendno}.tar --transform 's,^\./${asuswrtdir}/*,asuswrt/,' ./${asuswrtdir}/${_} >> GPL_${uc_model}_${kernel_ver}.${fs_ver}.${serialno}.${extendno}.lst");
+				}
+			}
+			close($fhandle);
+		}
+		system("gzip -c GPL_${uc_model}_${kernel_ver}.${fs_ver}.${serialno}.${extendno}.tar > GPL_${uc_model}_${kernel_ver}.${fs_ver}.${serialno}.${extendno}.tgz");
+
+		chdir "${builddir}/${asuswrtdir}";
+		system("git checkout -f");
+		chdir "${builddir}";
+
+		unlink("./excludes");
+		unlink("./excludefiles");
+
+		chrealdir();
+	}
+}
+
+sub autoclean
+{
+	$orig_dir = `pwd`;
+	chomp $orig_dir;
+	chdir "../..";
+	print "Clean-up git repository!!!\n";
+	system("git stash");
+	system("git clean -xdf 1>/dev/null");
+	chdir "$orig_dir";
+}
+
+sub getlastcommit()
+{
+	my $f;
+	my $localcommit="";
+
+	$commit="";
+	system("git show $oldversioninfo > tmp");
+	open($f, "tmp");
+	while (<$f>) {
+		if ( /commit / ) {
+			chomp;
+			s/commit //;
+			$localcommit = $_;
+		}
+
+	}
+	close($f);
+	system("rm -f tmp");
+
+	# check if this commit is the latest one
+	system("git log $localcommit.. > tmp");
+	open($f, "tmp");
+	while (<$f>) {
+		if ( /commit / ) {
+			$commit = $localcommit
+		}
+
+	}
+	close($f);
+	system("rm -f tmp");
+}
+
+sub generatelog
+{
+	my $commitlog;
+	my $changelog;
+
+	# get log from last commit
+	system ("git log $commit.. --pretty=\"short\" > ./image/commit.log");
+
+	open($commitlog, "./image/commit.log");
+	open($changelog, ">> ./image/change.log");
+	print $changelog sprintf("%s%02s%02s - %s.%s build %s\n", $year, $month, $day, $kernel_ver, $fs_ver, $serialno);
+
+	while (<$commitlog>) {
+		chomp;
+		s/ *//;
+		if ( /commit /) {
+			print $changelog "\n";
+		}
+		elsif ( /Author: / ) {
+		}
+		elsif ( /Merge: / ) {
+		}
+		elsif ( /Merge branch/ ) {
+		}
+		elsif ( length($_) > 0 ) {
+			s/^[0-9]. //;
+			print $changelog "   ".$_."\n";
+		}
+	}
+	print $changelog "\n";
+	close($commitlog);
+	close($changelog);
+	system("rm ./image/commit.log -f");
+}
+
+# working directory must be src-XXX
+sub autoinstall
+{
+	my $imagefile;
+	my $newimagefile;
+	my $tail;
+	my $uc_model;
+	my $uc_type;
+	my $rsasignfile;
+	my $dslrsasignfile;
+
+	$tail = sprintf("%s%02s%02s%02s%02s", $year, $month, $day, $hour, $min);
+
+	$uc_model=uc($_[0]);
+
+	$logdir = "${builddir}/${logprefix}";
+	system("mkdir -p ${logdir}");
+	system("mkdir -p ${logdir}/log");
+
+	if ( $uc_model =~ /DSL/ ) {
+		if ( $uc_model =~ /N55U/ ) {
+			if( $uc_model =~ /-B/ ) {
+				$uc_type = "Annex_B";
+			}
+			else {
+				$uc_type = "Annex_A";
+			}
+		}
+		else {
+			$uc_type = "DSL";
+		}
+		$imagefile = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${extendno}.trx";
+		$imagemd5file = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${extendno}.md5";
+		$morefile = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${extendno}_${uc_type}.trx";
+		$moremd5file = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${extendno}_${uc_type}.md5";
+		$binfile = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${extendno}.bin";
+		$rsasignfile = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${extendno}_rsa.zip";
+		$dslrsasignfile = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${extendno}_${uc_type}_rsa.zip";
+		#$newimagefile = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${uc_type}_${tail}*.trx";
+	}
+	else {
+		if ( $uc_model =~ /GT-AC/ || $uc_model =~ /RT-AC86U/ ) {
+			$imagefile = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${extendno}_cferom_ubi.w";
+			$imagemd5file = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${extendno}_cferom_ubi.md5";
+			$rsasignfile = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${extendno}_cferom_ubi_rsa.zip";
+			$binfile = "";
+			$morefile = "";
+		}
+		else {
+			$imagefile = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${extendno}.trx";
+			$imagemd5file = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${extendno}.md5";
+			$rsasignfile = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${extendno}_rsa.zip";
+			$binfile = "";
+			$morefile = "";
+			#$newimagefile = uc($_[0])."_${kernel_ver}.${fs_ver}_${serialno}_${tail}*.trx";
+		}
+	}
+	
+	# install firmware image file to local share
+	$path = "$backupdir";
+	system("mkdir -p ${path}/${uc_model}");
+	system("mkdir -p ${path}/${uc_model}/log");
+	system("cp image/*.log ${path}/${uc_model}/log/. -f");
+	system("cp image/${imagefile} ${path}/${uc_model}/. -f");
+	system("cp image/${imagemd5file} ${path}/${uc_model}/. -f");
+
+	system("mkdir -p ${localreleasedir}/${release_model}");
+	system("mkdir -p ${localreleasedir}/${release_model}/log");
+	system("cp image/*.log ${localreleasedir}/${release_model}/log/. -f");
+	system("cp image/${imagefile} ${localreleasedir}/${release_model}/. -f");
+	system("chmod 777 -R ${localreleasedir}");
+
+	if ( $binfile eq "" ) {
+		printf "no binfile to copy\n";
+	}
+	else {
+		system("cp image/${binfile} ${path}/${uc_model}/. -f");
+	}
+	if ( $morefile eq "" ) {
+		printf "no morefile to copy\n";
+	}
+	else {
+		system("cp image/${morefile} ${path}/${uc_model}/. -f");
+		system("cp image/${moremd5file} ${path}/${uc_model}/. -f");
+	}
+	if ( $rsasignfile eq "" ) {
+		printf "no rsasignfile to copy\n";
+	}
+	else {
+		system("cp image/${rsasignfile} ${path}/${uc_model}/. -f");
+	}
+	if ( $dslrsasignfile eq "" ) {
+		printf "no dslrsasignfile to copy\n";
+	}
+	else {
+		system("cp image/${dslrsasignfile} ${path}/${uc_model}/. -f");
+	}
+
+	#system("cp image/${imagefile} ${path}/${uc_model}/old/${newimagefile} -f");
+
+	#install firmware image file to localhost
+	#$path = "/media/ASUSWRT/Firmware";
+	#system("cp image/${imagefile} ${path}/${uc_model}/. -f");
+	#system("cp image/${imagefile} ${path}/${uc_model}/old/${newimagefile} -f");
+
+	# install firmware image file to dropbox
+	# $path = "~/Dropbox/Working/Firmware/ASUSWRT";
+	# system("cp image/*.log ${path}/${uc_model}/. -f");
+	# system("cp image/${imagefile} ${path}/${uc_model}/. -f");
+	# system("cp image/${imagefile} ${path}/${uc_model}/old/${newimagefile} -f");
+
+	# install firmware image file to tp-fs-11
+	if ( $ARGV[0] =~ /tag/ ) {
+
+		$path = "$releasedir";
+		system("mkdir -p ${path}/${uc_model}");
+ 		system("mkdir -p ${path}/${uc_model}/log");
+		system("cp image/*.log ${path}/${uc_model}/log/. -f");
+		system("[ ! -f image/${imagefile} ] && echo '${uc_model}' >> $logdir/${asuswrtdir}/autobuild_errlog");
+		system("[ ! -f image/${imagefile} ] && echo '${uc_model}' > $logdir/log/autobuild_errlog_fw_${uc_model}_${kernel_ver}.${fs_ver}.${serialno}.${extendno}");
+		system("cp image/${imagefile} ${path}/${uc_model}/. -f");
+	 	system("cp image/${imagemd5file} ${path}/${uc_model}/. -f");
+
+		
+		if ( $fwsizelimit eq "0" ) {
+			printf "no file size info. to check\n";
+		}
+		else {
+			my $fwsize=-s "image/${imagefile}";
+
+			if ( $fwsize > $fwsizelimit ) {
+				system("echo '${uc_model}' >> $logdir/${asuswrtdir}/autobuild_oversizelog");
+			}
+		}	
+	
+		if ( $binfile eq "" ) {
+			printf "no binfile to copy\n";
+		}
+		else {
+			system("cp image/${binfile} ${path}/${uc_model}/. -f");
+		}
+		if ( $morefile eq "" ) {
+			printf "no morefile to copy\n";
+		}
+		else {
+			system("cp image/${morefile} ${path}/${uc_model}/. -f");
+			system("cp image/${moremd5file} ${path}/${uc_model}/. -f");
+		}
+		if ( $rsasignfile eq "" ) {
+			printf "no rsasignfile to copy\n";
+		}
+		else {
+			system("cp image/${rsasignfile} ${path}/${uc_model}/. -f");
+		}
+		if ( $dslrsasignfile eq "" ) {
+			printf "no rsasignfile to copy\n";
+		}
+		else {
+			system("cp image/${dslrsasignfile} ${path}/${uc_model}/. -f");
+		}
+	}
+
+	if ( $ARGV[0] =~ /gpl/ ) {
+		system("[ ! -f $builddir/$GPL_${uc_model}_${kernel_ver}.${fs_ver}.${serialno}.${extendno}.tgz ] && echo '${uc_model}' >> $logdir/autobuild_errlog");
+		system("[ ! -f $builddir/$GPL_${uc_model}_${kernel_ver}.${fs_ver}.${serialno}.${extendno}.tgz ] && echo '${uc_model}' > $logdir/log/autobuild_errlog_gpl_${uc_model}_${kernel_ver}.${fs_ver}.${serialno}.${extendno}");
+	}
+
+	if ( $ARGV[0] =~ /taggpl/ ) {
+		#install GPL to tp-fs-11
+		system("mkdir -p $releasedir/GPL/${uc_model}");
+		system("cp $builddir/GPL_${uc_model}_${kernel_ver}.${fs_ver}.${serialno}.${extendno}.tgz $releasedir/GPL/${uc_model}/. -f");
+	}
+}
+
+# working directory must be src-XXX
+sub is_prebuilt_binary_exist
+{
+	$uc_model=uc($_[0]);
+
+	if ( -e "${builddir}/${pbprefix}/${uc_model}.${kernel_ver}.${fs_ver}.${serialno}.${extendno}/release" ) {
+		return 1;
+	}
+	else {
+		printf "${builddir}/${pbprefix}/${uc_model}.${kernel_ver}.${fs_ver}.${serialno}.${extendno}/release not exist\n";
+		return 0;
+	}	
+}
+
+sub update_prebuilt_binary
+{
+	my $fhandle;
+
+	if ($_[0] eq "") {
+		return -1;
+	}
+
+	$uc_model=uc($_[0]);
+	$pbdir = "${builddir}/${pbprefix}/${uc_model}.${kernel_ver}.${fs_ver}.${serialno}.${extendno}";
+	printf "pbdir: ${pbdir}\n";
+	system("mkdir -p ${pbdir}");
+
+	if(open($fhandle, "upb.mak")) {
+		close($fhandle);
+		system("make gen_prebuilt PBDIR=${pbdir}");
+	}
+}
+
+sub automake
+{
+	my $cmd;
+	my $f;
+	my $log;
+	my $commit;
+
+	#tag: build firmware image file and GPL
+	#gpl :only build GPL
+	#only model name: build model's firmware image file
+	if($ARGV[0]=~/tag/)
+	{
+		foreach $model(@ARGV)
+		{
+			if($model=~/tag/)
+			{
+				printf"skip tag keyword";
+			}
+			else
+			{
+				# it will also change to current model dir too
+				# create tar ball only when ARGV[0]=taggpl
+				chrealdir(${model});
+				autoclean();
+
+				$cmd = "mkdir ./image && make ${model} V=99 2>&1 | tee ./image/make-${model}.${kernel_ver}.${fs_ver}.${serialno}.${extendno}.log";
+				system("$cmd");
+				update_prebuilt_binary(${model});
+				autoinstall(${model});
+				creategpl(${model});
+			}
+		}
+	}
+	elsif($ARGV[0]=~/gpl/)
+	{
+		# running here,
+		# wl binary may not belong to its models
+		foreach $model(@ARGV)
+		{
+			if($model=~/gpl/)
+			{
+				printf"skip gpl keyword\n";
+			}
+			else
+			{
+				$ENV{'LIVE_UPDATE_RSA_GPL'} = '1';
+				chrealdir(${model});
+				if(!is_prebuilt_binary_exist(${model})) {	
+					autoclean();
+					$cmd = "mkdir ./image && make ${model} V=99 2>&1 | tee ./image/make-${model}.${kernel_ver}.${fs_ver}.${serialno}.${extendno}.log";
+					system("$cmd");
+					update_prebuilt_binary(${model});
+				}
+				creategpl(${model});
+				delete $ENV{"LIVE_UPDATE_RSA_GPL"};
+			}
+		}
+	}
+	else
+	{
+		foreach $model(@ARGV)
+		{
+			chrealdir(${model});
+			autoclean();
+			$cmd = "make ${model} V=99 2>&1 | tee ./image/make-${model}.${kernel_ver}.${fs_ver}.${serialno}.${extendno}.log";
+			system($cmd);
+			update_prebuilt_binary(${model});
+			autoinstall(${model});
+		}
+	}
+}
+
+if (@ARGV >= 1) {
+	# usage autobulid [tag] [model] [model] ..
+	$builddir = `pwd`;
+	chomp $builddir;
+	print "pwd= $builddir\n";
+
+	if( $asuswrtdir eq "" ) {
+		$asuswrtdir = "asuswrt";
+	}
+
+	$asuswrtdir =~ s/^\.\.*\/*//;
+	$asuswrtdir =~ s/\/*$//;
+	printf "asuswrtdir: ${asuswrtdir}\n";
+
+	if( $versionconfdir eq "" ) {
+		$versionconf = "./${asuswrtdir}/release/src-rt/version.conf";
+	}
+	else
+	{
+		$versionconf = "$versionconfdir/version.conf";
+	}
+	printf "versionconf: $versionconf\n";
+
+	autosync();
+	automake();
+}
+

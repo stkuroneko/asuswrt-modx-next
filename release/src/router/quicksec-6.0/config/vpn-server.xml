@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE quicksec PUBLIC "quicksec:dtd" "quicksec.dtd">
+<quicksec>
+  <params>
+    <nat ifname="eth0"/>
+
+    <!-- Address pool for allocation virtual IP addresses for remote -->
+    <!-- access clients. -->
+    <address-pool dns="192.168.1.1" wins="192.168.1.1" dhcp="192.168.1.1">
+	  <subnet>192.168.1.0/24</subnet>
+      <address netmask="255.255.255.0">192.168.1.100-192.168.1.199</address>
+    </address-pool>
+
+   <!-- Authentication domain specifies IKE authentication
+         parameters -->
+    <auth-domain>
+      <!-- shared secret and identity of remote IKE peer -->
+      <remote-secret id-type="email" 
+                     id="b@ipsec.com">foo</remote-secret>
+
+       <!-- Password based authentication. -->
+      <password user-name="guest@ipsec.com" password="hi"/>
+    </auth-domain>
+	
+  </params>
+  <policy>
+
+    <tunnel name="remote-access" flags="require-cfgmode
+                                        allow-cfgmode
+                                        proxy-arp
+                                        dont-initiate">
+      <!-- local identity sent to the remote IKE peer.
+           local shared secret is taken from the remote secret
+           based on the remote identity, if local-secret has
+           not been specified as in this example. -->
+      <identity id-type="email" id="a@ipsec.com"/>
+      <ike-versions>1 2</ike-versions>
+    </tunnel>
+
+    <!-- Allow traffic from the remote access clients. -->
+    <rule from-tunnel="remote-access"/>
+
+     <!-- L2TP tunnel -->
+    <tunnel name="lns" flags="allow-l2tp
+                              transport
+                              proxy-arp
+                              aggressive-mode
+                              dont-initiate">
+      <identity id-type="email" id="a@ipsec.com">
+        <local-secret>foo</local-secret>
+      </identity>
+      <ike-versions>1 2</ike-versions>
+    </tunnel>
+	
+   <!-- We may at some point receive plaintext L2tp packets.
+         If these are processed by a rule which creates a flow,
+         then any L2tp control packets which are sent by the
+         policymanager may actually hit this flow in the
+         reverse direction. Therefore we explicitly forbid plaintext 
+         packets to the L2tp control port -->
+    <rule type="drop">
+      <dst>ipv4(udp:1701,0.0.0.0/0)</dst>
+      <local-stack direction="to"/>
+    </rule>
+
+    <!-- Allow traffic from L2TP clients. -->
+    <rule from-tunnel="lns"/>
+
+	    <!-- The local host stack, the policymanager and the
+         kernel mode engine may at some points be out of
+         sync for short amounts of time, when the IPsec SA
+         protecting the L2tp disappears. This rule ensures
+         that l2tp packets are dropped if they arrive into
+         the engine when no suitable transform (apply rule) 
+         exists. -->
+    <rule type="drop">
+      <src>ipv4(udp:1701,0.0.0.0/0)</src>
+      <local-stack direction="from"/>
+    </rule>
+
+   <!-- Pass rule, that allows traffic from subnet 10.1.0.0/24 
+         to be passed (and NATed) to any address. -->
+    <rule>
+      <src>ipv4(192.168.1.0/24)</src>
+      <dst>ipv4(0.0.0.0/0)</dst>
+    </rule>
+
+	
+  </policy>
+</quicksec>
