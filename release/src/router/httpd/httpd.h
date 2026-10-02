@@ -606,6 +606,7 @@ extern int filter_ban_ip();
 extern void slowloris_check();
 extern void slow_post_read_check();
 extern int check_chpass_auth(char *cur_username, char *cur_passwd);
+extern void reg_default_final_token();
 extern int save_changed_param(json_object *cfg_root, char *param);
 extern int b64_decode(const char* str, unsigned char* space, int size);
 extern int last_time_lock_warning(void);

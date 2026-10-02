@@ -4411,6 +4411,7 @@ int validate_apply(webs_t wp, json_object *root)
 			if(current_page != NULL){
 				if(!strstr(current_page, "QIS_"))
 				{
+					reg_default_final_token();
 					nvram_set("x_Setting", "1");
 					notify_rc("restart_firewall");
 #ifdef RTCONFIG_EXTPHY_BCM84880
@@ -13468,6 +13469,7 @@ do_lang_post(char *url, FILE *stream, int len, char *boundary)
 		nvram_set_x ("", "preferred_lang", new_lang);
 		if (is_firsttime ()){
 			cprintf ("set x_Setting --> 1\n");
+			reg_default_final_token();
 			nvram_set("x_Setting", "1");
 			notify_rc("restart_firewall");
 		}
@@ -21358,6 +21360,7 @@ do_chpass_cgi(char *url, FILE *stream)
 			notify_rc_and_wait(real_action_script);
 
 		if(is_def_pwd){
+			reg_default_final_token();
 			nvram_set("x_Setting", "1");
 			notify_rc("restart_firewall");
 #ifdef RTCONFIG_EXTPHY_BCM84880
