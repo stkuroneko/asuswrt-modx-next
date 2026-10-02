@@ -237,10 +237,6 @@ config RTCONFIG_INADYN
 	depends on RTCONFIG_DDNS
 	default n
 
-config RTCONFIG_ASUSDDNS_ACCOUNT_BASE
-	bool "ASUS DDNS for Account base"
-	default n
-
 config RTCONFIG_L7
 	bool "Layer 7 Netfilter"
 	default y
@@ -529,6 +525,10 @@ config RTCONFIG_USB
 	bool "USB Support"
 	default y
 
+config RTCONFIG_USB_WAN_BACKUP
+	bool "USB WAN Backkup Support"
+	default n
+
 config RTCONFIG_USBRESET
 	bool "USB Power Reset Support"
 	default n
@@ -619,6 +619,10 @@ config RTCONFIG_SAMBASRV
 config RTCONFIG_SAMBA3
 	bool "Compile with Samba 3"
 	depends on RTCONFIG_SAMBASRV
+	default n
+
+config RTCONFIG_AWSIOT
+	bool "Compile with aws-iot"
 	default n
 
 config RTCONFIG_SAMBA36X
@@ -996,6 +1000,11 @@ config RTCONFIG_WIFI_QCA9994_QCA9994
 	depends on RTCONFIG_QCA
 	default n
 
+config RTCONFIG_NO_RELOAD_WIFI_DRV_IF_POSSIBLE
+	bool "Don't reload WiFi driver if possible"
+	depends on RTCONFIG_QCA
+	default n
+
 config RTCONFIG_CFG80211
 	bool "Qualcomm Atheros cfg80211 support"
 	depends on RTCONFIG_QCA
@@ -1356,6 +1365,10 @@ config RTCONFIG_DUAL_TRX2
 	depends on RTCONFIG_DUAL_TRX
 	default n
 
+config RTCONFIG_TEST_FLIPBITS
+	bool "Test NAND Flash bit-flip"
+	default n
+
 config RTCONFIG_UBI
 	bool "Unsorted Block Images"
 	default n
@@ -1525,6 +1538,10 @@ config RTCONFIG_DEBUG
 
 config RTCONFIG_DMALLOC
 	bool "Link with dmalloc that is used to detect memory leak."
+	default n
+
+config RTCONFIG_VALGRIND
+	bool "Compiled valgrind"
 	default n
 
 config RTCONFIG_HAS_5G
@@ -2728,4 +2745,9 @@ config RTCONFIG_AVOID_TZ_ENV
 config RTCONFIG_ECC256
 	bool "Support ECC256 CA"
 	depends on RTCONFIG_HTTPS
+	default n
+
+config RTCONFIG_PASS_V2
+	bool "Use PASS V2 for encryption"
+	depends on RTCONFIG_RALINK
 	default n

@@ -3663,7 +3663,7 @@ function initial_AiMesh(){
 					var node_capability = httpApi.aimesh_get_node_capability(specific_node_data);
 					if(!node_capability.sched_v2) {
 						var show_notice = false;
-						for(var i = 0; i < parent.wl_info.wl_if_total; i += 1) {
+						for(var i = 0; i < wl_info.wl_if_total; i += 1) {
 							var wl_timesched = httpApi.nvramGet(["wl" + i + "_timesched"])["wl" + i + "_timesched"];
 							if(wl_timesched == "1") {
 								show_notice = true;

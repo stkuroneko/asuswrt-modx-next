@@ -2,7 +2,7 @@ include ../common.mak
 include $(SRCBASE)/.config
 include ../.config
 
-CFLAGS += -Os -Wall $(EXTRACFLAGS) -fPIC
+CFLAGS += $(if $(RTCONFIG_DEBUG),-g,-Os) -Wall $(EXTRACFLAGS) -fPIC
 #CFLAGS += $(PRIVATE_EXTRACFLAGS)
 CFLAGS += -I. -I$(TOP)/shared -I$(SRCBASE)/include
 
@@ -456,6 +456,12 @@ CFLAGS  += -I$(TOP)/sw-hw-auth
 vpath %.c $(TOP)/sw-hw-auth
 endif
 
+ifeq ($(RTCONFIG_TUNNEL),y)
+OBJS += aae_ipc.o
+CFLAGS  += -I$(TOP)/aaews
+vpath %.c $(TOP)/aaews
+endif
+
 ifeq ($(RTCONFIG_GEFORCENOW), y)
 OBJS += nvgfn.o
 endif
@@ -528,6 +534,11 @@ endif
 nvpriv.o:
 ifneq ($(wildcard ./prebuild/nvpriv.o),)
 	@-cp -f ./prebuild/nvpriv.o .
+endif
+
+aae_ipc.o:
+ifeq ($(wildcard $(SRCBASE)/router/aaews/*.c),)
+    cp -f $(TOP)/aaews/prebuild/aae_ipc.o ./
 endif
 
 ifeq ($(RTCONFIG_USB),y)

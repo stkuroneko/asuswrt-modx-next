@@ -4611,6 +4611,9 @@ uint8_t smb2cli_session_security_mode(struct smbXcli_session *session)
 	if (conn->mandatory_signing) {
 		security_mode |= SMB2_NEGOTIATE_SIGNING_REQUIRED;
 	}
+	if (session->smb2->should_sign) {
+		security_mode |= SMB2_NEGOTIATE_SIGNING_REQUIRED;
+	}
 
 	return security_mode;
 }

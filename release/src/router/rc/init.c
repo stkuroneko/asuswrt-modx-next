@@ -139,6 +139,7 @@ static int initsigs[] = {
 };
 
 static char *defenv[] = {
+	"USER=root",	/* keep it on first item and modified at run-time. */
 	"TERM=vt100",
 	"HOME=/",
 	//"PATH=/usr/bin:/bin:/usr/sbin:/sbin",
@@ -157,7 +158,6 @@ static char *defenv[] = {
 	"LD_LIBRARY_PATH=/lib:/usr/lib:/opt/lantiq/usr/lib:/opt/lantiq/usr/sbin/:/tmp/wireless/lantiq/usr/lib/",
 #endif
 	"SHELL=" SHELL,
-	"USER=root",
 	"TMOUT=0",
 #ifdef RTCONFIG_DMALLOC
 /*
@@ -2472,6 +2472,7 @@ static int console_init(void)
 
 static pid_t run_shell(int timeout, int nowait)
 {
+	char user_env[sizeof("USER=XXX") + 32];
 	char *argv_shell[] = { SHELL, NULL };
 	char *argv_login[] = { LOGIN, "-p", NULL };
 	char **argv = argv_login;
@@ -2482,6 +2483,8 @@ static pid_t run_shell(int timeout, int nowait)
 	if (waitfor(STDIN_FILENO, timeout) <= 0)
 		return 0;
 
+	snprintf(user_env, sizeof(user_env), "USER=%s", nvram_get("http_username")? : "admin");
+	defenv[0] = user_env;
 	if (ate_factory_mode())
 	        argv = argv_shell;
 	else if (!check_if_file_exist("/etc/shadow"))
@@ -2530,7 +2533,8 @@ int console_main(int argc, char *argv[])
 	console_init();
 
 	signal(SIGHUP, console_hup);
-	for (;;) run_shell(0, 0);
+	for (; nvram_match("noconsole", "0");)
+		run_shell(0, 0);
 
 	return 0;
 }
@@ -3419,6 +3423,21 @@ void chk_gmac3_excludes()
 #endif
 #endif
 
+void init_subunit(void)
+{
+
+#if defined(RTCONFIG_AMAS)
+#if defined(RTCONFIG_FRONTHAUL_DWB) || defined(RTCONFIG_MSSID_PRELINK) || defined(RTCONFIG_FRONTHAUL_DBG) || defined(RTCONFIG_VIF_ONBOARDING)
+	init_amas_subunit();
+#endif
+#endif
+
+#ifdef RTCONFIG_OWE_TRANS
+    append_owe_trans_vif(); // reserve vif for OWE-Transition mode
+#endif
+
+}
+
 // intialized in this area
 //  lan_ifnames
 //  wan_ifnames
@@ -3444,7 +3463,7 @@ int init_nvram(void)
 	char wancaps[16] __attribute__((unused));
 #endif
 #if defined(RTCONFIG_SWITCH_MT7986_MT7531)
-	char *dw_lan;
+	char *dw_lan = NULL;
 #endif
 #if defined(RTCONFIG_WANPORT2) || defined(PLAX56_XP4) || defined(TUFAX4200) || defined(TUFAX6000) || defined(RTAX59U)
 	char *wan0, *wan1 __attribute__((unused)), *lan_1, *lan_2, lan_ifs[IFNAMSIZ * 4];
@@ -4519,6 +4538,8 @@ int init_nvram(void)
 		//either txpower or singlesku supports rc.
 		add_rc_support("pwrctrl");
 		add_rc_support("smart_connect");
+		add_rc_support("defpsk");
+		add_rc_support("defpass");
 		add_led_ctrl_capability(LED_ON_OFF);
 		// the following values is model dep. so move it from default.c to here
 		nvram_set("wl0_HT_TxStream", "2");
@@ -16232,9 +16253,10 @@ int init_nvram(void)
 		nvram_set_int("ct_expect_max", 150);
 #endif
 
+	init_subunit();
+
 #if defined(RTCONFIG_AMAS)
 #if defined(RTCONFIG_FRONTHAUL_DWB) || defined(RTCONFIG_MSSID_PRELINK) || defined(RTCONFIG_FRONTHAUL_DBG) || defined(RTCONFIG_VIF_ONBOARDING)
-	init_amas_subunit();
 #if defined(RTCONFIG_FRONTHAUL_DWB)
 	if (nvram_get_int("fh_ap_enabled") >= 0)
 		nvram_set("fh_ap_bss", "0");  // Fronthaul AP is be control by cfg daemon. So disable it when booted.
@@ -16257,10 +16279,6 @@ int init_nvram(void)
 		amas_stop_acsd_config_init(model);
 #endif
 #endif
-#endif
-
-#ifdef RTCONFIG_OWE_TRANS
-	append_owe_trans_vif(); // reserve vif for OWE-Transition mode
 #endif
 
 	if(nvram_match("wifison_ready", "1"))
@@ -16762,6 +16780,9 @@ int init_nvram(void)
 #ifdef RTAC68U
 NO_USB_CAP:
 #endif
+#ifdef RTCONFIG_USB_WAN_BACKUP
+	add_rc_support("usb_bk");
+#endif
 #endif // RTCONFIG_USB
 
 #ifdef RTCONFIG_FRS_FEEDBACK
@@ -16977,12 +16998,10 @@ NO_USB_CAP:
 #ifdef RTCONFIG_KEY_GUARD
 	add_rc_support("keyGuard");
 #endif
-#if defined(RTCONFIG_RALINK) || defined(RTCONFIG_QCA)
 #if !defined(RTCONFIG_SSID_AMAPS) /* AMAPS default is open system */
-	if(!nvram_match("wifi_psk", ""))
+	if(strcmp(nvram_safe_get("wifi_psk"), "") != 0)
 		add_rc_support("defpsk");
 #endif /* RTCONFIG_SSID_AMAPS */
-#endif
 
 #if defined(RTAC1200)
 	add_rc_support("noaidisk nodm noftp");
@@ -17481,6 +17500,14 @@ int init_nvram2(void)
 	/* reset the counter "fb_req_cnt" to "0" */
 	nvram_set("fb_req_cnt", "0");
 #endif /* RTCONFIG_FRS_FEEDBACK */
+
+#if defined(RTCONFIG_BWDPI)
+	if(!nvram_match("extendno", nvram_safe_get("extendno_org"))){
+		adjust_62_nv_list("bwdpi_game_list");
+		adjust_62_nv_list("bwdpi_stream_list");
+		adjust_62_nv_list("bwdpi_wfh_list");
+	}
+#endif
 
 	// upgrade/downgrade dont keep info
 	if(!nvram_match("extendno", nvram_safe_get("extendno_org"))){
@@ -18565,7 +18592,6 @@ static void sysinit(void)
 #if defined(RTCONFIG_QCA)
 	pre_syspara();
 #endif
-
 	init_syspara();// for system dependent part (befor first get_model())
 
 #ifdef RTCONFIG_RALINK
@@ -18767,9 +18793,7 @@ static void sysinit(void)
 	f_write_string("/proc/sys/kernel/core_pattern", "/tmp/core-%e-%g-%p-%s-%t-%u", 0, 0);
 	f_write_string("/proc/sys/fs/suid_dumpable", "2", 0, 0);
 #endif
-#ifdef RTCONFIG_BCMARM
 	f_write_string("/proc/sys/kernel/print-fatal-signals", "1", 0, 0);
-#endif
 
 	for (i = 0; i < sizeof(fatalsigs) / sizeof(fatalsigs[0]); i++) {
 		signal(fatalsigs[i], handle_fatalsigs);
@@ -18994,6 +19018,10 @@ static void sysinit(void)
 	reset_stacksize(ASUSRT_STACKSIZE);
 #endif
 #ifdef RTCONFIG_SOFTWIRE46
+	if (nvram_match("x_Setting", "0") && !strncmp(nvram_safe_get("territory_code"), "JP", 2)) {
+		init_wan46();
+		nvram_set("ipv6_service", "ipv6pt");
+	}
 	nvram_set("s46_mapsvr_id", "");
 #endif
 
@@ -19140,42 +19168,6 @@ int init_nvram4(void)
 	return 0;
 }
 #endif
-
-int init_pass_nvram(void)
-{
-#if defined(RTCONFIG_BCMARM)
-	if (!nvram_get_int("x_Setting")) {
-		nvram_set("forget_it", cfe_nvram_safe_get_raw("forget_it"));
-	}
-#elif defined(RTCONFIG_RALINK)
-	/* PASS */
-	{
-		char pass[MAX_PASS_LEN + 1];
-	        memset(pass, 0, sizeof(pass));
-		if (FRead(pass, OFFSET_PASS, MAX_PASS_LEN) < 0) {
-			_dprintf("READ ASUS PASS: Out of scope\n");
-			nvram_unset("forget_it");
-		 } else {
-			int len = strlen(pass);
-			int i;
-			if (pass[0] == 0xff)
-				nvram_unset("forget_it");
-			else
-			{
-				for(i = 0; i < MAX_PASS_LEN && pass[i] != '\0'; i++) {
-					if ((unsigned char)pass[i] == 0xff)
-					{
-						pass[i] = '\0';
-						break;
-					}
-				}
-				nvram_set("forget_it", pass);
-			}
-		}
-	}
-#endif
-	return 0;
-}
 
 int init_main(int argc, char *argv[])
 {
@@ -19927,6 +19919,12 @@ _dprintf("%s %d turnning on power on ethernet here\n", __func__, __LINE__);
 
 #ifdef RTCONFIG_USB_PRINTER
 			start_usblpsrv();
+#endif
+#if defined(RTCONFIG_USB_MODEM) && (defined(BCM4912) || defined(BCM6756) || defined(RTCONFIG_HND_ROUTER_AX_6710) || defined(RTAX53U))
+			_dprintf("%s: execute \"usbmuxd\"...\n", __func__);
+			char *cmd_usbmuxd[] = {"usbmuxd", NULL};
+			pid_t pid_usbmuxd;
+			_eval(cmd_usbmuxd, NULL, 0, &pid_usbmuxd);
 #endif
 #endif // RTCONFIG_USB
 

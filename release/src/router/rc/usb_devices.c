@@ -117,6 +117,14 @@ int is_android_phone(const int mode, const unsigned int vid, const unsigned int 
 	return 0;
 }
 
+int is_apple_device(const int mode, const unsigned int vid, const unsigned int pid)
+{
+	if(vid == 0x05ac)
+		return 1;
+
+	return 0;
+}
+
 int is_storage_cd(const unsigned int vid, const unsigned int pid)
 {
 	static const struct {
@@ -3641,6 +3649,12 @@ int asus_sg(const char *device_name, const char *action)
 			sleep(2);
 			usb_dbg("(%s): Running usb_modeswitch twice...\n", device_name);
 			xstart("usb_modeswitch", "-c", switch_file);
+#elif defined(RTCONFIG_RALINK_MT7621)
+			sleep(4);
+			if(!access(switch_file, F_OK)){
+				usb_dbg("(%s): Running usb_modeswitch twice...\n", device_name);
+				xstart("usb_modeswitch", "-c", switch_file);
+			}
 #endif
 		}
 	}
@@ -4554,9 +4568,19 @@ int asus_usb_interface(const char *device_name, const char *action)
 #endif
 				modprobe_r("usbserial");
 
-#ifdef RTCONFIG_USB_BECEEM
 				vid = atoi(nvram_safe_get(strcat_r(prefix2, "act_vid", tmp2)));
 				pid = atoi(nvram_safe_get(strcat_r(prefix2, "act_pid", tmp2)));
+
+				usb_dbg("(%s): Remove 0x%04x:0x0%4x...\n", device_name, vid, pid);
+
+				if(is_apple_device(0, vid, pid) && strstr(device_name, ":1.0")){
+					usb_dbg("(%s): Skip to unset device information.\n", device_name);
+
+					file_unlock(isLock);
+					return 0;
+				}
+
+#ifdef RTCONFIG_USB_BECEEM
 				if(is_samsung_dongle(1, vid, pid) || is_gct_dongle(1, vid, pid)){
 					modprobe_r("drxvi314");
 

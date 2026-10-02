@@ -3069,8 +3069,10 @@ int wan_hgw_detect(const int wan_unit, const char *wan_ifname, const char *prc)
 				snprintf(prefix_x, sizeof(prefix_x), "wan%d_x", wan_unit);
 				nvram_set(strcat_r(prefix_x, "ipaddr", tmp), nvram_safe_get(strcat_r(prefix, "ipaddr", tmp1)));
 				nvram_set(strcat_r(prefix_x, "gateway", tmp), nvram_safe_get(strcat_r(prefix, "gateway", tmp1)));
-				nvram_set(strcat_r(prefix_x, "dns", tmp), nvram_safe_get(strcat_r(prefix, "dns", tmp1)));
 				nvram_set(strcat_r(prefix_x, "netmask", tmp), nvram_safe_get(strcat_r(prefix, "netmask", tmp1)));
+				if (wan_proto != WAN_OCNVC)
+					nvram_set(strcat_r(prefix_x, "dns", tmp), nvram_safe_get(strcat_r(prefix, "dns", tmp1)));
+
 				nvram_set(strcat_r(prefix, "gateway", tmp), "0.0.0.0");
 				nvram_set(strcat_r(prefix, "dns", tmp), "0.0.0.0");
 				nvram_pf_set_int(prefix, "s46_hgw_case", S46_CASE_MAP_HGW_OFF);
@@ -3462,10 +3464,6 @@ NOIP:
 #ifdef RTCONFIG_OPENVPN
 		start_ovpn_eas();
 #endif
-		if(nvram_get_int("ntp_ready") == 1) {
-			stop_ddns();
-			start_ddns(NULL);
-		}
 #ifdef RTCONFIG_TR069
                if(wan_unit == 0 ){
                        if(!pids("tr069")){
@@ -3510,11 +3508,6 @@ NOIP:
 #ifdef RTCONFIG_OPENVPN
 	start_ovpn_eas();
 #endif
-	if(nvram_get_int("ntp_ready") == 1) {
-		stop_ddns();
-		start_ddns(NULL);
-	}
-
 #ifdef RTCONFIG_VPNC
 #ifdef RTCONFIG_VPN_FUSION
 	start_vpnc();
@@ -4582,6 +4575,95 @@ int autodet_plc_main(int argc, char *argv[]){
 	cnt = get_connected_plc(NULL);
 	nvram_set_int("autodet_plc_state" , cnt);
 
+	return 0;
+}
+#endif
+
+#ifdef RTCONFIG_SOFTWIRE46
+void init_wan46(void) {
+
+	int unit;
+	char prefix[]="wan46detXXXXXX_", tmp[100];
+
+	/* JP Sku Only */
+	if (!strncmp(nvram_safe_get("territory_code"), "JP", 2)) {
+		nvram_unset("wan46det_proceeding");
+		for (unit = WAN_UNIT_FIRST; unit < WAN_UNIT_MAX; ++unit) {
+			if (unit == WAN_UNIT_FIRST)
+				snprintf(prefix, sizeof(prefix), "wan46det_");
+			else
+				snprintf(prefix, sizeof(prefix), "wan46det%d_", unit);
+			nvram_unset(strcat_r(prefix, "state", tmp));
+		}
+	}
+	return;
+}
+
+int auto46det_main(int argc, char *argv[]) {
+
+	int opt, unit, re = 0;
+	char wired_link_nvram[16];
+	char prefix[]="wan46detXXXXXX_", tmp[100];
+
+	while ((opt = getopt(argc, argv, "r")) != -1) {
+		switch (opt) {
+		case 'r':
+			re = 1;
+			break;
+		default:
+			break;
+		}
+	}
+
+	if (nvram_get_int("wan46det_proceeding"))
+		return 0;
+
+	nvram_set("wan46det_proceeding", "1");
+
+	/* JP Sku Only */
+	if (!strncmp(nvram_safe_get("territory_code"), "JP", 2)) {
+		for (unit = WAN_UNIT_FIRST; unit < WAN_UNIT_MAX; ++unit) {
+
+			if (!eth_wantype(unit))
+				continue;
+
+			link_wan_nvname(unit, wired_link_nvram, sizeof(wired_link_nvram));
+			if (unit == WAN_UNIT_FIRST)
+				snprintf(prefix, sizeof(prefix), "wan46det_");
+			else
+				snprintf(prefix, sizeof(prefix), "wan46det%d_", unit);
+
+			if (nvram_get_int("x_Setting") && !ipv6_enabled()) {
+				nvram_set_int(strcat_r(prefix, "state", tmp), WAN46DET_STATE_UNKNOW);
+				_dprintf("[%s(%d)] ### IPv6 Disabled. ###\n", __FUNCTION__, __LINE__);
+				continue;
+			}
+
+			if (re) {
+				_dprintf("[%s(%d)] ### Aute Detect RESET ###\n", __FUNCTION__, __LINE__);
+				nvram_set_int(strcat_r(prefix, "state", tmp), WAN46DET_STATE_INITIALIZING);
+			}
+
+			if (!nvram_get_int(wired_link_nvram)) {
+				nvram_set_int(strcat_r(prefix, "state", tmp), WAN46DET_STATE_NOLINK);
+				continue;
+			}
+
+			if (nvram_get_int(strcat_r(prefix, "state", tmp)) >= WAN46DET_STATE_UNKNOW)
+				continue;
+
+			if (!pids("odhcp6c")) {
+				nvram_set("ipv6_service", "ipv6pt");
+				wan6_up(get_wan6face());
+				sleep(5);
+			}
+
+			nvram_set_int(strcat_r(prefix, "state", tmp), WAN46DET_STATE_INITIALIZING);
+			nvram_set_int(strcat_r(prefix, "state", tmp), wan46det(unit));
+		}
+	}
+
+	nvram_set("wan46det_proceeding", "0");
 	return 0;
 }
 #endif

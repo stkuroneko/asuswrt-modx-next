@@ -16,9 +16,6 @@ OBJS=$(patsubst %.c, %.o, $(SRC))
 #WS_SOURCES := $(WS_SRC)/curl_api.c $(WS_SRC)/parse_xml.c $(WS_SRC)/wb.c $(WS_SRC)/wb_util.c $(WS_SRC)/ssl_api.c $(WS_SRC)/log.c
 WS_SOURCES := $(wildcard $(WS_SRC)/*.c)
 WSLIB_OBJS := $(WS_SOURCES:%.c=$(OUTPUT)/%.o)
-ifeq ($(RT4GAC86U),y)
-WSLIB_OBJS += $(LIBDIR)/libc_nonshared.a
-endif
 
 ifeq ($(wildcard $(TOP)/wb/ws_src/*.c),)
 all:
@@ -49,6 +46,12 @@ LDFLAGS = -L$(OPENSSL_DIR) -lcrypto -lssl
 LDFLAGS += -L$(CURL_DIR)/lib/.libs -lcurl
 LDFLAGS += -L$(XML2_DIR)/.libs -lxml2
 LDFLAGS += -L$(JSON_C_DIR)/.libs -ljson-c
+ifeq ($(RTCONFIG_REALTEK),y)
+LDFLAGS = -L$(TOP_PLATFORM)/nvram${BCMEX} -lnvram -L$(TOP)/shared -lshared -lcrypt -ldl
+else
+LDFLAGS = -L$(TOP_PLATFORM)/nvram${BCMEX}${EX7} -lnvram -L$(TOP)/shared -lshared $(if $(CONFIG_BCMWL5),-lcrypt -ldl)
+endif
+
 ifeq ($(HND_ROUTER),y)
 LDFLAGS += -lm -lgcc_s
 endif

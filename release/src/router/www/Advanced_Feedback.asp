@@ -37,6 +37,13 @@
 	cursor: pointer;
 	text-decoration: underline;
 }
+.loadingIcon {
+	background: url('/images/InternetScan.gif') center no-repeat;
+	width: 33px;
+	height: 33px;
+	background-size: contain;
+	display: inline-block;
+}
 </style>
 <script>
 var usb_status_last_time = false;
@@ -60,6 +67,7 @@ var several_hour = "<#feedback_when_hour#>";
 var updated_several_hour = several_hour.replace('%2$@', '3');	//1-3
 var several_hours = "<#feedback_when_hours#>";
 var updated_several_hours = several_hour.replace('%1$@', '3').replace('%2$@', '12');	//3-12
+var fb_state = httpApi.nvramGet(["fb_state"], true).fb_state;
 
 function initial(){
 	show_menu();
@@ -108,6 +116,15 @@ function initial(){
 		init_diag_feature();
 	else {
 		$(".dblog_support_class").remove();
+	}
+
+	if(fb_state == "2"){
+		$('html, body').hide();
+		redirect();
+	}
+	else if(fb_state == "0"){
+		disbled_feedback_filed(0);
+		detect_fb_state();
 	}
 
 	if(false){
@@ -171,21 +188,38 @@ function gen_contact_sel(){
 	}
 }
 
+/*
+ * option status:
+ * 0: feedback proceeding
+ * 1: wan disconnect
+ */
+function disbled_feedback_filed(status){
+	document.form.eula_checkbox.disabled = true;
+	document.form.fb_country.disabled = true;
+	document.form.fb_email.disabled = true;
+	document.form.fb_serviceno.disabled = true;
+	document.form.attach_syslog.disabled = true;
+	document.form.attach_cfgfile.disabled = true;
+	document.form.attach_modemlog.disabled = true;
+	document.form.attach_wlanlog.disabled = true;
+	document.form.fb_ptype.disabled = true;
+	document.form.fb_pdesc.disabled = true;
+	document.form.fb_comment.disabled = true;
+	document.form.btn_send.disabled = true;
+	if(status == 0){
+		$(".dblog_disabled_status").find("input, textarea, button, select").attr("disabled", true);
+		$("#apply_button").css("display", "none");
+		$("#loadingIcon").css("display", "");
+	}
+	else if(status == 1){
+		document.getElementById("fb_desc_disconnect").style.display = "";
+	}
+}
+
 function check_wan_state(){
 	
 	if(sw_mode != 3 && document.getElementById("connect_status").className == "connectstatusoff"){
-		document.getElementById("fb_desc_disconnect").style.display = "";
-		document.form.fb_country.disabled = true;
-		document.form.fb_email.disabled = true;
-		document.form.fb_serviceno.disabled = true;
-		document.form.attach_syslog.disabled = true;
-		document.form.attach_cfgfile.disabled = true;
-		document.form.attach_modemlog.disabled = true;
-		document.form.attach_wlanlog.disabled = true;
-		document.form.fb_ptype.disabled = true;
-		document.form.fb_pdesc.disabled = true;
-		document.form.fb_comment.disabled = true;
-		document.form.btn_send.disabled = true;
+		disbled_feedback_filed(1);
 		if(dsl_support){
 			document.form.fb_ISP.disabled = true;
 			document.form.fb_Subscribed_Info.disabled = true;
@@ -196,7 +230,6 @@ function check_wan_state(){
 			document.form.fb_availability.disabled = true;
 			
 		}
-
 	}
 	else{
 		document.getElementById("fb_desc_disconnect").style.display = "none";
@@ -1206,6 +1239,14 @@ function CheckFBSize(){
 		}
 	});
 }
+
+function detect_fb_state(){
+	var fb_state = httpApi.nvramGet(["fb_state"], true).fb_state;
+	if(fb_state == "0")
+		setTimeout("detect_fb_state();", 5000);
+	else
+		top.location.href="Advanced_Feedback.asp";
+}
 </script>
 </head>
 <body onload="initial();" onunLoad="return unload_body();" class="bg">
@@ -1487,7 +1528,8 @@ function CheckFBSize(){
 			<div style="float: left;"><input type="checkbox" name="eula_checkbox"/></div>
 			<div id="eula_content" style="margin-left: 20px;"><#feedback_eula#></div>
 		</div>
-		<input class="button_gen" style="margin-left: 305px; margin-top:5px;" name="btn_send" onclick="applyRule()" type="button" value="<#btn_send#>"/>
+		<input id="apply_button" class="button_gen" style="margin-left: 305px; margin-top:5px;" name="btn_send" onclick="applyRule()" type="button" value="<#btn_send#>"/>
+		<div  id="loadingIcon" style="display:none;"><div class="loadingIcon" style="float: left; margin-left: 305px; margin-top:5px;"></div><div style="float: left; margin-left: 15px; margin-top:10px;"><span class="hint-color"><#Main_alert_processing#>...</span></div></div>
 	</td>
 </tr>
 

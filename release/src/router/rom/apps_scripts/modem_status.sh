@@ -27,6 +27,8 @@ sim_order=`nvram get modem_sim_order`
 
 usb_gobi2=`nvram get usb_gobi2`
 
+usb_path1_manufacturer=`nvram get usb_path1_manufacturer`
+
 stop_lock=`nvram get stop_atlock`
 if [ -n "$stop_lock" ] && [ "$stop_lock" -eq "1" ]; then
 	at_lock=""
@@ -564,6 +566,10 @@ elif [ "$1" == "fullsignal" ]; then
 			lac=`echo -n "$fullstr" |awk 'BEGIN{FS=","}{print $5}' 2>/dev/null`
 			rsrp=`echo -n "$fullstr" |awk 'BEGIN{FS=","}{print $13}' 2>/dev/null`
 			rsrq=`echo -n "$fullstr" |awk 'BEGIN{FS=","}{print $14}' 2>/dev/null`
+			if [ "$usb_path1_manufacturer" == "Fibocom" ]; then
+				rsrp=$(($rsrp-141))
+				rsrq=$(($rsrq/2-20))
+			fi
 			if [ "$mode" -eq "4" ]; then
 				at_ret=`/usr/sbin/modem_at.sh +GTCAINFO? "$modem_reg_time" 2>&1`
 				ret=`echo -n "$at_ret" |grep "OK" 2>/dev/null`

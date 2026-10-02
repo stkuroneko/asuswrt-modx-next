@@ -1912,7 +1912,7 @@ function change_passwd(){
 function check_password_length(obj){
 
 	if(is_KR_sku || is_SG_sku || is_AA_sku){     /* MODELDEP by Territory Code */
-		showtext(document.getElementById("new_pwd_msg"),"");
+		showtext(document.getElementById("new_pwd_msg"),"<#JS_validLoginPWD#>");
 		return;
 	}
 	

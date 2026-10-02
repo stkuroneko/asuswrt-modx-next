@@ -522,20 +522,20 @@ void get_related_nvram(){
 	snprintf(dualwan_mode, sizeof(dualwan_mode), "%s", nvram_safe_get("wans_mode"));
 	snprintf(dualwan_wans, sizeof(dualwan_wans), "%s", nvram_safe_get("wans_dualwan"));
 
-	memset(wandog_target, 0, sizeof(wandog_target));
 	if(sw_mode == SW_MODE_ROUTER){
-		wandog_enable = nvram_get_int("wandog_enable");
-		dnsprobe_enable = nvram_get_int("dns_probe");
+		if(!strcmp(dualwan_mode, "lb")){
+			wandog_enable = 0;
+			dnsprobe_enable = 0;
+		}
+		else{
+			wandog_enable = nvram_get_int("wandog_enable");
+			dnsprobe_enable = nvram_get_int("dns_probe");
+		}
+
 		scan_interval = nvram_get_int("wandog_interval");
 		for(unit = WAN_UNIT_FIRST; unit < WAN_UNIT_MAX; ++unit)
 			max_disconn_count[unit] = nvram_get_int("wandog_maxfail");
 		wandog_delay = nvram_get_int("wandog_delay");
-
-		if((!strcmp(dualwan_mode, "fo") || !strcmp(dualwan_mode, "fb"))
-				&& wandog_enable == 1
-				){
-			snprintf(wandog_target, sizeof(wandog_target), "%s", nvram_safe_get("wandog_target"));
-		}
 
 		if(!strcmp(dualwan_mode, "fb")){
 			max_fb_count = nvram_get_int("wandog_fb_count");
@@ -700,6 +700,8 @@ int do_ping_detect(int wan_unit, const char *target)
 static int wanduck_ping_detect(int wan_unit)
 {
 #ifdef RTCONFIG_DUALWAN
+	snprintf(wandog_target, sizeof(wandog_target), "%s", nvram_safe_get("wandog_target"));
+
 	return do_ping_detect(wan_unit, wandog_target);
 #else /* RTCONFIG_DUALWAN */
 	return -1;
@@ -869,6 +871,10 @@ int do_dns_detect(int wan_unit)
 #endif
 
 	snprintf(host, sizeof(host), "%s", nvram_safe_get("dns_probe_host"));
+	// the dns probe is disabled
+	if(*host == '\0')
+		return 1;
+
 	snprintf(content, sizeof(content), "%s", nvram_safe_get("dns_probe_content"));
 	if (debug)
 		_dprintf("%s: %s %s %s\n", __FUNCTION__, "check", host, content);
@@ -996,8 +1002,8 @@ int do_dns_detect(int wan_unit)
 			}
 
 			foreach(word, content, next) {
-				if ((strcmp(word, "*") == 0) ||
-				    (inet_pton(ai->ai_family, word, &target) > 0 && memcmp(addr, &target, size) == 0)) {
+				if ((strcmp(word, "*") == 0 && inet_pton(ai->ai_family, "10.0.0.1", &target) > 0 && memcmp(addr, &target, size) != 0) ||
+					(inet_pton(ai->ai_family, word, &target) > 0 && memcmp(addr, &target, size) == 0)) {
 					status = 1;
 					break;
 				}
@@ -1070,7 +1076,8 @@ int detect_internet(int wan_unit)
 	unsigned long rx_packets, tx_packets;
 #endif
 	int link_internet;
-	int wan_ppp, is_ppp_demand, dns_ret, ping_ret;
+	int wan_ppp, is_ppp_demand, ppp_echo_dns;
+	int dns_ret, ping_ret;
 	char tmp[100], prefix[16];
 
 #ifdef DETECT_INTERNET_MORE
@@ -1084,8 +1091,18 @@ int detect_internet(int wan_unit)
 
 	/* Don't trigger demand PPP connections with DNS probes & ping */
 	is_ppp_demand = (wan_ppp && nvram_get_int(strcat_r(prefix, "pppoe_demand", tmp)));
+#if defined(RTCONFIG_DUALWAN)
+	ppp_echo_dns = (wan_ppp && nvram_get_int(strcat_r(prefix, "ppp_echo", tmp)) == 2 && strcmp(dualwan_mode, "lb"));
+#else
+	ppp_echo_dns = (wan_ppp && nvram_get_int(strcat_r(prefix, "ppp_echo", tmp)) == 2);
+#endif
 
-	dns_ret = is_ppp_demand ? -1 : delay_dns_response(wan_unit);
+	if(isFirstUse)
+		dns_ret = delay_dns_response(wan_unit);
+	else if(dnsprobe_enable || ppp_echo_dns)
+		dns_ret = is_ppp_demand ? -1 : delay_dns_response(wan_unit);
+	else
+		dns_ret = -1;
 
 #if defined(RTCONFIG_IPV6) && defined(RTCONFIG_INTERNAL_GOBI)
 	if(dualwan_unit__usbif(wan_unit) && modem_pdp == 2)
@@ -1115,7 +1132,6 @@ int detect_internet(int wan_unit)
 	else if(dualwan_unit__usbif(wan_unit) && modem_pdp == 2 && !ping_ret)
 		link_internet = DISCONN;
 #endif
-#ifdef RTCONFIG_DUALWAN
 #if 0
 	else if((!strcmp(dualwan_mode, "fo") || !strcmp(dualwan_mode, "fb"))
 			&& wandog_enable == 1 && !isFirstUse && !wanduck_ping_detect(wan_unit)){
@@ -1126,9 +1142,9 @@ int detect_internet(int wan_unit)
 			nat_state = stop_nat_rules();
 	}
 #else
-	else if((wandog_enable && !ping_ret && !dnsprobe_enable)
-			|| (dnsprobe_enable && !dns_ret && !wandog_enable)
-			|| (wandog_enable && !ping_ret && dnsprobe_enable && !dns_ret)
+	else if((!ping_ret && !dnsprobe_enable)
+			|| (!dns_ret && !wandog_enable)
+			|| (!ping_ret && !dns_ret)
 			){
 		link_internet = DISCONN;
 
@@ -1137,9 +1153,8 @@ int detect_internet(int wan_unit)
 			nat_state = stop_nat_rules();
 	}
 #endif
-#endif
-	else if(!dns_ret && /* PPP connections with DNS detection */
-			wan_ppp && nvram_get_int(strcat_r(prefix, "ppp_echo", tmp)) == 2)
+	else if(ppp_echo_dns /* PPP connections with DNS detection */
+			&& !dns_ret)
 		link_internet = DISCONN;
 	else
 		link_internet = CONNED;
@@ -1161,6 +1176,7 @@ int detect_internet(int wan_unit)
 
 	return link_internet;
 }
+
 int passivesock(char *service, int protocol_num, int qlen){
 	//struct servent *pse;
 	struct sockaddr_in sin;
@@ -1307,7 +1323,6 @@ int chk_proto(int wan_unit){
 		disconn_case[wan_unit] = CASE_DATALIMIT;
 		return DISCONN;
 	}
-	else
 #endif
 #ifdef RTCONFIG_WIRELESSREPEATER
 	if(sw_mode == SW_MODE_HOTSPOT){
@@ -1330,7 +1345,6 @@ int chk_proto(int wan_unit){
 			return DISCONN;
 		}
 	}
-	else
 #endif
 	// Start chk_proto() in SW_MODE_ROUTER.
 #ifdef RTCONFIG_USB_MODEM
@@ -1411,6 +1425,11 @@ int chk_proto(int wan_unit){
 		char *autodet_argv[] = {"autodet", NULL};
 
 		_eval(autodet_argv, NULL, 0, &pid);
+#ifdef RTCONFIG_SOFTWIRE46
+		char *auto46det_argv[] = {"auto46det", NULL};
+
+		_eval(auto46det_argv, NULL, 0, &pid);
+#endif
 	}
 
 	if(!if_wan_ppp(wan_unit, 1)){
@@ -2879,7 +2898,7 @@ void record_conn_status(int wan_unit){
 			disconn_case_old[wan_unit] = CASE_DISWAN;
 
 #if defined(RTCONFIG_AMAS) && defined(RTCONFIG_PRELINK)
-			if (nvram_match("x_Setting", "0")) {
+			if (isFirstUse) {
 				nvram_set("amas_bdl_wanstate", "0");
 #if defined(RTCONFIG_BT_CONN)
 				ble_rename_ssid();
@@ -2889,6 +2908,10 @@ void record_conn_status(int wan_unit){
 
 			logmessage(log_title, "WAN(%d) link down.", wan_unit);
 
+#ifdef RTCONFIG_SOFTWIRE46
+			if (!strncmp(nvram_safe_get("territory_code"), "JP", 2))
+				stop_auto46det();
+#endif
 #if defined(RTCONFIG_NOTIFICATION_CENTER)
 			_dprintf("wanduck(%d): NC send SYS_WAN_CABLE_UNPLUGGED_EVENT.\n", wan_unit);
 			snprintf(buff, sizeof(buff), "0x%x", SYS_WAN_CABLE_UNPLUGGED_EVENT);
@@ -2937,7 +2960,7 @@ void record_conn_status(int wan_unit){
 #endif
 			}
 #if defined(RTCONFIG_AMAS) && defined(RTCONFIG_PRELINK)
-			if (nvram_match("x_Setting", "0")) {
+			if (isFirstUse) {
 				nvram_set("amas_bdl_wanstate", "2");
 #if defined(RTCONFIG_BT_CONN)
 				ble_rename_ssid();
@@ -2967,7 +2990,7 @@ void record_conn_status(int wan_unit){
 #endif
 
 #if defined(RTCONFIG_AMAS) && defined(RTCONFIG_PRELINK)
-			if (nvram_match("x_Setting", "0")) {
+			if (isFirstUse) {
 				nvram_set("amas_bdl_wanstate", "2");
 #if defined(RTCONFIG_BT_CONN)
 				ble_rename_ssid();
@@ -3017,7 +3040,7 @@ void record_conn_status(int wan_unit){
 			reboot(RB_AUTOBOOT);
 #endif
 #if defined(RTCONFIG_AMAS) && defined(RTCONFIG_PRELINK)
-			if (nvram_match("x_Setting", "0")) {
+			if (isFirstUse) {
 				nvram_set("amas_bdl_wanstate", "2");
 #if defined(RTCONFIG_BT_CONN)
 				ble_rename_ssid();
@@ -3049,7 +3072,7 @@ void record_conn_status(int wan_unit){
 			}
 #endif
 #if defined(RTCONFIG_AMAS) && defined(RTCONFIG_PRELINK)
-			if (nvram_match("x_Setting", "0")) {
+			if (isFirstUse) {
 				nvram_set("amas_bdl_wanstate", "2");
 #if defined(RTCONFIG_BT_CONN)
 				ble_rename_ssid();
@@ -3064,7 +3087,7 @@ void record_conn_status(int wan_unit){
 		disconn_case_old[wan_unit] = -1;
 
 #if defined(RTCONFIG_AMAS) && defined(RTCONFIG_PRELINK)
-		if (nvram_match("x_Setting", "0")) {
+		if (isFirstUse) {
 			nvram_set("amas_bdl_wanstate", "2");
 #if defined(RTCONFIG_BT_CONN)
 			ble_rename_ssid();
@@ -3077,7 +3100,7 @@ void record_conn_status(int wan_unit){
 	else if(conn_changed_state[wan_unit] == PHY_RECONN){
 
 #if defined(RTCONFIG_AMAS) && defined(RTCONFIG_PRELINK)
-		if (nvram_match("x_Setting", "0")) {
+		if (isFirstUse) {
 			nvram_set("amas_bdl_wanstate", "2");
 #if defined(RTCONFIG_BT_CONN)
 			ble_rename_ssid();

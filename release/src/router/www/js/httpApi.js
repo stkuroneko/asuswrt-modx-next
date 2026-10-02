@@ -366,6 +366,10 @@ var httpApi ={
 		$.get("/appGet.cgi?hook=start_dsl_autodet()");
 	},
 
+	"startWan46AutoDet": function(){
+		$.get("/appGet.cgi?hook=restart_auto46det()");
+	},
+
 	"detwanGetRet": function(){
 		var wanInfo = httpApi.nvramGet(["wan0_state_t", "wan0_sbstate_t", "wan0_auxstate_t", "autodet_state", "autodet_auxstate", "wan0_proto",
 										 "link_internet", "x_Setting", "usb_modem_act_sim", "link_wan"], true);
@@ -612,6 +616,52 @@ var httpApi ={
 		return retData;
 	},
 
+	"detwan46GetRet": function(){
+		var wanInfo = httpApi.nvramGet(["wan46det_state","link_internet","x_Setting","link_wan"], true);
+
+		var wanTypeList = {
+			"init":"INITIALIZING",
+			"nolink":"NOLINK", 
+			"unknow":"UNKNOW",
+			"v6plus":"V6PLUS",
+			"hgw_v6plus":"HGW_V6PLUS",
+			"ocnvc":"OCNVC"
+		}
+
+		var retData = {
+			"wan46State": "",
+			"isError": false
+		};
+
+		if(wanInfo.isError){
+			retData.wan46State = wanTypeList.init;
+			retData.isError = true;
+		}
+		else if(wanInfo.link_wan == "0"){
+			retData.wan46State = wanTypeList.nolink;
+		}
+		else if(wanInfo.wan46det_state == "0"){
+			retData.wan46State = wanTypeList.init;
+		}
+		else if(wanInfo.wan46det_state == "1"){
+			retData.wan46State = wanTypeList.nolink;
+		}
+		else if(wanInfo.wan46det_state == "2"){
+			retData.wan46State = wanTypeList.unknow;
+		}
+		else if(wanInfo.wan46det_state == "3"){
+			retData.wan46State = wanTypeList.v6plus;
+		}
+		else if(wanInfo.wan46det_state == "4"){
+			retData.wan46State = wanTypeList.hgw_v6plus;
+		}
+		else if(wanInfo.wan46det_state == "5"){
+			retData.wan46State = wanTypeList.ocnvc;
+		}
+
+		return retData;
+	},
+
 	"getWanInfo": function(_index){
 		var connect_proto_array = {
 			"dhcp": "<#BOP_ctype_title1#>",
@@ -634,10 +684,12 @@ var httpApi ={
 			"proto": "",
 			"proto_text": ""
 		};
-
+		var wans_info = httpApi.nvramGet(["wans_dualwan", "wans_mode"], true);
+		var dualwan_enabled = (isSupport("dualwan") && wans_info.wans_dualwan.search("none") == -1) ? 1 : 0;
+		var active_wan_unit = httpApi.hookGet("get_wan_unit", true);
 		var wan_index = (_index == undefined) ? 0 : _index;
 		if(dualwan_enabled){
-			if(active_wan_unit != wan_index && (wans_mode == "fo" || wans_mode == "fb")){
+			if(active_wan_unit != wan_index && (wans_info.wans_mode == "fo" || wans_info.wans_mode == "fb")){
 				result.status = "standby";
 				result.status_text = "<#Standby_str_cold#>";
 
@@ -655,6 +707,9 @@ var httpApi ={
 			var wanInfo = httpApi.nvramGet(["wan" + wan_index + "_ipaddr", "wan" + wan_index + "_proto"], true);
 			result.ipaddr = wanInfo["wan" + wan_index + "_ipaddr"];
 			result.proto = wanInfo["wan" + wan_index + "_proto"];
+			if(isSupport("usbX") && wans_info.wans_dualwan.split(" ")[wan_index] == "usb"){
+				result.proto = "USB Modem";
+			}
 			if(isSupport("dsl")){
 				if(wans_info.wans_dualwan.split(" ")[wan_index] == "dsl"){
 					var dslInfo = httpApi.nvramGet(["dsl0_proto", "dslx_transmode"], true);

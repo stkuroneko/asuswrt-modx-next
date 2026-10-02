@@ -504,10 +504,6 @@ ifneq ($(RTCONFIG_FINDASUS), y)
 	rm -rf $(INSTALLDIR)/www/images/New_ui/wifi-logo.png
 endif
 
-ifneq ($(RTCONFIG_JFFS2USERICON), y)
-	rm -rf $(INSTALLDIR)/www/ajax_uploadicon.asp
-endif
-
 ifneq ($(RTCONFIG_TR069), y)
 	rm -rf $(INSTALLDIR)/www/Advanced_TR069_Content.asp
 endif
@@ -895,4 +891,8 @@ endif
 
 ifneq ($(RTCONFIG_DNSPRIVACY), y)
 	rm -rf $(INSTALLDIR)/www/dot-servers.json
+endif
+
+ifneq ($(RTCONFIG_USB_WAN_BACKUP), y)
+	rm -rf $(INSTALLDIR)/www/images/phone_as_modem
 endif

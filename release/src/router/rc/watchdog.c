@@ -6439,9 +6439,9 @@ void regular_ddns_check(void)
 {
 #ifdef RPAC68U
 /* The workaround solution avoiding watchdog segfault on RP-AC68U. */
-	int r, wan_unit = rtk_wan_primary_ifunit(), last_unit = nvram_get_int("ddns_last_wan_unit");
+	int wan_unit = rtk_wan_primary_ifunit(), last_unit = nvram_get_int("ddns_last_wan_unit");
 #else
-	int r, wan_unit = wan_primary_ifunit(), last_unit = nvram_get_int("ddns_last_wan_unit");
+	int wan_unit = wan_primary_ifunit(), last_unit = nvram_get_int("ddns_last_wan_unit");
 #endif
 	char prefix[sizeof("wanXXXXXXXXXX_")], *host;
 	struct in_addr ip_addr;
@@ -6468,10 +6468,13 @@ void regular_ddns_check(void)
 			int u = get_first_connected_public_wan_unit();
 			if (u < WAN_UNIT_FIRST || u >= WAN_UNIT_MAX)
 			{
-				logmessage("DDNS", "[%s] dual WAN load balance DDNS cannot succeed to work, because none of wan is public IP.", __FUNCTION__);
-				return;
+				u = get_first_connected_dual_wan_unit(); /* can use private WAN IP */
+				if (u < WAN_UNIT_FIRST || u >= WAN_UNIT_MAX)
+				{
+					logmessage("DDNS", "[%s] None of wan can connect to internet in load balance Dual WAN.", __FUNCTION__);
+					return;
+				}
 			}
-
 			wan_unit = u;
 		}
 	}
@@ -6499,14 +6502,8 @@ void regular_ddns_check(void)
 #endif
 	}
 	logmessage("watchdog", "Hostname/IP mapping error! Restart ddns.");
-	if (last_unit != wan_unit)
-		r = notify_rc("restart_ddns");
-	else
-		r = notify_rc("start_ddns");
-
-	if (!r)
-		nvram_set_int("ddns_last_wan_unit", wan_unit);
-
+	stop_ddns();
+	start_ddns(NULL);
 
 	return;
 }
@@ -6515,9 +6512,9 @@ void ddns_check(void)
 {
 #ifdef RPAC68U
 /* The workaround solution avoiding watchdog segfault on RP-AC68U. */
-	int r, wan_unit = rtk_wan_primary_ifunit(), last_unit = nvram_get_int("ddns_last_wan_unit");
+	int wan_unit = rtk_wan_primary_ifunit(), last_unit = nvram_get_int("ddns_last_wan_unit");
 #else
-	int r, wan_unit = wan_primary_ifunit(), last_unit = nvram_get_int("ddns_last_wan_unit");
+	int wan_unit = wan_primary_ifunit(), last_unit = nvram_get_int("ddns_last_wan_unit");
 #endif
 
 	//_dprintf("ddns_check... %d\n", ddns_check_count);
@@ -6534,10 +6531,13 @@ void ddns_check(void)
 			int u = get_first_connected_public_wan_unit();
 			if (u < WAN_UNIT_FIRST || u >= WAN_UNIT_MAX)
 			{
-				logmessage("DDNS", "[%s] dual WAN load balance DDNS cannot succeed to work, because none of wan is public IP.", __FUNCTION__);
-				return;
+				u = get_first_connected_dual_wan_unit(); /* can use private WAN IP */
+				if (u < WAN_UNIT_FIRST || u >= WAN_UNIT_MAX)
+				{
+					logmessage("DDNS", "[%s] None of wan can connect to internet in load balance Dual WAN.", __FUNCTION__);
+					return;
+				}
 			}
-
 			wan_unit = u;
 		}
 	}
@@ -6572,10 +6572,19 @@ void ddns_check(void)
 		ddns_check_count++;
 	}
 
-	if (wan_unit == last_unit && nvram_match("ddns_updated", "1")) //already updated success
+	if (wan_unit == last_unit && nvram_match("ddns_updated", "1")) { //already updated success
+#ifdef RTCONFIG_IPV6
+		/* not enable IPv6 or IPv6 already updated success */
+		if (!ipv6_enabled() || nvram_match("ddns_ipv6_update", "0") || (ipv6_enabled() && nvram_match("ddns_ipv6_update", "1") && nvram_match("ddns_ipv6_updated", "1"))) {
+			//logmessage("watchdog", "IPv4/IPv6 already updated success, exit DDNS Retry.\n");
+			return;
+		}
+#else
 		return;
+#endif
+	}
 
-	if (wan_unit == last_unit) {
+	if (wan_unit == last_unit) { //Only Time-out, connect_fail, -1 (in asusddns) or not auth_fail (not in asusddns)
 		if ( nvram_match("ddns_server_x", "WWW.ASUS.COM") || nvram_match("ddns_server_x", "WWW.ASUS.COM.CN")) {
 			if ( !( !strcmp(nvram_safe_get("ddns_return_code_chk"),"Time-out") ||
 				!strcmp(nvram_safe_get("ddns_return_code_chk"),"connect_fail") ||
@@ -6624,13 +6633,8 @@ void ddns_check(void)
 #endif
 	}
 	logmessage("watchdog", "start ddns.");
-	if (last_unit != wan_unit)
-		r = notify_rc("restart_ddns watchdog");
-	else
-		r = notify_rc("start_ddns watchdog");
-
-	if (!r)
-		nvram_set_int("ddns_last_wan_unit", wan_unit);
+	stop_ddns();
+	start_ddns("watchdog");
 
 	return;
 }
@@ -6668,6 +6672,14 @@ void httpd_check()
 		start_rtl_watchdog();
 #endif
 	}
+}
+
+void awsiot_check()
+{
+#ifdef RTCONFIG_AWSIOT
+    if (!pids("awsiot"))
+        start_awsiot();
+#endif
 }
 
 #ifdef RTCONFIG_UPNPC_NEW
@@ -9601,6 +9613,11 @@ wdp:
 	beacon_counter_monitor();
 	thermal_monitor();
 #endif
+
+#ifdef RTCONFIG_AWSIOT
+	awsiot_check();
+#endif
+
 #ifdef RTCONFIG_UPNPC_NEW
 	if(nvram_get_int("ipsec_ig_enable") == 1)
 	{

@@ -195,7 +195,6 @@ typedef struct _ROAMING_TABLE {
 #endif
 
 #if defined(RTCONFIG_RALINK)
-#define xR_MAX  4
 extern int xTxR;
 #elif defined(RTCONFIG_QCA)
 #endif

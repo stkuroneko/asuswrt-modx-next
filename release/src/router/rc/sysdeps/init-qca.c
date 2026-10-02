@@ -2373,7 +2373,7 @@ static int do_cold_boot_calibration(char *mod, int is_ftm)
 #endif
 #if defined(RTCONFIG_SPF11_QSDK) || defined(RTCONFIG_SPF11_1_QSDK) \
  || defined(RTCONFIG_SPF11_3_QSDK)
-	char testmode[] = "7", ftm_testmode[] = "10";
+	char testmode[] __attribute__((unused))= "7", ftm_testmode[] __attribute__((unused)) = "10";
 	char testmode_param[] = "testmode=7", ftm_testmode_param[] = "testmode=10";
 #endif
 	int cold_boot = 0, daemon = 0;
@@ -3314,6 +3314,8 @@ static void __load_wifi_driver(int testmode)
 	f_write_string("/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor", "performance", 0, 0); // for throughput
 	f_write_string("/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq", "716000", 0, 0); // for throughput
 #endif
+
+	save_wl_params_for_testing_reload_wifi_drv();
 }
 
 void load_wifi_driver(void)
@@ -3751,6 +3753,15 @@ skip_wifison:
 	return ;
 }
 
+#if defined(RTCONFIG_NO_RELOAD_WIFI_DRV_IF_POSSIBLE)
+static inline int need_to_reload_wifi_drv(void)
+{
+	if (__need_to_reload_wifi_drv() || IS_ATE_FACTORY_MODE())
+		return 1;
+	return 0;
+}
+#endif
+
 void fini_wl(void)
 {
 	int i;
@@ -3849,20 +3860,22 @@ void fini_wl(void)
 	ifconfig(WIF_60G, 0, NULL, NULL);
 #endif
 
+	if (need_to_reload_wifi_drv()) {
 #if !defined(RTCONFIG_QCA_WLAN_SCRIPTS)
-	for (i = ARRAY_SIZE(load_wifi_kmod_seq)-1, wp = &load_wifi_kmod_seq[i]; i >= 0; --i, --wp) {
-		if (!module_loaded(wp->kmod_name))
-			continue;
+		for (i = ARRAY_SIZE(load_wifi_kmod_seq)-1, wp = &load_wifi_kmod_seq[i]; i >= 0; --i, --wp) {
+			if (!module_loaded(wp->kmod_name))
+				continue;
 
-		if (!(wp->flags & QWIFI_STICK)) {
-			eval("rmmod", wp->kmod_name);
-			if (wp->remove_sleep)
-				sleep(wp->remove_sleep);
+			if (!(wp->flags & QWIFI_STICK)) {
+				eval("rmmod", wp->kmod_name);
+				if (wp->remove_sleep)
+					sleep(wp->remove_sleep);
+			}
 		}
-	}
 #else
-	eval("unloadwifi.sh");
+		eval("unloadwifi.sh");
 #endif
+	}
 }
 
 static void chk_valid_country_code(char *country_code)

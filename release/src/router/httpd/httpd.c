@@ -2545,11 +2545,6 @@ int main(int argc, char **argv)
 }
 
 #ifdef RTCONFIG_HTTPS
-#if defined(RTCONFIG_ECC256)
-#define HTTPS_CA_JFFS  "/jffs/cert_ecdsa.tgz"
-#else
-#define HTTPS_CA_JFFS  "/jffs/cert.tgz"
-#endif
 void save_cert(void)
 {
 	eval("tar", "-C", "/", "-czf", HTTPS_CA_JFFS, "etc/cert.pem", "etc/key.pem");
@@ -2669,7 +2664,7 @@ int check_current_ip_is_lan_or_wan()
 		if (inet_aton(nvram_safe_get("lan_ipaddr"), &lan) == 0 ||
 		    inet_aton(nvram_safe_get("lan_netmask"), &mask) == 0)
 			return -1;
-		return (lan.s_addr & mask.s_addr) == (login_uip_tmp.in.s_addr & mask.s_addr);
+		return ((lan.s_addr & mask.s_addr) == (login_uip_tmp.in.s_addr & mask.s_addr))?0:1;
 #ifdef RTCONFIG_IPV6
 	case AF_INET6:
 		/* IPv6 addresses are dynamic, must be bind to bind to interface */

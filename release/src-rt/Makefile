@@ -1404,6 +1404,10 @@ define RouterOptions
 			echo "RTCONFIG_SAMBA3=y" >>$(1); \
 		fi; \
 	fi;
+	if [ "$(AWSIOT)" = "y" ]; then \
+		sed -i "/RTCONFIG_AWSIOT/d" $(1); \
+		echo "RTCONFIG_AWSIOT=y" >>$(1); \
+	fi;
 	if [ "$(REALTEK)" = "y" ]; then \
 		sed -i "/RTCONFIG_REALTEK/d" $(1); \
 		echo "RTCONFIG_REALTEK=y" >>$(1); \
@@ -2205,6 +2209,10 @@ define RouterOptions
 				sed -i "/RTCONFIG_MODEM_BRIDGE/d" $(1); \
 				echo "RTCONFIG_MODEM_BRIDGE=y" >>$(1); \
 			fi; \
+			if [ "$(USB_WAN_BACKUP)" = "y" ]; then \
+				sed -i "/RTCONFIG_USB_WAN_BACKUP/d" $(1); \
+				echo "RTCONFIG_USB_WAN_BACKUP=y" >>$(1); \
+			fi; \
 		fi; \
 		if [ "$(PRINTER)" = "y" ]; then \
 			sed -i "/RTCONFIG_USB_PRINTER/d" $(1); \
@@ -2431,6 +2439,10 @@ define RouterOptions
 		sed -i "/RTCONFIG_PSISTLOG/d" $(1); \
 		echo "RTCONFIG_PSISTLOG=y" >>$(1); \
 	fi;
+	if [ "$(FLIPBITS)" = "y" ]; then \
+		sed -i "/RTCONFIG_TEST_FLIPBITS/d" $(1); \
+		echo "RTCONFIG_TEST_FLIPBITS=y" >>$(1); \
+	fi;
 	if [ "$(UBI)" = "y" ]; then \
 		sed -i "/RTCONFIG_UBI/d" $(1); \
 		echo "RTCONFIG_UBI=y" >>$(1); \
@@ -2473,6 +2485,15 @@ define RouterOptions
 	if [ "$(DYN_DICT_NAME)" = "y" ]; then \
 		sed -i "/RTCONFIG_DYN_DICT_NAME/d" $(1); \
 		echo "RTCONFIG_DYN_DICT_NAME=y" >>$(1); \
+	fi;
+	if [ "$(VALGRIND)" = "y" ]; then \
+		sed -i "/RTCONFIG_VALGRIND\>/d" $(1); \
+		echo "RTCONFIG_VALGRIND=y" >>$(1); \
+		sed -i "/RTCONFIG_DEBUG/d" $(1); \
+		echo "RTCONFIG_DEBUG=y" >>$(1); \
+	else \
+		sed -i "/RTCONFIG_VALGRIND/d" $(1); \
+		echo "# RTCONFIG_VALGRIND is not set" >>$(1); \
 	fi;
 	if [ "$(DMALLOC)" = "y" ]; then \
 		sed -i "/RTCONFIG_DMALLOC/d" $(1); \
@@ -3377,6 +3398,10 @@ define RouterOptions
 			sed -i "/RTCONFIG_HIDDEN_BACKHAUL/d" $(1); \
 			echo "RTCONFIG_HIDDEN_BACKHAUL=y" >>$(1); \
 		fi; \
+		if [ "$(NRLWL)" = "y" ]; then \
+			sed -i "/RTCONFIG_NO_RELOAD_WIFI_DRV_IF_POSSIBLE/d" $(1); \
+			echo "RTCONFIG_NO_RELOAD_WIFI_DRV_IF_POSSIBLE=y" >>$(1); \
+		fi; \
 		if [ "$(CFG80211)" = "y" ]; then \
 			sed -i "/RTCONFIG_CFG80211/d" $(1); \
 			echo "RTCONFIG_CFG80211=y" >>$(1); \
@@ -3472,8 +3497,6 @@ define RouterOptions
 			else \
 				echo "RTCONFIG_DPSTA=y" >>$(1); \
 			fi; \
-			sed -i "/RTCONFIG_PTHSAFE_POPEN/d" $(1); \
-			echo "RTCONFIG_PTHSAFE_POPEN=y" >>$(1); \
 		fi; \
 		sed -i "/RTCONFIG_LIBASUSLOG/d" $(1); \
 		echo "RTCONFIG_LIBASUSLOG=y" >>$(1); \
@@ -3580,8 +3603,12 @@ define RouterOptions
 		fi; \
 		sed -i "/RTCONFIG_AMAS_SYNC_2G_BW/d" $(1); \
 		echo "RTCONFIG_AMAS_SYNC_2G_BW=y" >>$(1); \
-		sed -i "/RTCONFIG_ACCOUNT_BINDING/d" $(1); \
-		echo "RTCONFIG_ACCOUNT_BINDING=y" >>$(1); \
+		if [ "$(findstring RP-, $(BUILD_NAME))" != "RP-" ]; then \
+			sed -i "/RTCONFIG_ACCOUNT_BINDING/d" $(1); \
+			echo "RTCONFIG_ACCOUNT_BINDING=y" >>$(1); \
+			sed -i "/RTCONFIG_AWSIOT/d" $(1); \
+			echo "RTCONFIG_AWSIOT=y" >>$(1); \
+		fi; \
 		sed -i "/RTCONFIG_NOTIFICATION_CENTER/d" $(1); \
 		echo "RTCONFIG_NOTIFICATION_CENTER=y" >>$(1); \
 		sed -i "/RTCONFIG_BHSWITCH_RE_SELFOPT/d" $(1); \
@@ -3759,10 +3786,6 @@ define RouterOptions
 	if [ "$(FRS_LIVE_UPDATE)" = "y" ]; then \
 		sed -i "/RTCONFIG_LIBASUSLOG/d" $(1); \
 		echo "RTCONFIG_LIBASUSLOG=y" >>$(1); \
-	fi;
-	if [ "$(ASUSDDNS_ACCOUNT_BASE)" = "y" ]; then \
-		sed -i "/RTCONFIG_ASUSDDNS_ACCOUNT_BASE/d" $(1); \
-		echo "RTCONFIG_ASUSDDNS_ACCOUNT_BASE=y" >>$(1); \
 	fi;
 	if [ "$(LIVE_UPDATE_RSA)" != "n" ] && [ "$(LIVE_UPDATE_RSA)" != "" ]; then \
 		sed -i "/RTCONFIG_LIVE_UPDATE_RSA/d" $(1); \
@@ -4008,6 +4031,10 @@ define RouterOptions
 	if [ "$(DUPVIF)" = "y" ]; then \
 		sed -i "/RTCONFIG_DUPVIF/d" $(1); \
 		echo "RTCONFIG_DUPVIF=y" >>$(1); \
+	fi;
+	if [ "$(PASS_V2)" = "y" ]; then \
+		sed -i "/RTCONFIG_PASS_V2/d" $(1); \
+		echo "RTCONFIG_PASS_V2=y" >>$(1); \
 	fi;
 	$(call platformRouterOptions, $(1))
 endef

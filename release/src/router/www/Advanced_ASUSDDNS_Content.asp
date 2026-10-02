@@ -87,12 +87,15 @@ var deregister_fail = 0;
 var cur_wan_ipaddr = wanlink_ipaddr();
 var inadyn = isSupport("inadyn");
 
-var faq_href = "https://nw-dlcdnet.asus.com/support/forward.html?model=&type=Faq&lang="+ui_lang+"&kw=&num=105";
 var le_sbstate_t = '<% nvram_get("le_sbstate_t"); %>';
 var le_auxstate_t = '<% nvram_get("le_auxstate_t"); %>';
 var le_re_ddns = '<% nvram_get("le_re_ddns"); %>';
-
+var faq_href = "https://nw-dlcdnet.asus.com/support/forward.html?model=&type=Faq&lang="+ui_lang+"&kw=&num=105";
+var oauth_auth_status = httpApi.nvramGet(["oauth_auth_status"], true).oauth_auth_status;
+var aae_ddnsinfo = httpApi.nvramGet(["aae_ddnsinfo"], true).aae_ddnsinfo;
+var ipv6_service = httpApi.nvramGet(["ipv6_service"], true).ipv6_service;
 var asusddns_token_state = httpApi.nvramGet(["asusddns_token_state"], true).asusddns_token_state;
+var ddns_accournt_remove_note = stringSafeGet("<#asusddns_rm_account_hint#>");
 
 function init(){
 	show_menu();
@@ -216,11 +219,18 @@ function force_update() {
 	submitForm();
 }
 
+function show_ipv6update_setting(){
+	if(ipv6_service != "disabled")
+		showhide("ddns_ipv6update_tr", 1);
+	else
+		showhide("ddns_ipv6update_tr", 0);
+}
+
 function show_deregister_btn(){
 	$("#deregister_btn").css("display", "inline");
 	if(asusddns_token_state == "1"){
 		$("#deregister_btn").click(function(){
-			alert("The host name has been bound to the login account of the router app, please delete/deregister it from the router app.");//untranslated
+			alert(ddns_accournt_remove_note);
 		});
 	}
 	else{

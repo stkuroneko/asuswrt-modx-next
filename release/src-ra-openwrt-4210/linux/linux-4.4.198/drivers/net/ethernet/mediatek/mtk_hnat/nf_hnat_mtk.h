@@ -22,6 +22,9 @@ struct hnat_skb_cb2 {
 	__u32 magic;
 };
 
+#define VLAN_LIST_BASIC_PARAM     2
+#define MTLAN_MAXINUM             17 /* 1 (Default) + 16 */
+
 struct hnat_desc {
 	u32 entry : 14;
 	u32 crsn : 5;

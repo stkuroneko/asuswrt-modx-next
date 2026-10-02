@@ -124,6 +124,8 @@ var iptv_port_settings = '<%nvram_get("iptv_port_settings"); %>';
 var faq_href1 = "https://nw-dlcdnet.asus.com/support/forward.html?model=&type=Faq&lang="+ui_lang+"&kw=&num=129";
 var faq_href2 = "https://nw-dlcdnet.asus.com/support/forward.html?model=&type=Faq&lang="+ui_lang+"&kw=&num=130";
 
+var usb_bk_support = isSupport("usb_bk");
+
 function initial(){
 	show_menu();
 	wans_flag = (wans_dualwan_orig.search("none") != -1 || !parent.dualWAN_support) ? 0 : 1;
@@ -264,6 +266,17 @@ function form_show(v){
 		document.getElementById("wans_standby_tr").style.display = "none";
 		inputCtrl(document.form.wans_standby, 0);
 		show_watchdog_table();
+		if(usb_bk_support){
+			$("#usb_tethering_tr").show();
+			if(wans_dualwan_array[0] == "usb"){
+				$("#usb_tethering_setting").hide();
+				$("#usb_tethering_hint").show();
+			}
+			else{
+				$("#usb_tethering_setting").show();
+				$("#usb_tethering_hint").hide();
+			}
+		}
 	}
 	else{ //DualWAN enabled
 		if(based_modelid == "GT-AX11000" || productid == "RT-AX86U" || based_modelid == "GT-AXE11000"){
@@ -353,6 +366,9 @@ function form_show(v){
 		appendModeOption(document.form.wans_mode_option.value);
 		show_wans_rules();
 		document.getElementById("wans_mode_tr").style.display = "";
+		if(usb_bk_support){
+			$("#usb_tethering_tr").hide();
+		}
 	}
 }
 
@@ -873,8 +889,20 @@ function changeWANProto(obj){
 
 		appendLANoption1(document.form.wans_primary);
 		appendLANoption2(document.form.wans_second);
-	}else
+	}else{
 		appendLANoption1(document.form.wans_primary);
+		if(usb_bk_support){
+			$("#usb_tethering_tr").show();
+			if(document.form.wans_primary.value == "usb"){
+				$("#usb_tethering_setting").hide();
+				$("#usb_tethering_hint").show();
+			}
+			else{
+				$("#usb_tethering_setting").show();
+				$("#usb_tethering_hint").hide();
+			}
+		}
+	}
 }
 
 function appendLANoption1(obj){
@@ -1368,6 +1396,7 @@ function remain_origins(){
 <input type="hidden" name="switch_stb_x" value="<% nvram_get("switch_stb_x"); %>" disabled>
 <input type="hidden" name="lacp_enabled" value="<% nvram_get("lacp_enabled"); %>" disabled>
 <input type="hidden" name="bond_wan" value="<% nvram_get("bond_wan"); %>" disabled>
+<input type="hidden" name="wans_usb_bk_act" value="<% nvram_get("wans_usb_bk_act"); %>" disabled>
 <!--===================================Beginning of Detection Time Confirm===========================================-->
 <div id="detect_time_confirm" style="display:none;">
 		<!--div style="margin:20px 30px 20px;"-->
@@ -1482,6 +1511,15 @@ function remain_origins(){
 																document.form.bond_wan.disabled = false;
 																document.form.bond_wan.value = orig_bond_wan;
 															}
+
+															if(usb_bk_support){
+																var cur_wans_usb_bk_act = httpApi.nvramGet(["wans_usb_bk_act"], true).wans_usb_bk_act;
+																if(cur_wans_usb_bk_act == "1"){
+																	document.form.wans_usb_bk.value = "0";
+																}
+																document.form.wans_usb_bk_act.value = "0";
+																document.form.wans_usb_bk_act.disabled = false;
+															}
 														}
 													);
 												</script>
@@ -1513,7 +1551,16 @@ function remain_origins(){
 												</select>											
 											</td>
 									  	</tr>
-
+										<tr id="usb_tethering_tr" style="display: none;">
+											<th>Auto USB Backup WAN</th><!--untranslated-->
+											<td>
+												<div id="usb_tethering_setting" style="display: none;">
+													<input type="radio" name="wans_usb_bk" class="input" value="1" <% nvram_match("wans_usb_bk", "1", "checked"); %>><#checkbox_Yes#>
+													<input type="radio" name="wans_usb_bk" class="input" value="0" <% nvram_match("wans_usb_bk", "0", "checked"); %>><#checkbox_No#>
+												</div>
+												<span id="usb_tethering_hint" style="display: none;">By switching to USB as primary WAN, Auto USB Backup WAN will not be available.</span>
+											</td>
+										</tr>
 										<tr id="wans_mode_tr">
 											<th><#dualwan_mode#></th>
 											<td>

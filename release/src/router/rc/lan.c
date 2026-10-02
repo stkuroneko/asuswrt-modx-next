@@ -2957,6 +2957,28 @@ NEITHER_WDS_OR_PSTA:
 			logmessage("hotplug", "add net %s.", interface);
 			_dprintf("hotplug net: add net %s.\n", interface);
 
+#if defined(RTCONFIG_USB_WAN_BACKUP ) && defined (RTCONFIG_DUALWAN)
+			if(nvram_match("wans_usb_bk", "1"))
+			{
+				int wans = get_wans_dualwan();
+				_dprintf("[%s, %d]wans=%x\n", __FUNCTION__, __LINE__, wans);
+				char dualwan[32],  *p;
+				if(get_dualwan_by_unit(WAN_UNIT_SECOND) ==  WANS_DUALWAN_IF_NONE	// must be single wan
+					&&  !(wans & WANSCAP_USB))	//not usb wan
+				{
+					_dprintf("[%s, %d]\n", __FUNCTION__, __LINE__);
+					get_wans_dualwan_str(dualwan, sizeof(dualwan));
+					p = strstr(dualwan, "none");
+					if(!p)
+						strlcat(dualwan, " usb", sizeof(dualwan));
+					else
+						strlcpy(p, "usb", sizeof(dualwan) - (p - dualwan));
+					nvram_set("wans_dualwan", dualwan);
+					nvram_set_int("wans_usb_bk_act", 1);
+				}
+			}
+#endif
+
 			snprintf(device_path, sizeof(device_path), "%s/%s/device", SYS_NET, interface);
 
 			memset(usb_path, 0, PATH_MAX);
@@ -3095,7 +3117,6 @@ NEITHER_WDS_OR_PSTA:
 				nvram_set(tmp2, "2");
 				return;
 			}
-
 #ifdef RTCONFIG_MODEM_BRIDGE
 			if(sw_mode() == SW_MODE_AP && nvram_get_int("modem_bridge")){
 				eval("brctl", "addif", lan_ifname, interface);
@@ -3165,6 +3186,30 @@ NEITHER_WDS_OR_PSTA:
 			snprintf(prefix, sizeof(prefix), "wan%d_", unit);
 
 			nvram_set(strcat_r(prefix, "ifname", tmp), "");
+
+#if defined(RTCONFIG_USB_WAN_BACKUP ) && defined (RTCONFIG_DUALWAN)
+			if(nvram_match("wans_usb_bk", "1") && nvram_match("wans_usb_bk_act", "1"))
+			{
+				int wan1_type, wan2_type;
+				char dualwan[32],  *p;
+
+				wan1_type = get_dualwan_by_unit(WAN_UNIT_FIRST);
+				wan2_type = get_dualwan_by_unit(WAN_UNIT_SECOND);
+				if((wan1_type != WANS_DUALWAN_IF_USB && wan1_type != WANS_DUALWAN_IF_USB2)
+					&& (wan2_type == WANS_DUALWAN_IF_USB || wan2_type == WANS_DUALWAN_IF_USB2))
+				{
+					get_wans_dualwan_str(dualwan, sizeof(dualwan));
+					p = strstr(dualwan, "usb");
+					if(p)
+					{
+						strlcpy(p, "none", sizeof(dualwan) - (p - dualwan));
+						nvram_set("wans_dualwan", dualwan);
+						nvram_set_int("wans_usb_bk_act", 0);
+					}
+				}
+
+			}
+#endif
 		}
 	}
 	// Beceem dongle, ASIX USB to RJ45 converter, ECM, RNDIS(LU-150: ethX with RNDIS).
@@ -3241,6 +3286,26 @@ NEITHER_WDS_OR_PSTA:
 		if(!strcmp(action, "add")){
 			logmessage("hotplug", "add net %s.", interface);
 			_dprintf("hotplug net: add net %s.\n", interface);
+
+#if defined(RTCONFIG_USB_WAN_BACKUP ) && defined (RTCONFIG_DUALWAN)
+			if(nvram_match("wans_usb_bk", "1"))
+			{
+				int wans = get_wans_dualwan();
+				char dualwan[32], *p;
+				if(get_dualwan_by_unit(WAN_UNIT_SECOND) ==  WANS_DUALWAN_IF_NONE	// must be single wan
+					&&  !(wans & WANSCAP_USB))	//not usb wan
+				{
+					get_wans_dualwan_str(dualwan, sizeof(dualwan));
+					p = strstr(dualwan, "none");
+					if(!p)
+						strlcat(dualwan, " usb", sizeof(dualwan));
+					else
+						strlcpy(p, "usb", sizeof(dualwan) - (p - dualwan));
+					nvram_set("wans_dualwan", dualwan);
+					nvram_set_int("wans_usb_bk_act", 1);
+				}
+			}
+#endif
 
 			snprintf(device_path, sizeof(device_path), "%s/%s/device", SYS_NET, interface);
 
@@ -3369,6 +3434,30 @@ NEITHER_WDS_OR_PSTA:
 			snprintf(prefix, sizeof(prefix), "wan%d_", unit);
 
 			nvram_set(strcat_r(prefix, "ifname", tmp), "");
+
+#if defined(RTCONFIG_USB_WAN_BACKUP ) && defined (RTCONFIG_DUALWAN)
+			if(nvram_match("wans_usb_bk", "1") && nvram_match("wans_usb_bk_act", "1"))
+			{
+				int wan1_type, wan2_type;
+				char dualwan[32],  *p;
+
+				wan1_type = get_dualwan_by_unit(WAN_UNIT_FIRST);
+				wan2_type = get_dualwan_by_unit(WAN_UNIT_SECOND);
+				if((wan1_type != WANS_DUALWAN_IF_USB && wan1_type != WANS_DUALWAN_IF_USB2)
+					&& (wan2_type == WANS_DUALWAN_IF_USB || wan2_type == WANS_DUALWAN_IF_USB2))
+				{
+					get_wans_dualwan_str(dualwan, sizeof(dualwan));
+					p = strstr(dualwan, "usb");
+					if(p)
+					{
+						strlcpy(p, "none", sizeof(dualwan) - (p - dualwan));
+						nvram_set("wans_dualwan", dualwan);
+						nvram_set_int("wans_usb_bk_act", 0);
+					}
+				}
+
+			}
+#endif
 
 #ifdef RTCONFIG_USB_BECEEM
 			if(strlen(port_path) <= 0)

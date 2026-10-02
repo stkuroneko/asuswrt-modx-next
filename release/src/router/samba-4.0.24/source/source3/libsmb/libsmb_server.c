@@ -719,6 +719,7 @@ SMBC_attr_server(TALLOC_CTX *ctx,
         ipc_srv = SMBC_find_server(ctx, context, server, "*IPC$",
                                    pp_workgroup, pp_username, pp_password);
         if (!ipc_srv) {
+		int signing_state = SMB_SIGNING_DEFAULT;
 
                 /* We didn't find a cached connection.  Get the password */
 		if (!*pp_password || (*pp_password)[0] == '\0') {
@@ -740,6 +741,9 @@ SMBC_attr_server(TALLOC_CTX *ctx,
                 if (smbc_getOptionUseCCache(context)) {
                         flags |= CLI_FULL_CONNECTION_USE_CCACHE;
                 }
+		if (context->internal->smb_encryption_level != SMBC_ENCRYPTLEVEL_NONE) {
+			signing_state = SMB_SIGNING_REQUIRED;
+		}
 
                 nt_status = cli_full_connection(&ipc_cli,
 						lp_netbios_name(), server,
@@ -748,7 +752,7 @@ SMBC_attr_server(TALLOC_CTX *ctx,
 						*pp_workgroup,
 						*pp_password,
 						flags,
-						SMB_SIGNING_DEFAULT);
+						signing_state);
                 if (! NT_STATUS_IS_OK(nt_status)) {
                         DEBUG(1,("cli_full_connection failed! (%s)\n",
                                  nt_errstr(nt_status)));

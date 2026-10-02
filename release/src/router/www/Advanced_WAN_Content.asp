@@ -151,6 +151,8 @@ function initial(){
 			$("#wan_proto_menu option[value='v6plus']").remove();
 			$("#wan_proto_menu option[value='ocnvc']").remove();
 		}
+
+		httpApi.faqURL("1050137", function(url){document.getElementById("s46reset_faq").href = url;});
 	}
 
 	updatDNSListOnline();
@@ -566,13 +568,19 @@ function applyRule(){
 		if(reboot_confirm==1){
 
 			if(confirm("<#AiMesh_Node_Reboot#>")){
+				if((wan_proto_orig != "v6plus" && document.form.wan_proto.value == "v6plus") ||
+					(wan_proto_orig != "ocnvc" && document.form.wan_proto.value == "ocnvc"))
+					s46reset();
+
 				FormActions("start_apply.htm", "apply", "reboot", "<% get_default_reboot_time(); %>");
 				showLoading();
 				document.form.submit();
 			}
 		}
 		else{
-
+			if((wan_proto_orig != "v6plus" && document.form.wan_proto.value == "v6plus") ||
+				(wan_proto_orig != "ocnvc" && document.form.wan_proto.value == "ocnvc"))
+				s46reset();
 			showLoading();
 			document.form.submit();	
 		}
@@ -905,6 +913,8 @@ function change_wan_type(wan_type, flag){
 		inputCtrl(document.form.wan_ppp_echo, 1);
 		ppp_echo_control();
 
+		$("#s46reset_div").hide();
+
 		if(wan_bonding_support){
 			inputCtrl(document.form.bond_wan_radio[0], 0);
 			inputCtrl(document.form.bond_wan_radio[1], 0);
@@ -938,6 +948,8 @@ function change_wan_type(wan_type, flag){
 		document.getElementById("vpn_dhcp").style.display = "none";
 		inputCtrl(document.form.wan_ppp_echo, 1);
 		ppp_echo_control();
+
+		$("#s46reset_div").hide();
 
 		if(wan_bonding_support){
 			inputCtrl(document.form.bond_wan_radio[0], 0);
@@ -973,6 +985,8 @@ function change_wan_type(wan_type, flag){
 		inputCtrl(document.form.wan_ppp_echo, 1);
 		ppp_echo_control();
 
+		$("#s46reset_div").hide();
+
 		if(wan_bonding_support){
 			inputCtrl(document.form.bond_wan_radio[0], 0);
 			inputCtrl(document.form.bond_wan_radio[1], 0);
@@ -1006,6 +1020,8 @@ function change_wan_type(wan_type, flag){
 		document.getElementById("vpn_dhcp").style.display = "none";
 		inputCtrl(document.form.wan_ppp_echo, 0);
 		ppp_echo_control(0);
+
+		$("#s46reset_div").hide();
 
 		if(wan_bonding_support){
 			if(based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000"){
@@ -1055,6 +1071,11 @@ function change_wan_type(wan_type, flag){
 		inputCtrl(document.form.wan_ppp_echo, 0);
 		ppp_echo_control(0);
 
+		if((wan_type == "v6plus" && wan_proto_orig == "v6plus") || (wan_type == "ocnvc" && wan_proto_orig == "ocnvc"))
+			$("#s46reset_div").css("display", "flex");
+		else
+			$("#s46reset_div").hide();
+
 		if(wan_bonding_support){
 			inputCtrl(document.form.bond_wan_radio[0], 0);
 			inputCtrl(document.form.bond_wan_radio[1], 0);
@@ -1089,6 +1110,8 @@ function change_wan_type(wan_type, flag){
 		document.getElementById("vpn_dhcp").style.display = "none";
 		inputCtrl(document.form.wan_ppp_echo, 0);
 		ppp_echo_control(0);
+
+		$("#s46reset_div").hide();
 
 		if(wan_bonding_support){
 			if(based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000"){
@@ -1821,6 +1844,34 @@ function DNSList_match(ip1, ip2){
 	return -1;
 }
 
+function s46reset(){
+	$.ajax({
+		url: "/s46reset.cgi",
+
+		success: function( response ) {
+		}
+	});
+}
+
+function update_map(){
+	var msg = "It will take 1-2 minutes to reassign MAP rule. All your connected devices will lose internet connection during the update. Do you want to proceed?";//untranslated
+	if(confirm(msg)){
+		$.ajax({
+			url: "/s46reset.cgi",
+
+			success: function( response ) {
+				httpApi.nvramSet({
+				    "action_mode": "apply",
+				    "rc_service" : "restart_wan"
+				});
+				showLoading(10);
+			}
+		});
+	}
+	else
+		return false;
+}
+
 </script>
 </head>
 
@@ -1916,11 +1967,12 @@ function DNSList_match(ip1, ip2){
 						  <tr>
 							<td colspan="2"><#t2BC#></td>
 						  </tr>
-						  </thead>		
+						  </thead>
 
 							<tr>
 								<th><#Layer3Forwarding_x_ConnectionType_itemname#></th>
 								<td align="left">
+									<div style="display: flex; align-items: center;">
 									<select id="wan_proto_menu" class="input_option" name="wan_proto" onchange="change_wan_type(this.value);fixed_change_wan_type(this.value);">
 										<option value="dhcp" <% nvram_match("wan_proto", "dhcp", "selected"); %>><#BOP_ctype_title1#></option>
 										<option value="static" <% nvram_match("wan_proto", "static", "selected"); %>><#BOP_ctype_title5#></option>
@@ -1932,16 +1984,23 @@ function DNSList_match(ip1, ip2){
 										<option value="v6plus" <% nvram_match("wan_proto", "v6plus", "selected"); %>><#IPv6_plus#></option>
 										<option value="ocnvc" <% nvram_match("wan_proto", "ocnvc", "selected"); %>><#IPv6_ocnvc#></option>
 									</select>
+										<div id="s46reset_div" style="display: flex; align-items: center;">
+											<div id="s46btn_div" style="display: flex; align-items: center;">
+												<div id="s46reset_btn" style="margin-left: 5px;"><input type="button" class="button_gen" onclick="update_map();" value="Update MAP"></div><!--untranslated-->
+												<div id="s46reset_help" style="margin-left: 5px; cursor: pointer;"><a id = "s46reset_faq" href="" target="_blank"><img src="/images/New_ui/bottom_help.png"></a></div>
+											</div>
+										</div>
+									</div>
 								</td>
 							</tr>
 
 							<tr>
-								<th><#Enable_WAN#></th>                 
+								<th><#Enable_WAN#></th>
 								<td>
 									<input type="radio" name="wan_enable" class="input" value="1" <% nvram_match("wan_enable", "1", "checked"); %>><#checkbox_Yes#>
 									<input type="radio" name="wan_enable" class="input" value="0" <% nvram_match("wan_enable", "0", "checked"); %>><#checkbox_No#>
 								</td>
-							</tr>				
+							</tr>
 
 							<tr>
 								<th><a class="hintstyle" href="javascript:void(0);" onClick="openHint(7,22);"><#Enable_NAT#></a></th>                 

@@ -271,6 +271,9 @@ int _eval(char *const argv[], const char *path, int timeout, int *ppid)
 		chld = signal(SIGCHLD, SIG_DFL);
 	}
 
+#if defined(RTCONFIG_VALGRIND)
+	setenv("USER", nvram_get("http_username")? : "admin", 1);
+#endif
 #ifdef HND_ROUTER
 	p = nvram_safe_get("env_path");
 	snprintf(s, sizeof(s), "%s%s/sbin:/bin:/usr/sbin:/usr/bin:/opt/sbin:/opt/bin", *p ? p : "", *p ? ":" : "");

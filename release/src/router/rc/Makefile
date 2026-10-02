@@ -1,6 +1,6 @@
 include ../common.mak
 
-CFLAGS += -Wall -Os $(EXTRACFLAGS)
+CFLAGS += -Wall $(if $(RTCONFIG_DEBUG),-g,-Os) $(EXTRACFLAGS)
 CFLAGS += -I. -I$(TOP)/shared -I$(SRCBASE)/include -I$(TOP)/networkmap
 ifneq ($(HND_ROUTER),y)
 CFLAGS += -idirafter$(LINUXDIR)/include
@@ -299,7 +299,7 @@ ifneq ($(findstring CONFIG_BCM_KF_NETFILTER=, $(shell cat $(LINUXDIR)/.config)),
 CFLAGS         += -DBCM_KF_NETFILTER
 endif
 
-OBJS := rc.o init.o interface.o lan.o wireless.o wan.o pppd.o auth.o services.o
+OBJS := rc.o init.o interface.o lan.o wireless.o $(if $(RTCONFIG_SOFTWIRE46), s46comm.o) wan.o pppd.o auth.o services.o
 OBJS += firewall.o ppp.o services.o common.o
 OBJS += watchdog.o check_watchdog.o ntp.o $(if $(RTCONFIG_MULTIWAN_CFG),qos_multiwan.o,qos.o) udhcpc.o ate.o
 OBJS += format.o
@@ -512,7 +512,7 @@ ifeq ($(RTCONFIG_FRS_LIVE_UPDATE),y)
 OBJS += frs_service.o
 endif
 
-ifeq ($(RTCONFIG_ASUSDDNS_ACCOUNT_BASE),y)
+ifeq ($(and $(RTCONFIG_TUNNEL),$(RTCONFIG_ACCOUNT_BINDING)),y)
 OBJS += asus_ddns.o
 endif
 
@@ -683,7 +683,7 @@ endif
 ifeq ($(RTCONFIG_SOFTWIRE46),y)
 CFLAGS += -I$(TOP)/json-c
 LDFLAGS += -L$(TOP)/json-c/.libs -ljson-c
-OBJS += s46comm.o v6plusd.o ocnvcd.o
+OBJS += v6plusd.o ocnvcd.o
 endif
 
 ifeq ($(RTCONFIG_INTERNAL_GOBI),y)
@@ -1428,6 +1428,8 @@ ifeq ($(RTCONFIG_LETSENCRYPT),y)
 endif
 
 ifeq ($(RTCONFIG_SOFTWIRE46),y)
+	@cd $(INSTALLDIR)/sbin && ln -sf rc init_wan46
+	@cd $(INSTALLDIR)/sbin && ln -sf rc auto46det
 	@cd $(INSTALLDIR)/sbin && ln -sf rc s46reset
 	@cd $(INSTALLDIR)/sbin && ln -sf rc mapcalc
 	@cd $(INSTALLDIR)/sbin && ln -sf rc v6plusd
@@ -1466,7 +1468,7 @@ ifeq ($(RTCONFIG_QCA_PLC2),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc detect_plc
 endif
 
-ifeq ($(RTCONFIG_ASUSDDNS_ACCOUNT_BASE),y)
+ifeq ($(and $(RTCONFIG_TUNNEL),$(RTCONFIG_ACCOUNT_BINDING)),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc update_asus_ddns_token
 endif
 	@cd $(INSTALLDIR)/sbin && ln -sf rc collect_debuglog

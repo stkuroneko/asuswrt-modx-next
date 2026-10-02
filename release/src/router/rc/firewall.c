@@ -1642,6 +1642,10 @@ void nat_setting(char *wan_if, char *wan_ip, char *wanx_if, char *wanx_ip, char 
 
 	_dprintf("writting prerouting %s %s %s %s %s %s\n", wan_if, wan_ip, wanx_if, wanx_ip, lan_if, lan_ip);
 
+#if defined(RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033)
+	add_nat_rule_for_gpon_sfp_module(fp);
+#endif
+
 	//Log
 	//if (nvram_match("misc_natlog_x", "1"))
 	// 	fprintf(fp, "-A PREROUTING -i %s -j LOG --log-prefix ALERT --log-level 4\n", wan_if);
@@ -2100,6 +2104,10 @@ void nat_setting2(char *lan_if, char *lan_ip, char *logaccept, char *logdrop)	//
 
 		_dprintf("writting prerouting 2 %s %s %s %s %s %s\n", wan_if, wan_ip, wanx_if, wanx_ip, lan_if, lan_ip);
 
+#if defined(RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033)
+		add_nat_rule_for_gpon_sfp_module(fp);
+#endif
+
 		//Log
 		//if (nvram_match("misc_natlog_x", "1"))
 		//	fprintf(fp, "-A PREROUTING -i %s -j LOG --log-prefix ALERT --log-level 4\n", wan_if);
@@ -2549,6 +2557,10 @@ void redirect_setting(void)
 #endif
 	}
 
+#if defined(RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033)
+	add_nat_rule_for_gpon_sfp_module(redirect_fp);
+#endif
+
 	fprintf(redirect_fp,
 		"-A PREROUTING ! -d %s -p tcp --dport 80 -j DNAT --to-destination %s:18017\n"
 		"-A PREROUTING -p udp --dport 53 -j DNAT --to-destination %s:18018\n",
@@ -2681,7 +2693,7 @@ start_default_filter(int lanunit)
 	char *nv, *nvp, *b;
 	char *enable, *srcip, *accessType;
 	char *lan_if = nvram_safe_get("lan_ifname");
-	int evalRet;
+	int evalRet, n;
 
 	if (!is_routing_enabled())
 		return;
@@ -2698,6 +2710,10 @@ start_default_filter(int lanunit)
 #ifdef RTCONFIG_PROTECTION_SERVER
 	fprintf(fp, ":%sWAN - [0:0]\n", PROTECT_SRV_RULE_CHAIN);
 	fprintf(fp, ":%sLAN - [0:0]\n", PROTECT_SRV_RULE_CHAIN);
+#endif
+
+#if defined(RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033)
+	add_filter_rule_for_gpon_sfp_module(fp);
 #endif
 
 #ifdef RTCONFIG_RESTRICT_GUI
@@ -2892,6 +2908,26 @@ start_default_filter(int lanunit)
 		fprintf(fp, "-A INPUT -m state --state INVALID -j DROP\n");
 		fprintf(fp, "-A INPUT -i %s -m state --state NEW -j ACCEPT\n", lan_if);
 		fprintf(fp, "-A INPUT -i %s -m state --state NEW -j ACCEPT\n", "lo");
+
+#ifdef RTCONFIG_SOFTWIRE46
+		if (!strncmp(nvram_safe_get("territory_code"), "JP", 2)) {
+			fprintf(fp, "-A INPUT -i %s -j ACCEPT\n", lan_if);
+			fprintf(fp, "-A INPUT -i lo -j ACCEPT\n");
+			switch (get_ipv6_service()) {
+#ifdef RTCONFIG_6RELAYD
+			case IPV6_PASSTHROUGH:
+#endif
+			case IPV6_NATIVE_DHCP:
+				/* allow responses from the dhcpv6 server */
+				fprintf(fp, "-A INPUT -p udp --sport 547 --dport 546 -j ACCEPT\n");
+				break;
+			}
+			for (n = 0; n < sizeof(allowed_local_icmpv6)/sizeof(int); n++) {
+				fprintf(fp, "-A INPUT -p ipv6-icmp --icmpv6-type %i -j ACCEPT\n", allowed_local_icmpv6[n]);
+			}
+		}
+#endif
+
 		//fprintf(fp, "-A FORWARD -m state --state INVALID -j DROP\n");
 		fprintf(fp, "-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT\n");
 		fprintf(fp, "-A FORWARD -i %s -o %s -j ACCEPT\n", lan_if, lan_if);
@@ -3376,6 +3412,10 @@ filter_setting(int wan_unit, char *lan_if, char *lan_ip, char *logaccept, char *
 		    ":logdrop - [0:0]\n",
 		nvram_match("ipv6_fw_enable", "1") ? "DROP" : "ACCEPT");
 	}
+#endif
+
+#if defined(RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033)
+	add_filter_rule_for_gpon_sfp_module(fp);
 #endif
 
 #if defined(WEB_REDIRECT)
@@ -4774,6 +4814,10 @@ filter_setting2(char *lan_if, char *lan_ip, char *logaccept, char *logdrop)
 		    ":logdrop - [0:0]\n",
 		nvram_match("ipv6_fw_enable", "1") ? "DROP" : "ACCEPT");
 	}
+#endif
+
+#if defined(RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033)
+	add_filter_rule_for_gpon_sfp_module(fp);
 #endif
 
 #if defined(WEB_REDIRECT)

@@ -710,6 +710,7 @@ obj-$(RTCONFIG_QTN) += libqcsapi_client
 obj-$(RTCONFIG_QTN) += qtnimage
 obj-$(RTCONFIG_QSR10G) += libqcsapi_client_10g
 obj-$(RTCONFIG_DMALLOC) += dmalloc
+obj-$(RTCONFIG_VALGRIND) += valgrind
 
 obj-$(RTCONFIG_BCMARM) += ctf_arm
 obj-$(RTAC53U) += ctf_5358
@@ -1207,6 +1208,12 @@ ifeq ($(RT4GAC86U),y)
 obj-$(RTCONFIG_USB_MODEM) += comgt-0.32
 endif
 
+# iphone
+obj-$(RTCONFIG_USB_MODEM) += libplist-2.2.0
+obj-$(RTCONFIG_USB_MODEM) += libusbmuxd-2.0.2
+obj-$(RTCONFIG_USB_MODEM) += libimobiledevice-1.3.0
+obj-$(RTCONFIG_USB_MODEM) += usbmuxd-1.1.1
+
 ifeq ($(KPATH_3X),y)
 ifeq ($(or $(RTCONFIG_SOC_IPQ8064),$(RTCONFIG_SOC_IPQ8074),$(RTCONFIG_ALPINE),$(RTCONFIG_LANTIQ)),y)
 obj-$(RTCONFIG_USB_MODEM) += usb-modeswitch
@@ -1216,7 +1223,7 @@ endif
 else ifeq ($(KPATH_2636_OR_3X),y)
 obj-$(RTCONFIG_USB_MODEM) += $(if $(or $(RTN56UB1),$(RTN56UB2)),usb-modeswitch-1.2.3,usb-modeswitch)
 else
-ifeq ($(RTCONFIG_BCMWL6),y)
+ifeq ($(or $(RTCONFIG_BCMWL6),$(RTCONFIG_RALINK_MT7621)),y)
 obj-$(RTCONFIG_USB_MODEM) += usb-modeswitch
 else
 obj-$(RTCONFIG_USB_MODEM) += usb-modeswitch-1.2.3
@@ -1301,6 +1308,10 @@ obj-$(NEED_SAMBA3) += $(if $(RTCONFIG_SAMBA36X),samba-3.6.x_opwrt,samba3)
 else
 obj-$(NEED_SAMBA3) += samba3
 endif
+endif
+
+ifeq ($(RTCONFIG_AWSIOT),y)
+obj-$(RTCONFIG_AWSIOT) += aws-iot
 endif
 
 ifeq ($(RTCONFIG_NTFS),y)
@@ -1588,6 +1599,9 @@ obj-$(RTCONFIG_TRACEROUTE) += traceroute-2.1.0
 obj-$(RTCONFIG_FPROBE) += libpcap
 obj-$(RTCONFIG_FPROBE) += fprobe-1.1
 obj-$(RTCONFIG_FPROBE) += tcpdump-4.4.0
+
+# add the library 'ipaddr' to check IP addr is private or public
+obj-y += ipaddr
 
 obj-$(RTCONFIG_BLINK_LED) += bled
 obj-$(RTCONFIG_BONDING) += ifenslave
@@ -3390,6 +3404,7 @@ openssl-1.1/Makefile:
 	cd openssl-1.1 && \
 	./Configure $(HOSTCONFIG) --prefix=/usr --openssldir=/etc --cross-compile-prefix=' ' \
 	$(if $(filter y,$(RTCONFIG_SFP) $(RTCONFIG_4M_SFP) $(RTCONFIG_8M_SFP)),-Os,-O2) \
+	$(if $(RTCONFIG_DEBUG),-g) \
 	-ffunction-sections -fdata-sections -Wl,--gc-sections \
 	shared $(OPENSSL_CIPHERS) no-async --api=1.0.0 \
 	    no-aria no-sm2 no-sm3 no-sm4 \
@@ -3409,17 +3424,17 @@ openssl-1.1-clean:
 openssl-1.1-install:
 ifneq ($(wildcard openssl-1.1/Makefile),)
 	install -D openssl-1.1/libcrypto.so.1.1 $(INSTALLDIR)$(INSTALLSUBDIR)/usr/lib/libcrypto.so.1.1
-	$(STRIP) $(INSTALLDIR)$(INSTALLSUBDIR)/usr/lib/libcrypto.so.1.1
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)$(INSTALLSUBDIR)/usr/lib/libcrypto.so.1.1)
 ifeq ($(or $(RTCONFIG_WEBDAV),$(RTCONFIG_FTP_SSL),$(RTCONFIG_OPENVPN),$(RTCONFIG_HTTPS)),y)
 	install -D openssl-1.1/libssl.so.1.1 $(INSTALLDIR)$(INSTALLSUBDIR)/usr/lib/libssl.so.1.1
-	$(STRIP) $(INSTALLDIR)$(INSTALLSUBDIR)/usr/lib/libssl.so.1.1
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)$(INSTALLSUBDIR)/usr/lib/libssl.so.1.1)
 endif
 ifeq ($(RTCONFIG_OPENSSL11),y)
 	cd $(INSTALLDIR)$(INSTALLSUBDIR)/usr/lib && rm -f libcrypto.so && ln -sf libcrypto.so.1.1 libcrypto.so
 	[ ! -f $(INSTALLDIR)$(INSTALLSUBDIR)/usr/lib/libssl.so.1.1 ] || \
 		cd $(INSTALLDIR)$(INSTALLSUBDIR)/usr/lib && rm -f libssl.so && ln -sf libssl.so.1.1 libssl.so
 	install -D openssl-1.1/apps/openssl $(INSTALLDIR)$(INSTALLSUBDIR)/usr/sbin/openssl
-	$(STRIP) $(INSTALLDIR)$(INSTALLSUBDIR)/usr/sbin/openssl
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)$(INSTALLSUBDIR)/usr/sbin/openssl)
 	chmod 0500 $(INSTALLDIR)$(INSTALLSUBDIR)/usr/sbin/openssl
 endif
 endif
@@ -5032,6 +5047,22 @@ fprobe-1.1-clean:
 	@$(SEP)
 	@$(MAKE) -C fprobe-1.1 clean
 
+ipaddr/stamp-h1:
+	touch $@
+
+ipaddr: ipaddr/stamp-h1
+	@$(SEP)
+	@$(MAKE) -C ipaddr CC=$(CC)
+
+ipaddr-install: ipaddr
+	install -D ipaddr/libipaddr.so $(INSTALLDIR)/$</usr/lib/libipaddr.so
+	$(STRIP) $(INSTALLDIR)/$</usr/lib/libipaddr.so
+
+ipaddr-clean:
+	@$(SEP)
+	@$(MAKE) -C ipaddr clean
+	rm -rf ipaddr/stamp-h1
+
 libpcap/Makefile:
 	cd libpcap && \
 	$(CONFIGURE) --prefix=/usr --disable-shared --enable-static \
@@ -6553,6 +6584,26 @@ lighttpd-1.4.39-clean:
 	-@$(MAKE) -C lighttpd-1.4.39 clean
 	@rm -f lighttpd-1.4.39/stamp-h1
 
+aws-iot: shared aws-iot/Makefile
+
+aws-iot/Makefile:
+	$(MAKE)
+
+
+aws-iot-install:
+	cd aws-iot && \
+	install -d $(INSTALLDIR)/aws-iot/usr/lib/
+	install -d $(INSTALLDIR)/aws-iot/usr/lib/certs/
+	install -d $(INSTALLDIR)/aws-iot/jffs/awscerts/
+	install -D aws-iot/src/awsiot $(INSTALLDIR)/aws-iot/usr/sbin/awsiot
+	$(STRIP) $(INSTALLDIR)/aws-iot/usr/sbin/awsiot
+	install -D aws-iot/src/ipc/libawsiot_ipc.so $(INSTALLDIR)/aws-iot/usr/lib/libawsiot_ipc.so
+	$(STRIP) $(INSTALLDIR)/aws-iot/usr/lib/libawsiot_ipc.so
+
+
+aws-iot-clean:
+	-@$(MAKE) -C aws-iot clean
+
 pcre-8.12/stamp-h1:
 	cd pcre-8.12 && \
 	CC=$(CC) CXX=$(CXX) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
@@ -6598,7 +6649,7 @@ pcre-8.31-clean:
 libxml2/stamp-h1:
 	cd libxml2 && mkdir -p m4 && autoreconf -i -f && \
 	CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) \
-	CFLAGS="-Os -Wall $(EXTRACFLAGS)" LDFLAGS="-ldl $(EXTRALDFLAGS)" \
+	CFLAGS="$(if $(RTCONFIG_DEBUG),-g,-Os) -Wall $(EXTRACFLAGS)" LDFLAGS="-ldl $(EXTRALDFLAGS)" \
 	./$(CONFIGURE) --prefix=/usr --without-python --disable-dependency-tracking \
 	--without-zlib
 	touch $@
@@ -6609,7 +6660,7 @@ libxml2: libxml2/stamp-h1
 libxml2-install: libxml2
 	@$(SEP)
 	install -D libxml2/.libs/libxml2.so.2 $(INSTALLDIR)/libxml2/usr/lib/libxml2.so.2
-	$(STRIP) $(INSTALLDIR)/libxml2/usr/lib/libxml2.so.2
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)/libxml2/usr/lib/libxml2.so.2)
 	cd $(INSTALLDIR)/libxml2/usr/lib && ln -sf libxml2.so.2 libxml2.so
 
 libxml2-clean:
@@ -6901,7 +6952,7 @@ curl/Makefile: curl/configure
 		$(if $(RTCONFIG_MBEDTLS),--with-mbedtls=$(STAGEDIR)/usr,--without-mbedtls) \
 		$(if $(RTCONFIG_WOLFSSL),--with-wolfssl=$(STAGEDIR)/usr,--without-wolfssl) \
 		--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt \
-		CFLAGS="-Os -Wall -ffunction-sections -fdata-sections" \
+		CFLAGS="$(if $(RTCONFIG_DEBUG),-g,-Os) -Wall -ffunction-sections -fdata-sections" \
 		CPPFLAGS="-I$(STAGEDIR)/usr/include" \
 		LDFLAGS="-Wl$(if $(RTCONFIG_TR069),$(comma)-rpath=$(STAGEDIR)/usr/lib,),--gc-sections $(LDFLAGS) -L$(STAGEDIR)/usr/lib" \
 		LIBS="-ldl $(if $(RTCONFIG_OPENSSL11),-lpthread,) \
@@ -6917,14 +6968,14 @@ curl: $(if $(RTCONFIG_OPENSSL11)$(RTCONFIG_OPENSSL10),openssl,) $(if $(RTCONFIG_
 curl-install:
 	@$(SEP)
 	install -D curl/lib/.libs/libcurl.so.4.8.0 $(INSTALLDIR)/curl/usr/lib/libcurl.so.4.8.0
-	$(STRIP) $(INSTALLDIR)/curl/usr/lib/libcurl.so.4.8.0
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)/curl/usr/lib/libcurl.so.4.8.0)
 	cd $(INSTALLDIR)/curl/usr/lib && \
 		ln -sf libcurl.so.4.8.0 libcurl.so && \
 		ln -sf libcurl.so.4.8.0 libcurl.so.4
 ifeq ($(or $(RTCONFIG_SPEEDTEST),$(RTCONFIG_LETSENCRYPT)),y)
 	# for speedtest
 	install -D curl/src/.libs/curl $(INSTALLDIR)/curl/usr/sbin/curl
-	$(STRIP) $(INSTALLDIR)/curl/usr/sbin/curl
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)/curl/usr/sbin/curl)
 endif
 
 curl-clean:
@@ -8174,8 +8225,8 @@ asd: shared $(if $(BCM_502L07P2),ethctl_lib) nvram$(BCMEX)$(EX7) curl openssl li
 asd-install:
 	install -D asd/asd $(INSTALLDIR)/asd/usr/bin/asd
 	install -D asd/libasd.so $(INSTALLDIR)/asd/usr/lib/libasd.so
-	$(STRIP) $(INSTALLDIR)/asd/usr/bin/asd
-	$(STRIP) $(INSTALLDIR)/asd/usr/lib/libasd.so
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)/asd/usr/bin/asd)
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) $(INSTALLDIR)/asd/usr/lib/libasd.so)
 
 asd-clean:
 	$(MAKE) -C asd clean
@@ -8200,7 +8251,7 @@ asusnatnl-install:
 	if [ -f asusnatnl/natnl/libasusnatnl.so ] ; then \
 		install -d $(INSTALLDIR)/asusnatnl/usr/lib/ ; \
 		install -D asusnatnl/natnl/libasusnatnl.so $(INSTALLDIR)/asusnatnl/usr/lib/libasusnatnl.so ; \
-		$(STRIP) -s $(INSTALLDIR)/asusnatnl/usr/lib/libasusnatnl.so ; \
+		$(if $(RTCONFIG_DEBUG),,$(STRIP) -s $(INSTALLDIR)/asusnatnl/usr/lib/libasusnatnl.so ; ) \
 	fi
 
 mastiff: shared $(if $(BCM_502L07P2),ethctl_lib) nvram${BCMEX}$(EX7) wb
@@ -8245,11 +8296,11 @@ aaews: wb
 aaews-install:
 	install -d $(INSTALLDIR)/wb/usr/lib/
 	install -D wb/libws.so $(INSTALLDIR)/wb/usr/lib/libws.so
-	$(STRIP) -s $(INSTALLDIR)/wb/usr/lib/libws.so
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) -s $(INSTALLDIR)/wb/usr/lib/libws.so)
 	install -D aaews/aaews $(INSTALLDIR)/wb/usr/sbin/aaews
-	$(STRIP) -s $(INSTALLDIR)/wb/usr/sbin/aaews
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) -s $(INSTALLDIR)/wb/usr/sbin/aaews)
 	install -D aaews/mastiff $(INSTALLDIR)/wb/usr/sbin/mastiff
-	$(STRIP) -s $(INSTALLDIR)/wb/usr/sbin/mastiff
+	$(if $(RTCONFIG_DEBUG),,$(STRIP) -s $(INSTALLDIR)/wb/usr/sbin/mastiff)
 ifeq ($(RTCONFIG_BCMARM),y)
 ifeq ($(HND_ROUTER),y)
 	install -D $(TOOLCHAIN)/arm-buildroot-linux-gnueabi/lib/libstdc++.so.6 $(INSTALLDIR)/ftpclient/usr/lib/libstdc++.so.6
@@ -8291,7 +8342,7 @@ uploader-install:
 	fi
 
 amas-utils: json-c openssl nvram${BCMEX}$(EX7)
-	CC=$(CC) CXX=$(CXX) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
+	CC=$(CC) CXX=$(CXX) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="$(if $(RTCONFIG_DEBUG),-g,-Os) -Wall $(EXTRACFLAGS)" \
 	$(MAKE) -C $@
 
 amas-utils-clean:
@@ -8316,7 +8367,7 @@ else
 	cd $(TOP)/json-c && \
 	$(CONFIGURE) --prefix=/usr --enable-shared --disable-static \
 	ac_cv_func_realloc_0_nonnull=yes ac_cv_func_malloc_0_nonnull=yes \
-	CFLAGS="-Os -Wno-error $(EXTRACFLAGS) $(if $(RTCONFIG_DEBUG),-g)" \
+	CFLAGS="$(if $(RTCONFIG_DEBUG),-g,-Os) -Wno-error $(EXTRACFLAGS)" \
 	LDFLAGS="$(EXTRALDFLAGS) -Wl,--as-needed -lm"
 	touch $@
 endif
@@ -9365,6 +9416,160 @@ dhcpfwd-clean:
 dhcpfwd-install:
 	install -D dhcpfwd/dhcpfwd $(INSTALLDIR)/dhcpfwd/usr/sbin/dhcpfwd
 	$(STRIP) $(INSTALLDIR)/dhcpfwd/usr/sbin/dhcpfwd
+
+ifeq ($(RTCONFIG_USB_MODEM),y)
+# iphone ethernet support
+libplist-2.2.0-configure:
+	cd libplist-2.2.0 && autoreconf --force --install && \
+		$(CONFIGURE) --without-cython \
+		--disable-shared
+
+libplist-2.2.0/Makefile:
+	$(MAKE) libplist-2.2.0-configure
+
+libplist-2.2.0: libplist-2.2.0/Makefile
+	$(MAKE) -C $@ && $(MAKE) $@-stage
+
+libplist-2.2.0-install: libplist-2.2.0
+	install -D libplist-2.2.0/tools/plistutil $(INSTALLDIR)/libplist-2.2.0/usr/bin/plistutil
+	$(STRIP) $(INSTALLDIR)/libplist-2.2.0/usr/bin/plistutil
+	#install -D libplist-2.2.0/src/.libs/libplist-2.0.so.3.3.0 $(INSTALLDIR)/libplist-2.2.0/usr/lib/libplist-2.0.so.3.3.0
+	#cd $(INSTALLDIR)/libplist-2.2.0/usr/lib/ && \
+	#	ln -sf libplist-2.0.so.3.3.0 libplist-2.0.so.3 && \
+	#	ln -sf libplist-2.0.so.3.3.0 libplist-2.0.so
+	#$(STRIP) $(INSTALLDIR)/libplist-2.2.0/usr/lib/libplist-2.0.so.3.3.0
+	#install -D libplist-2.2.0/src/.libs/libplist++-2.0.so.3.3.0 $(INSTALLDIR)/libplist-2.2.0/usr/lib/libplist++-2.0.so.3.3.0
+	#cd $(INSTALLDIR)/libplist-2.2.0/usr/lib/ && \
+	#	ln -sf libplist++-2.0.so.3.3.0 libplist++-2.0.so.3 && \
+	#	ln -sf libplist++-2.0.so.3.3.0 libplist++-2.0.so
+	#$(STRIP) $(INSTALLDIR)/libplist-2.2.0/usr/lib/libplist++-2.0.so.3.3.0
+
+libplist-2.2.0-clean:
+	[ ! -f libplist-2.2.0/Makefile ] || $(MAKE) -C libplist-2.2.0 distclean
+	@rm -rf libplist-2.2.0/Makefile libplist-2.2.0/*/.deps
+
+libusbmuxd-2.0.2-configure:
+	cd libusbmuxd-2.0.2 && autoreconf --force --install && \
+		$(CONFIGURE) \
+		LDFLAGS="-lm" \
+		--disable-shared \
+		libplist_CFLAGS="-I$(TOP)/libplist-2.2.0/include" \
+		libplist_LIBS="-L$(TOP)/libplist-2.2.0/src/.libs -lplist-2.0"
+
+libusbmuxd-2.0.2/Makefile:
+	$(MAKE) libusbmuxd-2.0.2-configure
+
+libusbmuxd-2.0.2: libusbmuxd-2.0.2/Makefile
+	$(MAKE) -C $@ && $(MAKE) $@-stage
+
+libusbmuxd-2.0.2-install: libusbmuxd-2.0.2
+	install -D libusbmuxd-2.0.2/tools/inetcat $(INSTALLDIR)/libusbmuxd-2.0.2/usr/bin/inetcat
+	$(STRIP) $(INSTALLDIR)/libusbmuxd-2.0.2/usr/bin/inetcat
+	install -D libusbmuxd-2.0.2/tools/iproxy $(INSTALLDIR)/libusbmuxd-2.0.2/usr/bin/iproxy
+	$(STRIP) $(INSTALLDIR)/libusbmuxd-2.0.2/usr/bin/iproxy
+	#install -D libusbmuxd-2.0.2/src/.libs/libusbmuxd-2.0.so.6.0.0 $(INSTALLDIR)/libusbmuxd-2.0.2/usr/lib/libusbmuxd-2.0.so.6.0.0
+	#cd $(INSTALLDIR)/libusbmuxd-2.0.2/usr/lib/ && \
+	#	ln -sf libusbmuxd-2.0.so.6.0.0 libusbmuxd-2.0.so.6 && \
+	#	ln -sf libusbmuxd-2.0.so.6.0.0 libusbmuxd-2.0.so
+	#$(STRIP) $(INSTALLDIR)/libusbmuxd-2.0.2/usr/lib/libusbmuxd-2.0.so.6.0.0
+
+libusbmuxd-2.0.2-clean:
+	[ ! -f libusbmuxd-2.0.2/Makefile ] || $(MAKE) -C libusbmuxd-2.0.2 distclean
+	@rm -rf libusbmuxd-2.0.2/Makefile libusbmuxd-2.0.2/*/.deps
+
+libimobiledevice-1.3.0-configure:
+	cd libimobiledevice-1.3.0 && autoreconf --force --install && \
+		$(CONFIGURE) --without-cython \
+		--disable-shared \
+		libplist_CFLAGS="-I$(TOP)/libplist-2.2.0/include" \
+		libplist_LIBS="-L$(TOP)/libplist-2.2.0/src/.libs -lplist-2.0" \
+		libusbmuxd_CFLAGS="-I$(TOP)/libusbmuxd-2.0.2/include" \
+		libusbmuxd_LIBS="-L$(TOP)/libusbmuxd-2.0.2/src/.libs -lusbmuxd-2.0" \
+		openssl_CFLAGS="-I$(TOP)/openssl/include" \
+		openssl_LIBS="-L$(TOP)/openssl -lssl -lcrypto"
+
+libimobiledevice-1.3.0/Makefile:
+	$(MAKE) libimobiledevice-1.3.0-configure
+
+libimobiledevice-1.3.0: libimobiledevice-1.3.0/Makefile
+	$(MAKE) -C $@ && $(MAKE) $@-stage
+
+libimobiledevice-1.3.0-install: libimobiledevice-1.3.0
+	install -D libimobiledevice-1.3.0/tools/idevicebackup $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicebackup
+	install -D libimobiledevice-1.3.0/tools/idevicebackup2 $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicebackup2
+	install -D libimobiledevice-1.3.0/tools/idevicecrashreport $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicecrashreport
+	install -D libimobiledevice-1.3.0/tools/idevicedate $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicedate
+	install -D libimobiledevice-1.3.0/tools/idevicedebug $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicedebug
+	install -D libimobiledevice-1.3.0/tools/idevicedebugserverproxy $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicedebugserverproxy
+	install -D libimobiledevice-1.3.0/tools/idevicediagnostics $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicediagnostics
+	install -D libimobiledevice-1.3.0/tools/ideviceenterrecovery $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/ideviceenterrecovery
+	install -D libimobiledevice-1.3.0/tools/idevice_id $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevice_id
+	install -D libimobiledevice-1.3.0/tools/ideviceimagemounter $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/ideviceimagemounter
+	install -D libimobiledevice-1.3.0/tools/ideviceinfo $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/ideviceinfo
+	install -D libimobiledevice-1.3.0/tools/idevicename $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicename
+	install -D libimobiledevice-1.3.0/tools/idevicenotificationproxy $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicenotificationproxy
+	install -D libimobiledevice-1.3.0/tools/idevicepair $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicepair
+	install -D libimobiledevice-1.3.0/tools/ideviceprovision $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/ideviceprovision
+	install -D libimobiledevice-1.3.0/tools/idevicescreenshot $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicescreenshot
+	install -D libimobiledevice-1.3.0/tools/idevicesetlocation $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicesetlocation
+	install -D libimobiledevice-1.3.0/tools/idevicesyslog $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicesyslog
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicebackup
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicebackup2
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicecrashreport
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicedate
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicedebug
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicedebugserverproxy
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicediagnostics
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/ideviceenterrecovery
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevice_id
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/ideviceimagemounter
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/ideviceinfo
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicename
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicenotificationproxy
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicepair
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/ideviceprovision
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicescreenshot
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicesetlocation
+	$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/bin/idevicesyslog
+	#install -D libimobiledevice-1.3.0/src/.libs/libimobiledevice-1.0.so.6.0.0 $(INSTALLDIR)/libimobiledevice-1.3.0/usr/lib/libimobiledevice-1.0.so.6.0.0
+	#cd $(INSTALLDIR)/libimobiledevice-1.3.0/usr/lib/ && \
+	#	ln -sf libimobiledevice-1.0.so.6.0.0 libimobiledevice-1.0.so.6 && \
+	#	ln -sf libimobiledevice-1.0.so.6.0.0 libimobiledevice-1.0.so
+	#$(STRIP) $(INSTALLDIR)/libimobiledevice-1.3.0/usr/lib/libimobiledevice-1.0.so.6.0.0
+
+libimobiledevice-1.3.0-clean:
+	[ ! -f libimobiledevice-1.3.0/Makefile ] || $(MAKE) -C libimobiledevice-1.3.0 distclean
+	@rm -rf libimobiledevice-1.3.0/Makefile libimobiledevice-1.3.0/*/.deps
+
+usbmuxd-1.1.1-configure:
+	cd usbmuxd-1.1.1 && autoreconf --force --install && \
+		$(CONFIGURE) \
+		--disable-shared \
+		ac_cv_func_malloc_0_nonnull=yes \
+		ac_cv_func_realloc_0_nonnull=yes \
+		ac_cv_enum_idevice_connection_type=yes \
+		libusb_CFLAGS="-I$(TOP)/libusb10/libusb" \
+		libusb_LIBS="-L$(TOP)/libusb10/libusb/.libs -lusb-1.0" \
+		libplist_CFLAGS="-I$(TOP)/libplist-2.2.0/include" \
+		libplist_LIBS="-L$(TOP)/libplist-2.2.0/src/.libs -lplist-2.0" \
+		libimobiledevice_CFLAGS="-I$(TOP)/libimobiledevice-1.3.0/include" \
+		libimobiledevice_LIBS="-L$(TOP)/libimobiledevice-1.3.0/src/.libs -limobiledevice-1.0"
+
+usbmuxd-1.1.1/Makefile:
+	$(MAKE) usbmuxd-1.1.1-configure
+
+usbmuxd-1.1.1: usbmuxd-1.1.1/Makefile
+	$(MAKE) -C $@ && $(MAKE) $@-stage
+
+usbmuxd-1.1.1-install: usbmuxd-1.1.1
+	install -D usbmuxd-1.1.1/src/usbmuxd $(INSTALLDIR)/usbmuxd-1.1.1/usr/bin/usbmuxd
+	$(STRIP) $(INSTALLDIR)/usbmuxd-1.1.1/usr/bin/usbmuxd
+
+usbmuxd-1.1.1-clean:
+	[ ! -f usbmuxd-1.1.1/Makefile ] || $(MAKE) -C usbmuxd-1.1.1 distclean
+	@rm -rf usbmuxd-1.1.1/Makefile usbmuxd-1.1.1/*/.deps
+endif
+
 
 #
 # Generic rules

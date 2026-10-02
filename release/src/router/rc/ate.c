@@ -1743,6 +1743,16 @@ int asus_ate_command(const char *command, const char *value, const char *value2)
 #endif
 	/*** ATE Set function ***/
 	if (!strcmp(command, "Set_StartATEMode")) {
+		if (!nvram_match("noconsole", "0")) {
+			pid_t pid, pid1;
+			char *nv_commit[] = { "nvram", "commit", NULL };
+			char *console[] = { "console", NULL };
+
+			nvram_set("noconsole", "0");
+			_eval(nv_commit, NULL, 0, &pid);
+			killall_tk("console");
+			_eval(console, NULL, 0, &pid1);
+		}
 		asus_ate_StartATEMode();
 		stop_wanduck();
 #ifdef RTCONFIG_FIXED_BRIGHTNESS_RGBLED
@@ -2017,6 +2027,10 @@ int asus_ate_command(const char *command, const char *value, const char *value2)
 	}
 #endif
 	else if (!strcmp(command, "Set_MacAddr_2G")) {
+		if (checkPASS("") < 0) {
+			puts("ATE_ERROR_CLEAR_PASS_FIRST");
+			return EINVAL;
+		}
 #if defined(RTCONFIG_CFEZ) && defined(RTCONFIG_BCMARM)
 		if (!chk_envrams_proc())
 			return EINVAL;
@@ -3274,14 +3288,24 @@ int asus_ate_command(const char *command, const char *value, const char *value2)
 		puts(value);
 		return 0;
 	}
-	else if (!strcmp(command, "Get_PSK")) {
-		getPSK();
+	else if (!strcmp(command, "Check_PSK")) {
+		if (checkPSK(value) < 0)
+		{
+			puts("ATE_ERROR_INCORRECT_PARAMETER");
+			return EINVAL;
+		}
+		puts("ATE_OK");
 		return 0;
 	}
 #endif
 #endif
 #if defined(RTCONFIG_BCMARM) || defined(RTCONFIG_RALINK)
 	else if (!strcmp(command, "Set_PASS")) {
+#if defined(RTCONFIG_CFEZ) && defined(RTCONFIG_BCMARM)
+		if (!chk_envrams_proc())
+			return EINVAL;
+#endif
+
 		if (setPASS(value) < 0)
 		{
 			puts("ATE_ERROR_INCORRECT_PARAMETER");
@@ -3290,8 +3314,13 @@ int asus_ate_command(const char *command, const char *value, const char *value2)
 		puts(value);
 		return 0;
 	}
-	else if (!strcmp(command, "Get_PASS")) {
-		getPASS();
+	else if (!strcmp(command, "Check_PASS")) {
+		if (checkPASS(value) < 0)
+		{
+			puts("ATE_ERROR_INCORRECT_PARAMETER");
+			return EINVAL;
+		}
+		puts("ATE_OK");
 		return 0;
 	}
 #endif
@@ -4266,4 +4295,58 @@ int ate_get_fw_upgrade_state(void) {
 			puts("UNKNOWN STATE");
 #endif
 		return 0;
+}
+
+/* For init default password and need to be built in prebuild */
+/* copy password from memory to nvram */
+int init_pass_nvram(void)
+{
+#ifdef RTCONFIG_NVRAM_ENCRYPT
+	char dec_passwd[128]={0};
+#endif
+#if defined(RTCONFIG_BCMARM)
+	if (!nvram_get_int("x_Setting")) {
+		char *forget_it = cfe_nvram_safe_get_raw("forget_it");
+#ifdef RTCONFIG_NVRAM_ENCRYPT
+		if(pw_dec(forget_it, dec_passwd, sizeof(dec_passwd), 0))
+			forget_it = dec_passwd;
+#endif
+		nvram_set("forget_it", forget_it);
+	}
+#elif defined(RTCONFIG_RALINK) || defined(RTCONFIG_QCA)
+	/* PASS */
+	{
+		char pass[PASS_LEN + 1];
+		memset(pass, 0, sizeof(pass));
+		if (FRead(pass, PASS_OFFSET, PASS_LEN) < 0) {
+			_dprintf("READ ASUS PASS: Out of scope\n");
+			nvram_set("forget_it", "");
+		 } else {
+			int len = strlen(pass);
+			int i;
+			if (pass[0] == 0xff)
+				nvram_set("forget_it", "");
+			else
+			{
+				for(i = 0; i < PASS_LEN && pass[i] != '\0'; i++) {
+					if ((unsigned char)pass[i] == 0xff)
+					{
+						pass[i] = '\0';
+						break;
+					}
+				}
+#if defined(RTCONFIG_NVRAM_ENCRYPT) && defined(RTCONFIG_PASS_V2)
+				if(pw_dec(pass, dec_passwd, sizeof(dec_passwd), 0))
+					strlcpy(pass, dec_passwd, sizeof(pass));
+#endif
+				nvram_set("forget_it", pass);
+			}
+		}
+	}
+#endif
+
+	if (strcmp(nvram_safe_get("forget_it"), "") && !nvram_contains_word("rc_support", "defpass"))
+		add_rc_support("defpass");
+
+	return 0;
 }

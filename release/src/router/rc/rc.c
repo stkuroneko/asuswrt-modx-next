@@ -37,6 +37,16 @@
 #include <sys/reboot.h>
 #endif
 
+
+#if defined(RTCONFIG_TUNNEL) && defined(RTCONFIG_ACCOUNT_BINDING)
+#include <json.h>
+#endif
+
+
+#if defined(RTCONFIG_TUNNEL) && defined(RTCONFIG_ACCOUNT_BINDING)
+#include <aae_ipc.h>
+#endif
+
 #ifndef ARRAYSIZE
 #define ARRAYSIZE(a) (sizeof(a) / sizeof(a[0]))
 #endif /* ARRAYSIZE */
@@ -590,6 +600,58 @@ static int rctest_main(int argc, char *argv[])
 		//	_dprintf("GetPhyStatus failed (%d): ", ret);
 		_dprintf("\n");
 	}
+#if defined(RTCONFIG_TUNNEL) && defined(RTCONFIG_ACCOUNT_BINDING)
+    	else if (strcmp(argv[1], "aae_refresh_userticket")==0) {
+        	char event[AAE_MAX_IPC_PACKET_SIZE];
+        	char out[AAE_MAX_IPC_PACKET_SIZE];
+        	snprintf(event, sizeof(event), AAE_DDNS_GENERIC_MSG, AAE_EID_DDNS_REFRESH_TOKEN);
+       	 	aae_sendIpcMsgAndWaitResp(MASTIFF_IPC_SOCKET_PATH, event, strlen(event), out, sizeof(out), 10);
+        	json_object *root = NULL;
+        	json_object *ddnsObj = NULL;
+        	json_object *eidObj = NULL;
+        	json_object *stsObj = NULL;
+        	root = json_tokener_parse((char *)out);
+        	json_object_object_get_ex(root, AAE_DDNS_PREFIX, &ddnsObj);
+        	json_object_object_get_ex(ddnsObj, AAE_IPC_EVENT_ID, &eidObj);
+        	json_object_object_get_ex(ddnsObj, AAE_IPC_STATUS, &stsObj);
+        	if (!ddnsObj || !eidObj || !stsObj)
+            		printf("Failed to aae_refresh_userticket\n");
+        	else {
+            		int eid = json_object_get_int(eidObj);
+            		const char *status = json_object_get_string(stsObj);
+            		if ((eid == AAE_EID_DDNS_REFRESH_TOKEN) && (!strcmp(status, "0")))
+                		printf("Success to aae_refresh_userticket\n");
+            		else
+                		printf("Failed to aae_refresh_userticket\n");
+        	}
+        	json_object_put(root);
+    	}
+    	else if (strcmp(argv[1], "aae_refresh_deviceticket")==0) {
+        	char event[AAE_MAX_IPC_PACKET_SIZE];
+        	char out[AAE_MAX_IPC_PACKET_SIZE];
+        	snprintf(event, sizeof(event), AAE_NTC_GENERIC_MSG, AAE_EID_NTC_REFRESH_DEVICE_TICKET);
+        	aae_sendIpcMsgAndWaitResp(MASTIFF_IPC_SOCKET_PATH, event, strlen(event), out, sizeof(out), 10);
+        	json_object *root = NULL;
+        	json_object *ntcObj = NULL;
+        	json_object *eidObj = NULL;
+        	json_object *stsObj = NULL;
+        	root = json_tokener_parse((char *)out);
+        	json_object_object_get_ex(root, AAE_NTC_PREFIX, &ntcObj);
+        	json_object_object_get_ex(ntcObj, AAE_IPC_EVENT_ID, &eidObj);
+        	json_object_object_get_ex(ntcObj, AAE_IPC_STATUS, &stsObj);
+        	if (!ntcObj || !eidObj || !stsObj)
+            		printf("Failed to aae_refresh_deviceticket\n");
+        	else {
+            		int eid = json_object_get_int(eidObj);
+            		const char *status = json_object_get_string(stsObj);
+            		if ((eid == AAE_EID_NTC_REFRESH_DEVICE_TICKET) && (!strcmp(status, "0")))
+                		printf("Success to aae_refresh_deviceticket\n");
+            		else
+                		printf("Failed to aae_refresh_deviceticket\n");
+        	}
+        	json_object_put(root);
+    	}
+#endif
 	else {
 		on = atoi(argv[2]);
 		_dprintf("%s %d\n", argv[1], on);
@@ -1605,6 +1667,7 @@ static const applets_t applets[] = {
 	{ "netool", 			netool_main			},
 #endif
 #ifdef RTCONFIG_SOFTWIRE46
+	{ "auto46det", 			auto46det_main			},
 	{ "v6plusd", 			v6plusd_main			},
 	{ "ocnvcd", 			ocnvcd_main			},
 #endif
@@ -1742,7 +1805,7 @@ static const applets_t applets[] = {
 #ifdef RTCONFIG_ISP_CUSTOMIZE_TOOL
 	{ "tci",			tci_main		},
 #endif
-#ifdef RTCONFIG_ASUSDDNS_ACCOUNT_BASE
+#if defined(RTCONFIG_TUNNEL) && defined(RTCONFIG_ACCOUNT_BINDING)
 	{ "update_asus_ddns_token",		update_asus_ddns_token_main			},
 #endif
 	{NULL, NULL}
@@ -3107,6 +3170,10 @@ _dprintf("LED_NOMOBILE=%d, LED_2G_YELLOW=%d, LED_3G_BLUE=%d, LED_4G_WHITE=%d.\n"
 	}
 #endif
 #if RTCONFIG_SOFTWIRE46
+	else if (!strcmp(base, "init_wan46")) {
+		init_wan46();
+		return 0;
+	}
 	else if (!strcmp(base, "s46reset")) {
 		if (argc != 2) {
 			printf("Usage: %s <wan unit>.\n", argv[0]);

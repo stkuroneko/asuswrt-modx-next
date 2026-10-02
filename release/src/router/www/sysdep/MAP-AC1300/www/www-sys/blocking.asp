@@ -260,6 +260,10 @@ ul{
 }
 </style>
 <script type="text/javascript">
+/* String replace &#39; with ' for dict */
+function stringSafeGet(str){
+	return str.replace(new RegExp("&#39;", 'g'), "'");
+}
 var bwdpi_support = ('<% nvram_get("rc_support"); %>'.search('bwdpi') == -1) ? false : true;
 var mac_parameter = '<% get_parameter("mac"); %>'.toUpperCase();
 var casenum = '<% get_parameter("cat_id"); %>';

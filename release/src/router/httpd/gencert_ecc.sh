@@ -17,11 +17,14 @@ for CN in $NVCN; do
         I=$(($I + 1))
 done
 
+# add startdate option for certificate
+echo "default_startdate=`date +%Y%m%d%H%M%S%Z`" >> openssl.config
+
 # 2022/09/07 ECC key
 openssl ecparam -name prime256v1 -genkey -noout -out /etc/key.pem
 
 # 2020/01/03 import the self-certificate
-OPENSSL_CONF=/etc/openssl.config RANDFILE=/dev/urandom openssl req -x509 -new -key /etc/key.pem -out /etc/cert.pem -days 365
+OPENSSL_CONF=/etc/openssl.config RANDFILE=/dev/urandom openssl req -x509 -new -key /etc/key.pem -out /etc/cert.pem -days 3653
 
 # server.pem for WebDav SSL
 cat key.pem cert.pem > server.pem

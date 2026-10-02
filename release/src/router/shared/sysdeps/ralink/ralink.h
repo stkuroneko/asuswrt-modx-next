@@ -480,6 +480,37 @@ enum ASUS_IOCTL_SUBCMD {
 };
 
 
+/* roam_sta is used by ASUS_SUBCMD_GROAM and ASUS_SUBCMD_GMONITOR_RSSI
+ * But the data used in ASUS_SUBCMD_GMONITOR_RSSI is shorter and have to shift heater with care */
+
+#define xR_MAX  4
+typedef struct _sta_info {
+	char mac[19];
+	char rssi_xR[xR_MAX][7];
+	char TxByte[21];
+	char RxByte[21];
+	char wnm_cap[7]; /* WNM capability */
+	char rrm_cap[7]; /* RRM capability */
+	char dump;
+} sta_info;
+
+typedef struct _sta_entry {
+	sta_info sta[128];
+} sta_entry;
+
+typedef struct _grssi_info {
+	char mac[19];
+	char rssi_xR[xR_MAX][7];
+	char Count[21];
+	char dump;
+} grssi;
+
+typedef struct _grssi_sta {
+	grssi sta[128];
+} grssi_sta;
+
+
+
 #if 0
 typedef enum _RT_802_11_PHY_MODE {
 	PHY_11BG_MIXED = 0,
@@ -846,9 +877,11 @@ struct GNU_PACKED wnm_command {
 
 
 #define MAX_PASS_LEN 32
+#define MAX_PASS_ENC_LEN 64
 
 #if defined(RTCONFIG_WLMODULE_MT7915D_AP)
-#define OFFSET_PASS		0x6ff50	// 32 bytes (MAX_PASS_LEN)
+#define OFFSET_PASS_ENC		0x6fee0	// 64 bytes (MAX_PASS_ENC_LEN) including space of OFFSET_PASS 32 bytes 
+#define OFFSET_PASS		0x6ff10	// 32 bytes (MAX_PASS_LEN)
 #define OFFSET_EISN		0x6ff70	// 32 bytes
 #define OFFSET_TERRITORY_CODE	0x6ff90	/* 5 bytes, e.g., US/01, US/02, TW/01, etc. */
 #define OFFSET_DEV_FLAGS	0x6ffa0 //device dependent flags
@@ -868,7 +901,8 @@ struct GNU_PACKED wnm_command {
 #define OFFSET_32BYTES_ODMPID   0x6FE47 // 32 bytes
 #endif
 #elif defined(RT4GAC86U)
-#define OFFSET_PASS		0x5ff50	// 32 bytes
+#define OFFSET_PASS_ENC		0x5fee0	// 64 bytes (MAX_PASS_ENC_LEN) including space of OFFSET_PASS 32 bytes
+#define OFFSET_PASS		0x5ff10	// 32 bytes (MAX_PASS_LEN)
 #define OFFSET_EISN		0x5ff70	// 32 bytes
 #define OFFSET_TERRITORY_CODE	0x5ff90	/* 5 bytes, e.g., US/01, US/02, TW/01, etc. */
 #define OFFSET_DEV_FLAGS	0x5ffa0 //device dependent flags
@@ -884,6 +918,7 @@ struct GNU_PACKED wnm_command {
 #define OFFSET_HW_BOM	0x5FE0C	// 32 bytes
 #define OFFSET_HW_DATE_CODE	0x5FE3E	// 8 bytes
 #else
+#define OFFSET_PASS_ENC		(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xfee0)	// 64 bytes for the encrypt length of 32 char.
 #define OFFSET_PASS		(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xff50)	// 32 bytes
 #define OFFSET_EISN		(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xff70)	// 32 bytes
 #define OFFSET_TERRITORY_CODE	(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xff90)	/* 5 bytes, e.g., US/01, US/02, TW/01, etc. */
@@ -911,6 +946,16 @@ struct GNU_PACKED wnm_command {
 #define OFFSET_AMAS_BUNDLE_KEY		0x6fd00
 #endif
 #endif // RTCONFIG_AMAS
+
+
+#if defined(RTCONFIG_PASS_V2)
+#define PASS_OFFSET	OFFSET_PASS_ENC
+#define PASS_LEN	MAX_PASS_ENC_LEN
+#else
+#define PASS_OFFSET	OFFSET_PASS
+#define PASS_LEN	MAX_PASS_LEN
+#endif
+
 
 #ifdef RTCONFIG_ASUSCTRL
 #if defined(RTCONFIG_MT798X)

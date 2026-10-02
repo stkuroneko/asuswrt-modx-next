@@ -18,6 +18,11 @@ function replaceAll(txt, replace, with_this) {
    return txt.replace(new RegExp(replace, 'g'),with_this);
 }
 
+/* String replace &#39; with ' for dict */
+function stringSafeGet(str){
+    return str.replace(new RegExp("&#39;", 'g'), "'");
+}
+
 /* Internet Explorer lacks this array method */
 if (!('indexOf' in Array.prototype)) {
 	Array.prototype.indexOf = function(find, i) {
@@ -746,9 +751,13 @@ if(based_modelid != "BRT-AC828"){
 }
 
 //notification value
-var notice_pw_is_default = '<% check_pw(); %>';
-if(notice_pw_is_default == 1 && window.location.pathname.toUpperCase().search("QIS_") < 0)	//force to change http_passwd / http_username & except QIS settings
+if(navigator.userAgent.search("asusrouter") == -1){
+	var notice_pw_is_default = '<% check_pw(); %>';
+	if(notice_pw_is_default == 1 && window.location.pathname.toUpperCase().search("QIS_") < 0) //force to change http_passwd / http_username & except QIS settings
 		location.href = 'Main_Password.asp?nextPage=' + window.location.pathname.substring(1 ,window.location.pathname.length);
+	else if('<% nvram_get("w_Setting"); %>' == '0' && sw_mode != 2 && window.location.pathname.toUpperCase().search("QIS_") < 0)
+		location.href = '/QIS_wizard.htm?flag=wireless';
+}
 
 var allUsbStatus = "";
 var allUsbStatusTmp = "";
@@ -2623,7 +2632,7 @@ function hadPlugged(deviceType){
 var AUTOLOGOUT_MAX_MINUTE = parseInt('<% nvram_get("http_autologout"); %>') * 20;
 var error_num = 5;
 function updateStatus(){
-	if(stopFlag == 1) return false;
+	if(stopFlag == 1 || navigator.userAgent.search("asusrouter") != -1) return false;
 	if(AUTOLOGOUT_MAX_MINUTE == 1) location = "Logout.asp"; // 0:disable auto logout, 1:trigger auto logout. 
 
 	require(['/require/modules/makeRequest.js'], function(makeRequest){
@@ -4373,3 +4382,4 @@ function Get_Component_PWD_Strength_Meter(id){
 	var $strength_color = $("<div>").addClass("strength_color").appendTo($pwd_strength_container).attr("id", "scorebar"+postfix);
 	return $pwd_strength_container;
 }
+

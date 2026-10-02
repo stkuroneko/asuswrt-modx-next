@@ -206,6 +206,7 @@ enum {
 	HTTP_FAIL = 400,
         HTTP_CHPASS_FAIL,
         HTTP_CHPASS_FAIL_MAX,
+	HTTP_AUTH_EXPIRE,
 	HTTP_RULE_ADD_SUCCESS = 2001,
 	HTTP_RULE_DEL_SUCCESS,
 	HTTP_NORULE_DEL,
@@ -222,7 +223,8 @@ enum {
 	HTTP_INVALID_FILE,
         HTTP_INVALID_SUPPORT,
 	HTTP_SHMGET_FAIL = 5000,
-	HTTP_FB_SVR_FAIL
+	HTTP_FB_SVR_FAIL,
+	HTTP_DM_SVR_FAIL
 };
 
 /* Exception MIME handler */
@@ -244,7 +246,7 @@ extern struct mime_referer mime_referers[];
 typedef struct asus_token_table asus_token_t;
 struct asus_token_table{
 	char useragent[1024];
-	char token[32];
+	char token[33];
 	char ipaddr[16];
 	char login_timestampstr[32];
 	char host[64];
@@ -448,6 +450,12 @@ extern int uaddr_is_localhost(uaddr *uip);
 extern int uaddr_is_equal(uaddr *a, uaddr *b);
 extern uaddr *uaddr_getpeer(webs_t wp, uaddr *uip);
 
+#if defined(RTCONFIG_ECC256)
+#define HTTPS_CA_JFFS  "/jffs/cert_ecdsa.tgz"
+#else
+#define HTTPS_CA_JFFS  "/jffs/cert.tgz"
+#endif
+
 /* web.c */
 extern int ej_lan_leases(int eid, webs_t wp, int argc, char_t **argv);
 extern int get_nat_vserver_table(int eid, webs_t wp, int argc, char_t **argv);
@@ -577,6 +585,9 @@ extern void amazon_wss_enable(char *wss_enable, char *do_rc);
 #endif
 #ifdef RTCONFIG_ACCOUNT_BINDING
 extern void do_get_eptoken_cgi(char *url, FILE *stream);
+extern void do_asusrouter_request_token_cgi(char *url, FILE *stream);
+extern void do_asusrouter_request_access_token_cgi(char *url, FILE *stream);
+extern void do_endpoint_request_token_cgi(char *url, FILE *stream);
 #endif
 #ifdef RTCONFIG_CAPTCHA
 extern unsigned int login_fail_num;
@@ -596,6 +607,7 @@ extern void slowloris_check();
 extern void slow_post_read_check();
 extern int check_chpass_auth(char *cur_username, char *cur_passwd);
 extern int save_changed_param(json_object *cfg_root, char *param);
+extern int b64_decode(const char* str, unsigned char* space, int size);
 extern int last_time_lock_warning(void);
 extern int check_lock_status(time_t *dt);
 extern char *wl_nband_to_wlx(char *nv_name, char *wl_name, size_t len);
