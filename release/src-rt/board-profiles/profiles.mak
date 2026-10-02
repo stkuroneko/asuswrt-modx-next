@@ -6,3 +6,6 @@ $(error Unsupported BOARD_PROFILE '$(BOARD_PROFILE)'; choose one of: $(MT7621_BO
 endif
 include $(dir $(realpath $(lastword $(MAKEFILE_LIST))))$(BOARD_PROFILE).mak
 endif
+
+# RT-AX54 libbwdpi requires the Softwire46 service detection symbols.
+export RT-AX54 += IPV6S46=y

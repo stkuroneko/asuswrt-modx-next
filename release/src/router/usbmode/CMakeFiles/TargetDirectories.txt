@@ -1,7 +1,0 @@
-/repo/Pass_GPL/asuswrt/release/src/router/usbmode/CMakeFiles/install/strip.dir
-/repo/Pass_GPL/asuswrt/release/src/router/usbmode/CMakeFiles/edit_cache.dir
-/repo/Pass_GPL/asuswrt/release/src/router/usbmode/CMakeFiles/rebuild_cache.dir
-/repo/Pass_GPL/asuswrt/release/src/router/usbmode/CMakeFiles/list_install_components.dir
-/repo/Pass_GPL/asuswrt/release/src/router/usbmode/CMakeFiles/install/local.dir
-/repo/Pass_GPL/asuswrt/release/src/router/usbmode/CMakeFiles/usbmode.dir
-/repo/Pass_GPL/asuswrt/release/src/router/usbmode/CMakeFiles/install.dir
