@@ -33,6 +33,7 @@
 #dns_list_Block{
 	font-family: Arial, Helvetica, MS UI Gothic, MS P Gothic, Microsoft Yahei UI, sans-serif;
 	width:825px;
+	border: 1px solid #FFF;
 }
 
 </style>
@@ -1673,7 +1674,7 @@ function create_DNSlist_view(){
 
 	code += "<div style='margin-top:10px;margin-bottom:20px;width:100%;text-align:center;'>";
 	code += "<input class='button_gen' type='button' onclick='closeDNSListView()' value='<#CTL_Cancel#>'>";
-	code += "<input class='button_gen' type='button' onclick='Update_DNS_service()' style='margin-left:15px;' value='<#CTL_ok#>'>";
+	code += "<input class='button_gen' type='button' onclick='Update_DNS_service()' style='margin-left:15px;' value='<#CTL_onlysave#>'>";
 	code += "</div>";
 
 	$("#dns_list_Block").html(code);
@@ -1738,7 +1739,15 @@ function Update_DNS_service(){
 			}
 		}
 	}
-	closeDNSListView();
+	
+	httpApi.nvramSet({
+		wan_unit: wan_unit_flag,
+		wan_dnsenable_x: document.form.wan_dnsenable_x.value,
+		wan_dns1_x: document.form.wan_dns1_x.value,
+		wan_dns2_x: document.form.wan_dns2_x.value,
+		action_mode: "apply",
+		rc_service: "restart_wan_if "+wan_unit_flag
+	}, closeDNSListView());
 	Update_DNS_status();
 }
 

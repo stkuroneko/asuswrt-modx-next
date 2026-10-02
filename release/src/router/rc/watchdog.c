@@ -6662,8 +6662,8 @@ void httpd_check()
 #if defined(RTL_WTDOG)
 		stop_rtl_watchdog();
 #endif
-		logmessage("watchdog", "restart httpd");
-		stop_httpd();
+		logmessage("watchdog", "start httpd");
+		//stop_httpd();
 		nvram_set("last_httpd_handle_request", nvram_safe_get("httpd_handle_request"));
 		nvram_set("last_httpd_handle_request_fromapp", nvram_safe_get("httpd_handle_request_fromapp"));
 		nvram_commit();

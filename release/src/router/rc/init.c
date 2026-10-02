@@ -654,7 +654,8 @@ wl_defaults(void)
 			snprintf(prefix, sizeof(prefix), "wl%d.%d_", unit, subunit);
 #if defined(RTCONFIG_REALTEK) && defined(RTCONFIG_AMAS)
 			if(sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1") && subunit == 1){
-				nvram_set(strcat_r(prefix, "bss_enabled", tmp), "1");
+				if (nvram_get_int("cfg_first_sync") == 0)
+					nvram_set(strcat_r(prefix, "bss_enabled", tmp), "1");
 			}
 #endif
 #ifdef RTCONFIG_WIRELESSREPEATER
@@ -683,8 +684,13 @@ wl_defaults(void)
 #if defined(RTCONFIG_BCMWL6) && defined(RTCONFIG_PROXYSTA)
 			if (is_psta(unit))
 				nvram_set(strcat_r(prefix, "bss_enabled", tmp), "0");
-			else if (is_psr(unit) && (subunit == 1))
+			else if (is_psr(unit) && (subunit == 1)) {
+#if defined(RTCONFIG_AMAS)
+				if (((nvram_get_int("re_mode") == 1 && nvram_get_int("cfg_first_sync") == 0)
+					|| nvram_get_int("re_mode") == 0))
+#endif
 				nvram_set(strcat_r(prefix, "bss_enabled", tmp), "1");
+			}
 #endif
 #if (defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)) && defined(RTCONFIG_AMAS)	/* handle wlX.1_ in AiMesh RE mode */
 			if (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1") && subunit == 1) {
@@ -694,7 +700,8 @@ wl_defaults(void)
 #elif defined(RTCONFIG_RALINK)
 				__get_wlifname(unit, 0, wlifname);
 #endif
-				nvram_set(strcat_r(prefix, "bss_enabled", tmp), "1");
+				if (nvram_get_int("cfg_first_sync") == 0)
+					nvram_set(strcat_r(prefix, "bss_enabled", tmp), "1");
 				nvram_set(strcat_r(prefix, "ifname", tmp), wlifname);
 				continue;
 			}
@@ -3715,8 +3722,12 @@ int init_nvram(void)
 	if (!nvram_get_int("x_Setting"))
 		nvram_set("amas_bdl_wanstate", "0");
 #endif	/* RTCONFIG_PRELINK */
-	if (nvram_get_int("re_mode") == 1)
+	if (nvram_get_int("re_mode") == 1) {
 		nvram_unset("led_ctrl_cap");
+		nvram_unset("cfg_first_sync");
+		if (strlen(nvram_safe_get("cfg_group")) == 0)
+			nvram_set("cfg_first_sync", "1");
+	}
 #endif	/* RTCONFIG_AMAS */
 
 #if defined(RTCONFIG_AMAS_WGN)
@@ -16436,6 +16447,9 @@ int init_nvram(void)
 #ifdef RTCONFIG_OCNVC
 	add_rc_support("ocnvc");
 #endif
+#ifdef RTCONFIG_DSLITE
+	add_rc_support("dslite");
+#endif
 #endif
 #endif
 
@@ -17452,9 +17466,6 @@ int init_nvram2(void)
 		if (enable_ETH_U(0) == 0)
 			nvram_set("eth_ifnames", "");
 #endif
-		nvram_unset("cfg_first_sync");
-		if (strlen(nvram_safe_get("cfg_group")) == 0)
-			nvram_set("cfg_first_sync", "1");
 #ifdef RTCONFIG_BHCOST_OPT
 		nvram_unset("cfg_level");
 		nvram_unset("cfg_maxlevel");
@@ -19950,9 +19961,9 @@ _dprintf("%s %d turnning on power on ethernet here\n", __func__, __LINE__);
 #ifdef RTCONFIG_AMAS
 			nvram_set("start_service_ready", "1");
 #endif
-			syslog(LOG_NOTICE, "fwver: %s_%s_%s (sn:%s /ha:%s )\n", rt_version, rt_serialno, rt_extendno, nvram_safe_get("serial_no"), nvram_safe_get("et0macaddr"));
+			logmessage("", "fwver: %s_%s_%s (sn:%s /ha:%s )\n", rt_version, rt_serialno, rt_extendno, nvram_safe_get("serial_no"), nvram_safe_get("et0macaddr"));
 #ifdef RPAX56
-			syslog(LOG_NOTICE, "abm: %s\n", cfe_nvram_safe_get("et0macaddr"));
+			logmessage("", "abm: %s\n", cfe_nvram_safe_get("et0macaddr"));
 #endif
 #if defined(RTCONFIG_HND_ROUTER_AX_6756)
                         int now_partition = getBootPartition();

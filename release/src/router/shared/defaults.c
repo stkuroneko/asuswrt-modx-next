@@ -3686,6 +3686,10 @@ struct nvram_tuple router_defaults[] = {
 	{ "wan_s46_offset_x", "6", CKN_STR3, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },	/* PSID Offset */
 	{ "wan_s46_psidlen_x", "0", CKN_STR3, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },	/* PSID Length */
 	{ "wan_s46_psid_x", "0", CKN_STR5, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },	/* PSID */
+	/* DS-Lite */
+	{ "ipv6_s46_aftr", "", CKN_STR128, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },		/* AFTR IPv6 address/Domain */
+	{ "ipv6_s46_b4addr", "192.0.0.2", CKN_STR20, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },	/* B4 address */
+	{ "wan_s46_dslite_mode", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },		/* Auto/Manual */
 #endif
 #if 0
 	{ "ipv6_dns", "", CKN_STR39, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },	/* DNS server(s) IPs */

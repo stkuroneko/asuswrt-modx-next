@@ -1314,6 +1314,10 @@ deconfig6(char *wan_ifname, const int mode)
 			S46_DBG("STOP_S46_TUNNEL\n");
 		}
 		break;
+	case WAN_DSLITE:
+		stop_s46_tunnel(unit, 1);
+		S46_DBG("STOP_S46_TUNNEL\n");
+		break;
 	}
 
 	if (nvram_match("x_Setting", "0") && !strncmp(nvram_safe_get("territory_code"), "JP", 2)) {
@@ -1415,7 +1419,7 @@ int s46_mapcalc(int wan_unit, int wan_proto, char *rules, char *peerbuf, size_t 
 	char *rule, *next_rule, *item, *next, *name, *value, *fmrbuf;
 	char v6maps[20];
 	size_t fmrbufsz;
-	int ret = 0;
+	int ret = 0, cnt = 0;
 
 	if (!rules || *rules == '\0' || (rules = strdup(rules)) == NULL)
 		return -1;
@@ -1584,9 +1588,13 @@ int s46_mapcalc(int wan_unit, int wan_proto, char *rules, char *peerbuf, size_t 
 			inet_ntop(AF_INET6, &prefix6, addrbuf6, sizeof(addrbuf6));
 			fprintf(fp, "%s/%d %s/%d %d %d ", addrbuf, prefix4len, addrbuf6, prefix6len, ealen, offset);
 			if (mapfp) {
+#if defined(RTAX53U)
+				if (cnt <= 100)
+#endif
 				fprintf(mapfp, "%s %d %s %d %d %d\n", addrbuf, prefix4len, addrbuf6, prefix6len, ealen, offset);
 			}
 		}
+		cnt++;
 	}
 	free(rules);
 	if (fp)
@@ -1674,6 +1682,7 @@ bound6(char *wan_ifname, int bound)
 		int i;
 		char rbuf[32];
 	case WAN_MAPE:
+	case WAN_DSLITE:
 		i = 0;
 		S46_DBG("[wan_if]:[%s], [bound]:[%d]\n", wan_ifname, bound);
 		while(environ[i] != NULL) {
@@ -1836,6 +1845,12 @@ skip:
 			}
 		}
 		goto s46_mapcalc;
+	case WAN_DSLITE:
+		if (setup_dslite(wan_unit)) {
+			stop_s46_tunnel(wan_unit, 0);
+			start_s46_tunnel(wan_unit);
+		}
+		break;
 	case WAN_V6PLUS:
 	case WAN_OCNVC:
 		//Get RA Addr
@@ -2109,6 +2124,10 @@ start_dhcp6c(void)
 		/* Send Information-Request message */
 		snprintf(mode, sizeof(mode), "%s", "none");
 		dhcp6c_argv[index++] = "-r94";	/* S46_CONT_MAPE */
+		break;
+	case WAN_DSLITE:
+		/* Send Information-Request message */
+		snprintf(mode, sizeof(mode), "%s", "none");
 		break;
 	}
 #endif

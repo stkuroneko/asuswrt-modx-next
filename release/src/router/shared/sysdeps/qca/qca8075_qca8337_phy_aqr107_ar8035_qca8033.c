@@ -848,7 +848,9 @@ static int get_qca8075_8337_8035_8033_aqr107_phy_linkStatus(unsigned int mask, u
 		break;
 	default:
 		speed=0;
-		_dprintf("%s: mask %8x t %8x invalid speed!\n", __func__, mask, t);
+		if ((mask & wanlanports_mask) != 0) {
+			_dprintf("%s: mask %8x t %8x invalid speed!\n", __func__, mask, t);
+		}
 	}
 	return speed;
 }
@@ -2164,7 +2166,7 @@ int add_filter_rule_for_gpon_sfp_module(FILE *fp)
 	char lan_if[IFNAMSIZ];
 	char sfpp_module_ipaddr[18], sfpp_mask[18], sfpp_nw_addr[18];
 
-	dbg("SSSSSS %s: start\n", __func__);
+	dbg("%s: start\n", __func__);
 	if (!fp)
 		return -1;
 	if (!is_routing_enabled() || !sfpp_iface_in_wan())

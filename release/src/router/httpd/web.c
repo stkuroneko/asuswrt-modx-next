@@ -1918,7 +1918,7 @@ static int get_basic_clientlist_info(webs_t wp, int opt)
 {
 	int ret = 0, client_name_status = 0, wl_count = 0, wire_count = 0;
 	struct json_object *clients = NULL, *cache_clients = NULL, *wire_clients_array_obj = NULL, *wl_clients_array_obj = NULL, *clients_array_obj = NULL;
-	struct json_object *client_tmp = NULL, *client_name = NULL, *isWL = NULL, *macArray = NULL, *macArray_tmp = NULL;
+	struct json_object *client_tmp = NULL, *client_name = NULL, *isWL = NULL, *isOnline = NULL, *macArray = NULL, *macArray_tmp = NULL;
 	macArray = json_object_new_array();
 	clients_array_obj = json_object_new_array();
 	wire_clients_array_obj = json_object_new_array();
@@ -1949,7 +1949,11 @@ static int get_basic_clientlist_info(webs_t wp, int opt)
 							json_object_array_add(macArray_tmp, json_object_new_string(key));
 
 						json_object_array_add(wl_clients_array_obj, macArray_tmp);
-						wl_count++;
+						if( (opt == 2) && json_object_object_get_ex(val, "isOnline", &isOnline) ) {
+							if(atoi(json_object_get_string(isOnline)) > 0) {
+								wl_count++;
+							}
+						}
 					}else{
 						json_object_array_add(macArray_tmp, json_object_new_string(key));
 						if(client_name_status)
@@ -1958,7 +1962,11 @@ static int get_basic_clientlist_info(webs_t wp, int opt)
 							json_object_array_add(macArray_tmp, json_object_new_string(key));
 
 						json_object_array_add(wire_clients_array_obj, macArray_tmp);
-						wire_count++;
+						if((opt == 2) && json_object_object_get_ex(val, "isOnline", &isOnline) ) {
+							if(atoi(json_object_get_string(isOnline)) > 0) {
+								wire_count++;
+							}
+						}
 					}
 				}
 			}
@@ -21392,14 +21400,28 @@ do_chpass_cgi(char *url, FILE *stream)
 
 static void do_ModelProduct_png(char *url, FILE *stream)
 {
-    int brand = nvram_get_int("CoBrand");
+    int i, brand = nvram_get_int("CoBrand");
     char path[128] = {0};
     char *productid = strdup(nvram_safe_get("productid"));
     char *odmpid = strdup(nvram_safe_get("odmpid"));
+    char default_image_name[64] = {0};
+    char lowercase_pid[32] = {0};
+    char *p;
 
-    //dbg("%s(%d): do_ModelProduct_png: brand = %d odmpid = %s productid = %s territory_code = %s\n",  __FUNCTION__, __LINE__, brand, nvram_safe_get("odmpid"), nvram_safe_get("productid"), nvram_safe_get("territory_code"));
+    p = odmpid;
+    for(i = 0; i < strlen(odmpid); i++){
+        lowercase_pid[i] = tolower(*p);
+        p++;
+    }
+    *p = '\0';
+
+    if(strlen(odmpid) > 0 && strcmp(odmpid, productid))
+        snprintf(default_image_name, sizeof(default_image_name), "Model_product_%s", lowercase_pid);
+    else
+        snprintf(default_image_name, sizeof(default_image_name), "Model_product");
+    HTTPD_DBG("[web.c] %s(%d): default_image_name =%s\n",  __FUNCTION__, __LINE__, default_image_name);
     if(brand > 0)
-        snprintf(path, sizeof(path), "images/Model_product_%d.png", brand);
+        snprintf(path, sizeof(path), "images/%s_%d.png", default_image_name, brand);
     else if(!strncmp(nvram_safe_get("territory_code"), "GD", 2))
         snprintf(path, sizeof(path), "images/Model_product_1.png");
     else if(strlen(odmpid) > 0 && strcmp(odmpid, productid)){
@@ -21412,38 +21434,58 @@ static void do_ModelProduct_png(char *url, FILE *stream)
         else if(!strcmp(odmpid, "RT-AX86S"))
             snprintf(path, sizeof(path), "images/Model_product_rt-ax86s.png");
     }
-    else if(!strcmp(productid, "RT-AC87U")){
-        if(nvram_match("territory_code", "JP/02"))
-            snprintf(path, sizeof(path), "images/Model_product_5.png");
-    }
     else if(nvram_contains_word("rc_support", "odm"))
         snprintf(path, sizeof(path), "images/Model_product_COD.png");
 
-//dbg("%s(%d): path: %s\n", __FUNCTION__, __LINE__, path);
 #ifdef RTCONFIG_UIDEBUG
     char sysdepPath[128];
-    snprintf(sysdepPath, sizeof(sysdepPath), "sysdep/%s/www/", nvram_safe_get("productid"));
-    strlcat(sysdepPath, path, sizeof(sysdepPath));
-    if(check_if_file_exist(sysdepPath)){
-        //dbg("%s(%d): ### GET ### sysdepPath: %s\n", __FUNCTION__, __LINE__, sysdepPath);
-        snprintf(path, sizeof(path), "%s", sysdepPath);
-    }
-    else{
-        snprintf(sysdepPath, sizeof(sysdepPath), "sysdep/%s/www/images/Model_product.png", nvram_safe_get("productid"));
+    snprintf(sysdepPath, sizeof(sysdepPath), "sysdep/%s/www/", productid);
+
+    if(check_if_dir_exist(sysdepPath) && strlen(path) > 0){
+        strlcat(sysdepPath, path, sizeof(sysdepPath));
         if(check_if_file_exist(sysdepPath)){
-            //dbg("%s(%d): use sysdep default image sysdepPath: %s\n", __FUNCTION__, __LINE__, sysdepPath);
             snprintf(path, sizeof(path), "%s", sysdepPath);
+        }
+        else{
+            snprintf(sysdepPath, sizeof(sysdepPath), "sysdep/%s/www/images/%s.png", productid, default_image_name);
+            if(check_if_file_exist(sysdepPath)){
+                snprintf(path, sizeof(path), "%s", sysdepPath);
+            }
+            else if(strlen(odmpid) > 0){
+                if(brand > 0){
+                    snprintf(sysdepPath, sizeof(sysdepPath), "sysdep/%s/www/images/Model_product_%d.png", productid, brand);
+                    if(check_if_file_exist(sysdepPath))
+                        snprintf(path, sizeof(path), "%s", sysdepPath);
+                    else{
+                        snprintf(sysdepPath, sizeof(sysdepPath), "sysdep/%s/www/images/Model_product.png", productid);
+                        if(check_if_file_exist(sysdepPath))
+                            snprintf(path, sizeof(path), "%s", sysdepPath);
+                    }
+                }
+                else{
+                    snprintf(sysdepPath, sizeof(sysdepPath), "sysdep/%s/www/images/Model_product.png", productid);
+                    if(check_if_file_exist(sysdepPath))
+                        snprintf(path, sizeof(path), "%s", sysdepPath);
+                }
+            }
         }
     }
 #endif
-
-    //dbg("%s(%d): do_ModelProduct_png: brand = %d path =%s (%d)\n",  __FUNCTION__, __LINE__, brand, path, strlen(path));
+    HTTPD_DBG("[web.c] %s(%d): brand = %d path =%s\n",  __FUNCTION__, __LINE__, brand, path);
     if(strlen(path) == 0 || !check_if_file_exist(path)){
-        //dbg("%s(%d): do_ModelProduct_png: no path or no such file\n",  __FUNCTION__, __LINE__);
-        snprintf(path, sizeof(path), "images/Model_product.png");
+        snprintf(path, sizeof(path), "images/%s.png", default_image_name);
+        HTTPD_DBG("[web.c] %s(%d): path = %s\n",  __FUNCTION__, __LINE__, path);
+        if(strlen(odmpid) > 0 && !check_if_file_exist(path)){
+            if(brand > 0){
+                snprintf(path, sizeof(path), "images/Model_product_%d.png", brand);
+                if(!check_if_file_exist(path))
+                    snprintf(path, sizeof(path), "images/Model_product.png");
+            }
+            else
+                snprintf(path, sizeof(path), "images/Model_product.png");
+        }
     }
-
-    //dbg("%s(%d): do_ModelProduct_png: do_file %s\n", __FUNCTION__, __LINE__, path);
+    HTTPD_DBG("[web.c] %s(%d): do_file path =%s\n",  __FUNCTION__, __LINE__, path);
     do_file(path, stream);
 
     if(productid)
@@ -24652,11 +24694,22 @@ int ej_UI_rs_status(int eid, webs_t wp, int argc, char **argv){
 }
 #endif
 
-#define WEBDEVINFO_VER 2 //log ej_webdavInfo
+#define WEBDEVINFO_VER 4 //log ej_webdavInfo
 /* lv2: add nvram odmpid, productid, extendno info */
+/* lv3: add nvram w_Setting */
+/* lv4: app_mnt / mtlancfg / BUSINESS info */
 int ej_webdavInfo(int eid, webs_t wp, int argc, char **argv) {
 
+	int mtlancfg_flag = 0, BUSINESS_flag = 0;
 	char ssid[32];
+
+#ifdef RTCONFIG_MULTILAN_CFG
+	mtlancfg_flag = 1;
+#endif
+#ifdef RTCONFIG_BUSINESS
+	BUSINESS_flag = 1;
+#endif
+
 	get_discovery_ssid(ssid, sizeof(ssid));
 	websWrite(wp, "// pktInfo=['PrinterInfo','SSID','NetMask','ProductID','FWVersion','OPMode','MACAddr','Regulation'];\n");
 	websWrite(wp, "pktInfo=['','%s',", ssid);
@@ -24685,7 +24738,7 @@ int ej_webdavInfo(int eid, webs_t wp, int argc, char **argv) {
 #endif
 	websWrite(wp, "];\n");
 
-	websWrite(wp, "// toAPPInfo=['Ver','ExtendCap', label_mac, odmpid, productid, extendno, rtinfo];\n");
+	websWrite(wp, "// toAPPInfo=['Ver','ExtendCap', label_mac, odmpid, productid, extendno, rtinfo, w_Setting, app_mnt, mtlancfg, BUSINESS];\n");
 	websWrite(wp, "toAPPInfo=['%d'", WEBDEVINFO_VER);
 	websWrite(wp, ",'%u',", get_extend_cap());
 	websWrite(wp, "'%s',", get_label_mac());
@@ -24693,6 +24746,10 @@ int ej_webdavInfo(int eid, webs_t wp, int argc, char **argv) {
 	websWrite(wp, "'%s',", nvram_safe_get("productid"));
 	websWrite(wp, "'%s',", nvram_safe_get("extendno"));
 	websWrite(wp, "'%d',", get_rtinfo());
+	websWrite(wp, "'%d',", nvram_get_int("w_Setting"));
+	websWrite(wp, "'%d',", nvram_get_int("app_mnt"));
+	websWrite(wp, "'%d',", mtlancfg_flag);
+	websWrite(wp, "'%d',", BUSINESS_flag);
 	websWrite(wp, "''];\n");
 
 	return 0;

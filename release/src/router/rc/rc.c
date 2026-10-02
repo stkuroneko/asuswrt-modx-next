@@ -1670,6 +1670,7 @@ static const applets_t applets[] = {
 	{ "auto46det", 			auto46det_main			},
 	{ "v6plusd", 			v6plusd_main			},
 	{ "ocnvcd", 			ocnvcd_main			},
+	{ "dslited", 			dslited_main			},
 #endif
 #if defined(RTCONFIG_RALINK) || defined(RTCONFIG_EXT_RTL8365MB) || defined(RTCONFIG_EXT_RTL8370MB) || defined(RTAX55) || defined(RTAX1800) || defined(RTAX58U_V2)
 	{ "rtkswitch",			config_rtkswitch		},

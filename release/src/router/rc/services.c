@@ -2344,9 +2344,9 @@ void stop_ipv6_tunnel(void)
 void start_s46_tunnel(int unit)
 {
 	char tmp[256], prefix[sizeof("wanXXXXXXXXXX_")];
-	char ipaddr[INET_ADDRSTRLEN], draft[4];
+	char ipaddr[INET_ADDRSTRLEN], AFTR[INET6_ADDRSTRLEN];
 	char *wan_ifname, *wan6_ifname, *elim, *ttl, *end;
-	char v6maps[20];
+	char v6maps[20], draft[4];
 #if defined(RTCONFIG_PORT_BASED_VLAN) || defined(RTCONFIG_TAGGED_BASED_VLAN)
 	char ip_mask[sizeof("192.168.100.200/255.255.255.255XXX")];
 #endif
@@ -2358,20 +2358,25 @@ void start_s46_tunnel(int unit)
 	switch (wan_proto) {
 	case WAN_LW4O6:
 	case WAN_MAPE:
-		snprintf(draft, sizeof(draft), "OFF");
-		break;
 	case WAN_V6PLUS:
 	case WAN_OCNVC:
-		snprintf(draft, sizeof(draft), "ON");
+		if (sscanf(nvram_safe_get(ipv6_nvname_by_unit("ipv6_s46_addr4", unit)), "%15[^/]/%d", ipaddr, &size) < 1)
+			return;
+		if (size <= 0 || size > 32)
+			size = 32;
+		if (wan_proto == WAN_V6PLUS || wan_proto == WAN_OCNVC)
+			snprintf(draft, sizeof(draft), "ON");
+		else
+			snprintf(draft, sizeof(draft), "OFF");
+		break;
+	case WAN_DSLITE:
+		snprintf(ipaddr, sizeof(ipaddr), "%s", nvram_safe_get(ipv6_nvname_by_unit("ipv6_s46_b4addr", unit)));
+		snprintf(AFTR, sizeof(AFTR), "%s", nvram_safe_get(ipv6_nvname_by_unit("ipv6_s46_aftr_addr", unit)));
 		break;
 	default:
 		return;
 	}
 
-	if (sscanf(nvram_safe_get(ipv6_nvname_by_unit("ipv6_s46_addr4", unit)), "%15[^/]/%d", ipaddr, &size) < 1)
-		return;
-	if (size <= 0 || size > 32)
-		size = 32;
 	netmask.s_addr = htonl(INADDR_BROADCAST << (32 - size));
 	nvram_set(strcat_r(prefix, "ipaddr", tmp), ipaddr);
 	nvram_set(strcat_r(prefix, "netmask", tmp), inet_ntoa(netmask));
@@ -2416,6 +2421,27 @@ void start_s46_tunnel(int unit)
 	if (strtoul(elim, &end, 0) == 0 && elim == end)
 		elim = "none";
 	ttl = nvram_safe_get(ipv6_nvname_by_unit("ipv6_s46_ttl", unit));
+
+	if (wan_proto == WAN_DSLITE) {
+		eval("ip", "-6", "tunnel", "add", wan_ifname, "mode", "ip4ip6",
+		     "remote", AFTR,
+		     "local", nvram_safe_get(ipv6_nvname_by_unit("ipv6_ra_addr", unit)),
+		     "encaplimit", elim,
+		     atoi(ttl) ? "hoplimit" : NULL, ttl);
+		S46_DBG("[CMD]:[ip -6 tunnel add %s mode ip4ip6 remote %s local %s encaplimit %s %s %s]\n",
+			wan_ifname, AFTR,
+			nvram_safe_get(ipv6_nvname_by_unit("ipv6_ra_addr", unit)),
+			elim, atoi(ttl) ? "hoplimit" : NULL, ttl);
+
+		eval("ifconfig", wan_ifname, ipaddr, "pointopoint", "192.0.0.1");
+		S46_DBG("[CMD]:[ifconfig %s %s pointopoint 192.0.0.1]\n", wan_ifname, ipaddr);
+		eval("ip", "link", "set", "dev", wan_ifname, "up");
+		S46_DBG("[CMD]:[ip link set dev %s up]\n", wan_ifname);
+
+		/* We are done configuration */
+		wan_up(wan_ifname);
+		return;
+	}
 
 	eval("ip", "-6", "addr", "add", nvram_safe_get(ipv6_nvname_by_unit("ipv6_s46_addr6", unit)),
 	     "dev", wan6_ifname, "preferred_lft", "0");
@@ -2477,6 +2503,7 @@ void stop_s46_tunnel(int unit, int unload)
 	case WAN_MAPE:
 	case WAN_V6PLUS:
 	case WAN_OCNVC:
+	case WAN_DSLITE:
 		break;
 	default:
 		return;
@@ -2489,7 +2516,9 @@ void stop_s46_tunnel(int unit, int unload)
 
 	ifconfig(wan_ifname, 0, NULL, NULL);
 	eval("ip", "-6", "tunnel", "del", wan_ifname);
-	eval("ip", "-6", "addr", "del", nvram_safe_get(ipv6_nvname_by_unit("ipv6_s46_addr6", unit)), "dev", wan6_ifname);
+
+	if (wan_proto != WAN_DSLITE)
+		eval("ip", "-6", "addr", "del", nvram_safe_get(ipv6_nvname_by_unit("ipv6_s46_addr6", unit)), "dev", wan6_ifname);
 
 	if (unload) {
 		modprobe_r("ip6_tunnel");
@@ -2585,6 +2614,46 @@ void restart_ocnvcd(int unit)
 {
 	stop_ocnvcd(unit);
 	start_ocnvcd(unit);
+}
+
+void start_dslited(int unit)
+{
+	pid_t pid;
+	char buf[64];
+	char unit_str[8];
+	char *dslited_argv[] = {"dslited", "-u", unit_str, NULL};
+
+	if(getpid()!=1) {
+		snprintf(buf, sizeof(buf), "stop_dslited %d", unit);
+		notify_rc(buf);
+		return;
+	}
+
+	snprintf(buf, sizeof(buf), DSLITED_PIDFILE, unit);
+	kill_pidfile_s(buf, SIGTERM);
+
+	snprintf(unit_str, sizeof(unit_str), "%d", unit);
+	_eval(dslited_argv, NULL, 0, &pid);
+}
+
+void stop_dslited(int unit)
+{
+	char buf[64];
+
+	if (getpid() != 1) {
+		snprintf(buf, sizeof(buf), "stop_dslited %d", unit);
+		notify_rc(buf);
+		return;
+	}
+
+	snprintf(buf, sizeof(buf), DSLITED_PIDFILE, unit);
+	kill_pidfile_s(buf, SIGTERM);
+}
+
+void restart_dslited(int unit)
+{
+	stop_dslited(unit);
+	start_dslited(unit);
 }
 
 void s46reset(int unit)
@@ -6087,7 +6156,8 @@ start_httpd(void)
 		NULL, NULL,	/* -i ifname */
 		NULL, NULL,	/* -p port */
 		NULL };
-	int httpd_index = 1;
+	int httpd_index = 1, i = 0;
+	char httpd_argv_buf[128] = {0};
 #ifdef RTCONFIG_HTTPS
 	char *https_argv[] = { "httpds", "-s",
 		NULL, NULL,	/* -i ifname */
@@ -6095,6 +6165,7 @@ start_httpd(void)
 		NULL };
 	int https_index = 2;
 	int enable;
+	char https_argv_buf[128] = {0};
 #endif
 	char *cur_dir;
 	pid_t pid;
@@ -6153,7 +6224,16 @@ start_httpd(void)
 			https_argv[https_index++] = nvram_safe_get("https_lanport");
 		}
 		logmessage(LOGNAME, "start https:%d", pid);
-		_eval(https_argv, NULL, 0, &pid);
+
+		for(i=0;i<https_index;i++){
+			if(i!=0)
+				strlcat(https_argv_buf, " ",sizeof(https_argv_buf));
+			strlcat(https_argv_buf, https_argv[i],sizeof(https_argv_buf));
+		}
+
+		if(get_pid_by_process_name(https_argv_buf) == -1)
+			_eval(https_argv, NULL, 0, &pid);
+
 #if defined(RTCONFIG_ALPINE) || defined(RTCONFIG_LANTIQ)
 		sleep(1);
 #endif
@@ -6169,7 +6249,15 @@ start_httpd(void)
 			httpd_argv[httpd_index++] = nvram_safe_get("http_lanport");
 		}
 		logmessage(LOGNAME, "start httpd:%d", pid);
-		_eval(httpd_argv, NULL, 0, &pid);
+
+		for(i=0;i<httpd_index;i++){
+			if(i!=0)
+				strlcat(httpd_argv_buf, " ",sizeof(httpd_argv_buf));
+			strlcat(httpd_argv_buf, httpd_argv[i],sizeof(httpd_argv_buf));
+		}
+
+		if(get_pid_by_process_name(httpd_argv_buf) == -1)
+			_eval(httpd_argv, NULL, 0, &pid);
 #if defined(RTCONFIG_ALPINE) || defined(RTCONFIG_LANTIQ)
 		sleep(1);
 #endif

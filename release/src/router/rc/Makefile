@@ -683,7 +683,7 @@ endif
 ifeq ($(RTCONFIG_SOFTWIRE46),y)
 CFLAGS += -I$(TOP)/json-c
 LDFLAGS += -L$(TOP)/json-c/.libs -ljson-c
-OBJS += v6plusd.o ocnvcd.o
+OBJS += v6plusd.o ocnvcd.o dslited.o
 endif
 
 ifeq ($(RTCONFIG_INTERNAL_GOBI),y)
@@ -1434,6 +1434,7 @@ ifeq ($(RTCONFIG_SOFTWIRE46),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc mapcalc
 	@cd $(INSTALLDIR)/sbin && ln -sf rc v6plusd
 	@cd $(INSTALLDIR)/sbin && ln -sf rc ocnvcd
+	@cd $(INSTALLDIR)/sbin && ln -sf rc dslited
 endif
 
 ifeq ($(RTCONFIG_WLCSCAN_RSSI),y)
@@ -1909,6 +1910,10 @@ endif
 ifneq ($(wildcard ./prebuild/ocnvcd.o),)
 ocnvcd.o:
 	@-cp -f ./prebuild/ocnvcd.o .
+endif
+ifneq ($(wildcard ./prebuild/dslited.o),)
+dslited.o:
+	@-cp -f ./prebuild/dslited.o .
 endif
 endif
 ifeq ($(RTCONFIG_TPVPN),y)

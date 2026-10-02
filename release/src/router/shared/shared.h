@@ -415,6 +415,7 @@ enum {
 	WAN_MAPE,
 	WAN_V6PLUS,
 	WAN_OCNVC,
+	WAN_DSLITE,
 };
 
 #ifdef RTCONFIG_IPV6

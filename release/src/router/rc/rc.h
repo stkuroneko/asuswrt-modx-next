@@ -2233,12 +2233,17 @@ enum S46_MAPSVR_STATE {
 	S46_MAPSVR_NO_RESPONSE		= 4,
 	S46_MAPSVR_MAX
 };
+enum DSLITE_SVC_TYPE {
+	DSLITE_CUSTOMER			= 0,
+	DSLITE_XPASS			= 1,
+	DSLITE_TRANSIX_EAST		= 2,
+	DSLITE_TRANSIX_WEST		= 3
+};
 extern int s46_mapcalc(int wan_unit, int wan_proto, char *rules, char *peerbuf, size_t peerbufsz,
 		       char *addr6buf, size_t addr6bufsz, char *addr4buf, size_t addr4bufsz,
 		       int *poffset, int *ppsidlen, int *ppsid, char **fmrs, int draft);
 extern void start_s46_tunnel(int unit);
 extern void stop_s46_tunnel(int unit, int unload);
-extern int wan_hgw_detect(const int wan_unit, const char *wan_ifname, const char *prc);
 
 extern void s46reset(int unit);
 extern void start_v6plusd(int unit);
@@ -2247,6 +2252,9 @@ extern void restart_v6plusd(int unit);
 extern void start_ocnvcd(int unit);
 extern void stop_ocnvcd(int unit);
 extern void restart_ocnvcd(int unit);
+extern void start_dslited(int unit);
+extern void stop_dslited(int unit);
+extern void restart_dslited(int unit);
 extern void start_auto46det(void);
 extern void stop_auto46det(void);
 //s46comm.c
@@ -2258,8 +2266,11 @@ extern void s46print(const char *logpath, const char *format, ...);
 extern int _nvram_check(const char *name, const char *value);
 extern int _nvram_set_check(const char *name, const char *value);
 extern int wan46det(int unit);
+extern int dslite_svc_check(const char *addr);
 extern int ce_dad_check(int unit);
 extern int s46_ntt_hgw(int unit);
+extern int is_v6addr(const char *input);
+extern char *get_AFTR_addr(const char *host, char *ip, size_t iplen);
 extern char *get_s46_ra(int unit);
 extern char *get_s46_url(char *s, int sz, int type, ...);
 extern char *calc_s46_port_range(int usable, int psid, int psidlen, int offset, char *ret, int retsz);
@@ -2275,6 +2286,10 @@ extern int v6plusd_main(int argc, char **argv);
 extern char *s46_ocn_maprules(char *v6perfix, int prefixlen, long *rsp_code);
 extern int check_ocnvcd(int unit);
 extern int ocnvcd_main(int argc, char **argv);
+// dslited.c
+#define DSLITED_PIDFILE "/var/run/dslited.%d.pid"
+extern int setup_dslite(int unit);
+extern int dslited_main(int argc, char **argv);
 #endif
 extern void start_ipv6(void);
 extern void stop_ipv6(void);

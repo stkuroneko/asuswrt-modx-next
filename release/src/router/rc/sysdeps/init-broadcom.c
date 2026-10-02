@@ -4790,6 +4790,10 @@ void generate_wl_para(char *ifname, int unit, int subunit)
 		else if (is_psr(unit)) {
 			if (subunit == 1)
 			{
+#if defined(RTCONFIG_AMAS)
+				if (((nvram_get_int("re_mode") == 1 && nvram_get_int("cfg_first_sync") == 0)
+					|| nvram_get_int("re_mode") == 0))
+#endif
 				nvram_set(strcat_r(prefix, "bss_enabled", tmp), "1");
 #ifdef RTCONFIG_DPSTA
 				if (!unit)

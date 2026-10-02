@@ -1875,6 +1875,11 @@ config RTCONFIG_OCNVC
 	depends on RTCONFIG_SOFTWIRE46
 	default n
 
+config RTCONFIG_DSLITE
+	bool "IPoE - DS-Lite support"
+	depends on RTCONFIG_SOFTWIRE46
+	default n
+
 config RTCONFIG_PORT_BASED_VLAN
 	bool "Port based vlan support"
 	default n

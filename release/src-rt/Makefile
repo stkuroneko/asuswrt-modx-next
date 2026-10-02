@@ -2360,6 +2360,10 @@ define RouterOptions
 				sed -i "/RTCONFIG_OCNVC/d" $(1); \
 				echo "RTCONFIG_OCNVC=y" >>$(1); \
 			fi; \
+			if [ "$(DSLITE)" = "y" ]; then \
+				sed -i "/RTCONFIG_DSLITE/d" $(1); \
+				echo "RTCONFIG_DSLITE=y" >>$(1); \
+			fi; \
 		fi; \
 	fi;
 	if [ "$(IPSEC)" = "y" ] || \

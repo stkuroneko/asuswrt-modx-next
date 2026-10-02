@@ -1535,6 +1535,7 @@ int get_wan_proto(char *prefix)
 		{ "map-e",	WAN_MAPE },
 		{ "v6plus",	WAN_V6PLUS },
 		{ "ocnvc",	WAN_OCNVC },
+		{ "dslite",	WAN_DSLITE },
 #endif
 		{ NULL }
 	};
@@ -1572,6 +1573,7 @@ int is_s46_service_by_unit(int unit)
 	case WAN_MAPE:
 	case WAN_V6PLUS:
 	case WAN_OCNVC:
+	case WAN_DSLITE:
 		ret = 1;
 		break;
 	}

@@ -1178,7 +1178,7 @@ apply.submitQIS = function(){
 			if(isSupport("yadns") && isSwMode("RT")){
 				return goTo.Yadns;
 			}
-			else if(systemVariable.isNewFw != 0 && !isSupport("amas_bdl")){
+			else if(systemVariable.isNewFw != 0){
 				return goTo.Update;
 			}
 			else{
@@ -4418,14 +4418,7 @@ goTo.Waiting46 = function(){
 };
 
 goTo.leaveQIS = function(){
-	if(isSupport("amas") && isSupport("amas_bdl") && (isSwMode("RT") || isSwMode("AP"))){
-		httpApi.log("goTo.leaveQIS", "goTo.amasbundle()", systemVariable.qisSession);
-		goTo.amasbundle();
-	}
-	else{
-		httpApi.log("goTo.leaveQIS", "go index page", systemVariable.qisSession);
-		location.href = "/";
-	}
+	location.href = "/";
 }
 
 goTo.AsusPP = function(){
