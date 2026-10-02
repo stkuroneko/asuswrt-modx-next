@@ -142,6 +142,11 @@ struct wl_sync_nvram {
 };
 #endif
 
+struct REPLACE_TAG_S {
+        char *org_name;
+        char *replace_name;
+};
+
 #define MIME_EXCEPTION_NOAUTH_ALL 	1<<0
 #define MIME_EXCEPTION_NOAUTH_FIRST	1<<1
 #define MIME_EXCEPTION_NORESETTIME	1<<2

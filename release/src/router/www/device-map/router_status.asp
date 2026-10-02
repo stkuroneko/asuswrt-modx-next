@@ -483,7 +483,7 @@ function get_plc_ports() {
 		if(autodet_plc_state >= 1){
 			var autodet_plc_tx_mimo = httpApi.nvramGet(["autodet_plc_tx_mimo"], true).autodet_plc_tx_mimo;
 			var autodet_plc_rx_mimo = httpApi.nvramGet(["autodet_plc_rx_mimo"], true).autodet_plc_rx_mimo;
-			status = (autodet_plc_tx_mimo = "1" && autodet_plc_rx_mimo == "1") ? "MIMO" : "SISO";
+			status = (autodet_plc_tx_mimo >= "1" && autodet_plc_rx_mimo >= "1") ? "MIMO" : "SISO";
 			tx = httpApi.nvramGet(["autodet_plc_tx"], true).autodet_plc_tx;;
 			rx = httpApi.nvramGet(["autodet_plc_rx"], true).autodet_plc_rx;;
 		}

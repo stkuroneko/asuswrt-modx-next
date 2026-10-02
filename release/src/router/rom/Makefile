@@ -86,6 +86,11 @@ certs-install: certs/ca-bundle.crt
 install:
 	mkdir -p $(INSTALLDIR)
 	( tar --exclude=.svn --exclude=*.bak -cpf - rom bin ) | ( cd $(INSTALLDIR) && tar -xpf - )
+ifeq ($(RTCONFIG_DEBUG),y)
+	$(if $(or $(RTCONFIG_SOC_IPQ8064),$(RTCONFIG_SOC_IPQ8074)),install -m 0755 gdb.ipq806x $(INSTALLDIR)/bin/gdb)
+	$(if $(RTCONFIG_MT798X),install -m 0755 gdb-10.1-arm64-musl $(INSTALLDIR)/bin/gdb)
+	$(if $(RTCONFIG_RALINK_MT7621),install -m 0755 gdb.mips-musl $(INSTALLDIR)/bin/gdb)
+endif
 
 	$(MAKE) certs-install
 ifeq ($(RTCONFIG_LETSENCRYPT),y)

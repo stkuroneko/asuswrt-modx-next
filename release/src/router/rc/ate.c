@@ -1307,17 +1307,12 @@ pincheck(const char *a)
 		return 0;
 }
 
-int isValidSN(const char *sn)
+int is0to9AtoZ(const char *str)
 {
 	int i = 0;
-	unsigned char *c = (unsigned char *) sn;
+	unsigned char *c = (unsigned char *) str;
 
-	if ( (strlen(sn) != SERIAL_NUMBER_LENGTH)
-		&& (strlen(sn) < (SERIAL_NUMBER_LENGTH+3) || strlen(sn) > SERIAL_NUMBER_LENGTH32 )
-	   )
-		return 0;
-
-	while (i < strlen(sn)) {
+	while (i < strlen(str)) {
 		/*  0~9 & A~Z */
 		if (!((*c > 0x2F && *c < 0x3A) || (*c > 0x40 && *c < 0x5B)))
 			return 0;
@@ -1329,16 +1324,25 @@ int isValidSN(const char *sn)
 	return 1;
 }
 
-int isResetSN(const char *sn)
+int isValidSN(const char *sn)
 {
-	char reset[] = "NONE";
+	if ( (strlen(sn) != SERIAL_NUMBER_LENGTH)
+		&& (strlen(sn) < (SERIAL_NUMBER_LENGTH+3) || strlen(sn) > SERIAL_NUMBER_LENGTH32 )
+	   )
+		return 0;
 
-	if (strlen(sn)==strlen(reset) && !strncmp(sn, reset, strlen(reset)))
-		return 1;
-
-	return 0;
+	return is0to9AtoZ(sn);
 }
 
+int isValidEISN(const char *eisn)
+{
+	if (strlen(eisn) < 6 || strlen(eisn) > SERIAL_NUMBER_LENGTH32)
+		return 0;
+
+	return is0to9AtoZ(eisn);
+}
+
+#if defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
 int isResetFactory(const char *str)
 {
 	char reset[] = "NONE";
@@ -1348,6 +1352,24 @@ int isResetFactory(const char *str)
 
 	return 0;
 }
+
+/* find the first 0xff/0x0 byte of FRead buffer */
+int lenFRead(const unsigned char *buf, const int len)
+{
+	int i = 0;
+	unsigned char *c = (unsigned char *) buf;
+
+	while (i < len) {
+		if (*c == 0xFF || *c == 0xff || *c == 0x00)
+			break;
+
+		c++;
+		i++;
+	}
+
+	return i;
+}
+#endif
 
 #define USB_HUB_PORT_NUM_MAX 8
 int
@@ -2357,6 +2379,13 @@ int asus_ate_command(const char *command, const char *value, const char *value2)
 		}
 		return 0;
  	}
+	else if (!strcmp(command, "Set_EmsInternalSerialNumber")) {
+		if (!setEISN(value)) {
+			puts("ATE_ERROR_INCORRECT_PARAMETER");
+			return EINVAL;
+		}
+		return 0;
+	}
 #ifdef RTCONFIG_ODMPID
 	else if (!strcmp(command, "Set_ModelName")) {
 #if defined(RTCONFIG_CFEZ) && defined(RTCONFIG_BCMARM)
@@ -2852,6 +2881,10 @@ int asus_ate_command(const char *command, const char *value, const char *value2)
 #endif
 	else if (!strcmp(command, "Get_SerialNumber")) {
 		getSN();
+		return 0;
+	}
+	else if (!strcmp(command, "Get_EmsInternalSerialNumber")) {
+		getEISN();
 		return 0;
 	}
 #ifdef RTCONFIG_ODMPID

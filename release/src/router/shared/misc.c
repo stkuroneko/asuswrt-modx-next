@@ -1397,6 +1397,7 @@ int get_wan_proto(char *prefix)
 		{ "lw4o6",	WAN_LW4O6 },
 		{ "map-e",	WAN_MAPE },
 		{ "v6plus",	WAN_V6PLUS },
+		{ "ocnvc",	WAN_OCNVC },
 #endif
 		{ NULL }
 	};
@@ -1824,6 +1825,10 @@ int wait_action_idle(int n)
 	while (n > 0) {
 		act.pid = 0;
 		if (__check_action(&act) == ACT_IDLE) return n;
+		if (act.pid == 1 && act.action == ACT_REBOOT) {
+			/* Rebooting, don't waste time to wait action idle due to init won't release it. */
+			break;
+		}
 		if (act.pid > 0 && !process_exists(act.pid)) {
 			if (!(r = unlink(ACTION_LOCK)) || errno == ENOENT) {
 				_dprintf("Terminated process, pid %d %s, hold action lock %d !!!\n",
@@ -4021,6 +4026,55 @@ int get_active_fw_num(void)
 #endif
 }
 
+/* Execute @cmd and return string behind @keyword of first line.
+ * If @keyword is NULL, copy first line of output of @cmd to @buf.
+ * If @keyword is specified, copy string behind @keyword of first line that match.
+ * First '\n' of string is reset as '\0'.
+ * @cmd:
+ * @keyword:	If specified, copy string behind it to @buf.
+ * 		If NULL, copy first line to @buf.
+ * @buf:	buffer to store string
+ * @buf_len:	length of @buf
+ * @return:
+ * 	0:	success
+ *  otherwise:	fail
+ */
+int exec_and_return_string(const char *cmd, const char *keyword, char *buf, size_t buf_len)
+{
+	int ret = 1;
+	char *p, line[256];
+	FILE *fp;
+
+	if (!cmd || !buf || !buf_len)
+		return -1;
+
+	*buf = '\0';
+	if (!(fp = popen(cmd, "r"))) {
+		dbg("%s: can't execute [%s], errno %d (%s)\n", __func__, cmd, errno, strerror(errno));
+		return -2;
+	}
+
+	while (ret && fgets(line, sizeof(line), fp)) {
+		if (keyword && !strstr(line, keyword))
+			continue;
+		if ((p = strchr(line, '\n')))
+			*p = '\0';
+		p = line;
+		if (keyword) {
+			p = strstr(line, keyword);
+			if (p)
+				p += strlen(keyword);
+			else
+				p = line;
+		}
+		strlcpy(buf, p, buf_len);
+		ret = 0;
+	}
+	pclose(fp);
+
+	return ret;
+}
+
 /**
  * Execute @cmd, find @keyword in output and parse it.
  * @cmd:
@@ -4042,7 +4096,7 @@ int exec_and_parse(const char *cmd, const char *keyword, const char *fmt, int cn
 		return -1;
 
 	if (!(fp = popen(cmd, "r"))) {
-		dbg("%s: can't execute [%s]\n", __func__, cmd);
+		dbg("%s: can't execute [%s], errno %d (%s)\n", __func__, cmd, errno, strerror(errno));
 		return -2;
 	}
 

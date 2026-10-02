@@ -355,14 +355,15 @@ static inline char *wan_if_eth(void)
 #endif
 
 #if defined(RTCONFIG_DEFAULT_AP_MODE)
-#define DUT_DOMAIN_NAME "ap.asus.com"
+#define DUT_DOMAIN_NAME "www.asusrouter.com"
+#define OLD_DUT_DOMAIN_NAME "ap.asus.com"
 #elif defined(RTCONFIG_CONCURRENTREPEATER)
-#define DUT_DOMAIN_NAME "repeater.asus.com"
+#define DUT_DOMAIN_NAME "www.asusrouter.com"
+#define OLD_DUT_DOMAIN_NAME "repeater.asus.com"
 #else
-#define DUT_DOMAIN_NAME "router.asus.com"
+#define DUT_DOMAIN_NAME "www.asusrouter.com"
+#define OLD_DUT_DOMAIN_NAME "router.asus.com"
 #endif
-#define OLD_DUT_DOMAIN_NAME1 "www.asusnetwork.net"
-#define OLD_DUT_DOMAIN_NAME2 "www.asusrouter.com"
 
 #define NETWORKMAP_PAGE "index.asp"
 
@@ -415,6 +416,7 @@ enum {
 	WAN_LW4O6,
 	WAN_MAPE,
 	WAN_V6PLUS,
+	WAN_OCNVC,
 };
 
 #ifdef RTCONFIG_IPV6
@@ -2140,13 +2142,19 @@ static inline int guest_wlif(char *ifname)
 #endif
 
 #if defined(RTCONFIG_TCODE)
+static inline int __is_tcode_country(char *tcode, char *cc)
+{
+	if (!tcode || !cc)
+		return 0;
+	return !strncmp(tcode, cc, 2);
+}
+
 static inline int is_tcode_country(char *cc)
 {
-	if (!cc)
-		return 0;
-	return !strncmp(nvram_safe_get("territory_code"), cc, 2);
+	return __is_tcode_country(nvram_safe_get("territory_code"), cc);
 }
 #else
+static inline int __is_tcode_country(char __attribute__((unused)) *tcode, char __attribute__((unused) *cc) { return 0; }
 static inline int is_tcode_country(char __attribute__((unused) *cc) { return 0; }
 #endif
 
@@ -2290,6 +2298,13 @@ extern int get_imageheader_size(void);
 #if defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
 extern void __gen_switch_log(char *fn) __attribute__((weak));
 #endif
+#if defined(RTCONFIG_RALINK)
+#ifdef IWLIB_H
+extern int get_ap_mac(const char *ifname, struct iwreq *pwrq);
+#endif
+extern int chk_assoc(const char *ifname);
+extern int get_ch_cch_bw(const char *wlif_name, int *ch, int *cch, int *bw);
+#endif
 #if defined(RTCONFIG_QCA)
 extern char *__get_wlifname(int band, int subunit, char *buf);
 extern int get_wlsubnet(int band, const char *ifname);
@@ -2309,6 +2324,7 @@ extern void set_cpufreq_attr(char *attr, char *val);
 extern int get_ap_mac(const char *ifname, struct iwreq *pwrq);
 #endif
 extern int chk_assoc(const char *ifname);
+extern int get_ch_cch_bw(const char *vap, int *ch, int *cch, int *bw);
 extern int match_radio_status(int unit, int status);
 #if defined(RTCONFIG_CFG80211)
 extern int get_iwphy_name(int unit, char *iwphy, size_t size);
@@ -3020,6 +3036,7 @@ extern int u_readl(unsigned long addr, unsigned long *value);
 extern int set_irq_smp_affinity(unsigned int irq, unsigned int cpu_mask);
 extern int set_irq_smp_affinity_by_name(const char *name, int order, unsigned int cpu_mask);
 extern int get_active_fw_num(void);
+extern int exec_and_return_string(const char *cmd, const char *keyword, char *buf, size_t buf_len);
 extern int exec_and_parse(const char *cmd, const char *keyword, const char *fmt, int cnt, ...);
 extern char *iwpriv_get(const char *iface, char *cmd);
 extern int iwpriv_get_int(const char *iface, char *cmd, int *result);
@@ -3110,6 +3127,7 @@ extern void set_maclist_del_kick(char *ifname, int mode, char *sta_addr);
 #include <stdio.h>
 void set_macfilter_unit(int unit, int subnet, FILE *fp);
 void set_macfilter_all(FILE *fp);
+extern int nat_acceleration_status(void);
 extern int get_wifi_temperature(enum wl_band_id band);
 #else
 static inline char *get_wsup_drvname(__attribute__ ((unused)) int band) { return ""; }
@@ -3669,10 +3687,6 @@ extern int FindBrifByWlif(const char *wl_ifname, char *brif_name, int size);
 #endif
 
 #ifdef RTCONFIG_HTTPS
-#if defined(RTCONFIG_RALINK_MT7621)
-#define CERT_VERSION "20221011"
-#define CERT_VERSION_PATH "/jffs/cert.version"
-#endif
 #define HTTPD_CERT	"/etc/cert.pem"
 #define HTTPD_KEY	"/etc/key.pem"
 #define LIGHTTPD_CERTKEY	"/etc/server.pem"

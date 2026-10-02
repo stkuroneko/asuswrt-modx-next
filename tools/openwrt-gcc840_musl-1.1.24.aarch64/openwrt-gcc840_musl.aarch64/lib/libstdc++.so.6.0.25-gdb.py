@@ -19,8 +19,8 @@ import gdb
 import os
 import os.path
 
-pythondir = '/SDK/MTK/openwrt/staging_dir/toolchain-aarch64_cortex-a53_gcc-8.4.0_musl/share/gcc-8.4.0/python'
-libdir = '/SDK/MTK/openwrt/staging_dir/toolchain-aarch64_cortex-a53_gcc-8.4.0_musl/aarch64-openwrt-linux-musl/lib'
+pythondir = '/SDK/MTK_0329/openwrt-6KePeL/staging_dir/toolchain-aarch64_cortex-a53_gcc-8.4.0_musl/share/gcc-8.4.0/python'
+libdir = '/SDK/MTK_0329/openwrt-6KePeL/staging_dir/toolchain-aarch64_cortex-a53_gcc-8.4.0_musl/aarch64-openwrt-linux-musl/lib'
 
 # This file might be loaded when there is no current objfile.  This
 # can happen if the user loads it manually.  In this case we don't

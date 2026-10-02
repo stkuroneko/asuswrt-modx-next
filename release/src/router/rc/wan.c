@@ -1699,20 +1699,24 @@ TRACE_PT("3g begin with %s.\n", wan_ifname);
 		update_wan_state(prefix, WAN_STATE_CONNECTING, 0);
 
 #ifdef RTCONFIG_SOFTWIRE46
-		if (wan_proto != WAN_V6PLUS) {
-			stop_s46map_rptd();
+		if (wan_proto != WAN_V6PLUS ||
+		    wan_proto != WAN_OCNVC) {
+			stop_v6plusd();
+			stop_ocnvcd();
 			nvram_set_int("s46_hgw_case", S46_CASE_INIT);
 		}
 #if defined(RTCONFIG_RALINK)
 		switch (wan_proto) {
 		case WAN_MAPE:
 		case WAN_V6PLUS:
+		case WAN_OCNVC:
 			/* Enable mtkhnat to support map-e. */
 			system("echo 1 > /sys/kernel/debug/hnat/mape_toggle");
 			break;
 		default:
 			/* Enable mtkhnat to support ds-lite.(As Default) */
 			system("echo 0 > /sys/kernel/debug/hnat/mape_toggle");
+			break;
 		}
 #endif
 #endif
@@ -2012,11 +2016,15 @@ TRACE_PT("3g begin with %s.\n", wan_ifname);
 			break;
 		}
 		case WAN_V6PLUS:
+		case WAN_OCNVC:
 		{
 			char v6tun_dev[IFNAMSIZ];
 
 			nvram_set_int("s46_hgw_case", S46_CASE_INIT);
-			restart_s46map_rptd();
+			if (wan_proto == WAN_V6PLUS)
+				restart_v6plusd();
+			else
+				restart_ocnvcd();
 
 			/* Bring up WAN interface */
 			dbG("ifup:%s\n", wan_ifname);
@@ -2170,6 +2178,7 @@ stop_wan_if(int unit)
 	case WAN_LW4O6:
 	case WAN_MAPE:
 	case WAN_V6PLUS:
+	case WAN_OCNVC:
 		wan6_down(wan_ifname);
 		break;
 #endif
@@ -2774,6 +2783,17 @@ void wan6_up(const char *pwan_ifname)
 			type = "map-e";
 			prefix4len = nvram_get_int(strcat_r(prefix, "s46_prefix4len_x", tmp));
 			ealen = nvram_get_int(strcat_r(prefix, "s46_ealen_x", tmp));
+			goto s46_maprules;
+		case WAN_OCNVC:
+			draft = 1;
+			if (nvram_get_int(strcat_r(prefix, "dhcpenble_x", tmp))) {
+				rules = s46_ocn_maprules(nvram_safe_get("ipv6_ra_addr"), nvram_get_int("ipv6_ra_length"), &rsp_code);
+				goto s46_mapcalc;
+			}
+			type = "map-e";
+			prefix4len = nvram_get_int(strcat_r(prefix, "s46_prefix4len_x", tmp));
+			ealen = nvram_get_int(strcat_r(prefix, "s46_ealen_x", tmp));
+			goto s46_maprules;
 		s46_maprules:
 			if (asprintf(&rules,
 				     "type=%s,ipv6prefix=%s,prefix6len=%d,ipv4prefix=%s,prefix4len=%d,"
@@ -2998,6 +3018,68 @@ static void adjust_netdev_if_of_wan_bled(int action, int wan_unit, char *wan_ifn
 }
 #endif
 
+#ifdef RTCONFIG_SOFTWIRE46
+int wan_hgw_detect(const int wan_unit, const char *wan_ifname, const char *prc)
+{
+	int ret = 0;
+	int hgwret;
+	int wan_proto;
+	char cmd[2048], tmp[100], tmp1[100];
+	char prefix[sizeof("wanXXXXXXXXX_")];
+	char prefix_x[sizeof("wanXXXXXXXXX_")];
+
+	snprintf(prefix, sizeof(prefix), "wan%d_", wan_unit);
+	wan_proto = get_wan_proto(prefix);
+
+	switch (wan_proto) {
+	case WAN_MAPE:
+		if (nvram_invmatch(ipv6_nvname("ipv6_ra_route"), "")) {
+			eval("ip", "-6", "route", "add", "::/0", "via", nvram_safe_get(ipv6_nvname("ipv6_ra_route")), "dev", wan_ifname);
+			S46_DBG("[CMD]:[ip -6 route add ::/0 via %s dev %s]\n", nvram_safe_get(ipv6_nvname("ipv6_ra_route")), wan_ifname);
+		}
+		break;
+	case WAN_V6PLUS:
+	case WAN_OCNVC:
+		if (!strcmp(prc, "udhcpc_wan") && nvram_get_int("s46_hgw_case") == S46_CASE_INIT) {
+			if (inet_addr_(nvram_safe_get(strcat_r(prefix, "gateway", tmp))) != INADDR_ANY) {
+				snprintf(cmd, sizeof(cmd), "ip route replace %s dev %s proto kernel", nvram_safe_get(strcat_r(prefix, "gateway", tmp)), wan_ifname);
+				S46_DBG("[CMD]:[%s]\n", cmd);
+				system(cmd);
+			}
+			snprintf(cmd, sizeof(cmd), "ip route replace default via %s dev %s", nvram_safe_get(strcat_r(prefix, "gateway", tmp)), wan_ifname);
+			S46_DBG("[CMD][%s]\n", cmd);
+			system(cmd);
+			system("ip route flush cache");
+			hgwret = s46_ntt_hgw();
+			/* Debug only */
+			if (nvram_get("s46_debug_hgwret")) {
+				S46_DBG("Using nvram s46_debug_hgwret val.\n");
+				hgwret = nvram_get_int("s46_debug_hgwret");
+			}
+			if (hgwret == 1) {
+				nvram_set_int("s46_hgw_case", S46_CASE_MAP_HGW_ON);
+				wan6_up(get_wan6face());
+				ret = 0;
+			} else {
+				if (hgwret < 0)
+					S46_DBG("HGW did not respond[%d].\n", hgwret);
+				snprintf(prefix_x, sizeof(prefix_x), "wan%d_x", wan_unit);
+				nvram_set(strcat_r(prefix_x, "ipaddr", tmp), nvram_safe_get(strcat_r(prefix, "ipaddr", tmp1)));
+				nvram_set(strcat_r(prefix_x, "gateway", tmp), nvram_safe_get(strcat_r(prefix, "gateway", tmp1)));
+				nvram_set(strcat_r(prefix_x, "dns", tmp), nvram_safe_get(strcat_r(prefix, "dns", tmp1)));
+				nvram_set(strcat_r(prefix_x, "netmask", tmp), nvram_safe_get(strcat_r(prefix, "netmask", tmp1)));
+				nvram_set(strcat_r(prefix, "gateway", tmp), "0.0.0.0");
+				nvram_set(strcat_r(prefix, "dns", tmp), "0.0.0.0");
+				nvram_set_int("s46_hgw_case", S46_CASE_MAP_HGW_OFF);
+				S46_DBG("[%s] done.\n", wan_ifname);
+				ret = 1;
+			}
+		}
+	}
+	return ret;
+}
+#endif
+
 void
 wan_up(const char *pwan_ifname)
 {
@@ -3017,8 +3099,6 @@ wan_up(const char *pwan_ifname)
 	FILE *fp;
 	char word[100], *next;
 #ifdef RTCONFIG_SOFTWIRE46
-	int hgwret;
-	char cmd[2048], tmp1[100];
 	char prc[16] = {0};
 
 	prctl(PR_GET_NAME, prc);
@@ -3031,6 +3111,7 @@ wan_up(const char *pwan_ifname)
 
 	switch (wan_proto) {
 		case WAN_V6PLUS:
+		case WAN_OCNVC:
 			S46_DBG("Callby:[%s]\n", prc);
 		default:
 			break;
@@ -3069,7 +3150,8 @@ wan_up(const char *pwan_ifname)
 				    nvram_match(ipv6_nvname("ipv6_ifdev"), "ppp"))
 					break;
 #ifdef RTCONFIG_SOFTWIRE46
-				if (wan_proto == WAN_LW4O6 || wan_proto == WAN_MAPE || wan_proto == WAN_V6PLUS)
+				if (wan_proto == WAN_LW4O6 || wan_proto == WAN_MAPE ||
+				    wan_proto == WAN_V6PLUS || wan_proto == WAN_OCNVC)
 					break;
 #endif
 				/* fall through */
@@ -3158,6 +3240,7 @@ wan_up(const char *pwan_ifname)
 	case WAN_LW4O6:
 	case WAN_MAPE:
 	case WAN_V6PLUS:
+	case WAN_OCNVC:
 #endif
 		/* the gateway is in the local network */
 		if (*gateway &&
@@ -3194,6 +3277,7 @@ wan_up(const char *pwan_ifname)
 	case WAN_LW4O6:
 	case WAN_MAPE:
 	case WAN_V6PLUS:
+	case WAN_OCNVC:
 #endif
 		nvram_set(strcat_r(prefix, "xgateway", tmp), strlen(gateway) > 0 ? gateway : "0.0.0.0");
 		add_routes(prefix, "mroute", wan_ifname);
@@ -3241,7 +3325,8 @@ NOIP:
 			    nvram_match(ipv6_nvname("ipv6_ifdev"), "ppp"))
 				break;
 #ifdef RTCONFIG_SOFTWIRE46
-			if (wan_proto == WAN_LW4O6 || wan_proto == WAN_MAPE || wan_proto == WAN_V6PLUS)
+			if (wan_proto == WAN_LW4O6 || wan_proto == WAN_MAPE ||
+			    wan_proto == WAN_V6PLUS || wan_proto == WAN_OCNVC)
 				break;
 #endif
 			/* fall through */
@@ -3313,49 +3398,8 @@ NOIP:
 	update_resolvconf();
 
 #ifdef RTCONFIG_SOFTWIRE46
-	switch (wan_proto) {
-	case WAN_MAPE:
-		if (nvram_invmatch(ipv6_nvname("ipv6_ra_route"), "")) {
-			eval("ip", "-6", "route", "add", "::/0", "via", nvram_safe_get(ipv6_nvname("ipv6_ra_route")), "dev", wan_ifname);
-			S46_DBG("[CMD]:[ip -6 route add ::/0 via %s dev %s]\n", nvram_safe_get(ipv6_nvname("ipv6_ra_route")), wan_ifname);
-		}
-		break;
-	case WAN_V6PLUS:
-		if (!strcmp(prc, "udhcpc") && nvram_get_int("s46_hgw_case") == S46_CASE_INIT) {
-			if (inet_addr_(nvram_safe_get(strcat_r(prefix, "gateway", tmp))) != INADDR_ANY) {
-				snprintf(cmd, sizeof(cmd), "ip route replace %s dev %s proto kernel", nvram_safe_get(strcat_r(prefix, "gateway", tmp)), wan_ifname);
-				S46_DBG("[CMD]:[%s]\n", cmd);
-				system(cmd);
-			}
-			snprintf(cmd, sizeof(cmd), "ip route replace default via %s dev %s", nvram_safe_get(strcat_r(prefix, "gateway", tmp)), wan_ifname);
-			S46_DBG("[CMD][%s]\n", cmd);
-			system(cmd);
-			system("ip route flush cache");
-			hgwret = s46_jpne_hgw();
-			/* Debug only */
-			if (nvram_get("s46_debug_hgwret")) {
-				S46_DBG("Using nvram s46_debug_hgwret val.\n");
-				hgwret = nvram_get_int("s46_debug_hgwret");
-			}
-			if (hgwret == 1) {
-				wan6_up(get_wan6face());
-				nvram_set_int("s46_hgw_case", S46_CASE_MAP_HGW_ON);
-			} else {
-				if (hgwret < 0)
-					S46_DBG("HGW did not respond[%d].\n", hgwret);
-				snprintf(prefix_x, sizeof(prefix_x), "wan%d_x", wan_unit);
-				nvram_set(strcat_r(prefix_x, "ipaddr", tmp), nvram_safe_get(strcat_r(prefix, "ipaddr", tmp1)));
-				nvram_set(strcat_r(prefix_x, "gateway", tmp), nvram_safe_get(strcat_r(prefix, "gateway", tmp1)));
-				nvram_set(strcat_r(prefix_x, "dns", tmp), nvram_safe_get(strcat_r(prefix, "dns", tmp1)));
-				nvram_set(strcat_r(prefix_x, "netmask", tmp), nvram_safe_get(strcat_r(prefix, "netmask", tmp1)));
-				nvram_set(strcat_r(prefix, "gateway", tmp), "0.0.0.0");
-				nvram_set(strcat_r(prefix, "dns", tmp), "0.0.0.0");
-				nvram_set_int("s46_hgw_case", S46_CASE_MAP_HGW_OFF);
-				S46_DBG("[%s] done.\n", wan_ifname);
-				return;
-			}
-		}
-	}
+	if (wan_hgw_detect(wan_unit, wan_ifname, prc))
+		return;
 #endif
 
 	/* default route via default gateway */
@@ -3735,6 +3779,7 @@ wan_down(char *wan_ifname)
 	case WAN_LW4O6:
 	case WAN_MAPE:
 	case WAN_V6PLUS:
+	case WAN_OCNVC:
 #endif
 		ifconfig(wan_ifname, IFUP, NULL, NULL);
 		break;
@@ -3788,6 +3833,7 @@ wan_ifunit(char *wan_ifname)
 #ifdef RTCONFIG_SOFTWIRE46
 		case WAN_MAPE:
 		case WAN_V6PLUS:
+		case WAN_OCNVC:
 #endif
 			if (nvram_match(strcat_r(prefix, "ifname", tmp), wan_ifname))
 				return unit;
@@ -3840,6 +3886,7 @@ wanx_ifunit(char *wan_ifname)
 #ifdef RTCONFIG_SOFTWIRE46
 		case WAN_MAPE:
 		case WAN_V6PLUS:
+		case WAN_OCNVC:
 #endif
 			if (nvram_match(strcat_r(prefix, "ifname", tmp), wan_ifname))
 				return unit;
@@ -4202,7 +4249,7 @@ start_wan(void)
 	symlink("/sbin/rc", "/etc/openvpn/ovpnc-route-pre-down");
 #endif
 #endif
-	symlink("/sbin/rc", "/tmp/udhcpc");
+	symlink("/sbin/rc", "/tmp/udhcpc_wan");
 	symlink("/sbin/rc", "/tmp/zcip");
 #ifdef RTCONFIG_EAPOL
 	symlink("/sbin/rc", "/tmp/wpa_cli");

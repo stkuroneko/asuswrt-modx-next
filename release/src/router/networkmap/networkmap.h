@@ -12,8 +12,12 @@
 #include <shared.h>
 #include <sm.h>
 
+#ifndef FALSE
 #define FALSE	0
+#endif
+#ifndef TRUE
 #define TRUE	1
+#endif
 #define INTERFACE	"br0"
 #define MODEL_NAME	RT_BUILD_NAME
 #define ARP_BUFFER_SIZE	512
@@ -79,6 +83,8 @@ enum
 #define USERAGENT			"Asuswrt/networkmap"
 #define NMP_VC_FILE_LOCK		"nmpvc"
 
+#define ALLWCLIENT_LIST_JSON_PATH		"/tmp/allwclientlist.json"
+#define ALLWEVENT_FILE_LOCK				"allwevent"
 
 #define NCL_LIMIT		14336   //database limit to 14KB to avoid UI glitch
 
@@ -217,6 +223,9 @@ typedef struct {
 /* wireless: 0:wired 1:2.4G 2:5G 3:5G-2
 */
 	unsigned char	wireless[MAX_NR_CLIENT_LIST];
+
+	unsigned char	is_wireless[MAX_NR_CLIENT_LIST];
+	int        		conn_ts[MAX_NR_CLIENT_LIST];		// connect  timestamp
 /* wireless log information
 */
 #ifdef RTCONFIG_LANTIQ
@@ -266,5 +275,7 @@ void type_filter(P_CLIENT_DETAIL_INFO_TABLE p_client_detail_info_tab, int x, uns
 int isBaseType(int type);
 
 int QueryConvTypes(P_CLIENT_DETAIL_INFO_TABLE p_client_detail_info_tab, int i);
+
+int get_wrieless_info(P_CLIENT_DETAIL_INFO_TABLE p_client_detail_info_tab, const int i);
 
 #endif  /*__NETWORKMAP_H__*/

@@ -211,7 +211,7 @@ function initial(){
 		}
 
 		if(wan_lanport_text!= ""){
-			var note_str = "This function is disabled because " + wan_lanport_text + " is configured as WAN. If you want to enable it, please click <a href=\"http://router.asus.com/Advanced_WANPort_Content.asp\" target=\"_blank\" style=\"text-decoration:underline;\">here</a> to change dual wan settings."; //untranslated
+			var note_str = "This function is disabled because " + wan_lanport_text + " is configured as WAN. If you want to enable it, please click <a href=\"http://<#Web_DOMAIN_NAME#>/Advanced_WANPort_Content.asp\" target=\"_blank\" style=\"text-decoration:underline;\">here</a> to change dual wan settings."; //untranslated
 			document.form.lacp_enabled.style.display = "none";
 			document.getElementById("lacp_note").innerHTML = note_str;
 			document.getElementById("lacp_desc").style.display = "";

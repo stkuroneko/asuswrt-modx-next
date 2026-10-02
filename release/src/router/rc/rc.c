@@ -1556,7 +1556,7 @@ static const applets_t applets[] = {
 #endif
 	{ "ddns_updated", 		ddns_updated_main		},
 	{ "radio",			radio_main			},
-	{ "udhcpc",			udhcpc_wan			},
+	{ "udhcpc_wan",			udhcpc_wan			},
 	{ "udhcpc_lan",			udhcpc_lan			},
 	{ "zcip",			zcip_wan			},
 #ifdef RTCONFIG_IPV6
@@ -1591,7 +1591,8 @@ static const applets_t applets[] = {
 	{ "netool", 			netool_main			},
 #endif
 #ifdef RTCONFIG_SOFTWIRE46
-	{ "s46map_rptd", 		s46map_rptd_main		},
+	{ "v6plusd", 			v6plusd_main			},
+	{ "ocnvcd", 			ocnvcd_main			},
 #endif
 #if defined(RTCONFIG_RALINK) || defined(RTCONFIG_EXT_RTL8365MB) || defined(RTCONFIG_EXT_RTL8370MB) || defined(RTAX55) || defined(RTAX1800) || defined(RTAX58U_V2)
 	{ "rtkswitch",			config_rtkswitch		},
@@ -3105,8 +3106,10 @@ _dprintf("LED_NOMOBILE=%d, LED_2G_YELLOW=%d, LED_3G_BLUE=%d, LED_4G_WHITE=%d.\n"
 			wan_proto = WAN_MAPE;
 		else if (!strcmp(argv[2], "lw4o6"))
 			wan_proto = WAN_LW4O6;
-		else
+		else if (!strcmp(argv[2], "v6plus"))
 			wan_proto = WAN_V6PLUS;
+		else
+			wan_proto = WAN_OCNVC;
 
 		while (fgets(rules, sizeof(rules), stdin) != NULL) {
 			if (s46_mapcalc(wan_proto, rules, peerbuf, sizeof(peerbuf), addr6buf, sizeof(addr6buf),

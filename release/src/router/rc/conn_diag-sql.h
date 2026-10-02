@@ -1,5 +1,6 @@
 #include <sqlite3.h>
 #include <pthread.h>
+#include <limits.h>
 
 #define RTCONFIG_UPLOADER
 

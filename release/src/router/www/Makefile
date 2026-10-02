@@ -49,8 +49,10 @@ ifeq ($(and $(HND_ROUTER),$(RTCONFIG_VISUALIZATION)),y)
 endif # CONFIG_VISUALIZATION
 	# INSTALL MODEL DEPENDENT files
 	cp ../www/sysdep/$(BUILD_NAME)/www $(INSTALLDIR)/. -rfL || true
+	-cp sysdep_2/$(BUILD_NAME)/www $(INSTALLDIR)/. -rfL
 	rm -rf $(INSTALLDIR)/www/Makefile
 	rm -rf $(INSTALLDIR)/www/sysdep
+	rm -rf $(INSTALLDIR)/www/sysdep_2
 	rm -rf $(INSTALLDIR)/www/gendict.pl
 	rm -rf $(INSTALLDIR)/www/dict.tmp
 	rm -rf $(INSTALLDIR)/www/encoding_check.sh
@@ -733,7 +735,7 @@ ifeq ($(BUILD_NAME),BLUECAVE)
 	rm -rf $(INSTALLDIR)/www/QIS_wizard_m.htm
 endif
 
-ifeq ($(BUILD_NAME),$(filter $(BUILD_NAME), GT-AC5300 GT-AC9600 GT-AXY16000 GT-AX11000 TUF-AX3000 TUF-AX3000_V2 TUF-AX5400 GT-AXE11000 GT-AX6000 GT-AX11000_PRO GT-AXE16000))
+ifeq ($(BUILD_NAME),$(filter $(BUILD_NAME), GT-AC5300 GT-AC9600 GT-AXY16000 GT-AX11000 TUF-AX3000 TUF-AX3000_V2 TUF-AX4200 TUF-AX6000 TUF-AX5400 GT-AXE11000 GT-AX6000 GT-AX11000_PRO GT-AXE16000))
 	rm -rf $(INSTALLDIR)/www/images/New_ui/networkmap/white_04.gif
 endif
 

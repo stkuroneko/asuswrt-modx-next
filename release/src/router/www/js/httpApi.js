@@ -613,7 +613,19 @@ var httpApi ={
 	},
 
 	"getWanInfo": function(_index){
-		var connect_proto_array = {"dhcp":"<#BOP_ctype_title1#>", "static": "<#BOP_ctype_title5#>", "pppoe": "PPPoE","pptp": "PPTP","l2tp": "L2TP"};
+		var connect_proto_array = {
+			"dhcp": "<#BOP_ctype_title1#>",
+			"static": "<#BOP_ctype_title5#>",
+			"pppoe": "PPPoE",
+			"pptp": "PPTP",
+			"l2tp": "L2TP",
+			"pppoa": "PPPoA",
+			"ipoa": "IPoA",
+			"lw4o6": "LW 4over6",
+			"map-e": "MAP-E",
+			"v6plus": "<#IPv6_plus#>",
+			"usb modem": "USB Modem"
+		};
 		var result = {
 			"status": "",
 			"status_text": "",
@@ -642,10 +654,23 @@ var httpApi ={
 			var wanInfo = httpApi.nvramGet(["wan" + wan_index + "_ipaddr", "wan" + wan_index + "_proto"], true);
 			result.ipaddr = wanInfo["wan" + wan_index + "_ipaddr"];
 			result.proto = wanInfo["wan" + wan_index + "_proto"];
-			if(result.proto != "")
-				result.proto_text = connect_proto_array[result.proto];
-			if(usb_index == wan_index)
-				result.proto_text = "USB Modem";
+			if(isSupport("dsl")){
+				if(wans_info.wans_dualwan.split(" ")[wan_index] == "dsl"){
+					var dslInfo = httpApi.nvramGet(["dsl0_proto", "dslx_transmode"], true);
+					if(dslInfo.dslx_transmode == "atm") {
+						if(dslInfo.dsl0_proto == "pppoa" || dslInfo.dsl0_proto == "ipoa")
+							result.proto = dslInfo.dsl0_proto;
+					}
+				}
+			}
+			if(result.proto != ""){
+				var proto_text = connect_proto_array[(result.proto).toLowerCase()];
+				result.proto_text = ((proto_text != undefined) ? proto_text : result.proto);
+				if(isSupport("gobi") && result.proto == "USB Modem"){
+					var modem_operation = httpApi.nvramGet(["usb_modem_act_operation"], true).usb_modem_act_operation;
+					result.proto_text = ((modem_operation != "") ? modem_operation : "<#Mobile_title#>");
+				}
+			}
 		}
 		return result;
 	},
@@ -1101,8 +1126,9 @@ var httpApi ={
 		if(amesh_support && (isSwMode("rt") || isSwMode("ap")) && ameshRouter_support) {
 			var get_cfg_clientlist = httpApi.hookGet("get_cfg_clientlist", true);
 			if(get_cfg_clientlist != undefined && get_cfg_clientlist.length > 1) {
-				get_cfg_clientlist.shift();//filter CAP
-				var online_node_list = get_cfg_clientlist.filter(function(item) { return item.online == "1"; });
+				var cfg_clientlist_tmp = JSON.parse(JSON.stringify(get_cfg_clientlist));
+				cfg_clientlist_tmp.shift();//filter CAP
+				var online_node_list = cfg_clientlist_tmp.filter(function(item) { return item.online == "1"; });
 				if(online_node_list.length > 0)
 					status = true;
 			}
@@ -1381,9 +1407,10 @@ var httpApi ={
 			"wifi_radio_ctl" : {
 				"value" : 22,
 				"def" : {
-					"wifi_radio_0" : {"bit" : 0},
-					"wifi_radio_1" : {"bit" : 1},
-					"wifi_radio_2" : {"bit" : 2}
+					"wifi_radio_0" : {"bit" : 0}, //2G
+					"wifi_radio_1" : {"bit" : 1}, //5G or 5G-1
+					"wifi_radio_2" : {"bit" : 2}, //5G-2
+					"wifi_radio_3" : {"bit" : 3}  //6G
 				}
 			},
 			"conn_eap_mode" : {

@@ -3251,10 +3251,11 @@ static void __load_wifi_driver(int testmode)
 #if defined(RTCONFIG_WIFI_SON)
 			if (sw_mode()!=SW_MODE_REPEATER && nvram_match("wifison_ready", "1")) {
 #if defined(RTCONFIG_HIDDEN_BACKHAUL)
-		        	if(strlen(nvram_safe_get("cfg_group"))){
+		        	if(strlen(nvram_safe_get("cfg_group")))
 #else
-				if(nvram_get_int("x_Setting")) {
+				if(nvram_get_int("x_Setting"))
 #endif
+				{
 				eval(IWPRIV, (char*) VPHY_2G, "no_vlan", "1");
 				eval(IWPRIV, (char*) VPHY_5G, "no_vlan", "1");
 				//send RCSA to uplink/CAP/PAP when detect radar

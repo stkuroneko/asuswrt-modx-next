@@ -291,6 +291,7 @@ int get_wan_unit(char *ifname)
 		case WAN_LW4O6:
 		case WAN_MAPE:
 		case WAN_V6PLUS:
+		case WAN_OCNVC:
 #endif
 			if (nvram_match(strcat_r(prefix, "pppoe_ifname", tmp), ifname))
 				return unit;
@@ -361,6 +362,7 @@ char *get_wan_ifname(int unit)
 		break;
 #ifdef RTCONFIG_SOFTWIRE46
 	case WAN_V6PLUS:
+	case WAN_OCNVC:
 		if (nvram_get_int("s46_hgw_case") >= S46_CASE_MAP_HGW_OFF) {
 			wan_ifname = nvram_safe_get(strcat_r(prefix, "pppoe_ifname", tmp));
 			break;

@@ -1140,15 +1140,11 @@ void Pty_start_wlc_connect(int band, char *bssid)
 	if (bssid != NULL) {
 		sta = get_staifname(band);
 		if (chk_assoc(sta)==0 || diff_current_bssid(band, bssid)) {	//Restart the network with configured BSSID
-			doSystem("wpa_cli -i %s -p /var/run/wpa_supplicant-%s disable_network 0", sta, sta);
-			doSystem("wpa_cli -i %s -p /var/run/wpa_supplicant-%s set_network 0 bssid %s", sta, sta, bssid);
-			doSystem("wpa_cli -i %s -p /var/run/wpa_supplicant-%s enable_network 0", sta, sta);
+			doSystem("wpa_cli -p /var/run/wpa_supplicant-%s disable_network 0", sta);
+			doSystem("wpa_cli -p /var/run/wpa_supplicant-%s set_network 0 bssid %s", sta, bssid);
+			doSystem("wpa_cli -p /var/run/wpa_supplicant-%s enable_network 0", sta);
 			logmessage("AMAS RE", "RE: wpacli set %s's bssid as %s\n", sta, bssid);
 		}
-		if (nvram_safe_get("amas_wlc_target_bssid")[0] == '\0')
-			doSystem("wpa_cli -i %s -p /var/run/wpa_supplicant-%s disable_network 1", sta, sta);
-		else
-			doSystem("wpa_cli -i %s -p /var/run/wpa_supplicant-%s enable_network 1", sta, sta);
 	}
 
 	set_wpa_cli_cmd(band, "reconnect", 0);

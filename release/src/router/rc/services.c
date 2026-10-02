@@ -444,10 +444,16 @@ static int build_temp_rootfs(const char *newroot)
 	char d1[PATH_MAX], d2[PATH_MAX];
 	struct utsname u;
 	const char *mdir[] = { "/proc", "/tmp", "/sys", "/usr", "/var", "/var/lock" };
-	const char *bin = "ash busybox cat cp dd df echo grep iwpriv kill ls ps mkdir mount nvram ping sh tar umount uname rm";
+	const char *bin = "ash busybox cat cp dd df echo grep iwpriv kill ls ps mkdir mount nvram ping sh tar umount uname rm chmod mv klogd syslogd";
 	const char *sbin = "init rc hotplug2 insmod lsmod modprobe reboot rmmod rtkswitch"
 #if defined(RTCONFIG_BWDPI)
 		" bwdpi* rsasign_sig_check"
+#endif
+#if defined(RTCONFIG_HW_DOG)
+		" hwdog"
+#endif
+#if defined(RTCONFIG_SCHED_DAEMON)
+		" sched_daemon"
 #endif
 		;
 	const char *lib = "librt*.so* libnsl* libdl* libm* ld-* libiw* libgcc* libpthread* libdisk* libc*"
@@ -455,12 +461,12 @@ static int build_temp_rootfs(const char *newroot)
 			     " libasuslog.so"
 #endif
 		;
-	const char *usrbin = "killall"
+	const char *usrbin = "killall cru"
 #if defined(RTCONFIG_WIFI_QCN5024_QCN5054) || defined(RTCONFIG_QCA_AXCHIP)
 			     " cnssdaemon"
 #endif
 		;
-	const char *usrsbin __attribute__((unused)) = "httpd"
+	const char *usrsbin __attribute__((unused)) = "httpd cru"
 #if defined(RTCONFIG_HTTPS)
 			     " httpds"
 #endif
@@ -1341,12 +1347,23 @@ void start_dnsmasq(void)
 
 		/* default names */
 		fprintf(fp, "%s %s\n", lan_ipaddr, DUT_DOMAIN_NAME);
-		fprintf(fp, "%s %s\n", lan_ipaddr, OLD_DUT_DOMAIN_NAME1);
-		fprintf(fp, "%s %s\n", lan_ipaddr, OLD_DUT_DOMAIN_NAME2);
-#if defined(RTAC68U) || defined(RPAX56) || defined(RPAX58)
-		if ((is_dpsta_repeater()||dpsr_mode()) && nvram_get_int("re_mode") == 0)
+		fprintf(fp, "%s %s\n", lan_ipaddr, "asusrouter.com");
+		fprintf(fp, "%s %s\n", lan_ipaddr, "www.asusrepeater.com");
+		fprintf(fp, "%s %s\n", lan_ipaddr, "asusrepeater.com");
+		fprintf(fp, "%s %s\n", lan_ipaddr, "www.asusap.com");
+		fprintf(fp, "%s %s\n", lan_ipaddr, "asusap.com");
+		fprintf(fp, "%s %s\n", lan_ipaddr, "www.asusswitch.com");
+		fprintf(fp, "%s %s\n", lan_ipaddr, "asusswitch.com");
+		fprintf(fp, "%s %s\n", lan_ipaddr, "router.asus.com");
 		fprintf(fp, "%s %s\n", lan_ipaddr, "repeater.asus.com");
-#endif
+		fprintf(fp, "%s %s\n", lan_ipaddr, "ap.asus.com");
+		fprintf(fp, "%s %s\n", lan_ipaddr, "www.asusnetwork.net");
+		fprintf(fp, "%s %s\n", lan_ipaddr, "asusswitch.net");
+		fprintf(fp, "%s %s\n", lan_ipaddr, "asusrepeater.net");
+		fprintf(fp, "%s %s\n", lan_ipaddr, "asusap.net");
+		fprintf(fp, "%s %s\n", lan_ipaddr, "zenwifi.net");
+		fprintf(fp, "%s %s\n", lan_ipaddr, "expertwifi.net");
+
 	nv = nvp = strdup(nvram_safe_get("dhcp_staticlist"));
 	if (nv)
 	{
@@ -2347,6 +2364,7 @@ void start_s46_tunnel(int unit)
 		snprintf(draft, sizeof(draft), "OFF");
 		break;
 	case WAN_V6PLUS:
+	case WAN_OCNVC:
 		snprintf(draft, sizeof(draft), "ON");
 		break;
 	default:
@@ -2459,6 +2477,7 @@ void stop_s46_tunnel(int unit, int unload)
 	case WAN_LW4O6:
 	case WAN_MAPE:
 	case WAN_V6PLUS:
+	case WAN_OCNVC:
 		break;
 	default:
 		return;
@@ -2489,35 +2508,66 @@ void stop_s46_tunnel(int unit, int unload)
 #endif
 }
 void
-start_s46map_rptd(void)
+start_v6plusd(void)
 {
-        char *s46map_rptd_argv[] = {"s46map_rptd", NULL};
+        char *v6plusd_argv[] = {"v6plusd", NULL};
         pid_t pid;
 
         if(getpid()!=1) {
-                notify_rc("start_s46map_rptd");
+                notify_rc("start_v6plusd");
                 return;
         }
 
-        killall("s46map_rptd", SIGTERM);
+        killall("v6plusd", SIGTERM);
 
-        _eval(s46map_rptd_argv, NULL, 0, &pid);
+        _eval(v6plusd_argv, NULL, 0, &pid);
 }
 
-void stop_s46map_rptd(void)
+void stop_v6plusd(void)
 {
         if(getpid()!=1) {
-                notify_rc("stop_s46map_rptd");
+                notify_rc("stop_v6plusd");
                 return;
         }
 
-        killall("s46map_rptd", SIGTERM);
+        killall("v6plusd", SIGTERM);
 }
 
-void restart_s46map_rptd(void)
+void restart_v6plusd(void)
 {
-	stop_s46map_rptd();
-	start_s46map_rptd();
+	stop_v6plusd();
+	start_v6plusd();
+}
+
+start_ocnvcd(void)
+{
+        char *ocnvcd_argv[] = {"ocnvcd", NULL};
+        pid_t pid;
+
+        if(getpid()!=1) {
+                notify_rc("start_ocnvcd");
+                return;
+        }
+
+        killall("ocnvcd", SIGTERM);
+
+        _eval(ocnvcd_argv, NULL, 0, &pid);
+}
+
+void stop_ocnvcd(void)
+{
+        if(getpid()!=1) {
+                notify_rc("stop_ocnvcd");
+                return;
+        }
+
+        killall("ocnvcd", SIGTERM);
+}
+
+void restart_ocnvcd(void)
+{
+	stop_ocnvcd();
+	start_ocnvcd();
 }
 #endif
 
@@ -5634,6 +5684,23 @@ stop_misc(void)
 #ifdef RTCONFIG_CONNDIAG
 	stop_conn_diag();
 #endif
+#endif
+	stop_pppoe_relay();
+	if (pids("igmpproxy"))
+		killall_tk("igmpproxy");
+	if (pids("telnetd"))
+		killall_tk("telnetd");
+	if (pids("dropbear"))
+		killall_tk("dropbear");
+	if (pids("alt_watchdog"))
+		killall_tk("alt_watchdog");
+#if defined(RTCONFIG_AWSIOT)
+	if (pids("awsiot"))
+		killall_tk("awsiot");
+#endif
+#ifdef RTCONFIG_FSMD
+	if (pids("fsmd"))
+		killall_tk("fsmd");
 #endif
 #ifdef RTCONFIG_AMAS
 	stop_amas_lib();
@@ -16390,10 +16457,15 @@ _dprintf("test 2. turn off the USB power during %d seconds.\n", reset_seconds[re
 	}
 #endif
 #ifdef RTCONFIG_SOFTWIRE46
-	else if (strcmp(script, "s46map_rptd") == 0)
+	else if (strcmp(script, "v6plusd") == 0)
 	{
-		if(action & RC_SERVICE_STOP) stop_s46map_rptd();
-		if(action & RC_SERVICE_START) start_s46map_rptd();
+		if(action & RC_SERVICE_STOP) stop_v6plusd();
+		if(action & RC_SERVICE_START) start_v6plusd();
+	}
+	else if (strcmp(script, "ocnvcd") == 0)
+	{
+		if(action & RC_SERVICE_STOP) stop_ocnvcd();
+		if(action & RC_SERVICE_START) start_ocnvcd();
 	}
 #endif
 #ifdef RTCONFIG_DISABLE_NETWORKMAP
@@ -16691,6 +16763,10 @@ _dprintf("test 2. turn off the USB power during %d seconds.\n", reset_seconds[re
 			start_plchost();
 			start_detect_plc();
 		}
+	}
+	else if (strcmp(script, "detect_plc") == 0) {
+		if (action & RC_SERVICE_STOP) stop_detect_plc();
+		if (action & RC_SERVICE_START) start_detect_plc();
 	}
 #endif	/* RTCONFIG_QCA_PLC_UTILS || RTCONFIG_QCA_PLC2 */
 #ifdef RTCONFIG_WIREGUARD
@@ -17361,6 +17437,10 @@ void start_amas_lldpd(void)
 
 	stop_amas_lldpd();
 
+#ifdef RTCONFIG_AVOID_TZ_ENV
+	#define CHROOTDIR_LLDPD "/var/run/lldpd"
+	doSystem("mkdir -p %s/etc ; ln -f /tmp/TZ %s/etc/TZ", CHROOTDIR_LLDPD, CHROOTDIR_LLDPD);	/* add a hard link to /tmp/TZ at /var/run/lldpd/etc/TZ */
+#endif
 	FILE *fp = NULL;
 	fp = fopen("/tmp/run_lldpd.sh", "w+");
 	if (!fp) {
@@ -17605,8 +17685,13 @@ int start_nat_rules(void)
 		return stop_nat_rules();
 
 	nat_state = nvram_get_int("nat_state");
-	if (nat_state == NAT_STATE_NORMAL)
+	if (nat_state == NAT_STATE_NORMAL) {
+#if defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
+		setup_ct_timeout(TRUE);
+		setup_udp_timeout(TRUE);
+#endif
 		return nat_state;
+	}
 
 	retry = 1;
 	while (lstat(NAT_RULES, &s) || (ret = S_ISLNK(s.st_mode) ? readlink(NAT_RULES, ln, sizeof(ln) - 1) : s.st_size) <= 0) {

@@ -5,8 +5,14 @@
 #include <rc.h>
 #include <shared.h>
 #include <amas-utils.h>
-#include <amas/amas.h>
 #include <libasuslog.h>
+
+//#include <amas/amas.h>
+enum {
+	ROLE_NONE = 0,
+	ROLE_LAN = 1,
+};
+
 
 #if defined(RTCONFIG_QCA_PLC2)
 #include <plc_utils.h>

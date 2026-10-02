@@ -18,6 +18,7 @@
 #define RTXXXXH
 
 #include <iwlib.h>
+#include <rtconfig.h>
 
 
 extern const char WIF_2G[];
@@ -55,8 +56,15 @@ extern const char APCLI_2G[];
 #define BW_40			1
 #define BW_BOTH			2
 #define BW_80			2
+#if defined(RTCONFIG_MT798X)
+#define BW_160			3
+#define BW_10			4
+#define BW_5			5
+#define BW_8080			6
+#else
 #define BW_10			3
 #define BW_160			3
+#endif
 
 #if defined(RTCONFIG_RALINK_MT7622) || defined(RTCONFIG_WLMODULE_MT7629_AP)
 #define RT_802_11_MAC_ENTRY_for_5G			RT_802_11_MAC_ENTRY
@@ -466,6 +474,8 @@ enum ASUS_IOCTL_SUBCMD {
     ASUS_SUBCMD_DFS_STATUS,
     ASUS_SUBCMD_RRM_BCN_RESP,
     ASUS_SUBCMD_GET_RCLASS,
+    ASUS_SUBCMD_DFS_CH_STATUS,				//24
+    ASUS_SUBCMD_GET_CH_BW,				//25
 	ASUS_SUBCMD_MAX
 };
 
@@ -835,6 +845,7 @@ struct GNU_PACKED wnm_command {
 #endif
 
 #if defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#define OFFSET_EISN		0x6ff70	// 32 bytes
 #define OFFSET_TERRITORY_CODE	0x6ff90	/* 5 bytes, e.g., US/01, US/02, TW/01, etc. */
 #define OFFSET_DEV_FLAGS	0x6ffa0 //device dependent flags
 #define OFFSET_ODMPID		0x6ffb0 //the shown model name (for Bestbuy and others)
@@ -853,6 +864,7 @@ struct GNU_PACKED wnm_command {
 #define OFFSET_32BYTES_ODMPID   0x6FE47 // 32 bytes
 #endif
 #elif defined(RT4GAC86U)
+#define OFFSET_EISN		0x5ff70	// 32 bytes
 #define OFFSET_TERRITORY_CODE	0x5ff90	/* 5 bytes, e.g., US/01, US/02, TW/01, etc. */
 #define OFFSET_DEV_FLAGS	0x5ffa0 //device dependent flags
 #define OFFSET_ODMPID		0x5ffb0 //the shown model name (for Bestbuy and others)
@@ -867,6 +879,7 @@ struct GNU_PACKED wnm_command {
 #define OFFSET_HW_BOM	0x5FE0C	// 32 bytes
 #define OFFSET_HW_DATE_CODE	0x5FE3E	// 8 bytes
 #else
+#define OFFSET_EISN		(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xff70)	// 32 bytes
 #define OFFSET_TERRITORY_CODE	(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xff90)	/* 5 bytes, e.g., US/01, US/02, TW/01, etc. */
 #define OFFSET_DEV_FLAGS	(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xffa0) //device dependent flags
 #define OFFSET_ODMPID		(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xffb0) //the shown model name (for Bestbuy and others)
@@ -981,6 +994,10 @@ int ra_gpio_read_int(int *value);
 int ra_gpio_write_bit(int idx, int value);
 
 extern int wl_ioctl(const char *ifname, int cmd, struct iwreq *pwrq);
+
+//cal the rate from MACHTTRANSMIT_SETTING structure replied from ioctl(CMD_RTPRIV_IOCTL_GET_MAC_TABLE_STRUCT)
+extern int getRate(MACHTTRANSMIT_SETTING_for_5G HTSetting);
+extern int getRate_2g(MACHTTRANSMIT_SETTING_for_2G HTSetting);
 
 /* for ATE Get_WanLanStatus command */
 #if defined(RTCONFIG_RALINK_MT7621)

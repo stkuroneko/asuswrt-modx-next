@@ -699,8 +699,10 @@ rfctime(const time_t *timep)
 	static char s[200];
 	struct tm tm;
 
+#ifndef RTCONFIG_AVOID_TZ_ENV
 	if(setenv("TZ", nvram_safe_get_x("", "time_zone_x"), 1)==0)
 		tzset();
+#endif
 
 	localtime_r(timep, &tm);
 	strftime(s, sizeof(s), "%a, %d %b %Y %H:%M:%S %z", &tm);
@@ -7332,27 +7334,35 @@ ej_lan_ipv6_network(int eid, webs_t wp, int argc, char_t **argv)
 
 #ifdef RTCONFIG_SOFTWIRE46
 	char *nv, *nvp, *item, *nextp;
+	int wan_proto = -1;
 	int wan_unit, cnt = 0;
+	int offset = nvram_get_int("ipv6_s46_offset");
 	char prefix[sizeof("wanXXXXXXXXXX_")];
-	char pt[16][12] = {0};
 	wan_unit = wan_primary_ifunit();
         snprintf(prefix, sizeof(prefix), "wan%d_", wan_unit);
-        switch (get_wan_proto(prefix)) {
+	switch (wan_proto = get_wan_proto(prefix)) {
 		case WAN_V6PLUS:
-			ret += websWrite(wp, "\n\nv6plus Usable Port:\n");
+		case WAN_OCNVC:
+			ret += websWrite(wp, "\n\n%s Usable Port Range:\n", (wan_proto == WAN_V6PLUS) ? "v6plus" : "OCN Virtual Connect");
+			ret += websWrite(wp, "-------------------------------------------------------------------\n");
 			if (nvram_get_int("s46_hgw_case") >= S46_CASE_MAP_HGW_OFF) {
 				nvp = nv = strdup(nvram_safe_get("ipv6_s46_ports"));
+				char (*pt)[12] = (char(*)[12]) calloc(((1 << offset) -1) * 12, sizeof(char));
 				for (item = strtok_r(nvp, " ", &nextp); item; item = strtok_r(NULL, " ", &nextp)) {
 					snprintf(pt[cnt], sizeof(pt[cnt]), "%s", item);
 					cnt++;
 				}
 				free(nv);
-				ret += websWrite(wp, "%-11s %-11s %-11s %-11s\n", pt[0], pt[1], pt[2], pt[3]);
-				ret += websWrite(wp, "%-11s %-11s %-11s %-11s\n", pt[4], pt[5], pt[6], pt[7]);
-				ret += websWrite(wp, "%-11s %-11s %-11s %-11s\n", pt[8], pt[9], pt[10], pt[11]);
-				ret += websWrite(wp, "%-11s %-11s %-11s\n", pt[12], pt[13], pt[14]);
+				for (i = 0; i < cnt && i < (1 << offset) -1; i++) {
+					if (((i+1) % 7) != 0)
+						ret += websWrite(wp, "%-11s ", pt[i]);
+					else
+						ret += websWrite(wp, "%-11s\n", pt[i]);
+				}
+				if (pt)
+					free(pt);
 			} else if (nvram_get_int("s46_hgw_case") == S46_CASE_MAP_HGW_ON) {
-				ret += websWrite(wp, "N/A (v6plus is active on HGW.)\n");
+				ret += websWrite(wp, "N/A (%s is active on HGW.)\n", (wan_proto == WAN_V6PLUS) ? "v6plus" : "OCN Virtual Connect");
 			}
 			break;
 		default:
@@ -9028,6 +9038,64 @@ static int get_client_bind_info(char *client_mac, char *node_mac, int node_mac_s
 #endif
 #endif
 
+
+static int get_wireless_client_info(char *mac, char *wireless) {
+
+	// _dprintf("get_wireless_client_info mac = %s, wireless = %s\n", mac, wireless);
+
+	int status = -1;
+	int lock;
+	int conn_ts = 0;
+
+	json_object *wClietListObj = NULL;
+	json_object *brMacObj = NULL;
+	json_object *wlObj = NULL;
+	json_object *tsObj = NULL;
+
+	if(check_if_file_exist(NMP_CL_JSON_FILE))
+	{
+		wClietListObj = json_object_from_file(NMP_CL_JSON_FILE);
+	} else {
+		_dprintf("file not exist >> %s\n", NMP_CL_JSON_FILE);
+	}
+
+	if (wClietListObj) {
+
+		char cap_mac[18] = {0};
+		snprintf(cap_mac, sizeof(cap_mac), "%s", get_lan_hwaddr());
+		// _dprintf("cap_mac = %s\n", cap_mac);
+
+		json_object_object_foreach(wClietListObj, key, val) {
+
+			brMacObj = val;
+
+			// _dprintf("mac key = %s, brMacObj = %s\n", key, json_object_get_string(brMacObj));
+
+			if(strcmp(key, mac) == 0) {
+
+				json_object_object_get_ex(brMacObj, "is_wireless", &wlObj);
+				json_object_object_get_ex(brMacObj, "conn_ts", &tsObj);
+				if(wlObj && tsObj) {
+					snprintf(wireless, sizeof(wireless), "%s", json_object_get_string(wlObj));
+					conn_ts = json_object_get_int(tsObj);
+
+					if(memcmp(wireless, "0", 1)) {
+						status = 1;
+						_dprintf("mac = %s, get wireless = %s, conn_ts = %d\n", mac, wireless, conn_ts);
+					}
+				} else {
+					snprintf(wireless, sizeof(wireless), "%s", "0");
+					conn_ts = 0;
+				}
+				break;
+			}
+		}
+		json_object_put(wClietListObj);
+	}
+
+	return status;
+}
+
 //2016.09 Rawny add for new networkmap
 //static int get_client_detail_info(int eid, webs_t wp, int argc, char_t **argv, key_t shmkey, char *maclist_buf){
 static int get_client_detail_info(struct json_object *clients, struct json_object *macArray, key_t shmkey){
@@ -9432,6 +9500,7 @@ static int get_client_detail_info(struct json_object *clients, struct json_objec
 				struct json_object *amas_re_get_isWL = NULL, *amas_re_get_amesh_papMac = NULL;
 				json_object_object_get_ex(client, "isWL", &amas_re_get_isWL);
 				json_object_object_get_ex(client, "amesh_papMac", &amas_re_get_amesh_papMac);
+
 				if(amas_re_get_amesh_papMac != NULL && strcmp(json_object_get_string(amas_re_get_isWL), "0")) {
 					char client_key[40] = {0};
 					memset(client_key, 0, sizeof(client_key));
@@ -9455,6 +9524,20 @@ static int get_client_detail_info(struct json_object *clients, struct json_objec
 #endif
 			}
 
+
+			// start : get wireless type , form nmp_cl_json.js
+			json_object *get_isWL = NULL;
+			json_object_object_get_ex(client, "isWL", &get_isWL);
+			snprintf(wireless, sizeof(wireless), "%s", json_object_get_string(get_isWL));
+			if(!memcmp(wireless, "0", 1)) {
+				// get nmp_cl_json.js content -> is_wireless
+				if(get_wireless_client_info(mac_buf, &wireless) > 0) {
+					json_object_object_add(client, "isOnline", json_object_new_string("0"));
+					snprintf(online, sizeof(online), "%s", "0");
+				}
+			}
+			// end : get wireless type
+
 			struct json_object *isOnline = NULL;
 			json_object_object_get_ex(client, "isOnline", &isOnline);
 			//check isOnline attribute only on amas support(not when RTCONFIG_AMAS defined)
@@ -9471,12 +9554,9 @@ static int get_client_detail_info(struct json_object *clients, struct json_objec
 				else if(isOnline && !strcmp(json_object_get_string(isOnline), "1")) {
  					json_object_array_add(macArray, json_object_new_string(mac_buf));
 				} else {
-					if( atoi(wireless) != 0 ) {
-						// _dprintf("get  wireless = %s, online = %s\n", wireless, online);
-						json_object_object_add(client, "isOnline", json_object_new_string(online));	
-						if(strcmp(online, "1") == 0) {
-							json_object_array_add(macArray, json_object_new_string(mac_buf));	
-						}
+					json_object_object_add(client, "isOnline", json_object_new_string(online));
+					if(strcmp(online, "1") == 0) {
+						json_object_array_add(macArray, json_object_new_string(mac_buf));	
 					}
 				}
 			}
@@ -15966,8 +16046,15 @@ do_clear_file_cgi(char *url, FILE *stream)
 	
 	char *clear_file;
 	clear_file = websGetVar(wp, "clear_file_name", "");
+
+	if(strcmp(clear_file, "cert.tgz") == 0) {
+		if(check_if_file_exist("/jffs/cert.tgz")){
+			eval("rm", "/jffs/cert.tgz");
+			notify_rc_and_wait("restart_httpd");
+		}
+	}
 #ifdef RTCONFIG_IPSEC
-	if(strcmp(clear_file, "ipsec") == 0) {
+	else if(strcmp(clear_file, "ipsec") == 0) {
 		strlcpy(file_name, FILE_PATH_IPSEC_LOG, sizeof(file_name));
 		if(check_if_file_exist(file_name)) {
 			//unlink(file_name);
@@ -27399,7 +27486,7 @@ do_lte_upgrade_post(char *url, FILE *stream, int len, char *boundary)
 	}
 
 #if defined(RT4GAX56)
-	upgrade_rc("stop", autoreboot, reset, 0);
+	upgrade_rc("stop", autoreboot, reset, "", 0);
 #endif
 
 #define BYTE_TO_KB(b) ((b >> 10) + ((b & 0x2ff)?1:0))
@@ -27564,7 +27651,8 @@ ej_chk_aqr_fw(int eid, webs_t wp, int argc, char **argv)
 	/* *.cld in aq-fw-download don't have version string, define version number manually. */
 	const char *aqr107_fw_ver = "3.7.B";		/* AQR107, AQR-G2_v3.7.B-AQR_Asus_GT-AX6000-prov1_TXDis_ID44757_VER12795.cld */
 	const char *aqr113_fw_ver = "5.4.A";		/* AQR113/113C, AQR-G4_v5.4.B-AQR_Asus_RT-AX89X_TXDis_ID44751_VER11505.cld */
-	char *fw = NULL, id_str[sizeof("0xXXXXXXXXYYY")];
+	const char *fw = NULL;
+	char id_str[sizeof("0xXXXXXXXXYYY")];
 	int aqr_addr = aqr_phy_addr(), id1 = 0, id2 = 0;
 
 	if (!is_aqr_phy_exist())
@@ -31707,30 +31795,33 @@ static int chk_srv_port_in_s46(char *type, uint16_t range_port[][2], int size) {
 static int ej_chk_s46_port_range(int eid, webs_t wp, int argc, char **argv)
 {
 
-	int i, max = 15;
+	int i;
 	char *nv, *nvp, *item, *nextp;
-	uint16_t range_port[max][2];
 
 	if (nvram_get_int("s46_hgw_case") <= S46_CASE_MAP_HGW_ON) {
 		websWrite(wp, "{\"pf\":\"0\",\"open_nat\":\"0\",\"pt\":\"0\",\"https\":\"0\",\"ssh\":\"0\",\"openvpn\":\"0\",\"ftp\":\"0\",\"ipsec\":\"0\"}");
 		return 0;
 	}
 
+	int max = (1 << nvram_get_int("ipv6_s46_offset")) -1;
+	uint16_t (*range_port)[2] = (uint16_t(*)[2]) calloc(max * 2, sizeof(uint16_t));
 	nvp = nv = strdup(nvram_safe_get("ipv6_s46_ports"));
-	for (i = 0, item = strtok_r(nvp, " ", &nextp); item; i++, item = strtok_r(NULL, " ", &nextp)) {
+	for (i = 0, item = strtok_r(nvp, " ", &nextp); i < max && item; i++, item = strtok_r(NULL, " ", &nextp)) {
 		if (sscanf(item, "%hu-%hu", &range_port[i][0], &range_port[i][1]) != 2)
 			continue;
 	}
 	free(nv);
 	websWrite(wp, "{\"pf\":\"%d\",\"open_nat\":\"%d\",\"pt\":\"%d\",\"https\":\"%d\",\"ssh\":\"%d\",\"openvpn\":\"%d\",\"ftp\":\"%d\",\"ipsec\":\"%d\"}",
-			chk_pf_in_s46("vts_rulelist", range_port, (i>15) ? max : i),
-			chk_pf_in_s46("game_vts_rulelist", range_port, (i>15) ? max : i),
-			chk_pt_in_s46("autofw_rulelist", range_port, (i>15) ? max : i),
-			chk_srv_port_in_s46("https", range_port, (i>15) ? max : i),
-			chk_srv_port_in_s46("ssh", range_port, (i>15) ? max : i),
-			chk_srv_port_in_s46("openvpn", range_port, (i>15) ? max : i),
-			chk_srv_port_in_s46("ftp", range_port, (i>15) ? max : i),
-			chk_srv_port_in_s46("ipsec", range_port, (i>15) ? max : i));
+			chk_pf_in_s46("vts_rulelist", range_port, (i>max) ? max : i),
+			chk_pf_in_s46("game_vts_rulelist", range_port, (i>max) ? max : i),
+			chk_pt_in_s46("autofw_rulelist", range_port, (i>max) ? max : i),
+			chk_srv_port_in_s46("https", range_port, (i>max) ? max : i),
+			chk_srv_port_in_s46("ssh", range_port, (i>max) ? max : i),
+			chk_srv_port_in_s46("openvpn", range_port, (i>max) ? max : i),
+			chk_srv_port_in_s46("ftp", range_port, (i>max) ? max : i),
+			chk_srv_port_in_s46("ipsec", range_port, (i>max) ? max : i));
+	if (range_port)
+		free(range_port);
 	return 0;
 }
 #endif

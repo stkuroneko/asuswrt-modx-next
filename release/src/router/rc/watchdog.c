@@ -266,7 +266,9 @@ static int ddns_check_count = 0;
 static int freeze_duck_count = 0;
 static int ddns_recover_min = 0;
 
+#ifndef RTCONFIG_AVOID_TZ_ENV
 static char time_zone_t[32]={0};
+#endif
 
 static const struct mfg_btn_s {
 	enum btn_id id;
@@ -4192,7 +4194,7 @@ void btn_check(void)
 			else
 				pb_state = -1;
 
-			if ((wps_enable && is_wps_stopped()) || --wsc_timeout == 0 || IS_PLC_JOIN_STOPPED(pb_state))
+			if (((wps_enable || pb_state == -2 /*OB*/) && is_wps_stopped()) || --wsc_timeout == 0 || IS_PLC_JOIN_STOPPED(pb_state))
 #else
 			if (is_wps_stopped() || --wsc_timeout == 0)
 #endif
@@ -4240,7 +4242,7 @@ void btn_check(void)
 				if (!wps_enable)
 					nvram_set("prelink_pap_status", "-1");	//PLC finish
 			}
-			if (wps_enable && wsc_timeout == 0) //keep doing when stop with wps_enable
+			if ((wps_enable || pb_state == -2 /*OB*/) && wsc_timeout == 0) //keep doing when stop with wps_enable
 			{
 #endif
 #ifdef RTCONFIG_WIFI_CLONE
@@ -4460,7 +4462,9 @@ int timecheck_item(char *activeTime)
 	int x=0, y=0, z=0;	//for loop usage
 
 	/* current router time */
+#ifndef RTCONFIG_AVOID_TZ_ENV
 	setenv("TZ", nvram_safe_get("time_zone_x"), 1);
+#endif
 	time(&now);
 	tm = localtime(&now);
 	now_dow = tm->tm_wday;
@@ -4575,7 +4579,9 @@ int timecheck_reboot(char *activeSchedule)
 	struct tm *tm;
 	int i;
 
+#ifndef RTCONFIG_AVOID_TZ_ENV
 	setenv("TZ", nvram_safe_get("time_zone_x"), 1);
+#endif
 
 	time(&now);
 	tm = localtime(&now);
@@ -4993,10 +4999,7 @@ static void catch_sig(int sig)
 		dbG("[watchdog] Handle WPS LED for WPS Start\n");
 
 #if defined(RTCONFIG_QCA_PLC2)
-		if (!nvram_match("wps_enable", "1"))
-			return;
-
-		nvram_unset("plc_pb_state");	//clean plc_pb_state for wps check
+		nvram_set("plc_pb_state", "-2");	//set plc_pb_state=-2 as OnBoarding for wps check
 #endif
 
 #if defined(RTCONFIG_LP5523)
@@ -9189,6 +9192,45 @@ void check_process_plc(void)
 }
 #endif
 
+#ifdef HND_ROUTER
+void udhcpc_check(void)
+{
+	FILE *fp;
+	char *pidfile = "/var/run/tmp_udhcpc_wan.pid";
+	char buf[8] = {0};
+	pid_t pid = 0;
+	int p = pidof("udhcpc_wan");
+	static int count = 0;
+
+	// _dprintf("%s\n", __FUNCTION__);
+	if (f_exists(pidfile)) {
+		f_read_string(pidfile, buf, sizeof(buf));
+		pid = strtoul(buf, NULL, 0);
+	}
+	if (pid && p == (int)pid) {
+		if (count) {
+			_dprintf("%s: kill %u\n", __FUNCTION__, pid);
+			kill_pid_tk(pid);
+			unlink(pidfile);
+			count = 0;
+		}
+		else {
+			_dprintf("%s: count %d\n", __FUNCTION__, count);
+			count++;
+		}
+	}
+	else if (p > 1) {
+		fp = fopen(pidfile, "w");
+		if (fp) {
+			_dprintf("%s: record %d\n", __FUNCTION__, p);
+			fprintf(fp, "%d", p);
+			fclose(fp);
+			count = 0;
+		}
+	}
+}
+#endif
+
 /* wathchdog is runned in NORMAL_PERIOD, 1 seconds
  * check in each NORMAL_PERIOD
  *	1. button
@@ -9401,11 +9443,13 @@ void watchdog(int sig)
 	}
 
 	if(nvram_match("ntp_ready", "1")) {
+#ifndef RTCONFIG_AVOID_TZ_ENV
 		if(!nvram_match("time_zone_x", time_zone_t)){
 			strlcpy(time_zone_t, nvram_safe_get("time_zone_x"), sizeof(time_zone_t));
 			setenv("TZ", nvram_safe_get("time_zone_x"), 1);
 			tzset();
 		}
+#endif	/* RTCONFIG_AVOID_TZ_ENV */
 		if(strstr(nvram_safe_get("time_zone_x"), "DST") && dst_critical()) {
 			_dprintf("dst critical.\n");
 			notify_rc("restart_firewall");
@@ -9561,6 +9605,9 @@ wdp:
 #if defined(RTCONFIG_QCA_PLC2)
 	check_process_plc();
 #endif
+#ifdef HND_ROUTER
+	udhcpc_check();
+#endif
 }
 
 #if ! (defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK))
@@ -9665,9 +9712,11 @@ watchdog_main(int argc, char *argv[])
 		nvram_set(p->nv, "0");
 	}
 
+#ifndef RTCONFIG_AVOID_TZ_ENV
 	setenv("TZ", nvram_safe_get("time_zone_x"), 1);
 
 	_dprintf("TZ watchdog\n");
+#endif	/* RTCONFIG_AVOID_TZ_ENV */
 	/* set timer */
 	alarmtimer(NORMAL_PERIOD, 0);
 

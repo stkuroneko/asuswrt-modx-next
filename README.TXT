@@ -69,7 +69,7 @@ Set Up Environment(Tested in Fedora 8/9 and Ubuntu)
 			mtd-utils intltool sharutils docbook-xsl-* libstdc++5 texinfo dos2unix xsltproc
 			u-boot-tools device-tree-compiler qemu gperf liblzo2-dev uuid-dev build-essential
 			lzma-dev liblzma-dev lzma binutils-dev patch cmake intltool libglib2.0-dev
-			gtk-doc-tools
+			gtk-doc-tools libssl-dev libyaml-dev
 
 		If you are using Ubuntu amd64, you may need to install 32-bit packages listed below.
 			libc6-i386 lib32stdc++6 lib32z1 libelf1:i386 lib32ncurses5 libc6-dev-i386
@@ -80,7 +80,7 @@ Set Up Environment(Tested in Fedora 8/9 and Ubuntu)
 		sudo yum install gettext-devel libxml2-devel mtd-utils-ubi ncurses-devel \
 			zlib-devel intltool sharutils docbook-dtds docbook-style-xsl \
 			uboot-tools dtc gengetopt qemu gperf cmake glib2-devel gtk-doc \
-			texinfo lzo-devel libbsd-devel
+			texinfo lzo-devel libbsd-devel libyaml-devel
 
 		If you are using Fedora 19 or above, you need to install below packages.
 		sudo yum groupinstall "C Development Tools and Libraries"

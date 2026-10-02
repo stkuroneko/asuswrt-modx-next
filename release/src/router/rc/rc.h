@@ -399,8 +399,11 @@ extern int isValidMacAddr(const char* mac);
 extern int isValidCountryCode(const char *Ccode);
 extern int isValidRegrev(const char *regrev);
 extern int isValidSN(const char *sn);
-extern int isResetSN(const char *sn);
+extern int isValidEISN(const char *eisn);
+#if defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
 extern int isResetFactory(const char *str);
+extern int lenFRead(const unsigned char *buf, const int len);
+#endif
 extern int isNumber(const char *num);
 extern int pincheck(const char *a);
 extern int isValidChannel(int is_2G, char *channel);
@@ -518,6 +521,8 @@ extern int setCountryCode_2G(const char *cc);
 extern int setCountryCode_5G(const char *cc);
 extern int setSN(const char *SN);
 extern int getSN(void);
+extern int setEISN(const char *EISN);
+extern int getEISN(void);
 extern int setPIN(const char *pin);
 extern int getPIN(void);
 extern int set40M_Channel_2G(char *channel);
@@ -2202,28 +2207,6 @@ extern void start_ipv6_tunnel(void);
 extern void stop_ipv6_tunnel(void);
 #ifdef RTCONFIG_SOFTWIRE46
 #define S46_LOG_PATH	"/jffs/s46.log"
-extern void set_s46_ra_addr(int wan_type, char *wan_ifname);
-extern int s46_mapcalc(int wan_proto, char *rules, char *peerbuf, size_t peerbufsz,
-	char *addr6buf, size_t addr6bufsz, char *addr4buf, size_t addr4bufsz,
-	int *poffset, int *ppsidlen, int *ppsid, char **fmrs, int draft);
-extern void start_s46_tunnel(int unit);
-extern void stop_s46_tunnel(int unit, int unload);
-// s46map_rptd.c
-extern void s46print(const char * logpath, const char * format, ...);
-#define S46_DBG(fmt, args...) \
-	do { \
-		s46print(S46_LOG_PATH, "[%s:(%d)]"fmt, __FUNCTION__, __LINE__, ##args); \
-	} while(0)
-extern int s46_jpne_hgw(void);
-extern char *s46_jpne_maprules(char *id, char *idbuf, size_t idlen, long *rsp_code);
-extern void s46_jpne_report(char *id, int act, int reason);
-extern int s46_mapcalc_chcek(char *id, char *rules, int draft);
-extern int s46map_rptd_main(int argc, char **argv);
-extern char *calc_s46_port_range(int usable, int psid, int psidlen, int offset, char *ret, int retsz);
-extern int check_s46map_rptd();
-extern void start_s46map_rptd(void);
-extern void stop_s46map_rptd(void);
-extern void restart_s46map_rptd(void);
 enum S46_MAPSVR_STATE {
 	S46_MAPSVR_INIT			= 0,
 	S46_MAPSVR_OK			= 1,
@@ -2232,6 +2215,40 @@ enum S46_MAPSVR_STATE {
 	S46_MAPSVR_NO_RESPONSE		= 4,
 	S46_MAPSVR_MAX
 };
+extern void set_s46_ra_addr(int wan_type, char *wan_ifname);
+extern int s46_mapcalc(int wan_proto, char *rules, char *peerbuf, size_t peerbufsz,
+		       char *addr6buf, size_t addr6bufsz, char *addr4buf, size_t addr4bufsz,
+		       int *poffset, int *ppsidlen, int *ppsid, char **fmrs, int draft);
+extern void start_s46_tunnel(int unit);
+extern void stop_s46_tunnel(int unit, int unload);
+extern int wan_hgw_detect(const int wan_unit, const char *wan_ifname, const char *prc);
+
+extern void start_v6plusd(void);
+extern void stop_v6plusd(void);
+extern void restart_v6plusd(void);
+extern void start_ocnvcd(void);
+extern void stop_ocnvcd(void);
+extern void restart_ocnvcd(void);
+//s46comm.c
+extern void s46print(const char *logpath, const char *format, ...);
+#define S46_DBG(fmt, args...) \
+	do { \
+		s46print(S46_LOG_PATH, "[%s:(%d)]"fmt, __FUNCTION__, __LINE__, ##args); \
+	} while(0)
+extern int _nvram_check(const char *name, const char *value);
+extern int _nvram_set_check(const char *name, const char *value);
+extern void fmrs2file(char *path);
+extern int ce_dad_check(void);
+extern int s46_ntt_hgw(void);
+extern char *calc_s46_port_range(int usable, int psid, int psidlen, int offset, char *ret, int retsz);
+// v6plusd.c
+extern char *s46_jpne_maprules(char *id, char *idbuf, size_t idlen, long *rsp_code);
+extern int check_v6plusd();
+extern int v6plusd_main(int argc, char **argv);
+// ocnvcd.c
+extern char *s46_ocn_maprules(char *v6perfix, int prefixlen, long *rsp_code);
+extern int check_ocnvcd();
+extern int ocnvcd_main(int argc, char **argv);
 #endif
 extern void start_ipv6(void);
 extern void stop_ipv6(void);

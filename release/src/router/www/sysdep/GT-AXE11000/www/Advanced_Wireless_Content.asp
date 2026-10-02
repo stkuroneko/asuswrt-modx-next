@@ -2100,7 +2100,7 @@ function controlHideSSIDHint() {
 		var sc_mode = ((_smart_connect_enable == "0") ? "0" : document.form.smart_connect_t.value);
 		var is_hide_ssid = ($('input:radio[name=wl' + dwb_info.band + '_closed]:checked').val() == "1") ? true : false;
 		if(sc_mode != "1" && is_hide_ssid)
-			$hide_ssid_field.find("td").append($("<div>").attr({"id":"dwb_band_hide_hint"}).append($("<span>").html('<#AiMesh_dedicated_backhaul_band_hide_SSID#>')));
+			$hide_ssid_field.find("td").append($("<div>").attr({"id":"dwb_band_hide_hint"}).append($("<span>").html("<#AiMesh_dedicated_backhaul_band_hide_SSID#>")));
 	}
 }
 function controlAXOnlyHint() {

@@ -962,7 +962,7 @@ function check_unregister_result(){
 			</tr>
 			<tr id="ddns_status_tr" style="display:none;">
 				<th>DDNS Status</th>
-				<td><sapn id="ddns_status" style="color:#FFCC00"></sapn><span id="ddns_status_detail" class="notificationon" style="display: none;" onmouseover="show_ddns_status_detail();" onMouseOut="nd();"></span></td>
+				<td><span id="ddns_status" style="color:#FFCC00"></span><span id="ddns_status_detail" class="notificationon" style="display: none;" onmouseover="show_ddns_status_detail();" onMouseOut="nd();"></span></td>
 			</tr>
 			<tr id="ddns_result_tr" style="display:none;">
 				<th>DDNS Registration Result</th>

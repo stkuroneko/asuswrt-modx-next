@@ -347,7 +347,9 @@ void Debug2File(const char *path, const char *fmt, ...)
 
 	fp = fopen(path, "a+");
 	if (fp) {
+#ifndef RTCONFIG_AVOID_TZ_ENV
 		setenv("TZ", nvram_safe_get_x("", "time_zone_x"), 1);
+#endif
 		now = time(NULL);
 		localtime_r(&now, &tm);
 		strftime(timebuf, sizeof(timebuf), "%b %d %H:%M:%S", &tm);
@@ -2246,7 +2248,9 @@ int main(int argc, char **argv)
 	/* set initial TZ to avoid mem leaks
 	 * it suppose to be convert after applying
 	 * time_zone_x_mapping(); */
+#ifndef RTCONFIG_AVOID_TZ_ENV
 	setenv("TZ", nvram_safe_get_x("", "time_zone_x"), 1);
+#endif
 
 #ifdef RTCONFIG_LETSENCRYPT
 	nvram_unset("le_restart_httpd");
@@ -2539,7 +2543,11 @@ int main(int argc, char **argv)
 }
 
 #ifdef RTCONFIG_HTTPS
+#if defined(RTCONFIG_RALINK_MT7621)
+#define HTTPS_CA_JFFS  "/jffs/cert_ecdsa.tgz"
+#else
 #define HTTPS_CA_JFFS  "/jffs/cert.tgz"
+#endif
 void save_cert(void)
 {
 	eval("tar", "-C", "/", "-czf", HTTPS_CA_JFFS, "etc/cert.pem", "etc/key.pem");

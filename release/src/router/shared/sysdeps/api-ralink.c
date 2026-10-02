@@ -1089,7 +1089,10 @@ int get_radar_channel_list(int unit, int radar_list[], int size)
 {
 	struct iwreq wrq;
 	char buffer[256], *data, *p = NULL, *tmplist = NULL, tmp[128], prefix[] = "wlXXXXXXXXXX_", *ifname;
-	int radar_cnt = 0;
+	int r, radar_cnt = 0;
+
+	if (!nvram_match("wlready", "1"))
+		return 0;
 
 	memset(buffer, 0, sizeof(buffer));
 	snprintf(prefix, sizeof(prefix), "wl%d_", unit);
@@ -1099,8 +1102,8 @@ int get_radar_channel_list(int unit, int radar_list[], int size)
 	wrq.u.data.pointer = buffer;
 	wrq.u.data.length  = sizeof(buffer);
 	wrq.u.data.flags   = ASUS_SUBCMD_GDFSNOPCHANNEL;
-	if (wl_ioctl(ifname, RTPRIV_IOCTL_ASUSCMD, &wrq) < 0) {
-		dbg("wl_ioctl failed on %s (%d)\n", __FUNCTION__, __LINE__);
+	if ((r = wl_ioctl(ifname, RTPRIV_IOCTL_ASUSCMD, &wrq)) < 0) {
+		dbg("%s failed, ret %d\n", __func__, r);
 		return -1;
 	}
 
@@ -1423,3 +1426,70 @@ int get_bonding_port_status(int port)
 	return ret;
 }
 #endif /* RTCONFIG_BONDING_WAN */
+
+int get_ap_mac(const char *ifname, struct iwreq *pwrq)
+{
+	return wl_ioctl(ifname, SIOCGIWAP, pwrq);
+}
+
+const unsigned char ether_zero[6]  = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+const unsigned char ether_bcast[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+
+int chk_assoc(const char *ifname)
+{
+	struct iwreq wrq;
+	int ret;
+
+	if((ret = get_ap_mac(ifname, &wrq)) < 0)
+		return ret;
+
+#if 0
+cprintf("## %s(): ret(%d) ap_addr(%02x:%02x:%02x:%02x:%02x:%02x)\n", __func__, ret
+, wrq.u.ap_addr.sa_data[0], wrq.u.ap_addr.sa_data[1], wrq.u.ap_addr.sa_data[2]
+, wrq.u.ap_addr.sa_data[3], wrq.u.ap_addr.sa_data[4], wrq.u.ap_addr.sa_data[5]);
+#endif
+	if(memcmp(&(wrq.u.ap_addr.sa_data), ether_zero, 6) == 0)
+		return 0;	// Not-Associated
+	else if(memcmp(&(wrq.u.ap_addr.sa_data), ether_bcast, 6) == 0)
+		return -1;	// Invalid
+
+	return 1;
+}
+
+int get_ch_cch_bw(const char *wlif_name, int *ch, int *cch, int *bw)
+{
+	struct iwreq wrq;
+	char data[256];
+	char *p;
+	int cnt = 0;
+
+	if (wlif_name == NULL || wlif_name[0] == '\0')
+		return -1;
+
+	data[0] = '\0';
+	wrq.u.data.length = sizeof(data);
+	wrq.u.data.pointer = (caddr_t) data;
+	wrq.u.data.flags = ASUS_SUBCMD_GET_CH_BW;
+	if (wl_ioctl(wlif_name, RTPRIV_IOCTL_ASUSCMD, &wrq) < 0) { 
+		dbg("%s: wl_ioctl(%s, ASUS_SUBCMD_GET_CH_BW) fail\n", __func__, wlif_name);
+		return -1;
+	}
+	if (  ch != NULL && (p = strstr(data, "\nchannel: ")) != NULL ) {
+		p += 10;
+		*ch = atoi(p);
+		cnt++;
+	}
+	if ( cch != NULL && (p = strstr(data, "\ncen_ch1: ")) != NULL ) {
+		p += 10;
+		*cch = atoi(p);
+		cnt++;
+	}
+	if (  bw != NULL && (p = strstr(data, "\nbw: ")) != NULL ) {
+		p += 5;
+		*bw = atoi(p);
+		cnt++;
+	}
+	//cprintf("%s: wlif_name(%s) ch(%d) cch(%d) bw(%d)\n", __func__, wlif_name, *ch, *cch, *bw);
+	return cnt;
+}
+

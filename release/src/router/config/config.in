@@ -2704,3 +2704,6 @@ config RTCONFIG_DUPVIF
 	depends on RTCONFIG_MULTICAST_IPTV
 	default n
 
+config RTCONFIG_AVOID_TZ_ENV
+	bool "Not use setenv(TZ) but use timezone in /etc/TZ"
+	default n

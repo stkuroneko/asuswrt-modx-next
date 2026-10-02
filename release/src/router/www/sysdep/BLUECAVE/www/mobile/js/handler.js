@@ -3839,9 +3839,9 @@ goTo.Conncap = function(){
 	systemVariable.macAddr = httpApi.nvramGet(["et0macaddr"]).et0macaddr;
 
 	setInterval(function(){
-		httpApi.checkCap("http://router.asus.com", function(){
+		httpApi.checkCap("http://<#Web_DOMAIN_NAME#>", function(){
 			setTimeout(function(){
-				if(isPage("amasconncap_page")) window.location.href = "http://router.asus.com/cfg_onboarding.cgi?flag=AMesh&id=" + systemVariable.macAddr.split(":").join("");
+				if(isPage("amasconncap_page")) window.location.href = "http://<#Web_DOMAIN_NAME#>/cfg_onboarding.cgi?flag=AMesh&id=" + systemVariable.macAddr.split(":").join("");
 			}, 3000);
 
 			$("#loginCapAlert").fadeIn(500);
@@ -4395,7 +4395,7 @@ goTo.amasOnboarding = function(){
 		if(wl_nband_array != "")
 			wl_nband_array = JSON.parse(wl_nband_array);
 
-		var re_isAX_model = (systemVariable.onboardingInfo.name.toUpperCase().indexOf("AX") >= 0 || systemVariable.onboardingInfo.name.toUpperCase().indexOf("ZENWIFI_X") >= 0 || systemVariable.onboardingInfo.name.toUpperCase().indexOf("ZENWIFI_E") >= 0);
+		var re_isAX_model = (systemVariable.onboardingInfo.name.toUpperCase().indexOf("AX") >= 0 || systemVariable.onboardingInfo.name.toUpperCase().indexOf("ZENWIFI_X") >= 0 || systemVariable.onboardingInfo.name.toUpperCase().indexOf("ZENWIFI_E") >= 0 || systemVariable.onboardingInfo.name.toUpperCase().indexOf("GT6") >= 0);
 		var auth_flag = false;
 		var wps_flag = false;
 		var band6g = 4;

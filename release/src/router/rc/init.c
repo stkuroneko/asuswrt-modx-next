@@ -2089,6 +2089,10 @@ static void post_restore_defaults(void)
 {
 	nvram_set("led_wan_last_state", "0");
 	nvram_set("led_lan_last_state", "0");
+
+	/* Use 768KB x 2 syslog instead of 256KB x 2. */
+	if (nvram_get_int("log_size") < 768)
+		nvram_set("log_size", "768");
 }
 #endif
 
@@ -4896,6 +4900,8 @@ int init_nvram(void)
 		//either txpower or singlesku supports rc.
 		add_rc_support("pwrctrl");
 		add_rc_support("smart_connect");
+		// for GUI display
+		add_rc_support("tuf");
 		// the following values is model dep. so move it from default.c to here
 		nvram_set("wl0_HT_TxStream", "2");
 		nvram_set("wl0_HT_RxStream", "2");
@@ -5067,8 +5073,11 @@ int init_nvram(void)
 		nvram_set_int("led_pwr_gpio", 11);
 		nvram_set_int("led_wps_gpio", 11);
 		nvram_set_int("led_wan_red_gpio", 12|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_2g_gpio", 1);	/* MT7986, WF2G_LED */
+		gpio_dir(1, GPIO_DIR_OUT_LOW);		/* Don't turn on WiFi LED by WF2G_LED, it can't be output high or input. */
+		nvram_set_int("led_2g_gpio", 2 /*1*/);	/* Use same PIN, WF5G_LED, to control WiFi LED. */
 		nvram_set_int("led_5g_gpio", 2);	/* MT7986, WF5G_LED */
+		config_netdev_bled("led_2g_gpio", "ra0");
+		config_netdev_bled("led_5g_gpio", "rax0");
 		nvram_set("led_wan_gpio", "gpy211");
 		nvram_set("led_lan_gpio", "gpy211");	/* LAN1~4: MT7531, LAN5: GPY211 */
 		// PWM channel R:0, G:1
@@ -5079,8 +5088,6 @@ int init_nvram(void)
 		nvram_set_int("led_green_gpio", 1+200);	/* for bled, pwm nr >=200 */
 		nvram_set_int("led_blue_gpio", 20);
 		/* enable bled */
-		config_netdev_bled("led_2g_gpio", "ra0");
-		config_netdev_bled("led_5g_gpio", "rax0");
 		config_netdev_bled("led_blue_gpio", "ra0");
 		add_gpio_to_bled("led_blue_gpio", "led_green_gpio");
 		add_gpio_to_bled("led_blue_gpio", "led_red_gpio");
@@ -5117,11 +5124,13 @@ int init_nvram(void)
 		//either txpower or singlesku supports rc.
 		add_rc_support("pwrctrl");
 		add_rc_support("smart_connect");
+		// for GUI display
+		add_rc_support("tuf");
 		// the following values is model dep. so move it from default.c to here
-		nvram_set("wl0_HT_TxStream", "2");
-		nvram_set("wl0_HT_RxStream", "2");
-		nvram_set("wl1_HT_TxStream", "3");
-		nvram_set("wl1_HT_RxStream", "3");
+		nvram_set("wl0_HT_TxStream", "4");
+		nvram_set("wl0_HT_RxStream", "4");
+		nvram_set("wl1_HT_TxStream", "4");
+		nvram_set("wl1_HT_RxStream", "4");
 #if defined(RTCONFIG_AMAS)
 		if (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1")) {
 			_dprintf("[%s][%d] sw mode = %d, repeater=%d, ap= %d ",
@@ -5347,7 +5356,12 @@ int init_nvram(void)
 		wan_ifaces[WAN_IFACE_ID] = "eth1";
 		wl_ifaces[WL_2G_BAND] = "ra0";
 		wl_ifaces[WL_5G_BAND] = "rai0";
-		set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "vlan1", NULL, "vlan3", 0);
+#ifdef RTCONFIG_AMAS
+		if(nvram_match("re_mode", "1")) //RE mode.
+			set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "eth1 vlan1", NULL, "vlan3", 0);
+		else
+#endif
+			set_basic_ifname_vars(wan_ifaces, "vlan1", wl_ifaces, "usb", "vlan1", NULL, "vlan3", 0);
 
 		nvram_set_int("btn_rst_gpio",  8|GPIO_ACTIVE_LOW);
 		nvram_set_int("btn_wps_gpio",  4|GPIO_ACTIVE_LOW);
@@ -5396,6 +5410,24 @@ int init_nvram(void)
 		nvram_set("wl0_HT_RxStream", "2");
 		nvram_set("wl1_HT_TxStream", "2");
 		nvram_set("wl1_HT_RxStream", "2");
+#if defined(RTCONFIG_AMAS)
+		if (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1")) {
+			_dprintf("[%s][%d] sw mode = %d, repeater=%d, ap= %d ",
+						__func__, __LINE__,
+						sw_mode(),SW_MODE_REPEATER,SW_MODE_AP);
+			add_lan_phy((char *)APCLI_2G);
+			add_lan_phy((char *)APCLI_5G);
+			nvram_set("eth_ifnames", "eth1"); /* WAN(eth1)*/
+			nvram_set("amas_ethif_type", "4"); /* 1G */
+			nvram_set("eth_priority", "0 1 1"); /* eth1: 1G(idx:0,prio:1,used:1) */
+			nvram_set("sta_phy_ifnames", "apcli0 apclii0"); /* 2G name, 5G name */
+			nvram_set("sta_ifnames", "apcli0 apclii0"); /* 2G name, 5G name */
+			nvram_set("sta_priority", "2 0 3 1" " 5 1 2 1"); /* 2G priority:3, 5G priority:2 */
+		}
+#endif	
+#if defined(RTCONFIG_AMAS) || defined(RTCONFIG_CFGSYNC)
+		nvram_set("wired_ifnames", "vlan1");
+#endif
 		break;
 #endif	/* RT4GAX56 */
 
@@ -19240,30 +19272,7 @@ int init_main(int argc, char *argv[])
 		_eval(argv, NULL, 0, &pid);
 	}
 #endif
-#if defined(RTCONFIG_RALINK_MT7621)
-{
-	int cert_need_update = 0;
-	char cert_ver[12];
 
-	memset(cert_ver, 0, sizeof(cert_ver));
-
-	if (!f_exists(CERT_VERSION_PATH) || f_read_string(CERT_VERSION_PATH, cert_ver, sizeof(cert_ver)) <= 0)
-		cert_need_update = 1;
-
-	if (atoi(cert_ver) < atoi(CERT_VERSION))
-		cert_need_update = 1;
-
-	f_write_string(CERT_VERSION_PATH, CERT_VERSION, 0, 0);
-	//system("cat /jffs/cert.version");
-
-	if (cert_need_update){
-		//_dprintf("====================== clean old cert files!! ===========================\n");
-		unlink("/etc/cert.pem");
-		unlink("/etc/key.pem");
-		unlink("/jffs/cert.tgz");
-	}
-}
-#endif
 	for (;;) {
 //		TRACE_PT("main loop signal/state=%d\n", state);
 

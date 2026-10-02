@@ -7,7 +7,7 @@ OUTPUT_FORMAT("elf64-bigaarch64", "elf64-bigaarch64",
 	      "elf64-littleaarch64")
 OUTPUT_ARCH(aarch64)
 ENTRY(_start)
-SEARCH_DIR("=/SDK/MTK/openwrt/staging_dir/toolchain-aarch64_cortex-a53_gcc-8.4.0_musl/aarch64-openwrt-linux-musl/lib");
+SEARCH_DIR("=/SDK/MTK_0329/openwrt-6KePeL/staging_dir/toolchain-aarch64_cortex-a53_gcc-8.4.0_musl/aarch64-openwrt-linux-musl/lib");
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */
