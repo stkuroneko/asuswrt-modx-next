@@ -42,6 +42,7 @@
 
 #ifdef RTCONFIG_RALINK
 #include <ralink.h>
+#include "flash_mtd.h"	//FRead
 #endif
 
 #ifdef RTCONFIG_QCA
@@ -188,7 +189,7 @@ static char *defenv[] = {
  * debug=0x4e48503 = log_stats, log-non-free, log-bad-space, log-elapsed-time, check-fence, check-shutdown, free-blank, error-abort, alloc-blank, catch-null
  * debug=0x3 = log-stats, log-non-free
  */
-	"DMALLOC_OPTIONS=debug=0x3,inter=100,log=/jffs/dmalloc_%d.log",
+	"DMALLOC_OPTIONS=debug=0x2,inter=100,log=/jffs/dmalloc_%d.log",
 #endif
 #if defined(HND_ROUTER) && !defined(RTCONFIG_BCM_MFG)
 	"ENV=/etc/profile",
@@ -1327,7 +1328,7 @@ void usbctrl_default()
 		char *dec_passwd = NULL;
 		dec_passwd = malloc(declen);
 		if(dec_passwd){
-			pw_dec(http_passwd, dec_passwd, declen);
+			pw_dec(http_passwd, dec_passwd, declen, 1);
 			char_to_ascii_safe(ascii_passwd, dec_passwd, sizeof(ascii_passwd));
 			free(dec_passwd);
 		}
@@ -1336,8 +1337,8 @@ void usbctrl_default()
 		char *enc_passwd = NULL;
 		enc_passwd = malloc(enclen);
 		if(enc_passwd){
-			pw_enc(ascii_passwd, enc_passwd);
 			memset(ascii_passwd, 0, sizeof(ascii_passwd));
+			pw_enc(ascii_passwd, enc_passwd, 1);
 			strlcpy(ascii_passwd, enc_passwd, sizeof(ascii_passwd));
 			free(enc_passwd);
 		}
@@ -1359,8 +1360,7 @@ void usbctrl_default()
 			char_to_ascii_safe(ascii_passwd, acc_password, 84);
 #ifdef RTCONFIG_NVRAM_ENCRYPT
 			memset(enc_passwd_buf, 0, sizeof(enc_passwd_buf));
-			pw_enc(ascii_passwd, enc_passwd_buf);
-			 memset(ascii_passwd, 0, 84);
+			pw_enc(ascii_passwd, enc_passwd_buf, 1);
 			strlcpy(ascii_passwd, enc_passwd_buf, sizeof(ascii_passwd));
 #endif
 			if (strcmp(acc_user, "admin")) {
@@ -2418,6 +2418,17 @@ static void set_term(int fd)
 	tcsetattr(fd, TCSANOW, &tty);
 }
 
+int console_fd = -1;
+
+int close_consolefd()
+{
+	if(console_fd >= 0) {
+		printf("close console_fd:%d\n", console_fd);
+		close(console_fd);
+	}
+	return 0;
+}
+
 static int console_init(void)
 {
 	int fd;
@@ -2504,11 +2515,21 @@ static pid_t run_shell(int timeout, int nowait)
 	}
 }
 
+void console_hup(int sig)
+{
+	if (sig != SIGHUP)
+		return;
+
+	close_consolefd();
+	console_init(); /* Reopen console */
+}
+
 int console_main(int argc, char *argv[])
 {
 	/* Reopen console */
 	console_init();
 
+	signal(SIGHUP, console_hup);
 	for (;;) run_shell(0, 0);
 
 	return 0;
@@ -4353,6 +4374,8 @@ int init_nvram(void)
 		nvram_set("wl1_HT_TxStream", "2");
 		nvram_set("wl1_HT_RxStream", "2");
 #if defined(RTCONFIG_AMAS)
+		add_rc_support("smart_connect");
+		add_led_ctrl_capability(LED_ON_OFF);
 		if (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1")) {
 			_dprintf("[%s][%d] sw mode = %d, repeater=%d, ap= %d ",
 						__func__, __LINE__,
@@ -4422,6 +4445,8 @@ int init_nvram(void)
 		nvram_set("wl1_HT_TxStream", "2");
 		nvram_set("wl1_HT_RxStream", "2");
 #if defined(RTCONFIG_AMAS)
+		add_rc_support("smart_connect");
+		add_led_ctrl_capability(LED_ON_OFF);
 		if (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1")) {
 			_dprintf("[%s][%d] sw mode = %d, repeater=%d, ap= %d ",
 						__func__, __LINE__,
@@ -5412,6 +5437,7 @@ int init_nvram(void)
 		nvram_set("wl1_HT_TxStream", "2");
 		nvram_set("wl1_HT_RxStream", "2");
 #if defined(RTCONFIG_AMAS)
+		add_rc_support("smart_connect");
 		if (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1")) {
 			_dprintf("[%s][%d] sw mode = %d, repeater=%d, ap= %d ",
 						__func__, __LINE__,
@@ -16388,6 +16414,9 @@ int init_nvram(void)
 #endif
 #ifdef RTCONFIG_SOFTWIRE46
 	add_rc_support("s46");
+#ifdef RTCONFIG_OCNVC
+	add_rc_support("ocnvc");
+#endif
 #endif
 #endif
 
@@ -16762,6 +16791,10 @@ NO_USB_CAP:
 	add_rc_support("pwrsave");
 #endif
 
+#ifdef RTCONFIG_PAGECACHE_RATIO
+	add_rc_support("pcache_ratio");
+#endif
+
 #ifdef RTCONFIG_HAS_5G_2
 	add_rc_support("5G-2");
 #else
@@ -16903,9 +16936,6 @@ NO_USB_CAP:
 
 #ifdef RTCONFIG_TCODE
 	add_rc_support("tcode");
-#endif
-#ifdef RTCONFIG_BCMARM
-	add_rc_support("dis11b");
 #endif
 
 #ifdef RTCONFIG_JFFS2USERICON
@@ -17232,7 +17262,10 @@ NO_USB_CAP:
 		add_rc_support("pwrctrl");
 	}
 #endif
-#ifdef RTCONFIG_BCMARM
+#if defined(RTCONFIG_BCMARM) || defined(RTCONFIG_MT798X) \
+ || (defined(RTCONFIG_QCA) && (defined(RTCONFIG_SOC_IPQ40XX) || defined(RTCONFIG_SOC_IPQ50XX) \
+			    || defined(RTCONFIG_SOC_IPQ60XX) || defined(RTCONFIG_SOC_IPQ8074)))
+	/* QCA: SPF5+ */
 	add_rc_support("dis11b");
 #endif
 #if defined(RTCONFIG_BCMBSD_V2)
@@ -17242,6 +17275,9 @@ NO_USB_CAP:
 #ifdef RTCONFIG_QCA_PLC2
 	add_rc_support("qca_plc2");
 #endif
+	if(!nvram_match("forget_it", ""))
+		add_rc_support("defpass");
+
 	return 0;
 }
 
@@ -18526,7 +18562,7 @@ static void sysinit(void)
 #ifdef RPAX56
 	reset_abmac();
 #endif
-#if defined(RTAX89U)
+#if defined(RTCONFIG_QCA)
 	pre_syspara();
 #endif
 
@@ -19087,7 +19123,7 @@ int init_nvram4(void)
 			enclen = pw_enc_blen(http_passwd) + 1;
 			char enc_passwd[enclen];
 			memset(enc_passwd, 0, sizeof(enc_passwd));
-			pw_enc(http_passwd, enc_passwd);
+			pw_enc(http_passwd, enc_passwd, 1);
 			//_dprintf("\n=====http_passwd: %s\nenc: %s\n=====\n\n", http_passwd, enc_passwd);
 			nvram_set("http_passwd", enc_passwd);
 			nvram_set("http_username", "optus");
@@ -19104,6 +19140,42 @@ int init_nvram4(void)
 	return 0;
 }
 #endif
+
+int init_pass_nvram(void)
+{
+#if defined(RTCONFIG_BCMARM)
+	if (!nvram_get_int("x_Setting")) {
+		nvram_set("forget_it", cfe_nvram_safe_get_raw("forget_it"));
+	}
+#elif defined(RTCONFIG_RALINK)
+	/* PASS */
+	{
+		char pass[MAX_PASS_LEN + 1];
+	        memset(pass, 0, sizeof(pass));
+		if (FRead(pass, OFFSET_PASS, MAX_PASS_LEN) < 0) {
+			_dprintf("READ ASUS PASS: Out of scope\n");
+			nvram_unset("forget_it");
+		 } else {
+			int len = strlen(pass);
+			int i;
+			if (pass[0] == 0xff)
+				nvram_unset("forget_it");
+			else
+			{
+				for(i = 0; i < MAX_PASS_LEN && pass[i] != '\0'; i++) {
+					if ((unsigned char)pass[i] == 0xff)
+					{
+						pass[i] = '\0';
+						break;
+					}
+				}
+				nvram_set("forget_it", pass);
+			}
+		}
+	}
+#endif
+	return 0;
+}
 
 int init_main(int argc, char *argv[])
 {
@@ -19167,6 +19239,7 @@ int init_main(int argc, char *argv[])
 		create_amas_sys_folder();
 #endif
 #ifdef RTCONFIG_NVRAM_ENCRYPT
+		init_pass_nvram();
 		init_enc_nvram();
 		init_nvram4();
 #endif

@@ -1110,7 +1110,7 @@ endif
 
 
 ifeq ($(RTCONFIG_MTK_BSD),y)
-ifeq ($(BUILD_NAME), $(filter $(BUILD_NAME), XD4S ))
+ifeq ($(BUILD_NAME), $(filter $(BUILD_NAME), XD4S RT-AX53U RT-AX54 4G-AX56))
 obj-y  += wapp
 obj-y  += mapd
 endif
@@ -3378,7 +3378,7 @@ ifeq ($(HND_ROUTER),y)
 	cp -u $(OPENSSL)/include/openssl/* $(BCM_FSBUILD_DIR)/public/include/openssl
 endif
 	install -D -m 0500 httpd/gencert.sh $(INSTALLDIR)$(INSTALLSUBDIR)/usr/sbin/gencert.sh
-ifeq ($(RTCONFIG_RALINK_MT7621),y)
+ifeq ($(RTCONFIG_ECC256),y)
 	install -D -m 0500 httpd/gencert_ecc.sh $(INSTALLDIR)$(INSTALLSUBDIR)/usr/sbin/gencert.sh
 endif
 endif
@@ -4921,19 +4921,22 @@ tr069-install: tr069
 	install -D tr069/test/sendtocli $(INSTALLDIR)/tr069/sbin/sendtocli
 	install -D tr069/test/notify $(INSTALLDIR)/tr069/sbin/notify
 	install -D tr069/test/udpclient $(INSTALLDIR)/tr069/sbin/udpclient
-ifeq ($(RTCONFIG_TR181),y)
+#ifeq ($(RTCONFIG_TR181),y)
 ifeq ($(RTCONFIG_DSL),y)
-	install -D tr069/conf/ASUSWRT/tr_181.xml.dsl $(INSTALLDIR)/tr069/usr/tr/tr.xml
+	install -D tr069/conf/ASUSWRT/tr_181.xml.dsl $(INSTALLDIR)/tr069/usr/tr/tr_181.xml
 else
-	install -D tr069/conf/ASUSWRT/tr_181.xml $(INSTALLDIR)/tr069/usr/tr/tr.xml
+	install -D tr069/conf/ASUSWRT/tr_181.xml $(INSTALLDIR)/tr069/usr/tr/tr_181.xml
+	install -D tr069/conf/tr181.conf $(INSTALLDIR)/tr069/usr/tr/tr181.conf
 endif
-else
+#else
 ifeq ($(RTCONFIG_DSL),y)
-	install -D tr069/conf/ASUSWRT/tr_98.xml.dsl $(INSTALLDIR)/tr069/usr/tr/tr.xml
+	install -D tr069/conf/ASUSWRT/tr_98.xml.dsl $(INSTALLDIR)/tr069/usr/tr/tr_98.xml
 else
-	install -D tr069/conf/ASUSWRT/tr_98.xml $(INSTALLDIR)/tr069/usr/tr/tr.xml
+	install -D tr069/conf/ASUSWRT/tr_98.xml $(INSTALLDIR)/tr069/usr/tr/tr_98.xml
+	install -D tr069/conf/tr098.conf $(INSTALLDIR)/tr069/usr/tr/tr098.conf
 endif
-endif
+	install -D tr069/conf/trcurrency.conf $(INSTALLDIR)/tr069/usr/tr/trcurrency.conf
+#endif
 
 nt_center/stamp-h1:
 	touch $@
@@ -5342,7 +5345,7 @@ dropbear/config.h: dropbear/config.h.in
 		CPPFLAGS="-Os -Wall $(EXTRACFLAGS) -DARGTYPE=3 -ffunction-sections -fdata-sections -I$(STAGEDIR)/usr/include \
 			$(if $(RTCONFIG_PROTECTION_SERVER),-DSECURITY_NOTIFY,)" \
 		LDFLAGS="-Wl,--gc-sections -L$(STAGEDIR)/usr/lib" \
-		LIBS="$(if $(RTCONFIG_PROTECTION_SERVER),-lptcsrv)" \
+		LIBS="$(if $(RTCONFIG_PROTECTION_SERVER),-lptcsrv) -L$(TOP_PLATFORM)/nvram${BCMEX}$(EX7) -lnvram -L$(TOP)/shared -lshared $(EXTRA_NV_LDFLAGS)" \
 		$(CONFIGURE) --disable-harden --disable-zlib --disable-pam \
 		--enable-openpty --enable-syslog --enable-shadow --enable-bundled-libtom \
 		--disable-lastlog \

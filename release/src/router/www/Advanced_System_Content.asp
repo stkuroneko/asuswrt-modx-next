@@ -301,7 +301,7 @@ function initial(){
 	}
 	else{
 
-		if(wan_proto=="v6plus" && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
+		if((wan_proto == "v6plus" || wan_proto == "ocnvc") && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
 			$(".setup_info_icon.https").show();
 			$(".setup_info_icon.https").click(
 				function() {
@@ -326,7 +326,7 @@ function initial(){
 	if(ssh_support){
 		check_sshd_enable('<% nvram_get("sshd_enable"); %>');
 
-		if(wan_proto=="v6plus" && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
+		if((wan_proto == "v6plus" || wan_proto == "ocnvc") && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
 			$(".setup_info_icon.ssh").show();
 			$(".setup_info_icon.ssh").click(
 				function() {
@@ -384,8 +384,16 @@ function initial(){
 	}
 	else{
 		document.getElementById("pwrsave_tr").style.display = "none";
-		document.form.pwrsave_mode[0].disabled = false;
-		document.form.pwrsave_mode[1].disabled = false;
+		document.form.pwrsave_mode[0].disabled = true;
+		document.form.pwrsave_mode[1].disabled = true;
+	}
+
+	if (pagecache_ratio_support) {
+		document.getElementById("pagecache_ratio_tr").style.display = "";
+		document.form.pagecache_ratio.disabled = false;
+	} else {
+		document.getElementById("pagecache_ratio_tr").style.display = "none";
+		document.form.pagecache_ratio.disabled = true;
 	}
 
 	if(hdspindown_support) {
@@ -614,6 +622,8 @@ function applyRule(){
 
 		if(pwrsave_support)
 			action_script_tmp += "pwrsave;";
+		if(pagecache_ratio_support)
+			action_script_tmp += "pagecache_ratio;";
 
 		if(needReboot){
 
@@ -668,9 +678,9 @@ function validForm(){
 			return false;
 		}
 
-		if(wan_proto=="v6plus" && s46_ports_check_flag && array_ipv6_s46_ports.length > 1 && document.form.sshd_enable.value == 1){
+		if((wan_proto == "v6plus" || wan_proto == "ocnvc") && s46_ports_check_flag && array_ipv6_s46_ports.length > 1 && document.form.sshd_enable.value == 1){
 			if (!validator.range_s46_ports(document.form.sshd_port, "none")){
-				if(!confirm("The following port related settings may not work properly since the port is not available in current v6plus usable port range. Do you want to continue?")){
+				if(!confirm(port_confirm)){
 					document.form.sshd_port.focus();
 					return false;
 				}
@@ -697,9 +707,9 @@ function validForm(){
 			if (!validator.range(document.form.misc_httpsport_x, 1024, 65535))
 				return false;
 
-			if (wan_proto=="v6plus" && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
+			if ((wan_proto == "v6plus" || wan_proto == "ocnvc") && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
 				if (!validator.range_s46_ports(document.form.misc_httpsport_x, "none")){
-					if(!confirm("The following port related settings may not work properly since the port is not available in current v6plus usable port range. Do you want to continue?")){
+					if(!confirm(port_confirm)){
 						document.form.misc_httpsport_x.focus();
 						return false;
 					}
@@ -753,6 +763,13 @@ function validForm(){
 	}
 	else if(!validator.rangeAllowZero(document.form.http_autologout, 10, 999, '<% nvram_get("http_autologout"); %>'))
 		return false;
+
+	if (pagecache_ratio_support) {
+		if (parseInt(document.form.pagecache_ratio.value) < 5)
+			document.form.pagecache_ratio.value = "5";
+		else if (parseInt(document.form.pagecache_ratio.value) > 90)
+			document.form.pagecache_ratio.value = "90";
+	}
 
 	if(reboot_schedule_support){
 		if(!document.form.reboot_date_x_Sun.checked && !document.form.reboot_date_x_Mon.checked &&
@@ -820,7 +837,7 @@ var timezones = [
 	["PST8DST",	"(GMT-08:00) <#TZ05#>"],
 	["MST7DST_1",	"(GMT-07:00) <#TZ06#>"],
 	["MST7_2",	"(GMT-07:00) <#TZ07#>"],
-	["MST7DST_3",	"(GMT-07:00) <#TZ08#>"],
+	["MST7_3",	"(GMT-07:00) <#TZ08#>"],	//MST7DST_3
 	["CST6_2",	"(GMT-06:00) <#TZ10#>"],
 	["CST6_3",	"(GMT-06:00) <#TZ11#>"],	//CST6DST_3
 	["CST6_3_1",	"(GMT-06:00) <#TZ12#>"],	//CST6DST_3_1
@@ -836,7 +853,7 @@ var timezones = [
 	["NST3.30DST",	"(GMT-03:30) <#TZ20#>"],
 	["EBST3",	"(GMT-03:00) <#TZ21#>"],	//EBST3DST_1
 	["UTC3",	"(GMT-03:00) <#TZ22#>"],
-	["EBST3DST_2",	"(GMT-03:00) <#TZ23#>"],
+	["UTC2_1",	"(GMT-02:00) <#TZ23#>"],	//EBST3DST_2
 	["UTC2",	"(GMT-02:00) <#TZ24#>"],
 	["UTC2DST",	"(GMT-02:00) <#TZ87#>"],
 	["EUT1DST",	"(GMT-01:00) <#TZ25#>"],
@@ -870,7 +887,7 @@ var timezones = [
 	["UTC-3_5",     "(GMT+03:00) <#TZ45#>"],        //UTC-4_7
 	["IST-3",	"(GMT+03:00) <#TZ48#>"],
 	["UTC-3_6",	"(GMT+03:00) <#TZ48_1#>"],
-	["UTC-3.30DST",	"(GMT+03:30) <#TZ49#>"],	
+	["UTC-3.30",	"(GMT+03:30) <#TZ49#>"],	//UTC-3.30DST	
 	["UTC-4_1",	"(GMT+04:00) <#TZ50#>"],
 	["UTC-4_5",	"(GMT+04:00) <#TZ50_2#>"],
 	["UTC-4_4",	"(GMT+04:00) <#TZ50_1#>"],
@@ -2268,6 +2285,12 @@ function check_password_length(obj){
 							<option value="1" <% nvram_match("pwrsave_mode", "1","selected"); %> ><#Auto#></option>
 							<option value="2" <% nvram_match("pwrsave_mode", "2","selected"); %> ><#usb_Power_Save#></option>
 						</select>
+					</td>
+				</tr>
+				<tr id="pagecache_ratio_tr" style="display:none;">
+					<th align="right"><a class="hintstyle" href="javascript:void(0);" onClick="overlib('Lower page cache ratio, poor NAS performance.');" onmouseout="nd();">Maximum page cache ratio</th>
+					<td>
+						<input type="text" class="input_3_table" maxlength="3" name="pagecache_ratio" value='<% nvram_get("pagecache_ratio"); %>' onblur="return validator.numberRange(this, 5, 90);" autocorrect="off" autocapitalize="off"> %
 					</td>
 				</tr>
 				<tr id="reboot_schedule_enable_tr">

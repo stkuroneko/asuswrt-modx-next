@@ -1093,6 +1093,10 @@ config RTCONFIG_POWER_SAVE
 	bool "Power Save"
 	default n
 
+config RTCONFIG_PAGECACHE_RATIO
+	bool "Control maximum page cache ratio"
+	default n
+
 config RTCONFIG_QCA8033
 	bool "Qualcomm Atheros QCA8033 Powerline Chip Support"
 	default n
@@ -1667,6 +1671,10 @@ config RTCONFIG_ACS_SUBNET
 	bool "Support ACS SUBNET Customize"
 	default n
 
+config RTCONFIG_SERIALSIZE_15
+	bool "Support SERIALSIZE 15 Customize"
+	default n
+
 config RTCONFIG_ISP_XLNPROVU
 	bool "Support ISP XLN/PROVU Customize"
 	default n
@@ -1843,6 +1851,11 @@ config RTCONFIG_6RELAYD
 config RTCONFIG_SOFTWIRE46
 	bool "IPv6 Softwire46 tunnel support"
 	depends on RTCONFIG_IPV6
+	default n
+
+config RTCONFIG_OCNVC
+	bool "IPoE - OCN Virtual Connect support"
+	depends on RTCONFIG_SOFTWIRE46
 	default n
 
 config RTCONFIG_PORT_BASED_VLAN
@@ -2710,4 +2723,9 @@ config RTCONFIG_DUPVIF
 
 config RTCONFIG_AVOID_TZ_ENV
 	bool "Not use setenv(TZ) but use timezone in /etc/TZ"
+	default n
+
+config RTCONFIG_ECC256
+	bool "Support ECC256 CA"
+	depends on RTCONFIG_HTTPS
 	default n

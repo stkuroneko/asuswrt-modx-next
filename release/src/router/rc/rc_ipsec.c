@@ -592,7 +592,9 @@ void rc_strongswan_conf_set()
 
 	user = nvram_safe_get("http_username");
 	if (*user == '\0')
-		user = "admin";
+		if(*(user = nvram_default_get("http_username")) == '\0')
+			user = "admin";
+
 
 	fprintf(fp,
 		"charon {\n"
@@ -1683,10 +1685,10 @@ void rc_ipsec_nvram_convert_check(void)
 }
 void rc_ipsec_config_init(void)
 {
-    memset((ipsec_samba_t *)&samba_prof, 0, sizeof(ipsec_samba_t));
-    memset((ipsec_prof_t *)&prof[0][0], 0, sizeof(ipsec_prof_t) * MAX_PROF_NUM);
-    //memset((pki_ca_t *)&ca_tab[0], 0, sizeof(pki_ca_t) * CA_FILES_MAX_NUM);
-	memset((ipsec_samba_t *)&pre_samba_prof, 0, sizeof(ipsec_samba_t));
+    memset((void *)&samba_prof, 0, sizeof(samba_prof));
+    memset((void *)&prof[0][0], 0, sizeof(prof));
+    //memset((void *)&ca_tab[0], 0, sizeof(ca_tab));
+    memset((void *)&pre_samba_prof, 0, sizeof(pre_samba_prof));
 	if(!d_exists("/etc/ipsec.d") || !d_exists("/etc/strongswan.d"))
 		system("cp -rf /usr/etc/* /tmp/etc/");
     system("mkdir -p /jffs/ca_files");

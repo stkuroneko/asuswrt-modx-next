@@ -18,7 +18,7 @@ export KERNEL_BINARY=$(LINUXDIR)/vmlinux
 ifeq ($(RTAX53U)$(RTAX54)$(RT4GAX56)$(if $(filter $(BUILD_NAME),XD4S),y,),y)
 export PLATFORM := mipsel-musl
 export PLATFORM_ARCH := mipsel-musl
-export TOOLS :=/opt/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24
+export TOOLS :=/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24
 export CROSS_COMPILE := $(TOOLS)/bin/mipsel-openwrt-linux-musl-
 export CROSS_COMPILER := $(CROSS_COMPILE)
 export READELF := $(TOOLS)/bin/mipsel-openwrt-linux-musl-readelf

@@ -320,6 +320,12 @@ typedef struct kw_s     {
 }
 #endif  // defined TRANSLATE_ON_FLY
 
+struct HTTPD_FILE_LOCK_TABLE {
+	char *Process_name;
+	char *lock_file;
+	char *rc_service;
+	int kill_process;
+};
 
 /* Regular file handler */
 extern void do_file(char *path, FILE *stream);
@@ -469,6 +475,10 @@ extern int check_AiMesh_whitelist(char *page);
 #endif
 extern int check_cmd_injection_blacklist(char *para);
 extern void __validate_apply_set_wl_var(char *nv, char *val) __attribute__((weak));
+#ifdef RTCONFIG_BWDPI
+extern int check_bwdpi_status_app_name(char *name);
+#endif
+extern int validate_apply_input_value(char *name, char *value);
 
 /* web-*.c */
 extern int ej_wl_status(int eid, webs_t wp, int argc, char_t **argv, int unit);
@@ -503,6 +513,8 @@ extern char HTTPD_LOCK_NUM[32];
 extern char cloud_file[256];
 
 #ifdef RTCONFIG_HTTPS
+extern int do_ssl;
+extern int ssl_stream_fd;
 extern int gen_ddns_hostname(char *ddns_hostname);
 extern int check_model_name(void);
 extern char *pwenc(char *input, char *output, int len);
@@ -587,4 +599,6 @@ extern int save_changed_param(json_object *cfg_root, char *param);
 extern int last_time_lock_warning(void);
 extern int check_lock_status(time_t *dt);
 extern char *wl_nband_to_wlx(char *nv_name, char *wl_name, size_t len);
+extern int gen_asus_token_cookie(char *asus_token, int asus_token_len, char *token_cookie, int cookie_len);
+extern void check_lock_state();
 #endif /* _httpd_h_ */

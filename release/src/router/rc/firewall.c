@@ -1412,6 +1412,7 @@ void write_port_forwarding(FILE *fp, char *config, char *lan_ip, char *lan_if)
 		if (mtwancfg) {
 			/* dualwan + load-balance */
 			for (unit = WAN_UNIT_FIRST; unit < wan_max_unit; ++unit) {
+
 				char vts_nv[sizeof("vts_rulelistXXXXXX")];
 				char dst_ip[sizeof("-d 111.222.333.444XXXXXX")];
 				char *wan_iface[3];	/* 0: br0; 1: wan_if; 2: wanx_if; */
@@ -1559,6 +1560,9 @@ void nat_setting(char *wan_if, char *wan_ip, char *wanx_if, char *wanx_ip, char 
 #ifdef RTCONFIG_MULTIWAN_CFG
 	int wanx_rules = 0;
 #endif
+#ifdef RTCONFIG_SOFTWIRE46
+	char wan_prefix[16];
+#endif
 #ifdef RTCONFIG_TOR
 	char addr_new[32];
 	int addr_type;
@@ -1574,17 +1578,22 @@ void nat_setting(char *wan_if, char *wan_ip, char *wanx_if, char *wanx_ip, char 
 	gst.s_addr = htonl(dip);
 	strcpy(g_lan_ip, inet_ntoa(gst));
 #endif
-#ifdef RTCONFIG_MULTISERVICE_WAN
+
 	wan_unit = wan_ifunit(wan_if);
+
+#ifdef RTCONFIG_MULTISERVICE_WAN
 	if (wan_unit > WAN_UNIT_MULTISRV_BASE) return;
 #endif
-
 #ifdef RTCONFIG_IPV6
 #if defined(RTCONFIG_OPENVPN) || defined(RTCONFIG_WIREGUARD)
 	if (ipv6_enabled()) {
 		eval("ip6tables", "-t", "nat", "-F");
 	}
 #endif
+#endif
+
+#ifdef RTCONFIG_SOFTWIRE46
+	snprintf(wan_prefix, sizeof(wan_prefix), "wan%d_", wan_unit);
 #endif
 
 	sprintf(name, "%s_%s_%s", NAT_RULES, wan_if, wanx_if);
@@ -1663,11 +1672,11 @@ void nat_setting(char *wan_if, char *wan_ip, char *wanx_if, char *wanx_ip, char 
 			char *nv, *nvp, *item, *nextp, *ptr;
 			char proto[16], *next;
 		case WAN_V6PLUS:
-			if (nvram_get_int("s46_hgw_case") <= S46_CASE_MAP_HGW_ON)
+			if (nvram_pf_get_int(wan_prefix, "s46_hgw_case") <= S46_CASE_MAP_HGW_ON)
 				break;
 			fprintf(fp, "-A PREROUTING -i %s -d %s -j MAPE\n", lan_if, wan_ip);
 			foreach(proto, "tcp udp", next) {
-				nvp = nv = strdup(nvram_safe_get("ipv6_s46_ports"));
+				nvp = nv = strdup(nvram_safe_get(ipv6_nvname_by_unit("ipv6_s46_ports", wan_unit)));
 				for (item = strtok_r(nvp, " ", &nextp); item; item = strtok_r(NULL, " ", &nextp)) {
 					ptr = strchr(item, '-');
 					if (ptr)
@@ -1889,13 +1898,13 @@ void nat_setting(char *wan_if, char *wan_ip, char *wanx_if, char *wanx_ip, char 
 				int offset, psidlen, psid;
 			case WAN_V6PLUS:
 			case WAN_OCNVC:
-				if (nvram_get_int("s46_hgw_case") == S46_CASE_MAP_HGW_ON)
+				if (nvram_pf_get_int(wan_prefix, "s46_hgw_case") == S46_CASE_MAP_HGW_ON)
 					break;
 			case WAN_LW4O6:
 			case WAN_MAPE:
-				offset = nvram_get_int(ipv6_nvname("ipv6_s46_offset")) ? : 6;
-				psidlen = nvram_get_int(ipv6_nvname("ipv6_s46_psidlen"));
-				psid = nvram_get_int(ipv6_nvname("ipv6_s46_psid"));
+				offset = nvram_get_int(ipv6_nvname_by_unit("ipv6_s46_offset", wan_unit)) ? : 6;
+				psidlen = nvram_get_int(ipv6_nvname_by_unit("ipv6_s46_psidlen", wan_unit));
+				psid = nvram_get_int(ipv6_nvname_by_unit("ipv6_s46_psid", wan_unit));
 				if (offset < 0 || psidlen < 0 || psid < 0 ||
 				    offset + psidlen == 0 || offset + psidlen > 16)
 					break;
@@ -1987,7 +1996,6 @@ void nat_setting(char *wan_if, char *wan_ip, char *wanx_if, char *wanx_ip, char 
 	unlink(NAT_RULES);
 	symlink(name, NAT_RULES);
 
-	wan_unit = wan_ifunit(wan_if);
 	if(is_phy_connect2(wan_unit)){
 		/* force nat update */
 		nvram_set_int("nat_state", NAT_STATE_UPDATE);

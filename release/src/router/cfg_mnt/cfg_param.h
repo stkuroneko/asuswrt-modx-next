@@ -921,7 +921,10 @@ static struct param_mapping_s param_mapping_list[] __attribute__ ((unused)) = {
 	{ "wl2_user_rssi", 		FT_WIRELESS, 		SUBFT_ADVANCED_BAND3,		"-70"},
 	{ "wl3_user_rssi", 		FT_WIRELESS, 		SUBFT_ADVANCED_BAND4,		"-70"},
 #if defined(RTCONFIG_WIFI_QCN5024_QCN5054)
+	/* Extended NSS */
 	{ "wl1_ext_nss", 		FT_WIRELESS, 		SUBFT_ADVANCED_BAND2,		"1"},
+	/* Agile DFS (preCACen) */
+	{ "wl1_precacen",		FT_WIRELESS,		SUBFT_ADVANCED_BAND2,		"1"},
 #endif
 	/* http login */
 	{ "http_username", 	FT_LOGIN,		SUBFT_ROUTER_LOGIN,		"admin"},

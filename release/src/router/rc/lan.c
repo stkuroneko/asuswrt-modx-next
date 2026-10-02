@@ -2462,7 +2462,7 @@ void stop_lan(void)
 		|| strcmp(nvram_safe_get("amas_bdlkey"), "")
 #endif
 	) {
-		start_amas_lldpd();
+		stop_amas_lldpd();
 	}
 #endif
 
@@ -4229,7 +4229,7 @@ void stop_lan_wl(void)
 		|| strcmp(nvram_safe_get("amas_bdlkey"), "")
 #endif
 	) {
-		start_amas_lldpd();
+		stop_amas_lldpd();
 	}
 #endif	
 

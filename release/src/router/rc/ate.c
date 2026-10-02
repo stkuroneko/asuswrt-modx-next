@@ -3280,6 +3280,21 @@ int asus_ate_command(const char *command, const char *value, const char *value2)
 	}
 #endif
 #endif
+#if defined(RTCONFIG_BCMARM) || defined(RTCONFIG_RALINK)
+	else if (!strcmp(command, "Set_PASS")) {
+		if (setPASS(value) < 0)
+		{
+			puts("ATE_ERROR_INCORRECT_PARAMETER");
+			return EINVAL;
+		}
+		puts(value);
+		return 0;
+	}
+	else if (!strcmp(command, "Get_PASS")) {
+		getPASS();
+		return 0;
+	}
+#endif
 #ifdef RTCONFIG_QCA_PLC_UTILS
 	else if (!strcmp(command, "Set_MacAddr_Plc")) {
 		if (!setPLC_para(value, OFFSET_PLC_MAC))

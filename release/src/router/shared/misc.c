@@ -1504,7 +1504,7 @@ int get_ipv6_service(void)
 	return get_ipv6_service_by_unit(wan_primary_ifunit_ipv6());
 }
 
-const char *ipv6_router_address(struct in6_addr *in6addr)
+const char *ipv6_router_address_by_unit(struct in6_addr *in6addr, int wan_unit)
 {
 	char *p;
 	struct in6_addr addr;
@@ -1513,9 +1513,9 @@ const char *ipv6_router_address(struct in6_addr *in6addr)
 	addr6[0] = '\0';
 	memset(&addr, 0, sizeof(addr));
 
-	if ((p = nvram_get(ipv6_nvname("ipv6_rtr_addr"))) && *p) {
+	if ((p = nvram_get(ipv6_nvname_by_unit("ipv6_rtr_addr", wan_unit))) && *p) {
 		inet_pton(AF_INET6, p, &addr);
-	} else if ((p = nvram_get(ipv6_nvname("ipv6_prefix"))) && *p) {
+	} else if ((p = nvram_get(ipv6_nvname_by_unit("ipv6_prefix", wan_unit))) && *p) {
 		inet_pton(AF_INET6, p, &addr);
 		addr.s6_addr16[7] = htons(0x0001);
 	} else
@@ -1526,6 +1526,11 @@ const char *ipv6_router_address(struct in6_addr *in6addr)
 		memcpy(in6addr, &addr, sizeof(addr));
 
 	return addr6;
+}
+
+const char *ipv6_router_address(struct in6_addr *in6addr)
+{
+	return ipv6_router_address_by_unit(in6addr, wan_primary_ifunit_ipv6());
 }
 
 // trim useless 0 from IPv6 address
@@ -1894,30 +1899,35 @@ const char *get_wan6face(void)
 	return get_wan6_ifname(wan_primary_ifunit_ipv6());
 }
 
-int update_6rd_info(void)
+int update_6rd_info_by_unit(int unit)
 {
 	char tmp[100], prefix[]="wanXXXXX_";
-	char addr6[INET6_ADDRSTRLEN + 1], *value;
+	char addr6[INET6_ADDRSTRLEN], *value;
 	struct in6_addr addr;
 
-	if (get_ipv6_service() != IPV6_6RD || !nvram_get_int(ipv6_nvname("ipv6_6rd_dhcp")))
+	if (get_ipv6_service_by_unit(unit) != IPV6_6RD || !nvram_get_int(ipv6_nvname_by_unit("ipv6_6rd_dhcp", unit)))
 		return -1;
 
-	snprintf(prefix, sizeof(prefix), "wan%d_", wan_primary_ifunit_ipv6());
+	snprintf(prefix, sizeof(prefix), "wan%d_", unit);
 
 	value = nvram_safe_get(strcat_r(prefix, "6rd_prefix", tmp));
 	if (*value ) {
 		/* try to compact IPv6 prefix */
 		if (inet_pton(AF_INET6, value, &addr) > 0)
 			value = (char *) inet_ntop(AF_INET6, &addr, addr6, sizeof(addr6));
-		nvram_set(ipv6_nvname("ipv6_6rd_prefix"), value);
-		nvram_set(ipv6_nvname("ipv6_6rd_router"), nvram_safe_get(strcat_r(prefix, "6rd_router", tmp)));
-		nvram_set(ipv6_nvname("ipv6_6rd_prefixlen"), nvram_safe_get(strcat_r(prefix, "6rd_prefixlen", tmp)));
-		nvram_set(ipv6_nvname("ipv6_6rd_ip4size"), nvram_safe_get(strcat_r(prefix, "6rd_ip4size", tmp)));
+		nvram_set(ipv6_nvname_by_unit("ipv6_6rd_prefix", unit), value);
+		nvram_set(ipv6_nvname_by_unit("ipv6_6rd_router", unit), nvram_safe_get(strlcat_r(prefix, "6rd_router", tmp, sizeof(tmp))));
+		nvram_set(ipv6_nvname_by_unit("ipv6_6rd_prefixlen", unit), nvram_safe_get(strlcat_r(prefix, "6rd_prefixlen", tmp, sizeof(tmp))));
+		nvram_set(ipv6_nvname_by_unit("ipv6_6rd_ip4size", unit), nvram_safe_get(strlcat_r(prefix, "6rd_ip4size", tmp, sizeof(tmp))));
 		return 1;
 	}
 
 	return 0;
+}
+
+int update_6rd_info(void)
+{
+	return update_6rd_info_by_unit(wan_primary_ifunit_ipv6());
 }
 #endif
 
@@ -4198,6 +4208,7 @@ int iwpriv_get_int(const char *iface, char *cmd, int *result)
  * @path:	path to a directory.
  * @keyword:	used to filter specific items to @handler.
  * @handler:	function pointer.
+ *              NOTE: To make sure both readdir_wrapper() and @handler see same struct dirent, @handler must check @de_size and stop if mismatch.
  * @arg:	parameter for @handler.
  * @return:
  * 	0:	success
@@ -4205,7 +4216,7 @@ int iwpriv_get_int(const char *iface, char *cmd, int *result)
  *     -2:	can't open @path
  *     -3:	error reported by @handler
  */
-int readdir_wrapper(const char *path, const char *keyword, int (*handler)(const char *path, const struct dirent *de, void *arg), void *arg)
+int readdir_wrapper(const char *path, const char *keyword, int (*handler)(const char *path, const struct dirent *de, size_t de_size, void *arg), void *arg)
 {
 	int ret = 0;
 	DIR *dir;
@@ -4221,7 +4232,7 @@ int readdir_wrapper(const char *path, const char *keyword, int (*handler)(const 
 		if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, ".."))
 			continue;
 		if (!keyword || *keyword == '\0' || strstr(de->d_name, keyword) != NULL) {
-			if (handler(path, de, arg))
+			if (handler(path, de, sizeof(*de), arg))
 				ret = -3;
 		}
 	}
@@ -5934,7 +5945,7 @@ int is_passwd_default(){
 	char *http_passwd = nvram_safe_get("http_passwd");
 #ifdef RTCONFIG_NVRAM_ENCRYPT
 	char dec_passwd[NVRAM_ENC_LEN];
-	pw_dec(http_passwd, dec_passwd, sizeof(dec_passwd));
+	pw_dec(http_passwd, dec_passwd, sizeof(dec_passwd), 1);
 	http_passwd = dec_passwd;
 #endif
 	if(strcmp(nvram_default_get("http_passwd"), http_passwd) == 0)
@@ -6100,3 +6111,76 @@ void wl_vif_to_subnet(const char *ifname, char *net, int len)
 	return;
 
 }
+
+char *make_salt(char *scheme_id, char *buf, size_t size)
+{
+	unsigned char tmp[12];
+	char *p = NULL;
+	int n = 0, tmp_len = 0;
+
+	if (buf == NULL)
+		return NULL;
+
+	if(!strcmp(scheme_id, "1")){
+		n = strlcpy(buf, "$1$", size);
+		tmp_len = 6;
+	}else if(!strcmp(scheme_id, "5")){
+		n = strlcpy(buf, "$5$", size);
+		tmp_len = 12;
+	}else
+		return buf;
+
+	n = (size - n - 1) / 4 * 3;
+	if (n > 0) {
+		if (n > tmp_len)
+			n = tmp_len;
+		f_read("/dev/urandom", tmp, n);
+		n = base64_encode(tmp, buf + 3, n);
+		buf[3 + n] = '\0';
+	}
+
+	for (p = buf; *p; p++) {
+		if (*p == '+')
+			*p = '.';
+	}
+
+	return buf;
+}
+
+int asus_openssl_crypt(char *key, char *salt, char *out, int out_len)
+{
+	dbg("asus_openssl_crypt: check toolchain crypt() support\n");
+	int scheme_id = 0, ret = 0;
+	FILE *p_fp = NULL;
+	char cmd_line[256] = {0}, crypt_buf[256] = {0};
+
+	if(salt && strlen(salt) > 4){
+		if(!strncmp(salt, "$1$", 3))
+			scheme_id = 1;
+		else if(!strncmp(salt, "$5$", 3))
+			scheme_id = 5;
+		else
+			return ret;
+	}else
+		return ret;
+
+	snprintf(cmd_line, sizeof(cmd_line), "openssl passwd -%d -salt %s %s", scheme_id, salt+3, key);
+
+	if((p_fp = popen(cmd_line, "r")) != NULL){
+		if(fgets(crypt_buf, sizeof(crypt_buf), p_fp)){
+			if (strlen(crypt_buf) > 0)
+				crypt_buf[strlen(crypt_buf)-1] = '\0';
+		}
+		pclose(p_fp);
+	}
+
+	if(crypt_buf[0] != '\0'){
+		if(!strncmp(crypt_buf, salt, strlen(salt))){
+			strlcpy(out, crypt_buf, out_len);
+			ret = 1;
+		}
+	}
+
+	return ret;
+}
+

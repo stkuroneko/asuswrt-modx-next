@@ -1566,6 +1566,22 @@ static inline int lacp_enabled(void)
 static inline int lacp_enabled(void) { return 0; }
 #endif
 
+#if defined(RTCONFIG_PAGECACHE_RATIO)
+static inline int get_pagecache_ratio(void)
+{
+	int v = nvram_get_int("pagecache_ratio");
+
+	if (v < 5)
+		v = 5;
+	if (v > 90)
+		v = 90;
+
+	return v;
+}
+#else
+static inline int get_pagecache_ratio(void) { return 90; }
+#endif
+
 /* Check Wireless band existance based on compile option only.
  * This is used when DUT is restored and restore_defaults() hasn't been executed.
  */
@@ -2946,6 +2962,7 @@ extern int nvram_set_file(const char *key, const char *fname, int max);
 #endif
 extern int free_caches(const char *clean_mode, const int clean_time, const unsigned int threshold);
 extern int update_6rd_info(void);
+extern int update_6rd_info_by_unit(int unit);
 extern int is_private_subnet(const char *ip);
 extern const char *get_wanface(void);
 extern const char *get_wanip(void);
@@ -3044,7 +3061,7 @@ extern int exec_and_return_string(const char *cmd, const char *keyword, char *bu
 extern int exec_and_parse(const char *cmd, const char *keyword, const char *fmt, int cnt, ...);
 extern char *iwpriv_get(const char *iface, char *cmd);
 extern int iwpriv_get_int(const char *iface, char *cmd, int *result);
-extern int readdir_wrapper(const char *path, const char *keyword, int (*handler)(const char *path, const struct dirent *de, void *arg), void *arg);
+extern int readdir_wrapper(const char *path, const char *keyword, int (*handler)(const char *path, const struct dirent *de, size_t de_size, void *arg), void *arg);
 extern char *get_qos_prefix(int unit, char *buf);
 extern int internet_ready(void);
 extern void set_no_internet_ready(void);
@@ -3739,20 +3756,27 @@ extern void erase_symbol(char *old, char *sym);
 
 /* pwenc.c */
 #if defined(RTCONFIG_NVRAM_ENCRYPT) || defined(RTCONFIG_ASD)
-extern int pw_enc(const char *input, char *output);
-extern int pw_dec(const char *input, char *output, int len);
+extern int pw_enc(const char *input, char *output, int with_salt);
+extern int pw_dec(const char *input, char *output, int len, int with_salt);
 extern int pw_enc_blen(const char *input);
 extern int pw_dec_len(const char *input);
 #endif
 #ifdef RTCONFIG_NVRAM_ENCRYPT
+struct INVALID_NVRAM_GET_TABLE {
+        char *name;
+        char *exclude_process;
+};
 #define NVRAM_ENC_LEN	1024
 #define NVRAM_ENC_MAXLEN	4096
 extern int set_enc_nvram(char *name, char *input, char *output);
 extern int enc_nvram(char *name, char *input, char *output);
 extern int dec_nvram(char *name, char *input, char *output);
 extern int start_enc_nvram(void);
-extern int start_dec_nvram(void);
 extern int init_enc_nvram(void);
+extern int invalid_nvram_get_name(char *name);
+extern int invalid_nvram_get_program(char *name);
+extern int invalid_program_check(void);
+extern char *str_to_md5(const char *string, int length, char *out);
 #endif
 
 /* amas_utils.c */
@@ -4146,4 +4170,8 @@ extern char *server6_table[][2];
 #endif
 
 #define SAFE_FREE(x)	if(x) {free(x); x=NULL;}
+
+extern char *make_salt(char *scheme_id, char *buf, size_t size);
+extern int asus_openssl_crypt(char *key, char *salt, char *out, int out_len);
+
 #endif	/* !__SHARED_H__ */

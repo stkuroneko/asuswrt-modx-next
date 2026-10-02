@@ -677,7 +677,7 @@ int do_ping_detect(int wan_unit, const char *target)
 	if (debug)
 		_dprintf("%s: %s %s\n", __FUNCTION__, "check", target);
 
-	snprintf(cmd, sizeof(cmd), "ping -c1 -w2 -s32 %s -Mdont '%s' 2>/dev/null",
+	snprintf(cmd, sizeof(cmd), "ping -c1 -w2 -s32 %s -Mdont '%s' 2>&1",
 		 nvram_get_int("ttl_spoof_enable") ? "" : "-t128", target);
 	if ((fp = popen(cmd, "r")) != NULL) {
 		while (fgets(cmd, sizeof(cmd), fp) != NULL) {
@@ -687,6 +687,8 @@ int do_ping_detect(int wan_unit, const char *target)
 					_dprintf("%s: %s %s\n", __FUNCTION__, target, ret ? "ok" : "fail");
 				break;
 			}
+			else
+				ret = 0;
 		}
 		pclose(fp);
 	}
@@ -2554,13 +2556,15 @@ int do_backup_ping_detect(int wan_unit)
 		if (route == 0)
 			route_add(wan_ifname, 0, addr, wan_gateway, "255.255.255.255");
 		//ping
-		snprintf(cmd, sizeof(cmd), "ping -c1 -w2 -s32 -Mdont -I %s '%s' 2>/dev/null", wan_ifname, addr);
+		snprintf(cmd, sizeof(cmd), "ping -c1 -w2 -s32 -Mdont -I %s '%s' 2>&1", wan_ifname, addr);
 		if ((fp = popen(cmd, "r")) != NULL) {
 			while (fgets(cmd, sizeof(cmd), fp) != NULL) {
 				if (sscanf(cmd, "%*s %*s transmitted, %d %*s received", &count) == 1) {
 					ret = (count > 0);
 					break;
 				}
+				else
+					ret = 0;
 			}
 			pclose(fp);
 		}

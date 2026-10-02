@@ -780,9 +780,7 @@ extern void Set_AvgUptime(const char *value);
 extern int country_to_code(char *ctry, int band, char *code_str, size_t len);
 extern void acs_ch_weight_param(void);
 extern void get_stainfo(int bssidx, int vifidx);
-#if defined(RTAX89U)
 extern void pre_syspara(void);
-#endif
 #endif	/* RTCONFIG_QCA */
 
 #if defined(RTCONFIG_SOC_IPQ8074)
@@ -2211,7 +2209,9 @@ extern void add_ip6_lanaddr(void);
 extern void start_ipv6_tunnel(void);
 extern void stop_ipv6_tunnel(void);
 #ifdef RTCONFIG_SOFTWIRE46
+#define S46_MAP_PATH	"/tmp/v6maps.%d"
 #define S46_LOG_PATH	"/jffs/s46.log"
+#define S46_RETRY_TIME	3
 enum S46_MAPSVR_STATE {
 	S46_MAPSVR_INIT			= 0,
 	S46_MAPSVR_OK			= 1,
@@ -2220,20 +2220,21 @@ enum S46_MAPSVR_STATE {
 	S46_MAPSVR_NO_RESPONSE		= 4,
 	S46_MAPSVR_MAX
 };
-extern void set_s46_ra_addr(int wan_type, char *wan_ifname);
-extern int s46_mapcalc(int wan_proto, char *rules, char *peerbuf, size_t peerbufsz,
+extern void set_s46_ra_addr(int wan_unit, int wan_type, char *wan_ifname);
+extern int s46_mapcalc(int wan_unit, int wan_proto, char *rules, char *peerbuf, size_t peerbufsz,
 		       char *addr6buf, size_t addr6bufsz, char *addr4buf, size_t addr4bufsz,
 		       int *poffset, int *ppsidlen, int *ppsid, char **fmrs, int draft);
 extern void start_s46_tunnel(int unit);
 extern void stop_s46_tunnel(int unit, int unload);
 extern int wan_hgw_detect(const int wan_unit, const char *wan_ifname, const char *prc);
 
-extern void start_v6plusd(void);
-extern void stop_v6plusd(void);
-extern void restart_v6plusd(void);
-extern void start_ocnvcd(void);
-extern void stop_ocnvcd(void);
-extern void restart_ocnvcd(void);
+extern void s46reset(int unit);
+extern void start_v6plusd(int unit);
+extern void stop_v6plusd(int unit);
+extern void restart_v6plusd(int unit);
+extern void start_ocnvcd(int unit);
+extern void stop_ocnvcd(int unit);
+extern void restart_ocnvcd(int unit);
 //s46comm.c
 extern void s46print(const char *logpath, const char *format, ...);
 #define S46_DBG(fmt, args...) \
@@ -2242,17 +2243,19 @@ extern void s46print(const char *logpath, const char *format, ...);
 	} while(0)
 extern int _nvram_check(const char *name, const char *value);
 extern int _nvram_set_check(const char *name, const char *value);
-extern void fmrs2file(char *path);
-extern int ce_dad_check(void);
-extern int s46_ntt_hgw(void);
+extern void fmrs2file(int unit);
+extern int ce_dad_check(int unit);
+extern int s46_ntt_hgw(int unit);
 extern char *calc_s46_port_range(int usable, int psid, int psidlen, int offset, char *ret, int retsz);
 // v6plusd.c
+#define V6PLUSD_PIDFILE "/var/run/v6plusd.%d.pid"
 extern char *s46_jpne_maprules(char *id, char *idbuf, size_t idlen, long *rsp_code);
-extern int check_v6plusd();
+extern int check_v6plusd(int unit);
 extern int v6plusd_main(int argc, char **argv);
 // ocnvcd.c
+#define OCNVCD_PIDFILE "/var/run/ocnvcd.%d.pid"
 extern char *s46_ocn_maprules(char *v6perfix, int prefixlen, long *rsp_code);
-extern int check_ocnvcd();
+extern int check_ocnvcd(int unit);
 extern int ocnvcd_main(int argc, char **argv);
 #endif
 extern void start_ipv6(void);

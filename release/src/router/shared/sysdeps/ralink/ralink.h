@@ -844,7 +844,11 @@ struct GNU_PACKED wnm_command {
 #define OFFSET_PSK		(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xff80) //15bytes
 #endif
 
+
+#define MAX_PASS_LEN 32
+
 #if defined(RTCONFIG_WLMODULE_MT7915D_AP)
+#define OFFSET_PASS		0x6ff50	// 32 bytes (MAX_PASS_LEN)
 #define OFFSET_EISN		0x6ff70	// 32 bytes
 #define OFFSET_TERRITORY_CODE	0x6ff90	/* 5 bytes, e.g., US/01, US/02, TW/01, etc. */
 #define OFFSET_DEV_FLAGS	0x6ffa0 //device dependent flags
@@ -864,6 +868,7 @@ struct GNU_PACKED wnm_command {
 #define OFFSET_32BYTES_ODMPID   0x6FE47 // 32 bytes
 #endif
 #elif defined(RT4GAC86U)
+#define OFFSET_PASS		0x5ff50	// 32 bytes
 #define OFFSET_EISN		0x5ff70	// 32 bytes
 #define OFFSET_TERRITORY_CODE	0x5ff90	/* 5 bytes, e.g., US/01, US/02, TW/01, etc. */
 #define OFFSET_DEV_FLAGS	0x5ffa0 //device dependent flags
@@ -879,6 +884,7 @@ struct GNU_PACKED wnm_command {
 #define OFFSET_HW_BOM	0x5FE0C	// 32 bytes
 #define OFFSET_HW_DATE_CODE	0x5FE3E	// 8 bytes
 #else
+#define OFFSET_PASS		(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xff50)	// 32 bytes
 #define OFFSET_EISN		(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xff70)	// 32 bytes
 #define OFFSET_TERRITORY_CODE	(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xff90)	/* 5 bytes, e.g., US/01, US/02, TW/01, etc. */
 #define OFFSET_DEV_FLAGS	(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xffa0) //device dependent flags

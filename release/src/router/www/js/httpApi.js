@@ -624,6 +624,7 @@ var httpApi ={
 			"lw4o6": "LW 4over6",
 			"map-e": "MAP-E",
 			"v6plus": "<#IPv6_plus#>",
+			"ocnvc": "<#IPv6_ocnvc#>",
 			"usb modem": "USB Modem"
 		};
 		var result = {

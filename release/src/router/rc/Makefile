@@ -1428,6 +1428,7 @@ ifeq ($(RTCONFIG_LETSENCRYPT),y)
 endif
 
 ifeq ($(RTCONFIG_SOFTWIRE46),y)
+	@cd $(INSTALLDIR)/sbin && ln -sf rc s46reset
 	@cd $(INSTALLDIR)/sbin && ln -sf rc mapcalc
 	@cd $(INSTALLDIR)/sbin && ln -sf rc v6plusd
 	@cd $(INSTALLDIR)/sbin && ln -sf rc ocnvcd

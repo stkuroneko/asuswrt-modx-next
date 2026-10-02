@@ -2257,6 +2257,10 @@ define RouterOptions
 		echo "RTCONFIG_FORCE_AUTO_UPGRADE=y" >>$(1); \
 		sed -i "/RTCONFIG_CAPTCHA/d" $(1); \
 		echo "RTCONFIG_CAPTCHA=y" >>$(1); \
+		if [ "$(ECC256)" = "y" ]; then \
+			sed -i "/RTCONFIG_ECC256/d" $(1); \
+			echo "RTCONFIG_ECC256=y" >>$(1); \
+		fi; \
 	else \
 		sed -i "/RTCONFIG_FTP_SSL/d" $(1); \
 		echo "# RTCONFIG_FTP_SSL is not set" >>$(1); \
@@ -2344,6 +2348,10 @@ define RouterOptions
 		if [ "$(IPV6S46)" = "y" -o "$(IPV6FULL)" = "y" ]; then \
 			sed -i "/RTCONFIG_SOFTWIRE46/d" $(1); \
 			echo "RTCONFIG_SOFTWIRE46=y" >>$(1); \
+			if [ "$(OCNVC)" = "y" ]; then \
+				sed -i "/RTCONFIG_OCNVC/d" $(1); \
+				echo "RTCONFIG_OCNVC=y" >>$(1); \
+			fi; \
 		fi; \
 	fi;
 	if [ "$(IPSEC)" = "y" ] || \
@@ -2978,11 +2986,11 @@ define RouterOptions
 		echo "RTCONFIG_TR143_110=y" >>$(1); \
 		sed -i "/RTCONFIG_ACS_SUBNET/d" $(1);\
 		echo "RTCONFIG_ACS_SUBNET=y">>$(1);\
-	fi;
+	fi; \
 	if [ "$(ACS_SUBNET)" = "y" ];then \
 		sed -i "/RTCONFIG_ACS_SUBNET/d" $(1);\
 		echo "RTCONFIG_ACS_SUBNET=y">>$(1);\
-	fi;
+	fi; \
 	if [ "$(TR_ISP)" = "XLNPROVU" ]; then \
 		sed -i "/RTCONFIG_ISP_XLNPROVU/d" $(1); \
 		echo "RTCONFIG_ISP_XLNPROVU=y" >>$(1); \

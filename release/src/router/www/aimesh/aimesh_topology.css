@@ -269,7 +269,7 @@
 	bottom: 6px;
 	right: 6px;
 	z-index: 9;
-	background-position: 0% 0%;
+	background-position: 40% 0%;
 }
 .model_icon.web{
 	background-size: contain;
@@ -1412,7 +1412,7 @@
 	background: #1EA2FF;
 	border-radius: 50%;
 	position: absolute;
-	top: 2px;
+	top: 4px;
 	bottom: 0;
 	left: 0;
 	right: 0;

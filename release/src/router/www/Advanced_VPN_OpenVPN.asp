@@ -200,7 +200,7 @@ function initial(){
 	document.getElementById("faq_iPhone").href=faq_href_iPhone;
 	document.getElementById("faq_android").href=faq_href_android;
 
-	if(wan_proto=="v6plus" && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
+	if((wan_proto == "v6plus" || wan_proto == "ocnvc") && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
 		$(".setup_info_icon.basic").click(
 			function() {				
 				if($("#s46_ports_content").is(':visible'))
@@ -379,9 +379,9 @@ function applyRule(){
 				return false;
 			}
 			else{
-				if(wan_proto=="v6plus" && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
+				if((wan_proto == "v6plus" || wan_proto == "ocnvc") && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
 					if (!validator.range_s46_ports(document.form.vpn_server_port_basic, "none")){
-						if(!confirm("The following port related settings may not work properly since the port is not available in current v6plus usable port range. Do you want to continue?")){
+						if(!confirm(port_confirm)){
 							document.form.vpn_server_port_basic.focus();
 							return false;
 						}
@@ -400,9 +400,9 @@ function applyRule(){
 				return false;
 			}
 			else{
-				if(wan_proto=="v6plus" && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
+				if((wan_proto == "v6plus" || wan_proto == "ocnvc") && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
 					if (!validator.range_s46_ports(document.form.vpn_server_port_adv, "none")){
-						if(!confirm("The following port related settings may not work properly since the port is not available in current v6plus usable port range. Do you want to continue?")){
+						if(!confirm(port_confirm)){
 							document.form.vpn_server_port_adv.focus();
 							return false;
 						}
@@ -936,7 +936,7 @@ function switchMode(mode){
 		document.getElementById("divAdvanced").style.display = "none";
 		updateVpnServerClientAccess();
 
-		if(wan_proto=="v6plus" && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
+		if((wan_proto == "v6plus" || wan_proto == "ocnvc") && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
 			if($("#s46_ports_content").is(':visible'))
 				$("#s46_ports_content").fadeOut();
 
@@ -952,7 +952,7 @@ function switchMode(mode){
 		$('*[data-group="cert_btn"]').hide();
 		document.getElementById("divAdvanced").style.display = "";
 
-		if(wan_proto=="v6plus" && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
+		if((wan_proto == "v6plus" || wan_proto == "ocnvc") && s46_ports_check_flag && array_ipv6_s46_ports.length > 1){
 			if($("#s46_ports_content").is(':visible'))
 				$("#s46_ports_content").fadeOut();
 			

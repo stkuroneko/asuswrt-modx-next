@@ -492,6 +492,10 @@ function applyRule(){
 			document.form.wandog_target.focus();
 			return false;
 		}
+		if(!validator.isValidHost(document.form.wandog_target.value)){
+			document.form.wandog_target.focus();
+			return false;
+        }
 		document.form.wandog_enable.value = "1";
 	}
 	else

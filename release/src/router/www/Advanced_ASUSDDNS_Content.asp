@@ -92,6 +92,8 @@ var le_sbstate_t = '<% nvram_get("le_sbstate_t"); %>';
 var le_auxstate_t = '<% nvram_get("le_auxstate_t"); %>';
 var le_re_ddns = '<% nvram_get("le_re_ddns"); %>';
 
+var asusddns_token_state = httpApi.nvramGet(["asusddns_token_state"], true).asusddns_token_state;
+
 function init(){
 	show_menu();
 	document.getElementById("faq").href=faq_href;
@@ -214,6 +216,28 @@ function force_update() {
 	submitForm();
 }
 
+function show_deregister_btn(){
+	$("#deregister_btn").css("display", "inline");
+	if(asusddns_token_state == "1"){
+		$("#deregister_btn").click(function(){
+			alert("The host name has been bound to the login account of the router app, please delete/deregister it from the router app.");//untranslated
+		});
+	}
+	else{
+		$("#deregister_btn").click(function(){
+			if(orig_le_enable != "0"){
+				var confirm_msg = "Your certification will be removed! You will be automatically logged out for the renewal. Please log in again for further configuration.";//untranslated
+				if(!confirm(confirm_msg)){
+					return false;
+				}
+			}
+
+			showLoading();
+			asuscomm_deregister();
+		});
+	}
+}
+
 function ddns_load_body(){
     if(ddns_enable_x == 1){
         inputCtrl(document.form.ddns_server_x, 1);
@@ -237,8 +261,7 @@ function ddns_load_body(){
             else
                 document.getElementById("ddns_hostname_x").value = "<#asusddns_inputhint#>";
         }
-        showhide("ddns_ipcheck_tr", 1);
-		
+		show_ipv6update_setting();
         change_ddns_setting(document.form.ddns_server_x.value);
         if(letsencrypt_support){
             show_cert_settings(1);
@@ -262,7 +285,6 @@ function ddns_load_body(){
         document.form.ddns_wildcard_x[0].disabled= 1;
         document.form.ddns_wildcard_x[1].disabled= 1;
         showhide("wildcard_field",0);
-        showhide("ddns_ipcheck_tr", 0);
         if(letsencrypt_support)
             show_cert_settings(0);
     }
@@ -284,18 +306,9 @@ function ddns_load_body(){
 			showhide("wan_ip_hide2", 0);
 			if(ddns_server_x == "WWW.ASUS.COM"){
 				showhide("wan_ip_hide3", 1);
-				document.getElementById("ddns_status").innerHTML = "<#Status_Active#>";
-				if(inadyn)
-					$("#deregister_btn").css("display", "inline");
 			}
 		}
 		else{
-			if(ddns_server_x == "WWW.ASUS.COM"){
-				document.getElementById("ddns_status").innerHTML = "<#Status_Inactive#>";
-				if(ddnsStatus != "")
-					$("#ddns_status_detail").css("display", "inline");
-			}
-
 			if((ddns_return_code == "ddns_query" || ddns_return_code_chk == "Time-out" || ddns_return_code_chk == "connect_fail" || ddns_return_code_chk.indexOf('-1') != -1) && le_re_ddns != "1")
 				checkDDNSReturnCode_noRefresh();
 		}
@@ -447,7 +460,7 @@ function checkDDNSReturnCode_noRefresh(){
 					showhide("wan_ip_hide3", 1);
 					document.getElementById("ddns_status").innerHTML = "<#Status_Active#>";
 					if(inadyn)
-						$("#deregister_btn").css("display", "inline");
+						show_deregister_btn();
 				}
 			}
 			else{
@@ -555,7 +568,7 @@ function change_ddns_setting(v){
 				(ddns_return_code_chk.indexOf('200')!=-1 || ddns_return_code_chk.indexOf('220')!=-1 || ddns_return_code_chk == 'register,230')){
 				document.getElementById("ddns_status").innerHTML = "<#Status_Active#>";
 				if(inadyn)
-					$("#deregister_btn").css("display", "inline");
+					show_deregister_btn();
 			}
 			else
 				document.getElementById("ddns_status").innerHTML = "<#Status_Inactive#>";
@@ -580,7 +593,7 @@ function change_ddns_setting(v){
 			document.form.DDNSName.parentNode.style.display = "none";
 			inputCtrl(document.form.ddns_username_x, 1);
 			inputCtrl(document.form.ddns_passwd_x, 1);
-			if(v == "WWW.TUNNELBROKER.NET" || v == "WWW.SELFHOST.DE" || v == "DOMAINS.GOOGLE.COM")
+			if(v == "WWW.TUNNELBROKER.NET" || v == "DNS.HE.NET" || v == "WWW.SELFHOST.DE" || v == "DOMAINS.GOOGLE.COM")
 				var disable_wild = 1;
 			else
 				var disable_wild = 0;
@@ -771,6 +784,19 @@ function asuscomm_deregister(){
 	});
 }
 
+function clean_ddns(){
+	$.ajax({
+		url: "/clean_ddns.cgi",
+
+		success: function( response ) {
+			setTimeout(function(){
+			alert("<#LANHostConfig_x_DDNS_alarm_16#>");
+			refreshpage();
+			}, 2000);
+		}
+	});
+}
+
 var max_retry_count = 6;
 var retry_count = 0;
 function check_unregister_result(){
@@ -792,8 +818,7 @@ function check_unregister_result(){
 
 	if(timeout || return_status != ""){
 		if(return_status == "200"){
-			alert("<#LANHostConfig_x_DDNS_alarm_16#>");
-			refreshpage();
+			clean_ddns();
 		}
 		else{
 			hideLoading();
@@ -871,15 +896,6 @@ function check_unregister_result(){
 				</select>
 				</td>
 			</tr>
-			<tr id="ddns_ipcheck_tr">
-				<th><a class="hintstyle" href="javascript:void(0);" onClick="openHint(5,17);">Method to retrieve WAN IP</a></th>
-                                <td>
-				<select name="ddns_realip_x" class="input_option">
-					<option class="content_input_fd" value="0" <% nvram_match("ddns_realip_x", "0","selected"); %>><#IPConnection_VSList_Internal#></option>
-					<option class="content_input_fd" value="1" <% nvram_match("ddns_realip_x", "1","selected"); %>><#IPConnection_VSList_External#></option>
-				</select>
-				</td>
-			</tr>
 			<tr id="ddns_ipv6update_tr" style="display: none;">
 				<th><a class="hintstyle" href="javascript:void(0);" onClick="openHint(5,18);"><#DDNS_ipv6_update#></a></th>
 				<td>
@@ -899,13 +915,14 @@ function check_unregister_result(){
 						<option value="WWW.SELFHOST.DE" <% nvram_match("ddns_server_x", "WWW.SELFHOST.DE","selected"); %>>WWW.SELFHOST.DE</option>
 						<option value="WWW.ZONEEDIT.COM" <% nvram_match("ddns_server_x", "WWW.ZONEEDIT.COM","selected"); %>>WWW.ZONEEDIT.COM</option>
 						<option value="WWW.DNSOMATIC.COM" <% nvram_match("ddns_server_x", "WWW.DNSOMATIC.COM","selected"); %>>WWW.DNSOMATIC.COM</option>
+						<option value="DNS.HE.NET" <% nvram_match("ddns_server_x", "DNS.HE.NET","selected"); %>>HE.NET</option>
 						<option value="WWW.TUNNELBROKER.NET" <% nvram_match("ddns_server_x", "WWW.TUNNELBROKER.NET","selected"); %>>WWW.TUNNELBROKER.NET</option>
 						<option value="WWW.NO-IP.COM" <% nvram_match("ddns_server_x", "WWW.NO-IP.COM","selected"); %>>WWW.NO-IP.COM</option>
 						<option value="WWW.ORAY.COM" <% nvram_match("ddns_server_x", "WWW.ORAY.COM","selected"); %>>WWW.ORAY.COM(花生壳)</option>
 					</select>
-					<input id="deregister_btn" class="button_gen" style="display: none; margin-left: 5px;" type="button" value="Deregister" onclick="showLoading();asuscomm_deregister();"/>
-				<a id="link" href="javascript:openLink('x_DDNSServer')" style=" margin-left:5px; text-decoration: underline;"><#LANHostConfig_x_DDNSServer_linkname#></a>
-				<a id="linkToHome" href="javascript:openLink('x_DDNSServer')" style=" margin-left:5px; text-decoration: underline;"><#ddns_home_link#></a>
+					<input id="deregister_btn" class="button_gen" style="display: none; margin-left: 5px;" type="button" value="Deregister"/>
+					<a id="link" href="javascript:openLink('x_DDNSServer')" style=" margin-left:5px; text-decoration: underline;"><#LANHostConfig_x_DDNSServer_linkname#></a>
+					<a id="linkToHome" href="javascript:openLink('x_DDNSServer')" style=" margin-left:5px; text-decoration: underline;"><#ddns_home_link#></a>
 				</td>
 			</tr>
 			<tr id="ddns_hostname_tr">

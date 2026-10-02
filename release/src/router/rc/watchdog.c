@@ -6588,8 +6588,10 @@ void ddns_check(void)
 		}
 	}
 
-	if (nvram_get_int("ntp_ready") != 1)
+	if (nvram_get_int("ntp_ready") != 1) {
+		logmessage("watchdog", "NTP time not sync, exit DDNS Retry.\n");
 		return;
+	}
 
 	/* MAX Retry Count mechanism */
 	int ddns_check_retry = nvram_get_int("ddns_check_retry");

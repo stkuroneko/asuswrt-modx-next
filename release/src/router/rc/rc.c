@@ -1007,12 +1007,19 @@ err_exit1:
 #endif
 
 #if defined(RTCONFIG_SOC_IPQ8074)
-static int count_q6mem_size(const char *basedir, const struct dirent *de, void *arg)
+static int count_q6mem_size(const char *basedir, const struct dirent *de, size_t de_size, void *arg)
 {
 	uint64_t *space = arg;
 	struct stat s = { 0 };
 	char path[sizeof("/jffs/dmesg_YYYYMMDD_HHMMSS.txtXXX")];
 
+	if (sizeof(*de) != de_size) {
+		/* If size of struct dirent mismatch, make sure readdir_wrapper() and this function see same struct dirent.h.
+		 * e.g., it's different in uclibc if _FILE_OFFSET_BITS=64 is defined or not.
+		 */
+		dbg("%s: size of struct dirent mismatch (%u v.s. %u)!\n", __func__, sizeof(*de), de_size);
+		return -1;
+	}
 	if (!basedir || !de || !arg)
 		return -1;
 
@@ -1027,10 +1034,17 @@ static int count_q6mem_size(const char *basedir, const struct dirent *de, void *
 	return 0;
 }
 
-static int del_q6mem(const char *basedir, const struct dirent *de, void *arg)
+static int del_q6mem(const char *basedir, const struct dirent *de, size_t de_size, void *arg)
 {
 	char path[sizeof("/jffs/dmesg_YYYYMMDD_HHMMSS.txtXXX")];
 
+	if (sizeof(*de) != de_size) {
+		/* If size of struct dirent mismatch, make sure readdir_wrapper() and this function see same struct dirent.h.
+		 * e.g., it's different in uclibc if _FILE_OFFSET_BITS=64 is defined or not.
+		 */
+		dbg("%s: size of struct dirent mismatch (%u v.s. %u)!\n", __func__, sizeof(*de), de_size);
+		return -1;
+	}
 	if (!basedir || !de)
 		return -1;
 
@@ -3093,6 +3107,15 @@ _dprintf("LED_NOMOBILE=%d, LED_2G_YELLOW=%d, LED_3G_BLUE=%d, LED_4G_WHITE=%d.\n"
 	}
 #endif
 #if RTCONFIG_SOFTWIRE46
+	else if (!strcmp(base, "s46reset")) {
+		if (argc != 2) {
+			printf("Usage: %s <wan unit>.\n", argv[0]);
+			return 0;
+		}
+		s46reset(atoi(argv[1]));
+		printf("WAN Unit:[%d] MAP nvarm is reset.\n", atoi(argv[1]));
+		return 0;
+	}
 	else if (!strcmp(base, "mapcalc")) {
 		char peerbuf[INET6_ADDRSTRLEN];
 		char addr6buf[INET6_ADDRSTRLEN];
@@ -3112,7 +3135,7 @@ _dprintf("LED_NOMOBILE=%d, LED_2G_YELLOW=%d, LED_3G_BLUE=%d, LED_4G_WHITE=%d.\n"
 			wan_proto = WAN_OCNVC;
 
 		while (fgets(rules, sizeof(rules), stdin) != NULL) {
-			if (s46_mapcalc(wan_proto, rules, peerbuf, sizeof(peerbuf), addr6buf, sizeof(addr6buf),
+			if (s46_mapcalc(0, wan_proto, rules, peerbuf, sizeof(peerbuf), addr6buf, sizeof(addr6buf),
 					addr4buf, sizeof(addr4buf), &offset, &psidlen, &psid, &fmrs, draft) <= 0) {
 				peerbuf[0] = addr6buf[0] = addr4buf[0] = '\0';
 				offset = 0, psidlen = 0, psid = 0;

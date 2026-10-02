@@ -2282,7 +2282,7 @@ _dprintf("usb_path: 4. don't set %s.\n", tmp);
 		if (nvram_get_int("usb_automount"))
 			run_nvscript("script_usbmount", mountpoint, 3);
 
-#if defined(RTCONFIG_APP_PREINSTALLED) && defined(RTCONFIG_CLOUDSYNC)
+#if defined(RTCONFIG_CLOUDSYNC)
 		char word[PATH_MAX], *next_word;
 		char cloud_setting[2048], *b, *nvp, *nv;
 		int type = 0, rule = 0, enable = 0;
@@ -3467,7 +3467,7 @@ start_samba(void)
 #ifdef RTCONFIG_NVRAM_ENCRYPT
 			char dec_passwd[64];
 			memset(dec_passwd, 0, sizeof(dec_passwd));
-			pw_dec(tmp_ascii_passwd, dec_passwd, sizeof(dec_passwd));
+			pw_dec(tmp_ascii_passwd, dec_passwd, sizeof(dec_passwd), 1);
 			tmp_ascii_passwd = dec_passwd;
 #endif
 			memset(char_passwd, 0, 64);
@@ -3924,8 +3924,9 @@ write_mt_daapd_conf(char *servername)
 	char *dec_passwd = NULL;
 	dec_passwd = malloc(declen);
 	if(dec_passwd){
-		pw_dec(http_passwd, dec_passwd, declen);
-		http_passwd = dec_passwd;
+		memset(dec_passwd, 0, declen);
+		pw_dec(http_passwd, dec_passwd, declen, 1);
+		strlcpy(http_passwd, dec_passwd, sizeof(http_passwd));
 	}
 #endif
 	memset(dbdir, 0, sizeof(dbdir));
@@ -4106,7 +4107,7 @@ void write_webdav_permissions()
 			int declen = strlen(tmp_ascii_passwd);
 			char dec_passwd[declen];
 			memset(dec_passwd, 0, sizeof(dec_passwd));
-			pw_dec(tmp_ascii_passwd, dec_passwd, sizeof(dec_passwd));
+			pw_dec(tmp_ascii_passwd, dec_passwd, sizeof(dec_passwd), 1);
 			tmp_ascii_passwd = dec_passwd;
 #endif
 			ascii_to_char_safe(char_passwd, tmp_ascii_passwd, 64);
