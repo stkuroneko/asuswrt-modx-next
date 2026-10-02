@@ -1,4 +1,0 @@
-kernel/drivers/tty/serial/serial_core.ko
-kernel/drivers/tty/serial/of_serial.ko
-kernel/drivers/tty/serial/8250/8250.ko
-kernel/drivers/tty/serial/8250/8250_base.ko

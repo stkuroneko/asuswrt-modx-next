@@ -128,6 +128,7 @@ else
 LBSTRING :=
 ifneq (,$(wildcard $(BUILDTOOLSDIR)/target.mak.3004))
 include $(BUILDTOOLSDIR)/target.mak.3004
+include $(SRCBASE)/../src-rt/board-profiles/profiles.mak
 else
 $(error $(BUILDTOOLSDIR)/target.mak.3004 not exist)
 endif
@@ -6148,4 +6149,3 @@ get_extendno:
 .PHONY: a b c d m Makefile allversions
 .PHONY: tags
 .PHONY: dummy
-

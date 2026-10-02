@@ -4801,7 +4801,16 @@ libconfuse-clean:
 inadyn/configure:
 	cd inadyn && ./autogen.sh
 
-inadyn/Makefile: inadyn/configure
+.PHONY: check-inadyn-config
+check-inadyn-config:
+
+inadyn/Makefile: inadyn/configure check-inadyn-config
+	@if [ -f inadyn/Makefile ] && \
+	    grep -Fqx "ac_pwd='$(realpath inadyn)'" inadyn/config.status && \
+	    [ inadyn/Makefile -nt inadyn/configure ]; then \
+		exit 0; \
+	fi; \
+	if [ -f inadyn/Makefile ]; then $(MAKE) -C inadyn clean || exit $$?; fi; \
 	cd inadyn && $(CONFIGURE) --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
 		--enable-openssl \
 		confuse_CFLAGS="-I$(STAGEDIR)/usr/include" \
@@ -6357,7 +6366,15 @@ lz4-install:
 openpam: openpam/Makefile
 	$(MAKE) -C $@ && $(MAKE) $@-stage
 
-openpam/Makefile:
+.PHONY: check-openpam-config
+check-openpam-config:
+
+openpam/Makefile: check-openpam-config
+	@if [ -f openpam/Makefile ] && \
+	    grep -Fqx "ac_pwd='$(realpath openpam)'" openpam/config.status; then \
+		exit 0; \
+	fi; \
+	if [ -f openpam/Makefile ]; then $(MAKE) -C openpam clean || exit $$?; fi; \
 	( cd openpam ; \
 		LDFLAGS=-ldl \
 		$(CONFIGURE) \
@@ -6394,7 +6411,15 @@ openvpn/dh2048.pem:
 openvpn: shared $(if $(BCM_502L07P2),ethctl_lib) openssl lzo$(LZO_VER) openpam zlib openvpn/dh2048.pem openvpn/Makefile
 	$(MAKE) -j 8 -C $@
 
-openvpn/Makefile:
+.PHONY: check-openvpn-config
+check-openvpn-config:
+
+openvpn/Makefile: check-openvpn-config
+	@if [ -f openvpn/Makefile ] && \
+	    grep -Fqx "ac_pwd='$(realpath openvpn)'" openvpn/config.status; then \
+		exit 0; \
+	fi; \
+	if [ -f openvpn/Makefile ]; then $(MAKE) -C openvpn clean || exit $$?; fi; \
 	( cd openvpn ; ./autogen.sh ; \
 		OPENSSL_CFLAGS="-I$(TOP)/openssl/include" \
 		OPENSSL_LIBS="-L$(TOP)/openssl/ -lssl -lcrypto" \
@@ -6779,7 +6804,16 @@ usbclient-clean:
 strongswan/configure:
 	cd strongswan && autoreconf -i
 
-strongswan/Makefile: strongswan/configure
+.PHONY: check-strongswan-config
+check-strongswan-config:
+
+strongswan/Makefile: strongswan/configure check-strongswan-config
+	@if [ -f strongswan/Makefile ] && \
+	    grep -Fqx "ac_pwd='$(realpath strongswan)'" strongswan/config.status && \
+	    [ strongswan/Makefile -nt strongswan/configure ]; then \
+		exit 0; \
+	fi; \
+	if [ -f strongswan/Makefile ]; then $(MAKE) -C strongswan clean || exit $$?; fi; \
 	cd strongswan && \
 	ac_cv_prog_cc_c99=no $(CONFIGURE) CC=$(CC) \
 	--prefix=/usr/ --bindir=/usr/sbin --sysconfdir=/etc/ --localstatedir=/var/ --libexecdir=/usr/lib \
@@ -8386,14 +8420,27 @@ json-c-clean:
 	-@[ ! -f json-c/Makefile ] || $(MAKE) -C json-c clean
 	-@rm -f json-c/stamp-h1
 
-phddns/stamp-h1:
+.PHONY: check-phddns-config
+check-phddns-config:
+
+phddns/stamp-h1: check-phddns-config
 ifeq ($(HND_ROUTER),y)
+	@if [ -f "$@" ] && \
+	    grep -Fqx "ac_pwd='$(realpath phddns)'" phddns/config.status; then \
+		exit 0; \
+	fi; \
+	if [ -f phddns/Makefile ]; then $(MAKE) -C phddns clean || exit $$?; fi; \
 	cd phddns && $(CONFIGURE) --prefix="" \
 		CFLAGS="-Os -I$(SRCBASE)/include -I$(TOP)/shared $(EXTRACFLAGS)" \
 		LDFLAGS="-L$(TOP_PLATFORM)/nvram$(BCMEX)$(EX7) -L$(TOP_PLATFORM)/wlcsm -L$(TOP)/shared $(if $(BCM_502L07P2),-L$(TOP_PLATFORM)/ethctl_lib) $(if $(RTCONFIG_QTN),-L$(TOP)/libqcsapi_client) $(EXTRALDFLAGS)" \
 		LIBS="-lnvram -lwlcsm -lshared $(if $(BCM_502L07P2),-lethctl) $(if $(RTCONFIG_QTN),-lqcsapi_client)"
 	@touch $@
 else
+	@if [ -f "$@" ] && \
+	    grep -Fqx "ac_pwd='$(realpath phddns)'" phddns/config.status; then \
+		exit 0; \
+	fi; \
+	if [ -f phddns/Makefile ]; then $(MAKE) -C phddns clean || exit $$?; fi; \
 	cd phddns && $(CONFIGURE) --prefix="" \
 		CFLAGS="-Os -I$(SRCBASE)/include -I$(TOP)/shared $(EXTRACFLAGS)" \
 		LDFLAGS="-L$(TOP_PLATFORM)/nvram$(BCMEX)$(EX7) -L$(TOP)/shared $(if $(RTCONFIG_QTN),-L$(TOP)/libqcsapi_client) $(EXTRALDFLAGS)" \
@@ -9643,5 +9690,3 @@ $(obj-y) $(obj-n) $(obj-clean) $(obj-install): dummy
 .PHONY: all clean distclean mrproper install package image
 .PHONY: conf mconf oldconf kconf kmconf config menuconfig oldconfig
 .PHONY: dummy libnet libpcap
-
-

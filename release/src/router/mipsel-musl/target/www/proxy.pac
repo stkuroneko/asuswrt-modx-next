@@ -1,1 +1,0 @@
-/www/ext/proxy.pac

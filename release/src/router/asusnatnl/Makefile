@@ -32,7 +32,12 @@ clean:
 	-$(MAKE) -C natnl clean
 	@rm -f pjproject-1.12/stamp-h1-*
 
-pjproject-1.12/stamp-h1-%:
-	cd pjproject-1.12 && AR="$(AR) -r -v" \
-	./$(CONFIGURE)
-	@touch $@
+.PHONY: check-pjproject-config
+check-pjproject-config:
+
+pjproject-1.12/stamp-h1-%: check-pjproject-config
+	@if [ ! -f "$@" ] || \
+	    ! grep -Fqx "export PJDIR := $(realpath pjproject-1.12)" pjproject-1.12/build.mak; then \
+		cd pjproject-1.12 && AR="$(AR) -r -v" ./$(CONFIGURE) && \
+		touch "$(notdir $@)"; \
+	fi

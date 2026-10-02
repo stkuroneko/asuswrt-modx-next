@@ -1,2 +1,0 @@
-﻿<% start_autodet(); %>
-
