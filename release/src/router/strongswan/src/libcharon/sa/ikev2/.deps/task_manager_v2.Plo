@@ -1,0 +1,567 @@
+sa/ikev2/task_manager_v2.lo: sa/ikev2/task_manager_v2.c \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdc-predef.h \
+ /repo/Fail_GPL/asuswrt/release/src/router/strongswan/config.h \
+ sa/ikev2/task_manager_v2.h sa/task_manager.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/limits.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/features.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/glibc-types.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/cdefs.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/limits.h \
+ ../../src/libstrongswan/library.h \
+ ../../src/libstrongswan/utils/printf_hook/printf_hook.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdlib.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/alltypes.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/alloca.h \
+ ../../src/libstrongswan/utils/printf_hook/printf_hook_builtin.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdarg.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdio.h \
+ ../../src/libstrongswan/utils/utils.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/types.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/endian.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdint.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/stdint.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/select.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stddef.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/time.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/string.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/strings.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/param.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/resource.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/resource.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/arpa/inet.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/netinet/in.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/inttypes.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/socket.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/socket.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/netdb.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sched.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/poll.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/poll.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/signal.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/signal.h \
+ ../../src/libstrongswan/utils/utils/types.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdbool.h \
+ ../../src/libstrongswan/utils/enum.h \
+ ../../src/libstrongswan/utils/printf_hook/printf_hook.h \
+ ../../src/libstrongswan/utils/utils/atomics.h \
+ ../../src/libstrongswan/utils/utils/align.h \
+ ../../src/libstrongswan/utils/utils/byteorder.h \
+ ../../src/libstrongswan/utils/utils/string.h \
+ ../../src/libstrongswan/utils/utils/memory.h \
+ ../../src/libstrongswan/utils/utils/strerror.h \
+ ../../src/libstrongswan/utils/utils/status.h \
+ ../../src/libstrongswan/utils/utils/object.h \
+ ../../src/libstrongswan/utils/utils/path.h \
+ ../../src/libstrongswan/utils/utils/time.h \
+ ../../src/libstrongswan/utils/utils/tty.h \
+ ../../src/libstrongswan/networking/host_resolver.h \
+ ../../src/libstrongswan/networking/host.h \
+ ../../src/libstrongswan/utils/utils.h \
+ ../../src/libstrongswan/utils/chunk.h \
+ ../../src/libstrongswan/utils/utils.h \
+ ../../src/libstrongswan/networking/streams/stream_manager.h \
+ ../../src/libstrongswan/networking/streams/stream_service.h \
+ ../../src/libstrongswan/processing/jobs/job.h \
+ ../../src/libstrongswan/networking/streams/stream.h \
+ ../../src/libstrongswan/processing/processor.h \
+ ../../src/libstrongswan/processing/scheduler.h \
+ ../../src/libstrongswan/processing/watcher.h \
+ ../../src/libstrongswan/crypto/crypto_factory.h \
+ ../../src/libstrongswan/collections/enumerator.h \
+ ../../src/libstrongswan/crypto/crypters/crypter.h \
+ ../../src/libstrongswan/crypto/aead.h \
+ ../../src/libstrongswan/crypto/signers/signer.h \
+ ../../src/libstrongswan/crypto/iv/iv_gen.h \
+ ../../src/libstrongswan/crypto/hashers/hasher.h \
+ ../../src/libstrongswan/crypto/prfs/prf.h \
+ ../../src/libstrongswan/credentials/keys/public_key.h \
+ ../../src/libstrongswan/utils/identification.h \
+ ../../src/libstrongswan/credentials/cred_encoding.h \
+ ../../src/libstrongswan/crypto/rngs/rng.h \
+ ../../src/libstrongswan/crypto/xofs/xof.h \
+ ../../src/libstrongswan/crypto/nonce_gen.h \
+ ../../src/libstrongswan/crypto/diffie_hellman.h \
+ ../../src/libstrongswan/crypto/transform.h \
+ ../../src/libstrongswan/crypto/proposal/proposal_keywords.h \
+ ../../src/libstrongswan/fetcher/fetcher_manager.h \
+ ../../src/libstrongswan/fetcher/fetcher.h \
+ ../../src/libstrongswan/resolver/resolver_manager.h \
+ ../../src/libstrongswan/resolver/resolver.h \
+ ../../src/libstrongswan/resolver/resolver_response.h \
+ ../../src/libstrongswan/resolver/rr_set.h \
+ ../../src/libstrongswan/collections/linked_list.h \
+ ../../src/libstrongswan/resolver/rr.h \
+ ../../src/libstrongswan/database/database_factory.h \
+ ../../src/libstrongswan/database/database.h \
+ ../../src/libstrongswan/credentials/credential_factory.h \
+ ../../src/libstrongswan/credentials/builder.h \
+ ../../src/libstrongswan/credentials/credential_manager.h \
+ ../../src/libstrongswan/credentials/auth_cfg.h \
+ ../../src/libstrongswan/credentials/credential_set.h \
+ ../../src/libstrongswan/credentials/keys/shared_key.h \
+ ../../src/libstrongswan/credentials/certificates/certificate.h \
+ ../../src/libstrongswan/credentials/keys/signature_params.h \
+ ../../src/libstrongswan/credentials/keys/private_key.h \
+ ../../src/libstrongswan/credentials/cert_validator.h \
+ ../../src/libstrongswan/credentials/cred_encoding.h \
+ ../../src/libstrongswan/utils/chunk.h \
+ ../../src/libstrongswan/utils/capabilities.h \
+ ../../src/libstrongswan/utils/integrity_checker.h \
+ ../../src/libstrongswan/utils/leak_detective.h \
+ ../../src/libstrongswan/utils/backtrace.h \
+ ../../src/libstrongswan/plugins/plugin_loader.h \
+ ../../src/libstrongswan/utils/debug.h \
+ ../../src/libstrongswan/settings/settings.h encoding/message.h \
+ encoding/payloads/ike_header.h encoding/payloads/payload.h \
+ encoding/payloads/encodings.h encoding/payloads/notify_payload.h \
+ encoding/payloads/proposal_substructure.h \
+ encoding/payloads/transform_substructure.h \
+ encoding/payloads/transform_attribute.h \
+ ../../src/libstrongswan/crypto/proposal/proposal.h \
+ ../../src/libstrongswan/networking/host.h kernel/kernel_ipsec.h \
+ ../../src/libstrongswan/ipsec/ipsec_types.h \
+ ../../src/libstrongswan/selectors/traffic_selector.h \
+ ../../src/libstrongswan/plugins/plugin.h \
+ ../../src/libstrongswan/plugins/plugin_feature.h \
+ ../../src/libstrongswan/eap/eap.h \
+ ../../src/libstrongswan/credentials/containers/container.h \
+ kernel/kernel_interface.h ../../src/libstrongswan/crypto/prf_plus.h \
+ kernel/kernel_listener.h ../../src/libstrongswan/networking/tun_device.h \
+ kernel/kernel_net.h sa/authenticator.h sa/ike_sa.h \
+ attributes/attribute_handler.h attributes/attributes.h \
+ encoding/payloads/configuration_attribute.h attributes/attributes.h \
+ sa/ike_sa_id.h sa/child_sa.h config/child_cfg.h sa/task.h sa/keymat.h \
+ config/peer_cfg.h config/ike_cfg.h \
+ ../../src/libstrongswan/networking/packet.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/math.h \
+ ../../src/libstrongswan/collections/array.h daemon.h \
+ attributes/attribute_manager.h attributes/attribute_provider.h \
+ attributes/attribute_handler.h network/sender.h network/receiver.h \
+ network/socket_manager.h network/socket.h control/controller.h bus/bus.h \
+ bus/listeners/logger.h bus/listeners/listener.h \
+ bus/listeners/custom_logger.h sa/ike_sa_manager.h sa/child_sa_manager.h \
+ sa/trap_manager.h sa/shunt_manager.h sa/redirect_manager.h \
+ sa/redirect_provider.h config/backend_manager.h config/backend.h \
+ sa/eap/eap_manager.h sa/eap/eap_method.h encoding/payloads/eap_payload.h \
+ sa/xauth/xauth_manager.h sa/xauth/xauth_method.h \
+ encoding/payloads/cp_payload.h sa/ikev2/tasks/ike_init.h \
+ sa/ikev2/tasks/ike_natd.h sa/ikev2/tasks/ike_mobike.h \
+ sa/ikev2/tasks/ike_auth.h sa/ikev2/tasks/ike_auth_lifetime.h \
+ sa/ikev2/tasks/ike_cert_pre.h sa/ikev2/tasks/ike_cert_post.h \
+ sa/ikev2/tasks/ike_rekey.h sa/ikev2/tasks/ike_reauth.h \
+ sa/ikev2/tasks/ike_reauth_complete.h sa/ikev2/tasks/ike_redirect.h \
+ sa/ikev2/tasks/ike_delete.h sa/ikev2/tasks/ike_config.h \
+ sa/ikev2/tasks/ike_dpd.h sa/ikev2/tasks/ike_mid_sync.h \
+ sa/ikev2/tasks/ike_vendor.h sa/ikev2/tasks/ike_verify_peer_cert.h \
+ sa/ikev2/tasks/child_create.h sa/ikev2/tasks/child_rekey.h \
+ sa/ikev2/tasks/child_delete.h encoding/payloads/delete_payload.h \
+ encoding/payloads/unknown_payload.h processing/jobs/retransmit_job.h \
+ processing/jobs/delete_ike_sa_job.h processing/jobs/initiate_tasks_job.h
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdc-predef.h:
+
+/repo/Fail_GPL/asuswrt/release/src/router/strongswan/config.h:
+
+sa/ikev2/task_manager_v2.h:
+
+sa/task_manager.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/limits.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/features.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/glibc-types.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/cdefs.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/limits.h:
+
+../../src/libstrongswan/library.h:
+
+../../src/libstrongswan/utils/printf_hook/printf_hook.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdlib.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/alltypes.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/alloca.h:
+
+../../src/libstrongswan/utils/printf_hook/printf_hook_builtin.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdarg.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdio.h:
+
+../../src/libstrongswan/utils/utils.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/types.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/endian.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdint.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/stdint.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/select.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stddef.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/time.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/string.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/strings.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/param.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/resource.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/resource.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/arpa/inet.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/netinet/in.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/inttypes.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/socket.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/socket.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/netdb.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sched.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/poll.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/poll.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/signal.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/signal.h:
+
+../../src/libstrongswan/utils/utils/types.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdbool.h:
+
+../../src/libstrongswan/utils/enum.h:
+
+../../src/libstrongswan/utils/printf_hook/printf_hook.h:
+
+../../src/libstrongswan/utils/utils/atomics.h:
+
+../../src/libstrongswan/utils/utils/align.h:
+
+../../src/libstrongswan/utils/utils/byteorder.h:
+
+../../src/libstrongswan/utils/utils/string.h:
+
+../../src/libstrongswan/utils/utils/memory.h:
+
+../../src/libstrongswan/utils/utils/strerror.h:
+
+../../src/libstrongswan/utils/utils/status.h:
+
+../../src/libstrongswan/utils/utils/object.h:
+
+../../src/libstrongswan/utils/utils/path.h:
+
+../../src/libstrongswan/utils/utils/time.h:
+
+../../src/libstrongswan/utils/utils/tty.h:
+
+../../src/libstrongswan/networking/host_resolver.h:
+
+../../src/libstrongswan/networking/host.h:
+
+../../src/libstrongswan/utils/utils.h:
+
+../../src/libstrongswan/utils/chunk.h:
+
+../../src/libstrongswan/utils/utils.h:
+
+../../src/libstrongswan/networking/streams/stream_manager.h:
+
+../../src/libstrongswan/networking/streams/stream_service.h:
+
+../../src/libstrongswan/processing/jobs/job.h:
+
+../../src/libstrongswan/networking/streams/stream.h:
+
+../../src/libstrongswan/processing/processor.h:
+
+../../src/libstrongswan/processing/scheduler.h:
+
+../../src/libstrongswan/processing/watcher.h:
+
+../../src/libstrongswan/crypto/crypto_factory.h:
+
+../../src/libstrongswan/collections/enumerator.h:
+
+../../src/libstrongswan/crypto/crypters/crypter.h:
+
+../../src/libstrongswan/crypto/aead.h:
+
+../../src/libstrongswan/crypto/signers/signer.h:
+
+../../src/libstrongswan/crypto/iv/iv_gen.h:
+
+../../src/libstrongswan/crypto/hashers/hasher.h:
+
+../../src/libstrongswan/crypto/prfs/prf.h:
+
+../../src/libstrongswan/credentials/keys/public_key.h:
+
+../../src/libstrongswan/utils/identification.h:
+
+../../src/libstrongswan/credentials/cred_encoding.h:
+
+../../src/libstrongswan/crypto/rngs/rng.h:
+
+../../src/libstrongswan/crypto/xofs/xof.h:
+
+../../src/libstrongswan/crypto/nonce_gen.h:
+
+../../src/libstrongswan/crypto/diffie_hellman.h:
+
+../../src/libstrongswan/crypto/transform.h:
+
+../../src/libstrongswan/crypto/proposal/proposal_keywords.h:
+
+../../src/libstrongswan/fetcher/fetcher_manager.h:
+
+../../src/libstrongswan/fetcher/fetcher.h:
+
+../../src/libstrongswan/resolver/resolver_manager.h:
+
+../../src/libstrongswan/resolver/resolver.h:
+
+../../src/libstrongswan/resolver/resolver_response.h:
+
+../../src/libstrongswan/resolver/rr_set.h:
+
+../../src/libstrongswan/collections/linked_list.h:
+
+../../src/libstrongswan/resolver/rr.h:
+
+../../src/libstrongswan/database/database_factory.h:
+
+../../src/libstrongswan/database/database.h:
+
+../../src/libstrongswan/credentials/credential_factory.h:
+
+../../src/libstrongswan/credentials/builder.h:
+
+../../src/libstrongswan/credentials/credential_manager.h:
+
+../../src/libstrongswan/credentials/auth_cfg.h:
+
+../../src/libstrongswan/credentials/credential_set.h:
+
+../../src/libstrongswan/credentials/keys/shared_key.h:
+
+../../src/libstrongswan/credentials/certificates/certificate.h:
+
+../../src/libstrongswan/credentials/keys/signature_params.h:
+
+../../src/libstrongswan/credentials/keys/private_key.h:
+
+../../src/libstrongswan/credentials/cert_validator.h:
+
+../../src/libstrongswan/credentials/cred_encoding.h:
+
+../../src/libstrongswan/utils/chunk.h:
+
+../../src/libstrongswan/utils/capabilities.h:
+
+../../src/libstrongswan/utils/integrity_checker.h:
+
+../../src/libstrongswan/utils/leak_detective.h:
+
+../../src/libstrongswan/utils/backtrace.h:
+
+../../src/libstrongswan/plugins/plugin_loader.h:
+
+../../src/libstrongswan/utils/debug.h:
+
+../../src/libstrongswan/settings/settings.h:
+
+encoding/message.h:
+
+encoding/payloads/ike_header.h:
+
+encoding/payloads/payload.h:
+
+encoding/payloads/encodings.h:
+
+encoding/payloads/notify_payload.h:
+
+encoding/payloads/proposal_substructure.h:
+
+encoding/payloads/transform_substructure.h:
+
+encoding/payloads/transform_attribute.h:
+
+../../src/libstrongswan/crypto/proposal/proposal.h:
+
+../../src/libstrongswan/networking/host.h:
+
+kernel/kernel_ipsec.h:
+
+../../src/libstrongswan/ipsec/ipsec_types.h:
+
+../../src/libstrongswan/selectors/traffic_selector.h:
+
+../../src/libstrongswan/plugins/plugin.h:
+
+../../src/libstrongswan/plugins/plugin_feature.h:
+
+../../src/libstrongswan/eap/eap.h:
+
+../../src/libstrongswan/credentials/containers/container.h:
+
+kernel/kernel_interface.h:
+
+../../src/libstrongswan/crypto/prf_plus.h:
+
+kernel/kernel_listener.h:
+
+../../src/libstrongswan/networking/tun_device.h:
+
+kernel/kernel_net.h:
+
+sa/authenticator.h:
+
+sa/ike_sa.h:
+
+attributes/attribute_handler.h:
+
+attributes/attributes.h:
+
+encoding/payloads/configuration_attribute.h:
+
+attributes/attributes.h:
+
+sa/ike_sa_id.h:
+
+sa/child_sa.h:
+
+config/child_cfg.h:
+
+sa/task.h:
+
+sa/keymat.h:
+
+config/peer_cfg.h:
+
+config/ike_cfg.h:
+
+../../src/libstrongswan/networking/packet.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/math.h:
+
+../../src/libstrongswan/collections/array.h:
+
+daemon.h:
+
+attributes/attribute_manager.h:
+
+attributes/attribute_provider.h:
+
+attributes/attribute_handler.h:
+
+network/sender.h:
+
+network/receiver.h:
+
+network/socket_manager.h:
+
+network/socket.h:
+
+control/controller.h:
+
+bus/bus.h:
+
+bus/listeners/logger.h:
+
+bus/listeners/listener.h:
+
+bus/listeners/custom_logger.h:
+
+sa/ike_sa_manager.h:
+
+sa/child_sa_manager.h:
+
+sa/trap_manager.h:
+
+sa/shunt_manager.h:
+
+sa/redirect_manager.h:
+
+sa/redirect_provider.h:
+
+config/backend_manager.h:
+
+config/backend.h:
+
+sa/eap/eap_manager.h:
+
+sa/eap/eap_method.h:
+
+encoding/payloads/eap_payload.h:
+
+sa/xauth/xauth_manager.h:
+
+sa/xauth/xauth_method.h:
+
+encoding/payloads/cp_payload.h:
+
+sa/ikev2/tasks/ike_init.h:
+
+sa/ikev2/tasks/ike_natd.h:
+
+sa/ikev2/tasks/ike_mobike.h:
+
+sa/ikev2/tasks/ike_auth.h:
+
+sa/ikev2/tasks/ike_auth_lifetime.h:
+
+sa/ikev2/tasks/ike_cert_pre.h:
+
+sa/ikev2/tasks/ike_cert_post.h:
+
+sa/ikev2/tasks/ike_rekey.h:
+
+sa/ikev2/tasks/ike_reauth.h:
+
+sa/ikev2/tasks/ike_reauth_complete.h:
+
+sa/ikev2/tasks/ike_redirect.h:
+
+sa/ikev2/tasks/ike_delete.h:
+
+sa/ikev2/tasks/ike_config.h:
+
+sa/ikev2/tasks/ike_dpd.h:
+
+sa/ikev2/tasks/ike_mid_sync.h:
+
+sa/ikev2/tasks/ike_vendor.h:
+
+sa/ikev2/tasks/ike_verify_peer_cert.h:
+
+sa/ikev2/tasks/child_create.h:
+
+sa/ikev2/tasks/child_rekey.h:
+
+sa/ikev2/tasks/child_delete.h:
+
+encoding/payloads/delete_payload.h:
+
+encoding/payloads/unknown_payload.h:
+
+processing/jobs/retransmit_job.h:
+
+processing/jobs/delete_ike_sa_job.h:
+
+processing/jobs/initiate_tasks_job.h:

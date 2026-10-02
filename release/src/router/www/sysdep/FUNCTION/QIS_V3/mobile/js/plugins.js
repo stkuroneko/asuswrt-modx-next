@@ -392,7 +392,7 @@ function chkPass(pwd, flag, obj, id) {
 		oScore =$(obj).find(".strength_text")[0];
 	}
 
-	if(flag == "http_passwd" && (isSku("KR") || isSku("SG") || isSku("AA"))){
+	if(flag == "http_passwd" && (isSku("KR") || isSku("SG") || isSku("AA") || isSupport("secure_default"))){
 		oScorebar.style.display = "none";
 		return;
 	}
@@ -602,7 +602,7 @@ function check_password_length(obj){
 	var password = obj.value;
 	var httpPassInput = $("#http_passwd");
 
-        if(isSku("KR") || isSku("SG") || isSku("AA")){     /* MODELDEP by Territory Code */
+        if(isSku("KR") || isSku("SG") || isSku("AA") || isSupport("secure_default")){     /* MODELDEP by Territory Code */
 		httpPassInput.showTextHint("");
 		return;
 	}
@@ -961,7 +961,7 @@ var Get_Component_WirelessInput = function(wlArray){
 
 		$("<div>")
 			.addClass("inputTitleContainer")
-			.append($("<div>").addClass("inputTitle").html(wl.title + " <#QIS_finish_wireless_item2#>"))
+			.append($("<div>").addClass("inputTitle").html(wl.title + " <#QIS_finish_wireless_item3#>"))
 			.append($("<div>").addClass("secureInput icon_eye_close").attr({"for":"wireless_key_" + wl.ifname}))
 			.appendTo(__container)
 

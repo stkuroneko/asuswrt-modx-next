@@ -1,0 +1,289 @@
+Terminals unused in grammar
+
+   "."
+   STRING_ERROR
+
+
+State 11 conflicts: 1 shift/reduce
+State 17 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: statements $end
+
+    1 statements: %empty
+    2           | statements NEWLINE
+    3           | statements statement
+
+    4 statement: section
+    5          | setting
+
+    6 section: section_start statements '}'
+
+    7 section_start: NAME '{'
+    8              | NAME ":" references '{'
+
+    9 references: NAME
+   10           | references "," NAME
+
+   11 setting: NAME '=' value
+   12        | NAME '='
+
+   13 value: valuepart
+   14      | value valuepart
+
+   15 valuepart: NAME
+   16          | STRING
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'=' (61) 11 12
+'{' (123) 7 8
+'}' (125) 6
+error (256)
+NAME (258) 7 8 9 10 11 12 15
+STRING (259) 16
+"." (260)
+"," (261) 10
+":" (262) 8
+NEWLINE (263) 2
+STRING_ERROR (264)
+
+
+Nonterminals, with rules where they appear
+
+$accept (13)
+    on left: 0
+statements (14)
+    on left: 1 2 3, on right: 0 2 3 6
+statement (15)
+    on left: 4 5, on right: 3
+section (16)
+    on left: 6, on right: 4
+section_start (17)
+    on left: 7 8, on right: 6
+references (18)
+    on left: 9 10, on right: 8 10
+setting (19)
+    on left: 11 12, on right: 5
+value (20)
+    on left: 13 14, on right: 11 14
+valuepart (21)
+    on left: 15 16, on right: 13 14
+
+
+State 0
+
+    0 $accept: . statements $end
+
+    $default  reduce using rule 1 (statements)
+
+    statements  go to state 1
+
+
+State 1
+
+    0 $accept: statements . $end
+    2 statements: statements . NEWLINE
+    3           | statements . statement
+
+    $end     shift, and go to state 2
+    NAME     shift, and go to state 3
+    NEWLINE  shift, and go to state 4
+
+    statement      go to state 5
+    section        go to state 6
+    section_start  go to state 7
+    setting        go to state 8
+
+
+State 2
+
+    0 $accept: statements $end .
+
+    $default  accept
+
+
+State 3
+
+    7 section_start: NAME . '{'
+    8              | NAME . ":" references '{'
+   11 setting: NAME . '=' value
+   12        | NAME . '='
+
+    ":"  shift, and go to state 9
+    '{'  shift, and go to state 10
+    '='  shift, and go to state 11
+
+
+State 4
+
+    2 statements: statements NEWLINE .
+
+    $default  reduce using rule 2 (statements)
+
+
+State 5
+
+    3 statements: statements statement .
+
+    $default  reduce using rule 3 (statements)
+
+
+State 6
+
+    4 statement: section .
+
+    $default  reduce using rule 4 (statement)
+
+
+State 7
+
+    6 section: section_start . statements '}'
+
+    $default  reduce using rule 1 (statements)
+
+    statements  go to state 12
+
+
+State 8
+
+    5 statement: setting .
+
+    $default  reduce using rule 5 (statement)
+
+
+State 9
+
+    8 section_start: NAME ":" . references '{'
+
+    NAME  shift, and go to state 13
+
+    references  go to state 14
+
+
+State 10
+
+    7 section_start: NAME '{' .
+
+    $default  reduce using rule 7 (section_start)
+
+
+State 11
+
+   11 setting: NAME '=' . value
+   12        | NAME '=' .
+
+    NAME    shift, and go to state 15
+    STRING  shift, and go to state 16
+
+    NAME      [reduce using rule 12 (setting)]
+    $default  reduce using rule 12 (setting)
+
+    value      go to state 17
+    valuepart  go to state 18
+
+
+State 12
+
+    2 statements: statements . NEWLINE
+    3           | statements . statement
+    6 section: section_start statements . '}'
+
+    NAME     shift, and go to state 3
+    NEWLINE  shift, and go to state 4
+    '}'      shift, and go to state 19
+
+    statement      go to state 5
+    section        go to state 6
+    section_start  go to state 7
+    setting        go to state 8
+
+
+State 13
+
+    9 references: NAME .
+
+    $default  reduce using rule 9 (references)
+
+
+State 14
+
+    8 section_start: NAME ":" references . '{'
+   10 references: references . "," NAME
+
+    ","  shift, and go to state 20
+    '{'  shift, and go to state 21
+
+
+State 15
+
+   15 valuepart: NAME .
+
+    $default  reduce using rule 15 (valuepart)
+
+
+State 16
+
+   16 valuepart: STRING .
+
+    $default  reduce using rule 16 (valuepart)
+
+
+State 17
+
+   11 setting: NAME '=' value .
+   14 value: value . valuepart
+
+    NAME    shift, and go to state 15
+    STRING  shift, and go to state 16
+
+    NAME      [reduce using rule 11 (setting)]
+    $default  reduce using rule 11 (setting)
+
+    valuepart  go to state 22
+
+
+State 18
+
+   13 value: valuepart .
+
+    $default  reduce using rule 13 (value)
+
+
+State 19
+
+    6 section: section_start statements '}' .
+
+    $default  reduce using rule 6 (section)
+
+
+State 20
+
+   10 references: references "," . NAME
+
+    NAME  shift, and go to state 23
+
+
+State 21
+
+    8 section_start: NAME ":" references '{' .
+
+    $default  reduce using rule 8 (section_start)
+
+
+State 22
+
+   14 value: value valuepart .
+
+    $default  reduce using rule 14 (value)
+
+
+State 23
+
+   10 references: references "," NAME .
+
+    $default  reduce using rule 10 (references)

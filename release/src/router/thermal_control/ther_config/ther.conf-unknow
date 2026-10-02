@@ -1,4 +1,0 @@
-/*id,    max,  hi,   low,  funcoff, txduty, path, power*/
-wlan0    200   200   200   0        0       0     0
-wlan1    200   200   200   0        0       0     0
-wlan2    200   200   200   0        0       0     0

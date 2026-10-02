@@ -1,0 +1,1 @@
+cmd_shell/lib.a := rm -f shell/lib.a; /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-musl-ar  rcs shell/lib.a shell/ash.o shell/ash_ptr_hack.o shell/math.o shell/shell_common.o

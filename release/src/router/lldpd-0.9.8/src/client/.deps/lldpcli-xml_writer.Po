@@ -1,0 +1,111 @@
+lldpcli-xml_writer.o: xml_writer.c \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdc-predef.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdio.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/features.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/glibc-types.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/cdefs.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/alltypes.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdlib.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/alloca.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/string.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/strings.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/encoding.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlversion.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlexports.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/iconv.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/tree.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/limits.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/limits.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlstring.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdarg.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlregexp.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/dict.h \
+ /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stddef.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlmemory.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/threads.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/globals.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/parser.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/hash.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/valid.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlerror.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/list.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlautomata.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/entities.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlIO.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/SAX2.h \
+ /repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlwriter.h \
+ writer.h ../log.h
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdc-predef.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdio.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/features.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/glibc-types.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/sys/cdefs.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/alltypes.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdlib.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/alloca.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/string.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/strings.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/encoding.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlversion.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlexports.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/iconv.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/tree.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/limits.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/bits/limits.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlstring.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stdarg.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlregexp.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/dict.h:
+
+/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/include/stddef.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlmemory.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/threads.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/globals.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/parser.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/hash.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/valid.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlerror.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/list.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlautomata.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/entities.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlIO.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/SAX2.h:
+
+/repo/Fail_GPL/asuswrt/release/src-ra-openwrt-4210/router/mipsel-musl/stage/usr/include/libxml2/libxml/xmlwriter.h:
+
+writer.h:
+
+../log.h:

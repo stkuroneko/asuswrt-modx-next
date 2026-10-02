@@ -1,0 +1,3 @@
+kernel/drivers/net/ethernet/mediatek/mtk_eth_soc.ko
+kernel/drivers/net/ethernet/mediatek/mtk_sgmii.ko
+kernel/drivers/net/ethernet/mediatek/mtk_eth_path.ko

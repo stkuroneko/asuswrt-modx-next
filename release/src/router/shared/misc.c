@@ -43,7 +43,6 @@
 #include "shared.h"
 #include "wlif_utils.h"
 #include "iboxcom.h"
-#include <regex.h>
 
 #ifndef ETHER_ADDR_LEN
 #define	ETHER_ADDR_LEN		6
@@ -5742,47 +5741,6 @@ int is_valid_domainname(const char *name)
 	}
 
 	return p - name;
-}
-
-int is_valid_oauth_code(char *code)
-{
-	int len;
-
-	len = strlen(code);
-	if (len > 2048) return 0;
-
-	while(*code) {
-		if (isalnum(*code) != 0 || *code == '-' || *code == '.' || *code == '_' || *code == '~' || *code == '+' || *code == '/' || isspace(*code) != 0)
-			code++;
-		else
-			return 0;
-	}
-	return 1;
-}
-int is_valid_email_address(char *address)
-{
-	int status=1, ret=0, rc=0;
-	regex_t preg;
-	const char *reg_exp = "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*.\\w+([-.]\\w+)*$";
-
-	rc = regcomp(&preg, reg_exp, REG_EXTENDED);
-
-	if (rc != 0)
-	{
-		dbg("%s: Failed to compile the regular expression:%d\n", __func__, rc);
-		return 4000;
-	}
-
-	status=regexec(&preg,address,0, NULL, 0);
-	if (status == REG_NOMATCH) {
-		dbg("No Match\n");
-	}
-	else if (status == 0) {
-		dbg("Match\n");
-		ret = 1;
-	}
-	regfree(&preg);
-	return ret;
 }
 
 int get_discovery_ssid(char *ssid_g, int size)

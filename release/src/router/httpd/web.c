@@ -3402,6 +3402,10 @@ int validate_instance(webs_t wp, char *name, json_object *root)
 			snprintf(prefix, sizeof(prefix), "wan%d_", i++);
 			value = get_cgi_json(strlcat_r(prefix, name+4, tmp, sizeof(tmp)),root);
 			if(value && strcmp(nvram_safe_get(tmp), value)) {
+				if(!validate_apply_input_value(tmp, value)){
+					dbg("validate(wanX) %s=%s is illegal\n", tmp, value);
+					continue;
+				}
 				dbG("nvram set %s = %s\n", tmp, value);
 				nvram_check_and_set_for_prefix(name, tmp, value);
 				//nvram_set(tmp, value);
@@ -3946,6 +3950,10 @@ int validate_apply(webs_t wp, json_object *root)
 				(void)strlcat_r(prefix, name+4, tmp, sizeof(tmp));
 
 				if(strcmp(nvram_safe_get(tmp), value)) {
+					if(!validate_apply_input_value(tmp, value)){
+						dbg("validate(wan) %s=%s is illegal\n", tmp, value);
+						continue;
+					}
 					nvram_set(tmp, value);
 					nvram_modified = 1;
 					_dprintf("set %s=%s\n", tmp, value);
@@ -4551,7 +4559,7 @@ static int ej_set_variables(int eid, webs_t wp, int argc, char_t **argv) {
 	int retStatus = 0;
 	char retList[65536]={0};
 	char *buf, *g, *p;
-	char nvramTmp[4096]={0}, strTmp[4096]={0};
+	char nvramTmp[65536]={0}, strTmp[4096]={0};
 	int iCurrentListNum = 0;
 
 	apiName = websGetVar(wp, "apiname", "");
@@ -16993,7 +17001,50 @@ do_diag_log_file(char *url, FILE *stream)
 }
 #endif
 
-#ifdef RTCONFIG_IG_S2S_WIREGUARD
+static void
+del_custom_clientlist(char *delete_mac)
+{
+	int retStatus = -1;
+	char nvramTmp[65536]={0};
+	char *buf, *g, *p;
+	char *name, *mac, *group, *type, *callback, *keeparp;
+
+	if(!strcmp(delete_mac, "")) {
+		retStatus = 3;
+	} else {
+		retStatus = 2;
+		g = buf = strdup(nvram_safe_get("custom_clientlist"));
+		while (buf) {
+			if ((p = strsep(&g, "<")) == NULL) break;
+			if((vstrsep(p, ">", &name, &mac, &group, &type, &callback, &keeparp)) != 6) continue;
+
+			if(!strcmp(delete_mac, mac)){
+				retStatus = 0;
+				continue;
+			}
+			else{
+				strlcat(nvramTmp, "<", sizeof(nvramTmp));
+				strlcat(nvramTmp, name, sizeof(nvramTmp));
+				strlcat(nvramTmp, ">", sizeof(nvramTmp));
+				strlcat(nvramTmp, mac, sizeof(nvramTmp));
+				strlcat(nvramTmp, ">", sizeof(nvramTmp));
+				strlcat(nvramTmp, group, sizeof(nvramTmp));
+				strlcat(nvramTmp, ">", sizeof(nvramTmp));
+				strlcat(nvramTmp, type, sizeof(nvramTmp));
+				strlcat(nvramTmp, ">", sizeof(nvramTmp));
+				strlcat(nvramTmp, callback, sizeof(nvramTmp));
+				strlcat(nvramTmp, ">", sizeof(nvramTmp));
+				strlcat(nvramTmp, keeparp, sizeof(nvramTmp));
+			}
+		}
+		free(buf);
+		if(retStatus == 0){
+			nvram_set("custom_clientlist", nvramTmp);
+			nvram_commit();
+		}
+	}
+}
+
 static void
 deleteOfflineClient(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg, char_t *url, char_t *path, char_t *query)
 {
@@ -17011,6 +17062,10 @@ deleteOfflineClient(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg, char_
 		ret = HTTP_INVALID_MAC;
 		goto FINISH;
 	}
+
+	// Remove MAC addresses that were set in the custom_clientlist
+	toUpperCase(mac);
+	del_custom_clientlist(mac);
 
 	int i, shm_client_info_id;
 	void *shared_client_info=(void *) 0;
@@ -17071,7 +17126,6 @@ do_deleteOfflineClient_cgi(char *url, FILE *stream)
 	deleteOfflineClient(stream, NULL, NULL, 0, url, NULL, NULL);
 
 }
-#endif	/* RTCONFIG_IG_S2S_WIREGUARD */
 
 #ifdef RTCONFIG_NETOOL
 static void
@@ -17907,7 +17961,7 @@ do_blocking_request_cgi(char *url, FILE *stream)
 	}
 
 	memset(filename, 0, 128);
-	snprintf(filename, sizeof(filename), "blocking.asp?mac=%s", block_mac);
+	snprintf(filename, sizeof(filename), "blocking.asp");
 	websRedirect(stream, filename);
 
 FINISH:
@@ -19108,6 +19162,9 @@ login_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 
 	lock_status = check_lock_status(&dt);
 
+	temp_ip_addr.s_addr = login_ip_tmp;
+	temp_ip_str = inet_ntoa(temp_ip_addr);
+
 	if(lock_status == FORCELOCK){
 		send_login_page(fromapp_flag, lock_status, NULL, NULL, 0, NOLOGINTRY);
 		return FORCELOCK;
@@ -19151,6 +19208,7 @@ login_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 			websWrite(wp,"Connection: close\r\n" );
 			websWrite(wp,"\r\n" );
 			login_error_status = WRONGCAPTCHA;
+			logmessage("HTTPD", "[LOGIN][%s][%s] captcha error (%s)\n", (do_ssl)?"https":"http", (fromapp_flag)?"APP":"Web", temp_ip_str);
 			if(fromapp_flag != 0){
 				websWrite(wp, "{\n\"error_status\":\"%d\", \"last_time_lock_warning\":\"%d\"\n}\n", login_error_status, last_time_lock_warning());
 			}else{
@@ -19184,6 +19242,7 @@ login_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 		)
 	{
 		HTTPD_DBG("authpass!\n");
+		logmessage("HTTPD", "[LOGIN][%s][%s] success (%s)\n", (do_ssl)?"https":"http",(fromapp_flag)?"APP":"Web", temp_ip_str);
 #ifdef RTCONFIG_CAPTCHA
 		login_fail_num = 0;
 		HTTPD_DBG("authpass: login_fail_num = %d\n", login_fail_num);
@@ -19233,7 +19292,7 @@ login_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 
 			websWrite(wp,"<HTML><HEAD>\n" );
 #ifndef RTCONFIG_BCM_MFG
-			if(is_passwd_default() && !nvram_match(ATE_FACTORY_MODE_STR(), "1"))
+			if((is_passwd_default() && !nvram_match(ATE_FACTORY_MODE_STR(), "1")) || nvram_get_int("force_chgpass"))
 				websWrite(wp, T("<meta http-equiv=\"refresh\" content=\"0; url=Main_Password.asp\">\r\n"));
 			else
 #endif
@@ -19279,8 +19338,6 @@ login_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 		}
 		if((cur_login_ip_type? login_try_wan: login_try) >= DEFAULT_LOGIN_MAX_NUM){
 			lock_flag |= (cur_login_ip_type? LOCK_LOGIN_WAN: LOCK_LOGIN_LAN);
-			temp_ip_addr.s_addr = login_ip_tmp;
-			temp_ip_str = inet_ntoa(temp_ip_addr);
 			logmessage("httpd login lock", "Detect abnormal logins at %d times. The newest one was from %s in login.", (cur_login_ip_type? login_try_wan: login_try), temp_ip_str);
 #ifdef RTCONFIG_NOTIFICATION_CENTER
 			json_object *root = NULL;
@@ -19325,6 +19382,7 @@ login_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 #if defined(RTCONFIG_RGBLED) && defined(GTAC2900)
 		send_aura_event("LoginFail");
 #endif
+		logmessage("HTTPD", "[LOGIN][%s][%s] fail (%s)\n", (do_ssl)?"https":"http", (fromapp_flag)?"APP":"Web", temp_ip_str);
 		HTTPD_DBG("authfail: login_error_status = %d\n", login_error_status);
 		if(fromapp_flag != 0){
 			if(login_error_status == LOGINLOCK)
@@ -21329,7 +21387,7 @@ do_chpass_cgi(char *url, FILE *stream)
 	cur_username = safe_get_cgi_json("cur_username", root);
 	cur_passwd = safe_get_cgi_json("cur_passwd", root);
 
-	if(is_def_pwd || check_chpass_auth(cur_username, cur_passwd)){
+	if(is_def_pwd || check_chpass_auth(cur_username, cur_passwd) || nvram_get_int("force_chgpass") == 1){
 
 		new_username = safe_get_cgi_json("new_username", root);
 		new_passwd = safe_get_cgi_json("new_passwd", root);
@@ -21420,6 +21478,10 @@ do_chpass_cgi(char *url, FILE *stream)
 		}
 
 		nvram_set("p_Setting", "1");
+
+		if(nvram_get_int("force_chgpass") == 1){
+			nvram_set_int("force_chgpass", 0);
+		}
 
 		nvram_commit();
 	}else{
@@ -21574,7 +21636,7 @@ struct mime_handler mime_handlers[] = {
 	{ "gotoHomePage.htm", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
 	{ "ure_success.htm", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
 	{ "ureip.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
-	{ "remote.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
+	//{ "remote.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
 	{ "js/jquery.js", "text/javascript", no_cache_IE7, NULL, do_file, NULL },
 	{ "js/https_redirect/https_redirect.js", "text/javascript", no_cache_IE7, NULL, do_ej, NULL },
 	{ "require/require.min.js", "text/javascript", no_cache_IE7, NULL, do_file, NULL },
@@ -21598,9 +21660,9 @@ struct mime_handler mime_handlers[] = {
 	{ "help_content.js", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, do_auth },
 	{ "httpd_check.htm", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
 	{ "manifest.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
-	{ "update_cloudstatus.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
-	{ "update_applist.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
-	{ "update_appstate.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
+	{ "update_cloudstatus.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, do_auth },
+	{ "update_applist.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, do_auth },
+	{ "update_appstate.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, do_auth },
 	{ "WAN_info.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
 	{ "detwan.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_detwan_cgi, do_auth },
 	{ "message.htm", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
@@ -21753,9 +21815,7 @@ struct mime_handler mime_handlers[] = {
 	{ "set_ig_config.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_set_ig_config_cgi, do_auth },
 #endif
 #endif
-#ifdef RTCONFIG_IG_S2S_WIREGUARD
 	{ "deleteOfflineClient.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_deleteOfflineClient_cgi, do_auth },
-#endif
 #ifdef RTCONFIG_QCA_PLC_UTILS
 	{ "plc.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_plc_cgi, do_auth },
 #endif
@@ -30566,6 +30626,7 @@ ej_get_header_info(int eid, webs_t wp, int argc, char **argv)
 		host_name_temp[strlen(host_name) - port_len] = '\0';
 	}
 	else{
+		host_name_copy = host_name_copy_t;
 		host_name_copy_temp = strtok(host_name_copy,":");
 		snprintf(host_name_temp, sizeof(host_name_temp), "%s", host_name_copy_temp);
 	}

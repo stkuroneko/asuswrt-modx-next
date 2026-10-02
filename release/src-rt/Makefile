@@ -4041,6 +4041,10 @@ define RouterOptions
 		sed -i "/RTCONFIG_PASS_V2/d" $(1); \
 		echo "RTCONFIG_PASS_V2=y" >>$(1); \
 	fi;
+	if [ "$(SECURE_BY_DEFAULT)" = "y" ]; then \
+		sed -i "/RTCONFIG_SECURE_BY_DEFAULT\>/d" $(1); \
+		echo "RTCONFIG_SECURE_BY_DEFAULT=y" >>$(1); \
+	fi;
 	$(call platformRouterOptions, $(1))
 endef
 

@@ -1,0 +1,1 @@
+cmd_procps/lib.a := rm -f procps/lib.a; /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-musl-ar  rcs procps/lib.a procps/free.o procps/kill.o procps/pidof.o procps/ps.o procps/renice.o procps/top.o procps/uptime.o procps/watch.o

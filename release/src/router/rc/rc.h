@@ -3267,14 +3267,6 @@ extern void asm1042_upgrade(int);
 #endif
 
 // private.c
-#if defined(RTCONFIG_NOTIFICATION_CENTER)
-extern void oauth_google_gen_token_email(void);
-extern void oauth_google_drive_gen_token(void);
-extern void oauth_google_update_token(void);
-extern int oauth_google_send_message(const char* receiver, const char* subject, const char* message, const char* attached_files[], int attached_files_count);
-extern void oauth_google_check_token_status(void);
-extern void oauth_google_drive_check_token_status(void);
-#endif
 extern void exec_uu();
 #if defined(RTCONFIG_MTK_BSD)
 #define BSD_LOG "/tmp/mtk_mapd.log"

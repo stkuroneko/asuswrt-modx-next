@@ -125,9 +125,14 @@ apply.login = function(){
 			return false;
 		}
 
+		if(httpUserInput.val() == httpPassInput.val()){
+			httpUserInput.showTextHint(`<#JS_validLoginPWD_same#>`);
+			return false;
+		}
+
 		/* check password */
 		if(!use_defpass){
-			if(isSku("KR") || isSku("SG") || isSku("AA")){
+			if(isSku("KR") || isSku("SG") || isSku("AA") || isSupport("secure_default")){
 				var isValidKRSkuPwd = validator.KRSkuPwd(httpPassInput.val())
 				if(isValidKRSkuPwd.isError){
 					httpPassInput.showTextHint(isValidKRSkuPwd.errReason);
@@ -2378,7 +2383,7 @@ goTo.Login = function(){
 			}
 		});
 
-	if(isSku("KR") || isSku("SG") || isSku("AA")){
+	if(isSku("KR") || isSku("SG") || isSku("AA") || isSupport("secure_default")){
 		$("#login_passwd_KR").show();
 	}
 
@@ -2386,7 +2391,6 @@ goTo.Login = function(){
 		$("#defpass_checkbox").enableCheckBox(true);
 		$("#defpass_checkbox").change();
 		$("#login_name .titleMain").html("<#Local_login#>");
-		$("#login_name #login_desc").html(str_local_login_desc);
 		$("#login_name #http_username_title").html("<#HSDPAConfig_Username_itemname#>");
 		var find_local_login_pw = str_find_st.replace("%@", "<#passwd_local#>");
 		$("#local_login_title_container").unbind("click").click(function(e){

@@ -13,6 +13,8 @@
 /* for struct utsname */
 #include <sys/utsname.h>
 
+extern int validate_apply_input_value(char *name, char *value);
+
 #ifdef IPSEC_DEBUG
 #define DBG(args) _dprintf args
 #endif
@@ -1052,9 +1054,9 @@ void rc_ipsec_gen_cert(int skip_checking)
     snprintf(ddns_name, sizeof(ddns_name), "%s", nvram_safe_get("ddns_hostname_x"));
     if(strlen(ddns_name) == 0 )
     {
-        snprintf(prefix, sizeof(prefix), "wan%d_", get_active_wan_unit());
-        snprintf(remote_id, sizeof(remote_id), "%s", nvram_pf_safe_get(prefix, "ipaddr"));
-        if(strlen(remote_id) == 0){
+        snprintf(prefix, sizeof(prefix), "wan%d_ipaddr", get_active_wan_unit());
+        snprintf(remote_id, sizeof(remote_id), "%s", nvram_safe_get(prefix));
+        if(strlen(remote_id) == 0 || !validate_apply_input_value(remote_id, prefix)){
             DBG(("[Error]wan ip is not set yet, no any CAs will be created.\n"));
             return;
         }

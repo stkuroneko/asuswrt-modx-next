@@ -1,0 +1,1 @@
+cmd_net/bridge/netfilter/ebt_limit.ko := /opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-musl-ld -r  -m elf32ltsmip -T ./scripts/module-common.lds --build-id  -o net/bridge/netfilter/ebt_limit.ko net/bridge/netfilter/ebt_limit.o net/bridge/netfilter/ebt_limit.mod.o

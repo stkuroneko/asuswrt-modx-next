@@ -7571,7 +7571,7 @@ void start_uam_srv()
 	eval("cp", UAM_JS, UAM_WEB_DIR);
 	eval("cp", BYPASS_PAGE, UAM_WEB_DIR);
 
-	if (gen_uam_srv_conf()) return;
+	// if (gen_uam_srv_conf()) return;
 	//_dprintf("%s %d\n", __FUNCTION__, __LINE__);	// tmp test;
 	if (!pids("uamsrv"))
 		_eval(lighttpd_argv, NULL, 0, &pid);
@@ -15664,54 +15664,6 @@ check_ddr_done:
 	else if (strcmp(script, "update_nc_setting_conf") == 0)
 	{
 		update_nc_setting_conf();
-	}
-	else if (strcmp(script, "oauth_google_gen_token_email") == 0)
-	{
-		oauth_google_gen_token_email();
-#ifdef RTCONFIG_CFGSYNC
-		// trigger cfg_server do sync
-		const char config[] =
-		{
-			"{"\
-			"\"oauth_google_refresh_token\":\"\","\
-			"\"oauth_google_user_email\":\"\","\
-			"\"fb_email_provider\":\"\""\
-			"}\0"
-		};
-		char event_msg[133] = {0};
-		memset(event_msg, 0, sizeof(event_msg));
-		snprintf(event_msg, sizeof(event_msg)-1, RC_CONFIG_CHANGED_MSG, EID_RC_CONFIG_CHANGED, config);
-		(void)send_cfgmnt_event(event_msg);
-		//  WEVENT_GENERIC_MSG	 "{\""WEVENT_PREFIX"\":{\""EVENT_ID"\":\"%d\"}}"
-#endif	// RTCONFIG_CFGSYNC
-	}
-	else if (strcmp(script, "oauth_google_drive_gen_token") == 0)
-	{
-		oauth_google_drive_gen_token();
-#ifdef RTCONFIG_CFGSYNC
-		// trigger cfg_server do sync
-		const char config[] =
-		{
-			"{"\
-			"\"oauth_google_drive_refresh_token\":\"\","\
-			"\"oauth_google_user_email\":\"\","\
-			"\"fb_email_provider\":\"\""\
-			"}\0"
-		};
-		char event_msg[133] = {0};
-		memset(event_msg, 0, sizeof(event_msg));
-		snprintf(event_msg, sizeof(event_msg)-1, RC_CONFIG_CHANGED_MSG, EID_RC_CONFIG_CHANGED, config);
-		(void)send_cfgmnt_event(event_msg);
-		//  WEVENT_GENERIC_MSG	 "{\""WEVENT_PREFIX"\":{\""EVENT_ID"\":\"%d\"}}"
-#endif	// RTCONFIG_CFGSYNC
-	}
-	else if (strcmp(script, "oauth_google_drive_check_token_status") == 0)
-	{
-		oauth_google_drive_check_token_status();
-	}
-	else if (strcmp(script, "oauth_google_check_token_status") == 0)
-	{
-		oauth_google_check_token_status();
 	}
 #endif
 	else if (strcmp(script, "logger") == 0)

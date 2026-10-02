@@ -1,0 +1,1 @@
+#define CONFIG_NSLOOKUP_LEDE 1

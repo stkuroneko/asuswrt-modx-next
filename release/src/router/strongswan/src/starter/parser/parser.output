@@ -1,0 +1,232 @@
+Terminals unused in grammar
+
+   STRING_ERROR
+
+
+Grammar
+
+    0 $accept: statements $end
+
+    1 statements: %empty
+    2           | statements NEWLINE
+    3           | statements statement
+
+    4 statement: section
+    5          | SPACES setting
+
+    6 section: section_type section_name
+
+    7 section_type: CONFIG_SETUP
+    8             | CONN
+    9             | CA
+
+   10 section_name: %empty
+   11             | STRING
+
+   12 setting: %empty
+   13        | STRING EQ value
+   14        | STRING EQ
+   15        | STRING
+
+   16 value: STRING
+   17      | value STRING
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+STRING (258) 11 13 14 15 16 17
+EQ (259) 13 14
+SPACES (260) 5
+NEWLINE (261) 2
+CONFIG_SETUP (262) 7
+CONN (263) 8
+CA (264) 9
+STRING_ERROR (265)
+
+
+Nonterminals, with rules where they appear
+
+$accept (11)
+    on left: 0
+statements (12)
+    on left: 1 2 3, on right: 0 2 3
+statement (13)
+    on left: 4 5, on right: 3
+section (14)
+    on left: 6, on right: 4
+section_type (15)
+    on left: 7 8 9, on right: 6
+section_name (16)
+    on left: 10 11, on right: 6
+setting (17)
+    on left: 12 13 14 15, on right: 5
+value (18)
+    on left: 16 17, on right: 13 17
+
+
+State 0
+
+    0 $accept: . statements $end
+
+    $default  reduce using rule 1 (statements)
+
+    statements  go to state 1
+
+
+State 1
+
+    0 $accept: statements . $end
+    2 statements: statements . NEWLINE
+    3           | statements . statement
+
+    $end          shift, and go to state 2
+    SPACES        shift, and go to state 3
+    NEWLINE       shift, and go to state 4
+    CONFIG_SETUP  shift, and go to state 5
+    CONN          shift, and go to state 6
+    CA            shift, and go to state 7
+
+    statement     go to state 8
+    section       go to state 9
+    section_type  go to state 10
+
+
+State 2
+
+    0 $accept: statements $end .
+
+    $default  accept
+
+
+State 3
+
+    5 statement: SPACES . setting
+
+    STRING  shift, and go to state 11
+
+    $default  reduce using rule 12 (setting)
+
+    setting  go to state 12
+
+
+State 4
+
+    2 statements: statements NEWLINE .
+
+    $default  reduce using rule 2 (statements)
+
+
+State 5
+
+    7 section_type: CONFIG_SETUP .
+
+    $default  reduce using rule 7 (section_type)
+
+
+State 6
+
+    8 section_type: CONN .
+
+    $default  reduce using rule 8 (section_type)
+
+
+State 7
+
+    9 section_type: CA .
+
+    $default  reduce using rule 9 (section_type)
+
+
+State 8
+
+    3 statements: statements statement .
+
+    $default  reduce using rule 3 (statements)
+
+
+State 9
+
+    4 statement: section .
+
+    $default  reduce using rule 4 (statement)
+
+
+State 10
+
+    6 section: section_type . section_name
+
+    STRING  shift, and go to state 13
+
+    $default  reduce using rule 10 (section_name)
+
+    section_name  go to state 14
+
+
+State 11
+
+   13 setting: STRING . EQ value
+   14        | STRING . EQ
+   15        | STRING .
+
+    EQ  shift, and go to state 15
+
+    $default  reduce using rule 15 (setting)
+
+
+State 12
+
+    5 statement: SPACES setting .
+
+    $default  reduce using rule 5 (statement)
+
+
+State 13
+
+   11 section_name: STRING .
+
+    $default  reduce using rule 11 (section_name)
+
+
+State 14
+
+    6 section: section_type section_name .
+
+    $default  reduce using rule 6 (section)
+
+
+State 15
+
+   13 setting: STRING EQ . value
+   14        | STRING EQ .
+
+    STRING  shift, and go to state 16
+
+    $default  reduce using rule 14 (setting)
+
+    value  go to state 17
+
+
+State 16
+
+   16 value: STRING .
+
+    $default  reduce using rule 16 (value)
+
+
+State 17
+
+   13 setting: STRING EQ value .
+   17 value: value . STRING
+
+    STRING  shift, and go to state 18
+
+    $default  reduce using rule 13 (setting)
+
+
+State 18
+
+   17 value: value STRING .
+
+    $default  reduce using rule 17 (value)

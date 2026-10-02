@@ -214,6 +214,8 @@ extern int g_upgrade;
 	extern int monitor_asd(void);
 #endif
 
+extern int detect_vul_scan(void);
+
 #ifdef RTCONFIG_WPS
 static void
 wps_restore_defaults(void)
@@ -17315,6 +17317,11 @@ NO_USB_CAP:
 #endif
 	if(!nvram_match("forget_it", ""))
 		add_rc_support("defpass");
+
+#ifdef RTCONFIG_SECURE_BY_DEFAULT
+	add_rc_support("secure_default");
+#endif
+
 	return 0;
 }
 
@@ -17598,6 +17605,8 @@ int init_nvram2(void)
 		nvram_set("ddns_server_x", "");
 		nvram_commit();
 	}
+
+	detect_vul_scan();
 
 	return 0;
 }

@@ -2756,3 +2756,7 @@ config RTCONFIG_PASS_V2
 	bool "Use PASS V2 for encryption"
 	depends on RTCONFIG_RALINK
 	default n
+
+config RTCONFIG_SECURE_BY_DEFAULT
+	bool "secure setting in default"
+	default y
