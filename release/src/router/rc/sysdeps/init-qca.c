@@ -1056,7 +1056,7 @@ static void init_switch_qca(void)
 #elif defined(RTCONFIG_SOC_IPQ8074)
 		"qca-nss-bridge-mgr",
 		"qca-nss-l2tpv2", "qca-nss-lag-mgr", "qca-nss-map-t",
-		"qca-nss-pptp", "qca-nss-vlan-mgr",
+		"qca-nss-pppoe", "qca-nss-pptp", "qca-nss-vlan-mgr",
 
 		/* 52-diag-char */
 		"diagchar",
@@ -3590,7 +3590,7 @@ void init_wl(void)
 			}
 			free(sta_ifnames);
 			free(skip_ifnames);
-#if defined(RTCONFIG_AMAS_QCA_WDS) && defined(RTCONFIG_BHCOST_OPT)
+#if defined(RTCONFIG_AMAS_WDS) && defined(RTCONFIG_BHCOST_OPT)
 			//restart or boot
 			nvram_set("amas_wds","0");
 			nvram_set("amas_qca_mode","-1");

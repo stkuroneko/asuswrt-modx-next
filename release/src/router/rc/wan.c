@@ -45,7 +45,10 @@
 #include <arpa/inet.h>
 #include <net/if_arp.h>
 #include <dirent.h>
+#if !defined(__GLIBC__) && !defined(__UCLIBC__) /* musl */
+#else
 #include <linux/sockios.h>
+#endif
 #include <bcmnvram.h>
 #include <shutils.h>
 #include <wlutils.h>
@@ -1092,8 +1095,11 @@ int check_wan_if(int unit)
 }
 #endif
 
-void start_dhcpfilter(const char *iface)
+void start_dhcpfilter(const char *ifname)
 {
+	char iface[IFNAMSIZ];
+
+	strlcpy(iface, ifname, sizeof(iface));
 	eval("ebtables", "-A", "INPUT", "-p", "ipv4", "-i", iface, "-d", "broadcast"
 		, "--ip-proto", "udp", "--ip-destination-port", "67", "-j", "DROP");
 	eval("ebtables", "-A", "FORWARD", "-p", "ipv4", "-i", iface, "-d", "broadcast"
@@ -1106,8 +1112,11 @@ void start_dhcpfilter(const char *iface)
 	}
 
 }
-void stop_dhcpfilter(const char *iface)
+void stop_dhcpfilter(const char *ifname)
 {
+	char iface[IFNAMSIZ];
+
+	strlcpy(iface, ifname, sizeof(iface));
 	eval("ebtables", "-D", "INPUT", "-p", "ipv4", "-i", iface, "-d", "broadcast"
 		, "--ip-proto", "udp", "--ip-destination-port", "67", "-j", "DROP");
 	eval("ebtables", "-D", "FORWARD", "-p", "ipv4", "-i", iface, "-d", "broadcast"
@@ -3956,9 +3965,8 @@ found_default_route(int wan_unit)
 			if (++n == 1 && strncmp(buf, "Iface", 5) == 0)
 				continue;
 
-				i = sscanf(buf, "%255s %x %*s %*s %*s %*s %*s %x",
-					device, &dest, &mask);
-
+			i = sscanf(buf, "%255s %x %*s %*s %*s %*s %*s %x",
+				device, &dest, &mask);
 			if (i != 3)
 			{
 				break;
@@ -4196,6 +4204,7 @@ start_wan(void)
 		sprintf(nv_mode, "%s_mode", "bond1");
 		sprintf(nv_policy, "%s_policy", "bond1");
 		set_bonding("bond1", nvram_get(nv_mode), nvram_get(nv_policy), get_wan_hwaddr());
+		ifconfig("bond1", IFUP, NULL, NULL);
 	}
 #endif
 
@@ -4287,26 +4296,9 @@ stop_wan(void)
 	}
 
 #ifdef RTCONFIG_RALINK
-#if defined(RTCONFIG_WLMODULE_MT7629_AP) || defined(RTCONFIG_WLMODULE_MT7622_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
-	if (module_loaded("mtkhnat"))
-
-#else
-	if (module_loaded("hw_nat"))
-#endif
-	{
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP) && !defined(RTCONFIG_RALINK_MT7622)
-		doSystem("iwpriv %s set hw_nat_register=%d", get_wifname(0), 0);
-#ifdef RTCONFIG_HAS_5G
-		doSystem("iwpriv %s set hw_nat_register=%d", get_wifname(1), 0);
-#endif
-#endif
-#if defined(RTCONFIG_WLMODULE_MT7629_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
-		modprobe_r("mtkhnat");
-#else
-#ifndef RTCONFIG_RALINK_MT7622
-			modprobe_r("hw_nat");
-#endif
-#endif
+	if (is_hwnat_loaded()) {
+		unregister_hnat_wlifaces();
+		modprobe_r(MTK_HNAT_MOD);
 		if (!g_reboot)
 			sleep(1);
 	}

@@ -62,7 +62,7 @@ var iptv_profiles = [<% get_iptvSettings();%>][0];
 var isp_profiles = iptv_profiles.isp_profiles;
 var port_definitions = iptv_profiles.port_definitions;
 var stbPortMappings = [<% get_stbPortMappings();%>][0];
-var orig_wnaports_bond = '<% nvram_get("wanports_bond"); %>';
+var orig_wanports_bond = '<% nvram_get("wanports_bond"); %>';
 var cloud_isp_profiles = [];
 
 if(wan_bonding_support)
@@ -681,8 +681,8 @@ function applyRule(){
 		}
 
 		if(wan_bonding_support && orig_bond_wan == "1"){
-			if(wanAggr_p2_conflicts_w_stb_port(document.form.switch_stb_x.value, wanAggr_p2_num(orig_wnaports_bond))){
-				var msg = "<#WANAggregation_PortConflict_hint1#>".replace(/LAN-*\D* 4/, wanAggr_p2_name(orig_wnaports_bond));
+			if(wanAggr_p2_conflicts_w_stb_port(document.form.switch_stb_x.value, wanAggr_p2_num(orig_wanports_bond))){
+				var msg = "<#WANAggregation_PortConflict_hint1#>".replace(/LAN-*\D* 4/, wanAggr_p2_name(orig_wanports_bond));
 				if(confirm(msg)){
 					document.form.bond_wan.disabled = false;
 					document.form.bond_wan.value = "0";

@@ -103,6 +103,7 @@ ASUS_eula_desc1_4=Navíc pro zajištění vaší vzdáleně ovládané funkce IF
 ASUS_eula_desc2=Společnost ASUS se zavazuje chránit a respektovat vaše soukromí. Můžete kdykoli navštívit Advancend Settings (Pokročilá nastavení) > Administration (Správa) > Privacy (Soukromí) pro zapnutí/vypnutí sdílení informací o vašem produktu se společností ASUS. Pro podrobnosti o tom, jak společnost ASUS chrání vaše soukromí prosím navštivte <a id="eula_url" style="font-weight: bolder;text-decoration:underline;cursor:pointer;" target="_blank">Zásady ochrany soukromí ASUS</a>.
 ASUS_eula_age=Jsem starší 16 let.
 ASUS_eula_age_confirm=Prosím potvrďte, že jste starší 16 let.
+ASUS_eula_use_confirm=Prosím potvrďte, že Podmínky používání ASUS.
 ASUS_eula_withdraw0=Pro %1$@ a vzdálené připojení (ASUS Router APP/Lyra APP/AiCloud/AiDisk):
 ASUS_eula_withdraw_desc1=Upozorňujeme vás, že vaše informace, včetně názvu modelu vašeho produktu, verze firmwaru, stavu internetu, IP adresy, adresy MAC a názvu DDNS, budou shromažďovány společností ASUS přes výše uvedené funkce.
 ASUS_eula_withdraw_desc1_2=Chcete-li zakázat sdílení vašich informací se společností ASUS přes výše uvedené funkce, klikněte prosím na <span style="font-weight: bold;">[[Odvolat]</span> níže. Nicméně vás upozorňujeme, že pokud zastavíte sdílení vašich informací se společností ASUS, tyto funkce nemusí fungovat.
@@ -246,7 +247,7 @@ FIRM_fail_desc=Aktualizace firmwaru se nezdařila. Může to být důsledek špa
 FIRM_ok_desc=Firmware se aktualizuje. Prosím vyčkejte asi 3 minuty.
 FIRM_ok_aimesh=Aktualizace firmwaru byla dokončena. Zavřete toto okno a znovu přejděte na svůj router AiMesh.
 FIRM_reboot_manually=Upgrade firmwaru byl proveden. Restartujte ZVMODELVZ ručně.
-FIRM_trx_valid_fail_desc=To comply with regulatory amendments, we have modified our certification rule to ensure better firmware quality. This version is not compatible with all previously released ASUS firmware and uncertified third party firmware. Please check our official websites for the certified firmware.
+FIRM_trx_valid_fail_desc=To comply with regulatory amendments, we have modified our certificate rule to ensure better firmware quality. This version is not compatible with all previously released ASUS firmware and uncertified third party firmware. Please check our official websites for the certified firmware.
 Five_attempts_logout_hint=5× jste zadali nesprávné uživatelské jméno nebo heslo. Budete odhlášeni.
 footer_copyright_desc=2022 ASUSTeK Computer Inc. Všechna práva vyhrazena.
 FW_n1=Během aktualizace firmwaru budou zachována nastavení parametrů konfigurace.
@@ -1081,13 +1082,14 @@ AiMesh_confirm_msg_ChangeSSID=Pokud změníte svůj SSID, bude to mít negativn�
 AiMesh_confirm_msg_ChangeKey=Pokud změníte svůj WPA předsdílený klíč, bude to mít negativní vliv na připojení WiFi vašeho uzlu AiMesh.
 AiMesh_confirm_msg_CountryCode=Změna kódu země může mít negativní vliv na váš systém AiMesh.
 AiMesh_confirm_msg5=Pokud deaktivujete funkci Radio (Rádio), bude to mít negativní vliv na připojení WiFi vašeho routeru AiMesh.
-AiMesh_confirm_msg6=Pokud skryjete svůj SSID, bude to mít negativní vliv na připojení WiFi vašeho routeru AiMesh.
+AiMesh_confirm_msg6=Skrytý identifikátor SSID nepomáhá zabezpečit síť Wi-Fi a může způsobit problémy s připojením.
 AiMesh_confirm_msg7=Pokud skryjete svůj SSID, funkce WPS bude deaktivována a bude to mít negativní vliv na připojení WiFi vašeho routeru AiMesh.
 AiMesh_confirm_msg8=Pokud deaktivujete server DHCP, bude to mít negativní vliv na připojení WiFi vašeho routeru AiMesh.
 AiMesh_confirm_msg9=Z důvodu kompatibility systému AiMesh a koncových zařízení doporučujeme používat WPA2-Personal. Chcete přepnout na #AUTHMODE ?\n*Pokud zaznamenáte problémy s připojením, přepněte na WPA2-Personal nebo se výrobce zeptejte na další informace.
 AiMesh_confirm_msg10=Chcete-li zajistit připojení systému AiMesh a koncových zařízení, měli byste si před přepnutím na WPA3-Personal přečíst tento přehled <a id="wpa3FaqLink">Nejčastější dotazy</a>.
 AiMesh_confirm_msg11=Aktuálně používáte WPA3-personal. Chcete-li vytvořit systém AiMesh, je nutné změnit způsob ověřování na WPA2/WPA3-personal. Chcete pokračovat?
 AiMesh_confirm_msg12=You can read this <a id='wpa3FaqLink'>FAQ</a> for more information.
+AiMesh_confirm_msg13=Další podrobnosti najdete na webu <a style='font-weight: bolder;text-decoration: underline;color:#000000;' href='' target='_blank'>Nejčastější dotazy</a>
 AiMesh_Feature_Desc=Pokročilý ASUS AiMesh je inovativní nová funkce směrovače, která připojuje více směrovačů ASUS a vytváří celou domácí síť WiFi.
 AiMesh_FAQ=Zjistěte víc o ASUS AiMesh
 AiMesh_FindNode=Najít uzel AiMesh
@@ -3442,6 +3444,7 @@ TZ17=Atlantický čas (Kanada)
 TZ18=La Paz
 TZ18_1=Caracas
 TZ19=Santiago
+TZ19_1=Asunción
 TZ20=Newfoundland
 TZ21=Brazílie
 TZ22=Buenos Aires, Georgetown
@@ -3534,10 +3537,10 @@ Uplink_rate=Odeslaná data/s
 Uplink_traffic=Odeslaná data
 upnp_Desc=Nastavte iTunes a mediální server UPnP.
 [###MODEL_DEP###][RT-AC1200G+][RT-AC1200G][RT-AC82U]upnp_Desc=Nastavte mediální server UPnP.
-UPnPMediaServer_Help=ZVMODELVZ podporuje standard UPnP. Můžete jej povolit a umožnit jiným UPnP zařízením, jako je PS3 nebo digitální přehrávač, přístup k multimediálním souborům na USB disku.
-[###MODEL_DEP###][RT-AC1200][RT-N600]UPnPMediaServer_Help=ZVMODELVZ podporuje standard UPnP. Můžete jej povolit a umožnit jiným UPnP zařízením, jako je PS3 nebo digitální přehrávač, přístup k multimediálním souborům na USB disku.
-[###MODEL_DEP###][RT-AC1200G][RT-AC82U]UPnPMediaServer_Help=ZVMODELVZ podporuje standard UPnP. Můžete jej povolit a umožnit jiným UPnP zařízením, jako je PS3 nebo digitální přehrávač, přístup k multimediálním souborům na USB disku.
-[###MODEL_DEP###][AC2900]UPnPMediaServer_Help=ZVMODELVZ podporuje standard UPnP. Můžete jej povolit a umožnit jiným UPnP zařízením, jako je PS3 nebo digitální přehrávač, přístup k multimediálním souborům na USB disku.
+UPnPMediaServer_Help=Nastavte <a id='upnp_link'>UPnP, iTunes</a>, <a id='ftp_link'>FTP</a> a <a id='samba_link'>Místa v síti (Samba)</a>.
+[###MODEL_DEP###][RT-AC1200][RT-N600]UPnPMediaServer_Help=Nastavte <a id='upnp_link'>UPnP, iTunes</a> a <a id='samba_link'>Místa v síti (Samba)</a>.
+[###MODEL_DEP###][RT-AC1200G][RT-AC82U]UPnPMediaServer_Help=Nastavte <a id='upnp_link'>UPnP</a>, <a id='ftp_link'>FTP</a> a <a id='samba_link'>Místa v síti (Samba)</a>.
+[###MODEL_DEP###][AC2900]UPnPMediaServer_Help=Nastavte <a id='upnp_link'>UPnP</a> a <a id='samba_link'>Místa v síti (Samba)</a>.
 url_keyword_alert=URL klíčových slov
 USB_Application_check=Zkontrolujte aplikaci USB
 USB_Application_disk_checking=Kontrola disku
@@ -3626,7 +3629,7 @@ vpn_network_place=Podpora místa v síti (Samba)
 vpn_openvpn_AdvDNS=Inzerovat DNS do klientů
 vpn_openvpn_Auth=Režim ověření
 vpn_openvpn_AuthOnly=Pouze ověření uživatelským jménem / heslem
-vpn_openvpn_AuthOnly_hint=Authorization Mode fixes on TLS
+vpn_openvpn_AuthOnly_hint=Authentication Mode fixes on TLS
 vpn_openvpn_AuthHMAC=Ověření HMAC
 vpn_openvpn_ExtraHMAC=Dodatečné ověření HMAC
 vpn_openvpn_ClientMutual=Povolit Klient <-> Klient

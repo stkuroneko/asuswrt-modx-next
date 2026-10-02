@@ -35,6 +35,7 @@
 #if defined(DEBUG) && defined(DMALLOC)
 #include <dmalloc.h>
 #endif
+#include <json.h>
 #include <rtconfig.h>
 
 /* Basic authorization userid and passwd limit */
@@ -568,4 +569,5 @@ extern int filter_ban_ip();
 extern void slowloris_check();
 extern void slow_post_read_check();
 extern int check_chpass_auth(char *cur_username, char *cur_passwd);
+extern int save_changed_param(json_object *cfg_root, char *param);
 #endif /* _httpd_h_ */

@@ -1334,8 +1334,8 @@ unsigned int getAPPIN(int unit)
 int
 wl_wps_info(int eid, webs_t wp, int argc, char_t **argv, int unit)
 {
-	int i, j = -1, u = unit;
-	char tmpstr[128], tmpstr2[256];
+	int /*i,*/ j = -1, u = unit;
+	char tmpstr[128]; //, tmpstr2[256];
 	WSC_CONFIGURED_VALUE result;
 	int retval=0;
 	struct iwreq wrq;
@@ -1696,6 +1696,37 @@ int ej_wl_sta_list_5g(int eid, webs_t wp, int argc, char_t **argv)
 exit:
 	return 0;
 }
+
+#if defined(RTCONFIG_STAINFO)
+/**
+ * Format:
+ * 	[ MAC, TX_RATE, RX_RATE, CONNECT_TIME, IDX ]
+ * IDX:	main/GN1/GN2/GN3
+ */
+static int wl_stainfo_list(int unit, webs_t wp)
+{
+	dbg("%s: unid %d, FIXME\n", __func__, unit);
+	return 0;
+}
+
+int
+ej_wl_stainfo_list_2g(int eid, webs_t wp, int argc, char_t **argv)
+{
+	return wl_stainfo_list(0, wp);
+}
+
+int
+ej_wl_stainfo_list_5g(int eid, webs_t wp, int argc, char_t **argv)
+{
+	return wl_stainfo_list(1, wp);
+}
+
+int
+ej_wl_stainfo_list_5g_2(int eid, webs_t wp, int argc, char_t **argv)
+{
+	return wl_stainfo_list(2, wp);
+}
+#endif  /* RTCONFIG_STAINFO */
 
 int ej_get_wlstainfo_list(int eid, webs_t wp, int argc, char_t **argv)
 {
@@ -2284,7 +2315,6 @@ static int ej_wl_rate(int eid, webs_t wp, int argc, char_t **argv, int unit)
 	int retval = 0;
 	char tmp[256], prefix[] = "wlXXXXXXXXXX_";
 	char *name;
-	char word[256], *next;
 	int rate=0;
 	int status;
 	char rate_buf[32];
@@ -2377,15 +2407,18 @@ ej_wl_rate_5g(int eid, webs_t wp, int argc, char_t **argv)
 int
 ej_nat_accel_status(int eid, webs_t wp, int argc, char_t **argv)
 {
-	int retval = 0;
+	char val[4];
+	int hwnat = 0, retval = 0;
 
-#if defined(RTCONFIG_WLMODULE_MT7629_AP) || defined(RTCONFIG_WLMODULE_MT7622_AP)
-	retval += websWrite(wp, "%d", module_loaded("mtkhnat"));
-#else
-	retval += websWrite(wp, "%d", module_loaded("hw_nat"));
-#endif
+	if (is_hwnat_loaded())
+		hwnat = 1;
 
-	return retval;
+	if (hwnat && f_exists("/sys/kernel/debug/hnat/hook_toggle")) {
+		if (f_read_string("/sys/kernel/debug/hnat/hook_toggle", val, sizeof(val)) > 0)
+			hwnat = !!safe_atoi(val);
+	}
+
+	return websWrite(wp, "%d", hwnat);
 }
 
 #ifdef RTCONFIG_PROXYSTA

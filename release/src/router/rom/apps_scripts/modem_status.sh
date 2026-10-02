@@ -595,8 +595,8 @@ elif [ "$1" == "fullsignal" ]; then
 		echo "rssi=$rssi."
 		echo "sinr=$sinr."
 
-		nvram set ${prefix}act_operation=$operation
-		nvram set ${prefix}act_band=$band
+		#nvram set ${prefix}act_operation=$operation
+		#nvram set ${prefix}act_band=$band
 		nvram set ${prefix}act_cellid=$cellid
 		nvram set ${prefix}act_lac=$lac
 		nvram set ${prefix}act_rsrp=$rsrp

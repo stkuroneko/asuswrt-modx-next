@@ -126,8 +126,8 @@ Set Up Environment(Tested in Fedora 8/9 and Ubuntu)
 		    - TOOLCHAIN_BASE=/opt/toolchains
 		    - PATH=/opt/toolchains/crosstools-arm-gcc-5.3-linux-4.1-glibc-2.22-binutils-2.25/usr/bin:/opt/toolchains/crosstools-aarch64-gcc-5.3-linux-4.1-glibc-2.22-binutils-2.25/usr/bin:/projects/hnd/tools/linux/hndtools-armeabi-2011.09/bin:$PATH
 
-	Mediatek/Ralink SoC models
-	==========================
+	Mediatek/Ralink MT76xx SoC models
+	=================================
 
 		For MT7622 Chip:
 	    	    - extract tools/lede-toolchain-mediatek-mt7622_gcc-5.4.0_glibc-2.24.Linux-x86_64.tar.bz2 to /opt
@@ -147,6 +147,13 @@ Set Up Environment(Tested in Fedora 8/9 and Ubuntu)
 		For MT7621 Uboot:
 	    	    - extract mips-2012.03.tar.bz2 directory to /opt
 		    - add /opt/mips-2012.03/bin to your uboot path
+
+	Mediatek/Ralink MT79xx SoC models
+	=================================
+
+		To install the tools:
+		    - extract tools/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24.tgz to /opt
+		    If your PC environment is 32bit or Ubuntu 16, extract tools/openwrt-gcc840_musl-1.1.24.aarch64-U16-32bit.tar.bz2 instead
 
 	Qualcomm QCA9557/QCA953x/QCA956x MIPS SoC models
 	================================================

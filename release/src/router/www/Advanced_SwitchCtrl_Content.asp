@@ -95,6 +95,17 @@ function initial(){
 			document.getElementById("natAccelDesc").innerHTML = "<#NAT_Acceleration_ctf_disable#>";
 		}
 	}
+	else if(mtk_support){
+		var nataccel = '<% nvram_get("hwnat"); %>';
+		var nataccel_status = '<% nat_accel_status(); %>';
+
+		if(nataccel == '1' && nataccel_status == '1'){
+			document.getElementById("MTKnatAccelDesc").innerHTML = "<#NAT_Acceleration_enable#>";
+		}
+		else{
+			document.getElementById("MTKnatAccelDesc").innerHTML = "<#NAT_Acceleration_ctf_disable#>";
+		}
+	}
 	else{
 		var ctf_disable = '<% nvram_get("ctf_disable"); %>';
 		var ctf_fa_mode = '<% nvram_get("ctf_fa_mode"); %>';
@@ -151,7 +162,7 @@ function initial(){
 			document.form.qca_sfe.disabled = false;
 		}
 	}
-	else if(based_modelid == "RT-ACRH18" || based_modelid == "4G-AC86U" || based_modelid == "4G-AX56" || based_modelid == "RT-AX53U" || based_modelid == "RT-AX54" || based_modelid == "XD4S"){//MTK
+	else if(mtk_support || based_modelid == "RT-ACRH18" || based_modelid == "4G-AC86U" || based_modelid == "4G-AX56" || based_modelid == "RT-AX53U" || based_modelid == "RT-AX54" || based_modelid == "XD4S"){//MTK
 		document.getElementById("mtk_tr").style.display = "";
 		document.form.hwnat.disabled = false;
 		document.getElementById("ctf_tr").style.display = "none";
@@ -388,7 +399,7 @@ function check_bonding_policy(obj){
 														<option class="content_input_fd" value="1" <% nvram_match("hwnat", "1","selected"); %>><#Auto#></option>
 													</select>
 													&nbsp
-												<span id="natAccelDesc"></span>
+												<span id="MTKnatAccelDesc"></span>
 												</td>
 											</tr>
 

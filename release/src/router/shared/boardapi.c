@@ -553,6 +553,11 @@ int init_gpio(void)
 			continue;
 		}
 #endif
+#if defined(TUXAX4200)
+		if (!strcmp(led_list[i], "led_wan_gpio") && nvram_match("led_wan_gpio", "gpy211")
+		 || !strcmp(led_list[i], "led_lan_gpio") && nvram_match("led_lan_gpio", "gpy211"))
+			continue;
+#endif
 		use_gpio = nvram_get_int(led_list[i]);
 
 		if((gpio_pin = use_gpio & 0xff) == 0xff)
@@ -916,6 +921,10 @@ int do_led_control(int which, int mode)
 		f_write_string("/sys/bus/pci/drivers/xhci_hcd/port_led", onoff, 0, 0);
 		return 0;
 	}
+#endif
+#if defined(TUFAX4200) || defined(TUFAX6000)
+	if (__do_led_control && __do_led_control(which, mode))
+		return 0;
 #endif
 
 #if defined(RTAC56U) || defined(RTAC56S)

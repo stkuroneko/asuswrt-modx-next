@@ -1027,7 +1027,7 @@ apply.wireless = function(){
 		}
 		else if(isSupport('wifi6e') && qisPostData.smart_connect_x == '3'){
 			qisPostData.wl0_auth_mode_x = "psk2";
-			qisPostData.wl0_mfp = "1";
+			qisPostData.wl0_mfp = "0";
 		}
 		else{
 			qisPostData.wl0_auth_mode_x = "psk2";
@@ -1054,7 +1054,7 @@ apply.wireless = function(){
 		}
 		else if(isSupport('wifi6e') && qisPostData.smart_connect_x == '3'){
 			qisPostData.wl1_auth_mode_x = "psk2";
-			qisPostData.wl1_mfp = "1";
+			qisPostData.wl1_mfp = "0";
 		}
 		else{
 			qisPostData.wl1_auth_mode_x = "psk2";			

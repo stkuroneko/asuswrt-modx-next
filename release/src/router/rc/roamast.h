@@ -1,3 +1,6 @@
+#ifndef _ROAMAST_H_
+#define _ROAMAST_H_
+
 #ifdef RTCONFIG_LIBASUSLOG
 #include <libasuslog.h>
 #endif
@@ -30,8 +33,8 @@
 
 #define ROAMING_BYPASS 1
 #define ROAMING_NOT_BYPASS 2
-
 #endif
+
 #define MAC_STR_LEN 17
 #ifdef RTCONFIG_11K_RCPI_CHECK
 struct report_entry {
@@ -233,7 +236,7 @@ typedef struct rast_sta_info {
 #endif
 	uint32 tx_rate;
 	uint32 rx_rate;
-#if defined(RTCONFIG_BCMARM) || defined(RTCONFIG_LANTIQ) || defined(RTCONFIG_QCA)
+#if defined(RTCONFIG_BCMARM) || defined(RTCONFIG_LANTIQ) || defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
 	uint64 tx_byte;
 	uint64 rx_byte;
 #if defined(RTCONFIG_BCMARM)
@@ -357,14 +360,18 @@ extern int Set_RAST_CPU(void);
 
 /* For ioctls that take a list of MAC addresses from src-rt/include/wlioctl.h (BCM platform's header) */
 
+#ifndef RTCONFIG_RALINK
+/* redefined in wlioctl.h */
 struct maclist {
         uint count;                     /* number of MAC addresses */
         struct ether_addr ea[1];        /* variable length array of MAC addresses */
 };
+#endif
 
 typedef struct _acl_maclist {
         char mac[19];
 } acl_maclist;
+
 typedef struct _acl_sta {
         acl_maclist list[128];
 } acl_sta;
@@ -391,10 +398,14 @@ extern void rast_retrieve_bs_data(int bssidx, int vifidx, int interval);
 
 #ifndef CONFIG_BCMWL5
 /* MAC list modes from src-rt/include/wlioctl.h (BCM platform's header) */
+/* follow ACL definition of platform WiFi driver. */
 #define WLC_MACMODE_DISABLED    0       /* MAC list disabled */
 #define WLC_MACMODE_ALLOW       1      /* Allow specified (i.e. deny unspecified) */
 #define WLC_MACMODE_DENY        2      /* Deny specified (i.e. allow unspecified) */
 #endif
+extern void rast_nonmesh_kv_thread_create(void);
+extern uint8 check_if_follow_spec(int8 rssi,int8 rcpi);
+extern void check_rcpilist_and_translate_to_rssi(struct rcpi_checklist *rcpi_list);
 
 #ifdef RTCONFIG_11K_RCPI_CHECK
 void add_to_rcpi_checklist(char *sta, char *ap_mac, char rcpi,struct rcpi_checklist **rcpi_list);
@@ -420,3 +431,4 @@ int add_to_roaming_list(int idx,int vidx ,struct ether_addr *sta,int rssi);
 int remove_from_roaming_list(int idx,int vidx ,struct ether_addr *sta);
 
 #endif //RTCONFIG_RAST_NONMESH_KVONLY
+#endif	/* _ROAMAST_H_ */

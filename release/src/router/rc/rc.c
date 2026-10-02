@@ -67,6 +67,11 @@ double wl_get_txpwr_target_max(char *name);
 double get_wifi_maxpower(int target_unit);
 #endif
 
+#if defined(RTCONFIG_LIB_CODB)
+/* codb_utils.h is not in $(STAGEDIR) directory, declare function prototype instead. */
+extern int codb_test();
+#endif
+
 // led_str_ctrl
 enum led_id get_led_id(const char *led_str)
 {
@@ -425,10 +430,10 @@ static int rctest_main(int argc, char *argv[])
 		FILE *fp;
 		int i, ch;
 		int size = nvram_get_int("dump_size");
-		int start = nvram_get_int("dump_start");
+		//int start = nvram_get_int("dump_start");
 
 		if(!argv[2])	
-			return;
+			return 0;
 
 		_dprintf("dumpx [%s] -------->\n", argv[2]);
 		fp = fopen(argv[2], "r");
@@ -568,7 +573,7 @@ static int rctest_main(int argc, char *argv[])
 		//if ((ret = GetPhyStatus(1, &phy_list)) == 1) {
 			GetPhyStatus(1, &phy_list);
 			for(i=0;i<phy_list.count;i++) {
-				fprintf(stderr, " phy_port_id=%d, label_name=%s, cap_name=%s, state=%s, link_rate=%d, duplex=%s, tx_packets=%u, rx_packets=%u, tx_bytes=%llu, rx_bytes=%llu, crc_errors=%u\n", 
+				fprintf(stderr, " phy_port_id=%d, label_name=%s, cap_name=%s, state=%s, link_rate=%d, duplex=%s, tx_packets=%u, rx_packets=%u, tx_bytes=%" PRIu64 ", rx_bytes=%" PRIu64 ", crc_errors=%u\n",
 					phy_list.phy_info[i].phy_port_id,
 					phy_list.phy_info[i].label_name,
 					phy_list.phy_info[i].cap_name,
@@ -670,25 +675,9 @@ static int rctest_main(int argc, char *argv[])
 		else if (strcmp(argv[1], "qos") == 0) {//qos test
 			if (on) {
 #ifdef RTCONFIG_RALINK
-#if defined(RTCONFIG_WLMODULE_MT7629_AP) || defined(RTCONFIG_WLMODULE_MT7622_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
-				if (module_loaded("mtkhnat"))
-#else
-				if (module_loaded("hw_nat"))
-#endif					
-				{
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP) && !defined(RTCONFIG_RALINK_MT7622)
-					doSystem("iwpriv %s set hw_nat_register=%d", get_wifname(0), 0);
-#ifdef RTCONFIG_HAS_5G
-					doSystem("iwpriv %s set hw_nat_register=%d", get_wifname(1), 0);
-#endif
-#endif
-#if defined(RTCONFIG_WLMODULE_MT7629_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
-					modprobe_r("mtkhnat");
-#else
-#ifndef RTCONFIG_RALINK_MT7622
-					modprobe_r("hw_nat");
-#endif
-#endif
+				if (is_hwnat_loaded()) {
+					unregister_hnat_wlifaces();
+					modprobe_r(MTK_HNAT_MOD);
 					sleep(1);
 #if 0
 					f_write_string("/proc/sys/net/ipv4/conf/default/force_igmp_version", "0", 0, 0);
@@ -714,11 +703,7 @@ static int rctest_main(int argc, char *argv[])
 //					!(nvram_get_int("fw_pt_l2tp") || nvram_get_int("fw_pt_ipsec") &&
 //					(nvram_match("wl0_radio", "0") || nvram_get_int("wl0_mrate_x")) &&
 //					(nvram_match("wl1_radio", "0") || nvram_get_int("wl1_mrate_x")) &&
-#if defined(RTCONFIG_WLMODULE_MT7629_AP) || defined(RTCONFIG_WLMODULE_MT7622_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
-					!module_loaded("mtkhnat"))
-#else
-					!module_loaded("hw_nat"))
-#endif
+				    !is_hwnat_loaded())
 				{
 #if 0
 					f_write_string("/proc/sys/net/ipv4/conf/default/force_igmp_version", "2", 0, 0);
@@ -729,23 +714,8 @@ static int rctest_main(int argc, char *argv[])
 					if (!(!nvram_match("switch_wantag", "none")&&!nvram_match("switch_wantag", "")))
 #endif
 					{
-#if defined(RTCONFIG_WLMODULE_MT7629_AP) || defined(RTCONFIG_WLMODULE_MT7622_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
-						modprobe("mtkhnat");
-#else					
-						modprobe("hw_nat");
-#endif
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP) && !defined(RTCONFIG_RALINK_MT7622) 
-						doSystem("iwpriv %s set hw_nat_register=%d", get_wifname(0), 1);
-#ifdef RTCONFIG_HAS_5G
-						doSystem("iwpriv %s set hw_nat_register=%d", get_wifname(1), 1);
-#endif
-#endif
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP)
-						doSystem("iwpriv %s set LanNatSpeedUpEn=%d", get_wifname(0), 1);
-#ifdef RTCONFIG_HAS_5G
-						doSystem("iwpriv %s set LanNatSpeedUpEn=%d", get_wifname(1), 1);
-#endif
-#endif
+						modprobe(MTK_HNAT_MOD);
+						register_hnat_wlifaces();
 						sleep(1);
 					}
 				}

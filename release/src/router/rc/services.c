@@ -69,6 +69,7 @@
 #include <dsl-upg.h>
 #endif
 #ifdef RTCONFIG_USB
+#include <disk_share.h>
 #include <disk_io_tools.h>	//mkdir_if_none()
 #ifdef RTCONFIG_USB_SMS_MODEM
 #include "libsmspdu.h"
@@ -173,7 +174,6 @@ static const struct itimerval zombie_tv = { {0,0}, {307, 0} };
 
 // -----------------------------------------------------------------------------
 
-static const char dmhosts[] = "/etc/hosts.dnsmasq";
 static const char dmresolv[] = "/tmp/resolv.conf";
 static const char dmservers[] = "/tmp/resolv.dnsmasq";
 
@@ -194,7 +194,7 @@ void stop_jitterentropy(void);
 #define MNT_DETACH	0x00000002
 #endif
 
-#if defined(BCMDBG) || defined(RTCONFIG_QCA)
+#if defined(BCMDBG) || defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
 #include <assert.h>
 #else
 #define assert(a)
@@ -2837,6 +2837,11 @@ check_wps_enable()
 	int wps_enable = nvram_get_int("wps_enable_x");
 	int unit = nvram_get_int("wps_band_x");
 
+#ifdef RTCONFIG_AMAS
+	if (nvram_get_int("re_mode") == 1)
+		return;
+#endif
+
 	if (no_need_to_start_wps() ||
 		wps_band_ssid_broadcast_off(get_radio_band(unit))) {
 		nvram_set("wps_enable_x", "0");
@@ -3025,6 +3030,7 @@ start_wps(void)
 			_eval(wps_argv, NULL, 0, &pid);
 		}
 #elif defined RTCONFIG_RALINK
+		nvram_set("wps_proc_status", "0");
 		start_wsc_pin_enrollee();
 		if (f_exists("/var/run/watchdog.pid"))
 		{
@@ -3242,7 +3248,7 @@ void stop_wlc_nt(void)
 {
 	killall_tk("wlc_nt");
 }
-#endif
+#endif	/* RTCONFIG_NOTIFICATION_CENTER */
 
 #ifdef CONFIG_BCMWL5
 #ifdef BCM_ASPMD
@@ -3632,7 +3638,7 @@ int stop_8021x(void)
 
 	return 0;
 }
-#endif
+#endif	/* RTCONFIG_RALINK */
 
 #ifdef RTCONFIG_REALTEK
 int exec_8021x_start(int band, int type)
@@ -10900,6 +10906,12 @@ stop_services_mfg(void)
 #ifdef RTCONFIG_NETOOL
 	stop_netool();
 #endif
+#ifdef HND_ROUTER
+	stop_jitterentropy();
+#endif
+#ifdef RTCONFIG_CONNDIAG
+	stop_conn_diag();
+#endif
 }
 
 // 2008.10 magic
@@ -12010,6 +12022,10 @@ again:
 #endif
 
 	if (strcmp(script, "reboot") == 0 || strcmp(script,"rebootandrestore")==0) {
+		if (wait_action_idle(10)) {
+			set_action(ACT_REBOOT);
+		}
+
 		g_reboot = 1;
 		f_write_string("/tmp/reboot", "1", 0, 0);
 
@@ -12360,11 +12376,20 @@ again:
 				select_upgrade_fw_order(fwpart);
 				if (!nvram_match("nflash_swecc", "1"))
 				{
+#if defined(RTCONFIG_FITFDT)		// don't write trx header(64 bytes) to flash
+					{
+						char header_size[20];
+						snprintf(header_size, sizeof(header_size), "%d", get_imageheader_size());
+						_dprintf(" Write FW to the inactive partition (%s) skip(%s)\n", fwpart[1], header_size);
+						eval("mtd-write", "-i", upgrade_file, "-d", fwpart[1], "-s", header_size);
+					}
+#else
 					_dprintf(" Write FW to the inactive partition (%s).\n", fwpart[1]);
 					if (nvram_contains_word("rc_support", "nandflash"))	/* RT-AC56S,U/RT-AC68U/RT-N16UHP */
 						eval("mtd-write2", upgrade_file, "linux2");
 					else
 						eval("mtd-write", "-i", upgrade_file, "-d", fwpart[1]);
+#endif	/* RTCONFIG_FITFDT */
 				}
 #endif
 				if (nvram_contains_word("rc_support", "nandflash")) {	/* RT-AC56S,U/RT-AC68U/RT-N16UHP */
@@ -12393,10 +12418,11 @@ again:
 #endif
 #endif
 #else /* !RTCONFIG_REALTEK */
-#if defined(RTCONFIG_QCA) && defined(RTCONFIG_FITFDT)
+#if defined(RTCONFIG_FITFDT)
 					{
 						char header_size[20];
 						snprintf(header_size, sizeof(header_size)-1, "%d", get_imageheader_size());
+						_dprintf("mtd-write and skip header_size(%s)\n", header_size);
 						eval("mtd-write", "-i", upgrade_file, "-d", "linux", "-s", header_size);
 					}
 #else
@@ -12406,7 +12432,7 @@ again:
 					else
 #endif
 					eval("mtd-write", "-i", upgrade_file, "-d", fwpart[0]);
-#endif /* RTCONFIG_QCA && RTCONFIG_FITFDT */
+#endif /* RTCONFIG_FITFDT */
 #endif /* RTCONFIG_REALTEK */
 #endif // RTAC1200G
 				}
@@ -12654,11 +12680,20 @@ again:
 				select_upgrade_fw_order(fwpart);
 				if (!nvram_match("nflash_swecc", "1"))
 				{
+#if defined(RTCONFIG_FITFDT)		// don't write trx header(64 bytes) to flash
+					{
+						char header_size[20];
+						snprintf(header_size, sizeof(header_size), "%d", get_imageheader_size());
+						_dprintf(" Write FW to the inactive partition (%s) skip(%s)\n", fwpart[1], header_size);
+						eval("mtd-write", "-i", upgrade_file, "-d", fwpart[1], "-s", header_size);
+					}
+#else
 					_dprintf(" Write FW to the inactive partition (%s).\n", fwpart[1]);
 					if (nvram_contains_word("rc_support", "nandflash"))	/* RT-AC56S,U/RT-AC68U/RT-N16UHP */
 						eval("mtd-write2", upgrade_file, "linux2");
 					else
 						eval("mtd-write", "-i", upgrade_file, "-d", fwpart[1]);
+#endif	/* RTCONFIG_FITFDT */
 				}
 #endif
 				if (nvram_contains_word("rc_support", "nandflash")) {	/* RT-AC56S,U/RT-AC68U/RT-N16UHP */
@@ -12688,10 +12723,11 @@ again:
 #endif
 #endif
 #else /* !RTCONFIG_REALTEK */
-#if defined(RTCONFIG_QCA) && defined(RTCONFIG_FITFDT)
+#if defined(RTCONFIG_FITFDT)
 					{
 						char header_size[20];
 						snprintf(header_size, sizeof(header_size)-1, "%d", get_imageheader_size());
+						_dprintf("mtd-write and skip header_size(%s)\n", header_size);
 						eval("mtd-write", "-i", upgrade_file, "-d", "linux", "-s", header_size);
 					}
 #else
@@ -12701,7 +12737,7 @@ again:
 					else
 #endif
 					eval("mtd-write", "-i", upgrade_file, "-d", fwpart[0]);
-#endif /* RTCONFIG_QCA && RTCONFIG_FITFDT */
+#endif /* RTCONFIG_FITFDT */
 #endif /* RTCONFIG_REALTEK */
 #endif // RTAC1200G
 				}
@@ -12866,7 +12902,8 @@ script_allnet:
 #ifdef RTCONFIG_CONNDIAG
 			stop_conn_diag();
 #endif
-			stop_cfgsync();
+			if (!strstr(nvram_safe_get("rc_service"), "start_cfgsync"))
+				stop_cfgsync();
 #endif
 #ifdef RTCONFIG_CAPTIVE_PORTAL
 			stop_chilli();
@@ -13013,7 +13050,8 @@ script_allnet:
 #endif
 #endif
 #ifdef RTCONFIG_CFGSYNC
-			start_cfgsync();
+			if (!strstr(nvram_safe_get("rc_service"), "start_cfgsync"))
+				start_cfgsync();
 #ifdef RTCONFIG_CONNDIAG
 			start_conn_diag();
 #endif
@@ -13097,7 +13135,8 @@ script_allnet:
 #ifdef RTCONFIG_CONNDIAG
 			stop_conn_diag();
 #endif
-			stop_cfgsync();
+			if (!strstr(nvram_safe_get("rc_service"), "start_cfgsync"))
+				stop_cfgsync();
 #endif
 			stop_wan();
 			stop_lan();
@@ -13225,7 +13264,8 @@ script_allnet:
 #endif
 #endif
 #ifdef RTCONFIG_CFGSYNC
-			start_cfgsync();
+			if (!strstr(nvram_safe_get("rc_service"), "start_cfgsync"))
+				start_cfgsync();
 #ifdef RTCONFIG_CONNDIAG
 			start_conn_diag();
 #endif
@@ -13349,7 +13389,8 @@ script_allnet:
 #ifdef RTCONFIG_CONNDIAG
 			stop_conn_diag();
 #endif
-			stop_cfgsync();
+			if (!strstr(nvram_safe_get("rc_service"), "start_cfgsync"))
+				stop_cfgsync();
 #endif
 #if defined(RTCONFIG_AMAS)
 			stop_amas_lib();
@@ -13496,7 +13537,8 @@ script_allnet:
 			start_plchost();
 #endif
 #ifdef RTCONFIG_CFGSYNC
-			start_cfgsync();
+			if (!strstr(nvram_safe_get("rc_service"), "start_cfgsync"))
+				start_cfgsync();
 #ifdef RTCONFIG_CONNDIAG
 			start_conn_diag();
 #endif
@@ -18153,7 +18195,14 @@ void start_pc_block(void)
 
 	get_all_pc_list(&pc_list);
 
-	if(nvram_get_int("MULTIFILTER_ALL") != 0 && count_pc_rules(pc_list, 1) > 0)
+	/* pc_block - 20220615
+		1. time-scheduling - BLOCK ALL DEVICES
+		2. time-scheduling - BLOCK
+		3. time-scheduling - TIME
+	*/
+	if (nvram_get_int("MULTIFILTER_BLOCK_ALL") == 1
+		|| (nvram_get_int("MULTIFILTER_ALL") != 0 && count_pc_rules(pc_list, 2))
+		|| (nvram_get_int("MULTIFILTER_ALL") != 0 && count_pc_rules(pc_list, 1)))
 		_eval(pc_block_argv, NULL, 0, &pid);
 
 	free_pc_list(&pc_list);

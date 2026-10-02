@@ -431,6 +431,9 @@ VOID MSTA_Init(RTMP_ADAPTER *pAd, RTMP_OS_NETDEV_OP_HOOK *pNetDevOps)
 		status = RtmpOSNetDevAttach(pAd->OpMode, pDevNew, &netDevHook);
 		pStaCfg->ApcliInfStat.ApCliInit = TRUE;
 		pAd->flg_msta_init = TRUE;
+#ifdef CONFIG_ASUS_FORCE4 /* force4 workaround, depend on CONFIG_MAP_SUPPORT & A4_CONN */
+		memset(pStaCfg->bm_mac, 0x00, sizeof(TXBM_MAC)*MAX_TX_BMCAST_MAC_SRC_CNT);
+#endif
 	}
 
 #ifdef MAC_REPEATER_SUPPORT
@@ -593,6 +596,10 @@ INT sta_inf_open(struct wifi_dev *wdev)
 	if (IS_MAP_ENABLE(pAd))
 		map_a4_init(pAd, wdev->func_idx, FALSE);
 #endif
+#ifdef CONFIG_ASUS_FORCE4 /* force4 workaround, depend on CONFIG_MAP_SUPPORT & A4_CONN */
+	else if (wdev->is_force4)
+		map_a4_init(pAd, wdev->func_idx, FALSE);
+#endif
 #ifdef MWDS
 	if (wdev->bDefaultMwdsStatus == TRUE)
 		MWDSEnable(pAd, wdev->func_idx, FALSE, TRUE);
@@ -644,6 +651,10 @@ INT sta_inf_close(struct wifi_dev *wdev)
 #ifdef CONFIG_MAP_SUPPORT
 		if (IS_MAP_ENABLE(pAd))
 			map_a4_deinit(pAd, wdev->func_idx, FALSE);
+#ifdef CONFIG_ASUS_FORCE4 /* force4 workaround, depend on CONFIG_MAP_SUPPORT & A4_CONN */
+		else if (wdev->is_force4)
+			map_a4_deinit(pAd, wdev->func_idx, FALSE);
+#endif
 #endif
 
 #ifdef MWDS
@@ -998,6 +1009,58 @@ static inline BOOLEAN ValidApCliEntry(RTMP_ADAPTER *pAd, INT apCliIdx)
 	return result;
 }
 
+#ifdef CONFIG_ASUS_FORCE4 /* force4 workaround, depend on CONFIG_MAP_SUPPORT & A4_CONN */
+#define CACHED_ENTRY_TIMEOUT (3*HZ)
+int apcli_bm_mac_cached(PSTA_ADMIN_CONFIG apcli_entry, PUCHAR mac)
+{
+	int i;
+	TXBM_MAC *mac_pt = apcli_entry->bm_mac;
+	for (i=0; i<MAX_TX_BMCAST_MAC_SRC_CNT; i++) {
+		if (mac_pt[i].seen_jiffies == 0) { //empty slot
+			return 0;
+		} else if (memcmp(mac_pt[i].srcMac, mac, MAC_ADDR_LEN)==0) { // cached one
+			if ( (jiffies - mac_pt[i].seen_jiffies) < CACHED_ENTRY_TIMEOUT)
+				return 1;
+			break;
+		}
+	}
+	return 0;
+}
+
+static void apcli_update_tx_mac(PSTA_ADMIN_CONFIG apcli_entry, PUCHAR mac)
+{
+	int i, candidate;
+	TXBM_MAC *mac_pt = apcli_entry->bm_mac;
+
+	for (i=0, candidate=-1; i<MAX_TX_BMCAST_MAC_SRC_CNT; i++) {
+		if (mac_pt[i].seen_jiffies == 0) { //empty slot
+			memcpy(mac_pt[i].srcMac, mac, MAC_ADDR_LEN);
+			mac_pt[i].seen_jiffies = jiffies;
+			//pr_crit("VVVVV[%s], add %pM, index %d\n", __func__, mac, i);
+			break;
+		} else if (memcmp(mac_pt[i].srcMac, mac, MAC_ADDR_LEN)==0) { // update timestamp
+			mac_pt[i].seen_jiffies = jiffies;
+			//pr_crit("VVVVV[%s], update %pM\n", __func__, mac);
+			break;
+		} else if (candidate == -1) { // check if this slot is over age
+			if ( (jiffies - mac_pt[i].seen_jiffies) > 2*CACHED_ENTRY_TIMEOUT) {
+				//pr_crit("VVVVV[%s], %pM cadidate %pM, index %d\n", __func__, mac, mac_pt[i].srcMac, i);
+				candidate = i;
+			}
+		}
+	}
+	if (i == MAX_TX_BMCAST_MAC_SRC_CNT) { // not found & overwrite first candidate
+		if (candidate==-1)
+			pr_warn("[%s]WARNING:cannot insert cache!\n", __func__);
+		else {
+			//pr_crit("VVVVV[%s], %pM overwrite %pM, index %d\n", __func__, mac, mac_pt[candidate].srcMac, candidate);
+			memcpy(mac_pt[candidate].srcMac, mac, MAC_ADDR_LEN);
+			mac_pt[candidate].seen_jiffies = jiffies;
+		}
+	}
+}
+#endif
+
 INT apcli_fp_tx_pkt_allowed(
 	IN RTMP_ADAPTER *pAd,
 	IN struct wifi_dev *wdev,
@@ -1096,6 +1159,13 @@ INT apcli_fp_tx_pkt_allowed(
 		}
 	}
 
+#ifdef CONFIG_ASUS_FORCE4 /* force4 workaround, depend on CONFIG_MAP_SUPPORT & A4_CONN */
+	if ((allowed == TRUE) && (wdev->is_force4 == TRUE) ) {
+		PUCHAR pSrcBufVA = RTMP_GET_PKT_SRC_VA(pkt);
+		if (pSrcBufVA[5] & 1)
+			apcli_update_tx_mac(apcli_entry, pSrcBufVA+6);
+	}
+#endif
 	return allowed;
 }
 

@@ -12,7 +12,6 @@ char *get_pap_bssid(int unit, char bssid_str[])
 	const char *ifname;
 	char data[12];
 	struct iwreq wrq;
-	int status;
 
 	ifname = get_staifname(unit);
 
@@ -23,18 +22,19 @@ char *get_pap_bssid(int unit, char bssid_str[])
 
 	if (wl_ioctl(ifname, RT_PRIV_IOCTL, &wrq) < 0) {
 		dbg("errors in getting %s bssid\n", ifname);
-		return -1;
+		return "";
 	}
 
 	ether_etoa(data, bssid_str);
 	return bssid_str;
 }
 
-typedef struct channel_info {
+struct channel_info {
 	unsigned char channel;
 	unsigned char bandwidth;
 	unsigned char extrach;
 };
+
 int wl_get_bw(int unit)
 {
 	struct iwreq wrq;
@@ -191,12 +191,11 @@ void add_beacon_vsie_guest(char *hexdata)
         else  // CAP/Router
             subunit = 2;
         for (; subunit <= num_of_mssid_support(unit); subunit++) {
-            char buf[] = "wlXX.XX_ifname";
-            memset(buf, 0, sizeof(buf));
-            snprintf(buf, sizeof(buf), "wl%d.%d_ifname", unit, subunit);
-            if (is_intf_up(nvram_safe_get(buf)) != -1)  // interface exist
+            char ifname[16];
+            __get_wlifname(unit, subunit, ifname);
+            if (is_intf_up(ifname) != -1)  // interface exist
 		    	vsie_operation(unit, subunit, VSIE_BEACON | VSIE_PROBE_RESP, 1, hexdata);
-        }
+       }
         unit++;
     }
 }
@@ -244,10 +243,9 @@ void del_beacon_vsie_guest(char *hexdata)
         else  // CAP/Router
             subunit = 2;
         for (; subunit <= num_of_mssid_support(unit); subunit++) {
-            char buf[] = "wlXX.XX_ifname";
-            memset(buf, 0, sizeof(buf));
-            snprintf(buf, sizeof(buf), "wl%d.%d_ifname", unit, subunit);
-            if (is_intf_up(nvram_safe_get(buf)) != -1)  // interface exist
+            char ifname[16];
+            __get_wlifname(unit, subunit, ifname);
+            if (is_intf_up(ifname) != -1)  // interface exist
 		    	vsie_operation(unit, subunit, VSIE_BEACON | VSIE_PROBE_RESP, 3, hexdata);
         }
         unit++;
@@ -311,7 +309,7 @@ int get_wlan_service_status(int bssidx, int vifidx)
 
     ifname = nvram_safe_get(strcat_r(prefix, "ifname", tmp));
 
-    if (is_intf_up(ifname)) return get_radio(bssidx, vifidx);
+    if (is_intf_up(ifname) > 0) return get_radio(bssidx, vifidx);
 
     return 0;
 }

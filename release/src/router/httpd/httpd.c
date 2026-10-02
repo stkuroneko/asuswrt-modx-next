@@ -702,7 +702,7 @@ send_token_headers( int status, char* title, char* extra_header, char* mime_type
     if ( mime_type != (char*) 0 )
 	(void) fprintf( conn_fp, "Content-Type: %s\r\n", mime_type );
 
-	(void) fprintf( conn_fp, "Set-Cookie: asus_token=%s; HttpOnly;\r\n",asus_token );
+    (void) fprintf( conn_fp, "Set-Cookie: asus_token=%s; HttpOnly;\r\n",asus_token );
 
     (void) fprintf( conn_fp, "Connection: close\r\n" );
     (void) fprintf( conn_fp, "\r\n" );

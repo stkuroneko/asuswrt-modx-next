@@ -161,7 +161,7 @@ typedef struct ovpn_cconf {
 	int userauth;	//username, password
 	int useronly;	//client certificte not required
 	char username[64];
-	char password[64];
+	char password[256];
 
 //Data Channel Encryption Options:
 	int direction;	//key-direction of secret or tls-auth (hmac)
@@ -208,7 +208,7 @@ typedef enum ovpn_errno{
 typedef struct ovpn_accnt
 {
 	char username[128];
-	char password[128];
+	char password[256];
 } ovpn_accnt_t;
 
 

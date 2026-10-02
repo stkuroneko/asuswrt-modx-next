@@ -1535,7 +1535,7 @@ function Get_Component_Open_3rd_Party(_parm){
 	$btn_container.unbind("click").click(function(e){
 		e = e || event;
 		e.stopPropagation();
-		var url = "https://www.hidemyass.com/zh-tw/index";
+		var url = "https://click.hmavpn.com/aff_c?offer_id=1&aff_id=1443";
 		window.open(url, '_new' ,'menubar=no,scrollbars=yes,toolbar=no,resizable=no,status=no,location=no');
 	});
 
@@ -2919,6 +2919,7 @@ function validate_format(_obj){
 			}
 			else{
 				isValid_wgc_addr = {'isError': true, 'errReason': address + " <#JS_validip#>"};
+				return false;
 			}
 		});
 		if(isValid_wgc_addr.isError){
@@ -2995,6 +2996,8 @@ function validate_format(_obj){
 		var isValid_wgc_aips = "";
 		var wgc_aips_array = $wgc_aips.val().split(",");
 		$.each(wgc_aips_array, function(index, address){
+			if(address == "::/0")
+				return true;
 			if(valid_is_IP_format(address, "IPv4")){
 				isValid_wgc_aips = valid_IP_CIDR(address, "IPv4", "1");
 				if(isValid_wgc_aips.isError)
@@ -3007,6 +3010,7 @@ function validate_format(_obj){
 			}
 			else{
 				isValid_wgc_aips = {'isError': true, 'errReason': address + " <#JS_validip#>"};
+				return false;
 			}
 		});
 		if(isValid_wgc_aips.isError){

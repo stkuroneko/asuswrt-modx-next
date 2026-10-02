@@ -2480,7 +2480,7 @@ void remove_storage_main(int shutdn)
 	exec_for_host(-1, 0x02, shutdn ? EFH_SHUTDN : 0, umount_partition);
 }
 
-#if defined(RTCONFIG_REALTEK) || defined(RTCONFIG_RALINK)
+#if defined(RTCONFIG_REALTEK) || (defined(RTCONFIG_RALINK) && !defined(RTCONFIG_MT798X))
 static const char *path_to_name(const char *path) {
 	const char *s = path, *tmp;
 	//_dprintf("%s(1)\n", __func__);

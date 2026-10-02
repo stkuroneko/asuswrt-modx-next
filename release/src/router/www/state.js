@@ -343,9 +343,9 @@ else if(isKimetsu){
 }
 
 var is_RU_sku = (function(){
-	var location = '<% nvram_get("location_code"); %>';
-	if(location != ''){
-		return (location.indexOf("RU") != -1);
+	var location_code = '<% nvram_get("location_code"); %>';
+	if(location_code != ''){
+		return (location_code.indexOf("RU") != -1);
 	}
 	else{
 		return in_territory_code("RU");
@@ -654,7 +654,7 @@ var isp_customize_tool_support = isSupport('isp_customize_tool');
 // return enum bs_port_id
 function wanAggr_p2_num(wanports_bond){
 	var p2_port = "4";
-	if (based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000" || based_modelid == "XT12") {
+	if (based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000" || based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000" || based_modelid == "XT12") {
 		p2_port = wanports_bond.split(" ")[1];
 		if (typeof(p2_port) == 'undefined')
 			p2_port = "-1";
@@ -664,7 +664,7 @@ function wanAggr_p2_num(wanports_bond){
 // wanports_bond = "P1 P2"; Px follow enum bs_port_id definition on QCA platform.
 function wanAggr_p2_name(wanports_bond){
 	var p2_port_str = "LAN 4";
-	if (based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000" || based_modelid == "XT12"){
+	if (based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000" || based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000" || based_modelid == "XT12"){
 		var p2_port = wanAggr_p2_num(wanports_bond);
 
 		if (typeof(p2_port) == 'undefined') {
@@ -674,6 +674,9 @@ function wanAggr_p2_name(wanports_bond){
 			if(based_modelid == "XT12"){
 				if(p2_port == 3)
 					p2_port_str = "2.5G/1G LAN";
+			} else if (based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000") {
+				if (p2_port == 5)
+					p2_port_str = "2.5G LAN";
 			}
 		} else if (p2_port == 30){
 			p2_port_str = "10G base-T";
@@ -693,6 +696,7 @@ function wanAggr_p2_conflicts_w_stb_port(stb,p2){
 	return (stb_ports[stb].indexOf(p2) == -1)? false : true;
 }
 var qca_support = isSupport("qca");
+var mtk_support = isSupport("mtk");
 var geforceNow_support = isSupport("nvgfn");
 var fileflex_support = isSupport("fileflex");
 var re_mode = '<% nvram_get("re_mode"); %>';
@@ -821,7 +825,19 @@ else{
 var IOS_app_link = "https://itunes.apple.com/tw/app/asus-router/id1033794044";
 var IOS_QR = "images/New_ui/asus_router_ios_qr.png";
 
-var wifison_ready = '<% nvram_get("wifison_ready"); %>';
+var aimesh_location_arr = [
+	{value:"Home",text:"<#AiMesh_NodeLocation01#>"}, {value:"Living Room",text:"<#AiMesh_NodeLocation02#>"}, {value:"Dining Room",text:"<#AiMesh_NodeLocation03#>"},
+	{value:"Bedroom",text:"<#AiMesh_NodeLocation04#>"}, {value:"Office",text:"<#AiMesh_NodeLocation05#>"}, {value:"Stairwell",text:"<#AiMesh_NodeLocation06#>"},
+	{value:"Hall",text:"<#AiMesh_NodeLocation07#>"}, {value:"Kitchen",text:"<#AiMesh_NodeLocation08#>"}, {value:"Attic",text:"<#AiMesh_NodeLocation09#>"},
+	{value:"Basement",text:"<#AiMesh_NodeLocation10#>"}, {value:"Yard",text:"<#AiMesh_NodeLocation11#>"}, {value:"Master Bedroom",text:"<#AiMesh_NodeLocation12#>"},
+	{value:"Guest Room",text:"<#AiMesh_NodeLocation13#>"}, {value:"Kids Room",text:"<#AiMesh_NodeLocation14#>"}, {value:"Study Room",text:"<#AiMesh_NodeLocation15#>"},
+	{value:"Hallway",text:"<#AiMesh_NodeLocation16#>"}, {value:"Walk-in Closet",text:"<#AiMesh_NodeLocation17#>"}, {value:"Bathroom",text:"<#AiMesh_NodeLocation18#>"},
+	{value:"First Floor",text:"First Floor"}, {value:"Second Floor",text:"<#AiMesh_NodeLocation19#>"}, {value:"Third Floor",text:"<#AiMesh_NodeLocation20#>"},
+	{value:"Storage",text:"<#AiMesh_NodeLocation21#>"}, {value:"Balcony",text:"<#AiMesh_NodeLocation22#>"}, {value:"Meeting Room",text:"<#AiMesh_NodeLocation23#>"},
+	{value:"Garage",text:"<#AiMesh_NodeLocation25#>"}, {value:"Gaming Room",text:"Gaming Room"}, {value:"Gym",text:"Gym"},
+	{value:"Custom",text:"<#AiMesh_NodeLocation24#>"}
+];
+
 var radioHintIgnored = false;
 var blockAllDeviceHintIgnored = false;
 (function(){

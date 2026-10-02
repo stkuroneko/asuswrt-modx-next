@@ -36,6 +36,9 @@ extern int cled_gpio[12];
 static int setAllSpecificColorLedOn(enum ate_led_color color)
 {
 	int i, model = get_model();
+#if defined(TUFAX4200) || defined(TUFAX6000)
+	enum ate_led_color switch_led_color = LED_COLOR_MAX;
+#endif
 #if defined(RTCONFIG_SWITCH_RTL8370M_PHY_QCA8033_X2) || \
     defined(RTCONFIG_SWITCH_RTL8370MB_PHY_QCA8033_X2)
 	enum ate_led_color rtk_switch_led_color = LED_COLOR_MAX;
@@ -195,6 +198,28 @@ static int setAllSpecificColorLedOn(enum ate_led_color color)
 		}
 		break;
 #endif
+#if defined(TUFAX4200) || defined(TUFAX6000)
+	case MODEL_TUFAX4200:
+	case MODEL_TUFAX6000:
+		{
+			static enum led_id white_led[] = {
+				LED_POWER,
+				LED_WAN, 	/* GPY211 */
+				LED_LAN, 	/* LAN1~4: MT7531, configed together; LAN5: GPY211 */
+				LED_2G, LED_5G,	/* MT7986 WiFi LED */
+				LED_ID_MAX
+			};
+			static enum led_id red_led[] = {
+				LED_WAN_RED,
+				LED_ID_MAX
+			};
+
+			all_led[LED_COLOR_WHITE] = white_led;
+			all_led[LED_COLOR_RED] = red_led;
+			switch_led_color = LED_COLOR_WHITE;
+		}
+		break;
+#endif	/* TUFAX4200, TUFAX6000 */
 #if defined(RTAC82U)
 	case MODEL_RTAC82U:
 		{
@@ -1076,6 +1101,20 @@ static int setAllSpecificColorLedOn(enum ate_led_color color)
 			led_control(*p++, v);
 		}
 	}
+
+#if defined(TUFAX4200) || defined(TUFAX6000)
+	if (switch_led_color >= 0 && switch_led_color < LED_COLOR_MAX) {
+		if (color == switch_led_color) {
+			force_gpy211_led_onoff(5, 1);	/* 2.5G LAN LED */
+			force_gpy211_led_onoff(6, 1);	/* 2.5G WAN LED, active-low */
+			force_mt7531_led_onoff(1);	/* LAN1~LAN4 LED */
+		} else {
+			force_gpy211_led_onoff(5, 0);	/* 2.5G LAN LED */
+			force_gpy211_led_onoff(6, 0);	/* 2.5G WAN LED, active-low */
+			force_mt7531_led_onoff(0);	/* LAN1~LAN4 LED */
+		}
+	}
+#endif
 
 #if defined(RTCONFIG_SWITCH_RTL8370M_PHY_QCA8033_X2) || \
     defined(RTCONFIG_SWITCH_RTL8370MB_PHY_QCA8033_X2)
@@ -2439,33 +2478,10 @@ int asus_ate_command(const char *command, const char *value, const char *value2)
 	}
 	else if (!strcmp(command, "Set_WanToLan")) {
 	   	set_wantolan();
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP) && !defined(RTCONFIG_RALINK_MT7622)
-		doSystem("iwpriv %s set hw_nat_register=%d", get_wifname(0), 0);
-#ifdef RTCONFIG_HAS_5G
-		doSystem("iwpriv %s set hw_nat_register=%d", get_wifname(1), 0);
-#endif
-#endif
-#if defined(RTCONFIG_WLMODULE_MT7629_AP) || defined(RTCONFIG_WLMODULE_MT7622_AP) || defined(RTCONFIG_WLMODULE_MT7915D_AP) || defined(RTCONFIG_MT798X)
-#ifndef RTCONFIG_RALINK_MT7622
-		modprobe_r("mtkhnat");
-#endif
-		modprobe("mtkhnat");
-#else
-		modprobe_r("hw_nat");
-		modprobe("hw_nat");
-#endif
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP) && !defined(RTCONFIG_RALINK_MT7622)
-		doSystem("iwpriv %s set hw_nat_register=%d", get_wifname(0), 1);
-#ifdef RTCONFIG_HAS_5G
-		doSystem("iwpriv %s set hw_nat_register=%d", get_wifname(1), 1);
-#endif
-#endif
-#if defined (RTCONFIG_WLMODULE_MT7615E_AP)
-		doSystem("iwpriv %s set LanNatSpeedUpEn=%d", get_wifname(0), 1);
-#ifdef RTCONFIG_HAS_5G
-		doSystem("iwpriv %s set LanNatSpeedUpEn=%d", get_wifname(1), 1);
-#endif
-#endif
+		unregister_hnat_wlifaces();
+		modprobe_r(MTK_HNAT_MOD);
+		modprobe(MTK_HNAT_MOD);
+		register_hnat_wlifaces();
 		stop_wanduck();
 		stop_udhcpc(-1);
 		return 0;
@@ -3858,10 +3874,16 @@ int asus_ate_command(const char *command, const char *value, const char *value2)
 	}
 #endif
 	else if (!strcmp(command, "Get_ModelDesc")) {
-		if (rt_modeldesc && strlen(rt_modeldesc))
-			puts(rt_modeldesc);
-		else
-			puts("NONE");
+		char ispctrl_desc[128];
+		snprintf(ispctrl_desc, sizeof(ispctrl_desc), "%s", nvram_safe_get("ispctrl_desc"));
+		if (strlen(ispctrl_desc))
+			puts(ispctrl_desc);
+		else {
+			if (rt_modeldesc && strlen(rt_modeldesc))
+				puts(rt_modeldesc);
+			else
+				puts("NONE");
+		}
 		return 0;
 	}
 #if defined(RTCONFIG_ASUSCTRL) && (defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK))

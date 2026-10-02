@@ -14,7 +14,9 @@
 <link rel="stylesheet" type="text/css" href="form_style.css">
 <link rel="stylesheet" type="text/css" href="usp_style.css">
 <link rel="stylesheet" type="text/css" href="pwdmeter.css">
-<link href="other.css"  rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="other.css">
+<link rel="stylesheet" type="text/css" href="css/confirm_block.css">
+<script type="text/javascript" src="/js/confirm_block.js"></script>
 <script type="text/javascript" src="/js/jquery.js"></script>
 <script type="text/javascript" src="/js/httpApi.js"></script>
 <script type="text/javascript" src="/state.js"></script>
@@ -72,6 +74,7 @@ var wl_wpa_psk_org = decodeURIComponent("<% nvram_char_to_ascii("WLANConfig11b",
 var faq_href1 = "https://nw-dlcdnet.asus.com/support/forward.html?model=&type=Faq&lang="+ui_lang+"&kw=&num=150";
 var faq_href2 = "https://nw-dlcdnet.asus.com/support/forward.html?model=&type=Faq&lang="+ui_lang+"&kw=&num=151";
 var faq_href3 = "https://nw-dlcdnet.asus.com/support/forward.html?model=&type=Faq&lang="+ui_lang+"&kw=&num=149";
+var faq_href_hide_ssid = "https://nw-dlcdnet.asus.com/support/forward.html?model=&type=Faq&lang="+ui_lang+"&kw=&num=162";
 
 function initial(){
 	show_menu();
@@ -654,6 +657,8 @@ function detect_qtn_ready(){
 }
 
 function applyRule(){
+	var confirm_flag = 0;
+	var confirm_content = "";
 	var auth_mode = document.form.wl_auth_mode_x.value;
 	var auth_mode_ori = '<% nvram_get("wl_auth_mode_x"); %>';
 	
@@ -683,22 +688,25 @@ function applyRule(){
 			var radio_value = (document.form.wl_closed[0].checked) ? 1 : 0;
 			if(document.form.wps_enable.value == 1) {
 				if(radio_value) {
-					if(!AiMesh_confirm_msg("Wireless_Hide_WPS", radio_value))
-						return false;
-					document.form.wps_enable.value = "0";
+					//if(!AiMesh_confirm_msg("Wireless_Hide_WPS", radio_value))
+						//return false;
+					confirm_flag=7;
+					confirm_content="<#AiMesh_confirm_msg7#>";
 				}
 			}
 			else {
-				if(!AiMesh_confirm_msg("Wireless_Hide", radio_value))
-					return false;
+				if(radio_value) {
+					//if(!AiMesh_confirm_msg("Wireless_Hide", radio_value))
+						//return false;
+					confirm_flag=6;
+					confirm_content="<#AiMesh_confirm_msg6#>";
+				}
 			}
 		}
 		else {
 			if(document.form.wl_closed[0].checked && document.form.wps_enable.value == 1 && (isSwMode("rt") || isSwMode("ap"))){
-				if(confirm("<#wireless_JS_Hide_SSID#>"))
-					document.form.wps_enable.value = "0";
-				else
-					return false;
+				confirm_flag=1;
+				confirm_content="<#wireless_JS_Hide_SSID#>";
 			}
 		}
 	
@@ -728,11 +736,6 @@ function applyRule(){
 
 		if(bw_160_support){
 			document.form.wl_bw_160.value = $("#enable_160mhz").prop("checked") ? 1 : 0;
-		}
-
-		showLoading();
-		if(based_modelid == "RT-AC87U" && wl_unit == "1"){
-			stopFlag = '0';
 		}
 			
 		document.form.wps_config_state.value = "1";		
@@ -987,13 +990,62 @@ function applyRule(){
 					document.form.acs_band3.value = "0";
 				}
 			}
-		}
-		
-		if (based_modelid == "RT-AC87U" && wl_unit == "1"){
-			detect_qtn_ready();
+		}	
+
+		if(confirm_flag==1 || confirm_flag==7 || confirm_flag==6){
+			if($(".confirm_block").length > 0){
+				$(".confirm_block").remove();
+			}
+			$("#Loading").css('visibility', 'visible');
+			$("#loadingBlock").css('visibility', 'hidden');
+
+			confirm_asus({
+						title: "<#WLANConfig11b_x_BlockBCSSID_itemname#>",
+						contentA: confirm_content+"<br><br><#AiMesh_confirm_msg13#> <#AiMesh_confirm_msg0#>",
+						contentC: "",
+						left_button: "<#CTL_ok#>",
+						left_button_callback: function(){
+							if(confirm_flag==1 || confirm_flag==7){
+								document.form.wps_enable.value = "0";
+							}
+							confirm_cancel();
+							$("#loadingBlock").css('visibility', 'visible');
+							showLoading();
+							if (based_modelid == "RT-AC87U" && wl_unit == "1"){
+								stopFlag = '0';
+								detect_qtn_ready();
+							}
+							else{
+								document.form.submit();
+							}
+						},
+						left_button_args: {},
+						right_button: "<#CTL_Cancel#>",
+						right_button_callback: function(){
+							confirm_cancel();
+							$("#Loading").css('visibility', 'hidden');
+							return false;
+						},
+						right_button_args: {},
+						iframe: "",
+						margin: "100px 0px 0px 25px",
+						note_display_flag: 0
+			});
+			$(".confirm_block").css( "zIndex", 10001 );
+			$("#ssid_hide_faq").attr('target', '_blank')
+							.attr('style', 'color:#FC0;text-decoration:underline;')
+							.attr("href", faq_href_hide_ssid);
+
 		}
 		else{
-			document.form.submit();
+			showLoading();
+			if (based_modelid == "RT-AC87U" && wl_unit == "1"){
+				stopFlag = '0';
+				detect_qtn_ready();
+			}
+			else{
+				document.form.submit();
+			}
 		}
 	}
 } 

@@ -155,6 +155,15 @@ function initial(){
 				sec_if = "10G base-T";
 			else if(sec_if == "SFP+")
 				sec_if = "10G SFP+";
+		} else if (based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000") {
+			if (pri_if == "WAN")
+				pri_if = "2.5G WAN";
+			if (sec_if == "WAN")
+				sec_if = "2.5G WAN";
+			if (pri_if == "LAN5")
+				pri_if = "2.5G LAN";
+			if (sec_if == "LAN5")
+				sec_if = "2.5G LAN";
 		}
 
 		if(sec_if != 'NONE'){
@@ -369,6 +378,26 @@ function loadBalance_form(lb_unit){
 	if(gobi_support){
 		pri_if = (pri_if == "USB")? "<#Mobile_title#>" : pri_if;
 		sec_if = (sec_if == "USB")? "<#Mobile_title#>": sec_if;
+	}
+
+	if(based_modelid == "GT-AXY16000" || based_modelid == "RT-AX89U"){
+		if(pri_if == "WAN2")
+			pri_if = "10G base-T";
+		else if(pri_if == "SFP+")
+			pri_if = "10G SFP+";
+		if(sec_if == "WAN2")
+			sec_if = "10G base-T";
+		else if(sec_if == "SFP+")
+			sec_if = "10G SFP+";
+	} else if (based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000") {
+		if (pri_if == "WAN")
+			pri_if = "2.5G WAN";
+		if (sec_if == "WAN")
+			sec_if = "2.5G WAN";
+		if (pri_if == "LAN5")
+			pri_if = "2.5G LAN";
+		if (sec_if == "LAN5")
+			sec_if = "2.5G LAN";
 	}
 
 	if(lb_unit == 0){

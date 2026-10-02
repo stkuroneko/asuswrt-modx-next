@@ -8,6 +8,7 @@
 #include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <net/if.h>
+#include <ctype.h>
 
 int bit_count(in_addr_t i)
 {
@@ -213,7 +214,7 @@ int validate_number(char *str)
 int validate_ip(char *ip)
 {
 	//check whether the IP is valid or not
-	int i, num, dots = 0;
+	int num, dots = 0;
 	char *ptr;
 	char buf[16] = {0};
 

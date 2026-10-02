@@ -2973,7 +2973,6 @@ define RouterOptions
 		echo "RTCONFIG_ISP_OPTUS=y" >>$(1); \
 		sed -i "/RTCONFIG_TR143_110/d" $(1); \
 		echo "RTCONFIG_TR143_110=y" >>$(1); \
-		sed -i "/RTCONFIG_DART/d" $(1);\
 		sed -i "/RTCONFIG_ACS_SUBNET/d" $(1);\
 		echo "RTCONFIG_ACS_SUBNET=y">>$(1);\
 	fi; \
@@ -3536,15 +3535,20 @@ define RouterOptions
 		else \
 			echo "# RTCONFIG_FRONTHAUL_DBG is not set" >>$(1); \
 		fi; \
-		if [ "$(AMAS_QCA_WDS)" = "y" ]; then \
-			echo "RTCONFIG_AMAS_QCA_WDS=y" >>$(1); \
+		if [ "$(AMAS_WDS)" = "y" ]; then \
+			echo "RTCONFIG_AMAS_WDS=y" >>$(1); \
 		else \
-			echo "# RTCONFIG_AMAS_QCA_WDS is not set" >>$(1); \
+			echo "# RTCONFIG_AMAS_WDS is not set" >>$(1); \
 		fi; \
 		if [ "$(AMAS_MTK_EZWDS)" = "y" ]; then \
 			echo "RTCONFIG_AMAS_MTK_EZWDS=y" >>$(1); \
 		else \
 			echo "# RTCONFIG_AMAS_MTK_EZWDS is not set" >>$(1); \
+		fi; \
+		if [ "$(MTK_BSD)" = "y" ]; then \
+			echo "RTCONFIG_MTK_BSD=y" >>$(1); \
+		else \
+			echo "# RTCONFIG_MTK_BSD is not set" >>$(1); \
 		fi; \
 		if [ "$(BH_SWITCH_ETH_FIRST)" = "y" ]; then \
 			echo "RTCONFIG_BH_SWITCH_ETH_FIRST=y" >>$(1); \
@@ -4204,6 +4208,15 @@ define BusyboxOptions
 		echo "# CONFIG_TFTP_DEBUG is not set" >>$(1); \
 		sed -i "/CONFIG_TELNET\b/d" $(1); \
 		echo "CONFIG_TELNET=y" >>$(1); \
+	fi; \
+	if [ "$(MUSL_LIBC)" = "y" ] || [ "$(MUSL32)" = "y" ] || [ "$(MUSL64)" = "y" ] ; then \
+		sed -i "/CONFIG_NSLOOKUP=y/d" $(1); \
+		echo "# CONFIG_NSLOOKUP is not set" >>$(1); \
+	else \
+		sed -i "/CONFIG_NSLOOKUP_LEDE=y/d" $(1); \
+		echo "# CONFIG_NSLOOKUP_LEDE is not set" >>$(1); \
+		sed -i "/CONFIG_FEATURE_NSLOOKUP_LEDE_LONG_OPTIONS=y/d" $(1); \
+		echo "# CONFIG_FEATURE_NSLOOKUP_LEDE_LONG_OPTIONS is not set" >>$(1); \
 	fi; \
 	if [ "$(SLIM)" = "y" ]; then \
 		sed -i "/CONFIG_AWK/d" $(1); \
@@ -6003,6 +6016,12 @@ endif
 	$(MAKE) -C router $@
 
 gen_prebuilt:
+ifeq ($(CONFIG_RALINK),y)
+	if grep -q "CONFIG_CHIP_MT7915=y" $(LINUXDIR)/.config ; then \
+		sed -i 's/CONFIG_MT_WIFI=y/CONFIG_MT_WIFI=m/g' $(LINUXDIR)/.config; \
+		$(MAKE) -C $(LINUXDIR) modules CC=$(KERNELCC) LD=$(KERNELLD); \
+	fi
+endif
 	-mkdir -p $(PBDIR)
 	$(MAKE) -f upb.mak PBDIR=${PBDIR}
 	@if [ -f .gpl_excludes_router ]; then cp -f .gpl_excludes_router ${PBDIR}/release/.; fi

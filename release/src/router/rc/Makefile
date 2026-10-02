@@ -43,9 +43,6 @@ export CFLAGS += -DRTL_WTDOG
 endif
 else ifeq ($(RTCONFIG_RALINK),y)
 CFLAGS += -I$(TOP)/shared/sysdeps/ralink -I$(TOP)/wireless_tools$(WTOOL_SUFFIX)
-ifeq ($(RTCONFIG_MT798X),y)
-CFLAGS += -I$(KERNEL_HEADER_DIR)
-endif
 ifneq ($(findstring MAC_REPEATER=, $(shell cat $(LINUXDIR)/.config)),)
 export CFLAGS += -DMAC_REPEATER
 endif
@@ -224,6 +221,10 @@ CFLAGS  += -I$(TOP)/sqlite
 CFLAGS  += -I$(TOP)/nt_center/lib
 CFLAGS  += -I$(TOP)/nt_center/actMail
 CFLAGS  += -DASUSWRT_SDK
+endif
+
+ifeq ($(RTCONFIG_ASD),y)
+CFLAGS  += -I$(TOP)/asd
 endif
 
 ifeq ($(RTCONFIG_PROTECTION_SERVER),y)
@@ -895,7 +896,7 @@ ifeq ($(RTCONFIG_CONNDIAG),y)
 ifeq ($(RTCONFIG_BCMBSD),y)
 CFLAGS += -I$(TOP)/bsd
 endif
-ifeq ($(or $(RTCONFIG_LANTIQ),$(RTAC59_CD6R),$(RTAC59_CD6N)),y)
+ifeq ($(or $(RTCONFIG_LANTIQ),$(RTAC59_CD6R),$(RTAC59_CD6N),$(TUFAX4200),$(TUFAX6000),$(RTAX59U)),y)
 CFLAGS += -fPIC
 endif
 ifeq ($(RTCONFIG_HND_ROUTER_AX),y)
@@ -913,6 +914,8 @@ else ifeq ($(RTCONFIG_LANTIQ),y)
 OBJS += conn_diag-lantiq.o
 else ifeq ($(RTCONFIG_QCA),y)
 OBJS += conn_diag-qca.o
+else ifeq ($(RTCONFIG_RALINK),y)
+OBJS += conn_diag-ralink.o
 endif
 DIAG_OBJS += conn_diag-sql.o
 endif
@@ -1470,6 +1473,16 @@ endif
 
 ifeq ($(RTCONFIG_ISP_CUSTOMIZE_TOOL),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc tci
+	@rm -rf $(INSTALLDIR)/../rom/${EX_ROM}/ict/
+	@if [ -f $(TOP)/rom/ict/settings.ini ] ; then \
+		install -D $(TOP)/rom/ict/settings.ini $(INSTALLDIR)/../rom/${EX_ROM}/ict/settings.ini ; \
+	fi;
+	@if [ -f $(TOP)/rom/ict/settings.cfg ] ; then \
+		install -D $(TOP)/rom/ict/settings.cfg $(INSTALLDIR)/../rom/${EX_ROM}/ict/settings.cfg ; \
+	fi;
+	@if [ -f $(TOP)/rom/ict/package.tar.gz ] ; then \
+		install -D $(TOP)/rom/ict/package.tar.gz $(INSTALLDIR)/../rom/${EX_ROM}/ict/package.tar.gz ; \
+	fi;
 endif
 
 clean:

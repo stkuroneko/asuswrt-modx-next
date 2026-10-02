@@ -103,6 +103,7 @@ ASUS_eula_desc1_4=Bunun yanı sıra, ASUS, ürününüz aracılığıyla IFTTT�
 ASUS_eula_desc2=ASUS, gizliliğinizi korumaya ve gizliliğinize saygı göstermeye kendini adar. Ürün bilgilerinizi ASUS ile paylaşmayı istediğiniz zaman etkinleştirmek/devre dışı bırakmak için Advanced Settings (Gelişmiş Ayarlar) > Administration (Yönetim) > Privacy (Gizlilik) kısmını ziyaret edebilirsiniz. ASUS\'un gizliliğinizi nasıl koruduğu konusunda daha fazla bilgi almak için lütfen <a id="eula_url" style="font-weight: bolder;text-decoration:underline;cursor:pointer;" target="_blank">ASUS Gizlilik İlkesi</a> kısmını ziyaret edin.
 ASUS_eula_age=16 yaşından büyüğüm.
 ASUS_eula_age_confirm=Lütfen 16 yaşından büyük olduğunuzu onaylayın.
+ASUS_eula_use_confirm=ASUS Kullanım Koşulları onaylayın.
 ASUS_eula_withdraw0=%1$@ ve Uzak bağlantı (ASUS Yönlendirici Uygulaması/Lyra Uygulaması/AiCloud/AiDisk) için:
 ASUS_eula_withdraw_desc1=Lütfen ürününüzün model adını, aygıt yazılımı sürümünü, Internet durumunu, IP Adresini, MAC Adresini ve DDNS adını da içeren bilgilerinizin ASUS tarafından yukarıdaki işlevler aracılığıyla toplanacağını unutmayın.
 ASUS_eula_withdraw_desc1_2=Bilgilerinizi yukarıdaki işlevler aracılığıyla ASUS ile paylaşmayı devre dışı bırakmak isterseniz lütfen aşağıdaki <span style="font-weight: bold;">[(Vazgeç]</span> öğesine tıklayın. Ancak, bilgilerinizi ASUS ile paylaşmaya son verirseniz bu tür özelliklerin/işlevlerin çalışmayabileceğini lütfen unutmayın.
@@ -246,7 +247,7 @@ FIRM_fail_desc=Donanım yazılımı yükseltme işlemi başarısız. Yanlış g�
 FIRM_ok_desc=Donanım yazılımı yükseltiliyor. Lütfen 3 dakika kadar bekleyin.
 FIRM_ok_aimesh=Yazılım güncellemeniz bitti. Bu pencereyi kapatın ve AiMesh yönlendiricinize tekrar erişin.
 FIRM_reboot_manually=Aygıt yazılımı yükseltmesi tamamlandı. Lütfen ZVMODELVZ maneül olarak yeniden başlatın.
-FIRM_trx_valid_fail_desc=To comply with regulatory amendments, we have modified our certification rule to ensure better firmware quality. This version is not compatible with all previously released ASUS firmware and uncertified third party firmware. Please check our official websites for the certified firmware.
+FIRM_trx_valid_fail_desc=To comply with regulatory amendments, we have modified our certificate rule to ensure better firmware quality. This version is not compatible with all previously released ASUS firmware and uncertified third party firmware. Please check our official websites for the certified firmware.
 Five_attempts_logout_hint=5 kez yanlış parola girdiniz. Oturumunuz kapatılacak.
 footer_copyright_desc=2022 ASUSTeK Computer Inc. Tüm hakları saklıdır.
 FW_n1=Yapılandırma parametreleri, ürün yazılımı güncelleme işlemi sırasında ayarlarını koruyacaktır.
@@ -1081,13 +1082,14 @@ AiMesh_confirm_msg_ChangeSSID=SSID'nizi değiştirirseniz, AiMesh düğümünüz
 AiMesh_confirm_msg_ChangeKey=WPA Ön Paylaşımlı Anahtarınızı değiştirirseniz, AiMesh düğümünüzün WiFi bağlantısı etkilenecektir.
 AiMesh_confirm_msg_CountryCode=Ülke kodunuzu değiştirmek AiMesh sisteminizi etkileyebilir.
 AiMesh_confirm_msg5=Radyo işlevselliğini devre dışı bırakırsanız, AiMesh yönlendiricinizin WiFi bağlantısı etkilenir.
-AiMesh_confirm_msg6=SSID'nizi gizlerseniz AiMesh yönlendiricinizin WiFi bağlantısı etkilenir.
+AiMesh_confirm_msg6=Gizli SSID, Wi-Fi ağınızı güvenli hale getirmeye yardımcı olmaz ve bazı bağlantı sorunlarına yol açabilir.
 AiMesh_confirm_msg7=SSID'nizi gizlerseniz, WPS işlevi devre dışı bırakılır ve AiMesh yönlendiricinizin WiFi bağlantısı etkilenir.
 AiMesh_confirm_msg8=DHCP Sunucusunu devre dışı bırakırsanız, AiMesh yönlendiricinizin WiFi bağlantısı etkilenir.
 AiMesh_confirm_msg9=AiMesh sistemi ve son cihazların uyumu göz önüne alındığında, WPA2-Kişisel kullanmanızı öneriyoruz. #AUTHMODE moduna geçmek istiyor musunuz?\n*Bağlantı sorunları yaşarsanız, lütfen WPA2-Kişisel’e geçin veya daha fazla bilgi almak için üreticiyle/üreticilerle kontrol edin.
 AiMesh_confirm_msg10=AiMesh sisteminiz ve son cihaz(lar) arasında bağlantıyı sağlamak için WPA3-Kişisel’e geçmeden önce lütfen bu <a id="wpa3FaqLink">SSS</a> kısmını okuyun.
 AiMesh_confirm_msg11=Şu anda WPA3-kişisel kullanıyorsunuz. Bir AiMesh sistemi oluşturmak için kimlik doğrulama yönteminiz WPA2/WPA3-kişisel olarak değiştirilecektir. İlerlemek istiyor musunuz?
 AiMesh_confirm_msg12=You can read this <a id='wpa3FaqLink'>FAQ</a> for more information.
+AiMesh_confirm_msg13=Daha fazla ayrıntı için, lütfen <a style='font-weight: bolder;text-decoration: underline;color:#000000;' href='' target='_blank'>bu SSS</a> adresini ziyaret edin
 AiMesh_Feature_Desc=Gelişmiş ASUS AiMesh, birden fazla ASUS yönlendiricinin birbirine bağlanmasıyla tüm ev WiFi ağı oluşturmayı sağlayan yenilikçi bir yeni yönlendirici özelliğidir.
 AiMesh_FAQ=ASUS AiMesh konusunda daha fazla bilgi edinin
 AiMesh_FindNode=AiMesh düğümü bul
@@ -3442,6 +3444,7 @@ TZ17=Atlantik Zamanı (Kanada)
 TZ18=La Paz
 TZ18_1=Caracas
 TZ19=Santiago
+TZ19_1=Asunción
 TZ20=Newfoundland
 TZ21=Brasilia
 TZ22=Buenos Aires, Georgetown
@@ -3534,10 +3537,10 @@ Uplink_rate=Gönderilen Veri/Sn.
 Uplink_traffic=Gönderilen Veri
 upnp_Desc=iTunes ve UPnP Medya sunucusunu ayarlayın.
 [###MODEL_DEP###][RT-AC1200G+][RT-AC1200G][RT-AC82U]upnp_Desc=UPnP Medya sunucusunu ayarlayın.
-UPnPMediaServer_Help=ZVMODELVZ, UPnP standartlarını desteklemektedir. Etkinleştirebilir ve PS3 veya dijital medya oynatıcı gibi diğer UPnP aygıtlarının USB diskteki multimedya dosyalarına erişmelerine izin verebilirsiniz.
-[###MODEL_DEP###][RT-AC1200][RT-N600]UPnPMediaServer_Help=ZVMODELVZ, UPnP standartlarını desteklemektedir. Etkinleştirebilir ve PS3 veya dijital medya oynatıcı gibi diğer UPnP aygıtlarının USB diskteki multimedya dosyalarına erişmelerine izin verebilirsiniz.
-[###MODEL_DEP###][RT-AC1200G][RT-AC82U]UPnPMediaServer_Help=ZVMODELVZ, UPnP standartlarını desteklemektedir. Etkinleştirebilir ve PS3 veya dijital medya oynatıcı gibi diğer UPnP aygıtlarının USB diskteki multimedya dosyalarına erişmelerine izin verebilirsiniz.
-[###MODEL_DEP###][AC2900]UPnPMediaServer_Help=ZVMODELVZ, UPnP standartlarını desteklemektedir. Etkinleştirebilir ve PS3 veya dijital medya oynatıcı gibi diğer UPnP aygıtlarının USB diskteki multimedya dosyalarına erişmelerine izin verebilirsiniz.
+UPnPMediaServer_Help=<a id='upnp_link'>UPnP, iTunes</a>, <a id='ftp_link'>FTP</a> ve <a id='samba_link'>Ağ Bağlantısını (Samba)</a> ayarlayın.
+[###MODEL_DEP###][RT-AC1200][RT-N600]UPnPMediaServer_Help=<a id='upnp_link'>UPnP, iTunes</a> ve <a id='samba_link'>Ağ Bağlantısını (Samba)</a> ayarlayın.
+[###MODEL_DEP###][RT-AC1200G][RT-AC82U]UPnPMediaServer_Help=<a id='upnp_link'>UPnP</a>, <a id='ftp_link'>FTP</a> ve <a id='samba_link'>Ağ Bağlantısını (Samba)</a> ayarlayın.
+[###MODEL_DEP###][AC2900]UPnPMediaServer_Help=<a id='upnp_link'>UPnP</a> ve <a id='samba_link'>Ağ Bağlantısını (Samba)</a> ayarlayın.
 url_keyword_alert=URL anahtar kelime
 USB_Application_check=Lütfen USB Uygulamasını kontrol edin
 USB_Application_disk_checking=Disk kontrol ediliyor
@@ -3626,7 +3629,7 @@ vpn_network_place=Ağ Yerleştirme (Samba) Desteği
 vpn_openvpn_AdvDNS=DNS’yi istemcilere tanıt
 vpn_openvpn_Auth=Yetkilendirme Modu
 vpn_openvpn_AuthOnly=Yalnızca Kullanıcı Adı / Şifre Yetkl.
-vpn_openvpn_AuthOnly_hint=Authorization Mode fixes on TLS
+vpn_openvpn_AuthOnly_hint=Authentication Mode fixes on TLS
 vpn_openvpn_AuthHMAC=Ek HMAC yetkilendirme
 vpn_openvpn_ExtraHMAC=Ek HMAC yetkilendirme
 vpn_openvpn_ClientMutual=İstemci <-> İstemci İzin Ver

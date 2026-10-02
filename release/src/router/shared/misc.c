@@ -19,9 +19,9 @@
 #include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <sys/sysinfo.h>
+#include <time.h>
 #if defined(HND_ROUTER) || defined(RTACRH18) || defined(RT4GAC86U)
 #include <limits.h>
-#include <time.h>
 #elif !defined (__GLIBC__) && !defined(__UCLIBC__)
 #include <limits.h>		//PATH_MAX, LONG_MIN, LONG_MAX
 #endif
@@ -1985,11 +1985,19 @@ const char *getifaddr(const char *ifname, int family, int flags)
 	return _getifaddr(ifname, family, flags, buf, sizeof(buf));
 }
 
+/**
+ *  1: interface exist and up
+ *  0: interface exist and down
+ * -1: interface not exist, NULL or empty
+ */
 int is_intf_up(const char* ifname)
 {
 	struct ifreq ifr;
 	int sfd;
 	int ret = 0;
+
+	if (!ifname || !strlen(ifname))
+		return -1;
 
 	if (!((sfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW)) < 0))
 	{
@@ -2723,7 +2731,7 @@ unsigned int netdev_calc(char *ifname, char *ifname_desc, unsigned long long *rx
 			return 0;
 	}
 
-#if defined(RTCONFIG_QCA)
+#if defined(RTCONFIG_QCA) || defined(RTCONFIG_SWITCH_MT7986_MT7531)
 #if defined(RTCONFIG_SWITCH_RTL8370M_PHY_QCA8033_X2) || \
     defined(RTCONFIG_SWITCH_RTL8370MB_PHY_QCA8033_X2)
 	/* Handle LAN aggregation interfaces.
@@ -2764,7 +2772,8 @@ unsigned int netdev_calc(char *ifname, char *ifname_desc, unsigned long long *rx
 	if (nvram_match("lacp_enabled", "1")) {
 		int b;
 		const char *q;
-#if defined(RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033)
+#if defined(RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033) \
+ || defined(RTCONFIG_SWITCH_MT7986_MT7531)
 		uint32_t m = BS_LAN1_PORT_MASK | BS_LAN2_PORT_MASK;
 #else
 #error	FIXME
@@ -2802,7 +2811,7 @@ unsigned int netdev_calc(char *ifname, char *ifname_desc, unsigned long long *rx
 		}
 	}
 #endif
-#endif
+#endif	/* RTCONFIG_QCA || RTCONFIG_SWITCH_MT7986_MT7531 */
 
 	// find in LAN interface
 	if (find_word(nv_lan_ifnames, ifname))
@@ -5852,7 +5861,7 @@ void update_wlx_psr_mbss(void)
 
 	for (unit=0; unit<num_of_wl_if(); unit++) {
 		wlx_psr_mbss = 0;
-		for (subunit=2; subunit<num_of_mssid_support(unit); subunit++) {
+		for (subunit=2; subunit<=num_of_mssid_support(unit); subunit++) {
 			memset(nv, 0, sizeof(nv));
 			snprintf(nv, sizeof(nv), "wl%d.%d_bss_enabled", unit, subunit);
 			if (nvram_get_int(nv) == 1) {
@@ -5932,4 +5941,69 @@ unsigned short get_extend_cap()
 		extend_cap |= __cpu_to_le16(EXTEND_CAP_ISPCTRL_LOGIN);
 
        return extend_cap;
+}
+
+void wl_vif_to_subnet(const char *ifname, char *net, int len)
+{
+	int i, found = 0;
+	char word[64];
+	char *next = NULL;
+	char nv[64];
+	char br_name[64];
+	char *br_ifnames = NULL;
+	char ipaddr[32], ipmask[32];
+
+ 	int fd;
+	struct ifreq ifr;
+	
+
+	if (!ifname || strlen(ifname) <= 0)
+		return;
+
+	if (!net || len <= 0)
+		return;
+
+	for (found=0, i=0; i<256; i++) {
+		memset(nv, 0, sizeof(nv));
+		snprintf(nv, sizeof(nv), "br%d_ifnames", i);
+		if ((br_ifnames = strdup(nvram_safe_get(nv)))) {
+			foreach (word, br_ifnames, next) {
+				if ((found = !strcmp(word, ifname)))
+					break;
+			}
+			
+			free(br_ifnames);
+		}
+
+		if (found)
+			break;
+	}
+
+	if (found) {
+		memset(nv, 0, sizeof(nv));
+		snprintf(nv, sizeof(nv), "br%d_ifname", i);
+		memset(br_name, 0, sizeof(br_name));
+		strlcpy(br_name, nvram_safe_get(nv), sizeof(br_name));
+
+		memset(&ifr, 0, sizeof(struct ifreq));
+		if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) >= 0) {
+			ifr.ifr_addr.sa_family = AF_INET;
+			strlcpy(ifr.ifr_name, br_name, IFNAMSIZ-1);
+
+			memset(ipaddr, 0, sizeof(ipaddr));
+			if (ioctl(fd, SIOCGIFADDR, &ifr) >= 0)
+				snprintf(ipaddr, sizeof(ipaddr)-1, "%s", inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
+
+			memset(ipmask, 0, sizeof(ipmask));
+			if (ioctl(fd, SIOCGIFNETMASK, &ifr) >= 0)
+				snprintf(ipmask, sizeof(ipmask)-1, "%s", inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
+
+			if (strlen(ipaddr)>0 && strlen(ipmask)>0)
+				snprintf(net, len, "%s/%s", ipaddr, ipmask);
+			close(fd);
+		}
+	}
+
+	return;
+
 }

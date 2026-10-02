@@ -10,10 +10,12 @@
 #include <errno.h>
 #include <endian.h>
 #include <dirent.h>
-#if defined(RTCONFIG_QCA)
+#if defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
 #include <net/ethernet.h>	//struct ethjdr
 #include <netinet/if_ether.h>	//struct ethhdr
 #include <netinet/ether.h>	//struct ether_addr
+#elif defined(RTCONFIG_RALINK)
+#include <net/ethernet.h>
 #endif
 #ifndef _LINUX_IF_H
 #include <net/if.h>
@@ -829,7 +831,7 @@ extern const char *getifaddr(const char *ifname, int family, int flags);
 extern long uptime(void);
 extern float uptime2(void);
 extern int _vstrsep(char *buf, const char *sep, ...);
-#if defined(RTCONFIG_QCA)
+#if defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
 extern char *wl_ether_etoa(const struct ether_addr *n);
 #endif
 extern void shortstr_encrypt(unsigned char *src, unsigned char *dst, unsigned char *shift);
@@ -1188,7 +1190,7 @@ enum led_id {
 	LED_BLUE,
 	LED_GREEN,
 	LED_RED,
-#if defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4) || defined(XD4S)
+#if defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4) || defined(XD4S) || defined(RTCONFIG_MT798X)
 	LED_WHITE,
 #endif
 #endif
@@ -2098,6 +2100,7 @@ extern int button_pressed(int which);
 void config_ext_wan_led(int onoff);
 #endif
 extern int led_control(int which, int mode);
+extern int __do_led_control(int which, int mode) __attribute__((weak));
 
 /* api-*.c */
 extern uint32_t gpio_dir(uint32_t gpio, int dir);
@@ -2181,6 +2184,7 @@ extern uint32_t get_phy_duplex(uint32_t portmask);
 extern uint64_t get_phy_mib(int port, char *type);
 extern uint32_t set_phy_ctrl(uint32_t portmask, int ctrl);
 #endif
+extern int set_wan_base_if(char *wan_ifaces);
 extern char *get_wan_base_if(void);
 extern char *__get_wan_base_if(char *wan_base_if) __attribute__((weak));
 extern void set_jumbo_frame(void) __attribute__((weak));
@@ -2202,9 +2206,15 @@ extern int get_sw_bridge_iptv_vid(void);
 extern int get_bonding_speed(char *bond_if);
 extern int get_bonding_port_status(int port);
 extern int __get_bonding_port_status(enum bs_port_id bs_port) __attribute__((weak));
+extern void force_gpy211_led_onoff(int port, int mode);
+extern void force_mt7531_led_onoff(int mode);
+extern void set_gpy211_led_onoff(int port, int mode);
+extern void set_mt7531_led_onoff(int mode);
 extern int wl_max_no_vifs(int unit);
 extern const char *bs_port_id_to_iface(enum bs_port_id bs_port);
 extern int set_netdev_sysfs_param(const char *iface, const char *param, const char *val);
+extern int set_wan_base_if(char *wan_ifaces);
+extern char *get_wan_base_if(void);
 extern char *get_lan_mac_name(void);
 extern char *get_wan_mac_name(void);
 extern char *get_2g_hwaddr(void);
@@ -2214,6 +2224,9 @@ extern char *get_wan_hwaddr(void);
 extern char *get_label_mac(void);
 extern void __wgn_sysdep_swtich_unset(int vid) __attribute__((weak));
 extern void __wgn_sysdep_swtich_set(int vid) __attribute__((weak));
+#if defined(RTCONFIG_FITFDT)
+extern int get_imageheader_size(void);
+#endif
 #if defined(RTCONFIG_QCA)
 extern void __gen_switch_log(char *fn) __attribute__((weak));
 extern char *__get_wlifname(int band, int subunit, char *buf);
@@ -2419,6 +2432,64 @@ static inline int rtconfig_amas(void) { return 0; }
 
 /* sysdeps/ralink/ *.c */
 #if defined(RTCONFIG_RALINK)
+#if defined(RTCONFIG_RALINK_MT7622) || defined(RTCONFIG_WLMODULE_MT7622_AP) \
+ || defined(RTCONFIG_RALINK_MT7629) || defined(RTCONFIG_WLMODULE_MT7629_AP) \
+ || defined (RTCONFIG_WLMODULE_MT7915D_AP) \
+ || defined(RTCONFIG_MT798X)
+#define MTK_HNAT_MOD "mtkhnat"
+static inline void __ctrl_hwnat(int ctrl)
+{
+	if (!module_loaded(MTK_HNAT_MOD))
+		return;
+	doSystem("echo %d > /sys/kernel/debug/hnat/hook_toggle", !!ctrl);
+}
+
+static inline void enable_hwnat(void) { __ctrl_hwnat(1); }
+static inline void disable_hwnat(void) { __ctrl_hwnat(0); }
+#else
+#define MTK_HNAT_MOD "hw_nat"
+static inline void enable_hwnat(void) { }
+static inline void disable_hwnat(void) { }
+#endif
+
+static inline int is_hwnat_loaded(void) { return module_loaded(MTK_HNAT_MOD); }
+
+#if defined (RTCONFIG_WLMODULE_MT7615E_AP)
+#if !defined(RTCONFIG_RALINK_MT7622)
+/* @ctrl: 0: unregister, 1: register */
+static inline void __register_hnat_wlifaces(int ctrl)
+{
+	int i, bands[] = { WL_2G_BAND
+#ifdef RTCONFIG_HAS_5G
+		, WL_5G_BAND
+#endif
+		, -1 };
+
+	for (i = 0; bands[i] >= 0; ++i)
+		doSystem("iwpriv %s set hw_nat_register=%d", get_wifname(i), ctrl);
+}
+#else	/* RTCONFIG_RALINK_MT7622 */
+/* @ctrl: 0: unregister, 1: register */
+static inline void __register_hnat_wlifaces(int ctrl)
+{
+	int i, bands[] = { WL_2G_BAND
+#ifdef RTCONFIG_HAS_5G
+		, WL_5G_BAND
+#endif
+		, -1 };
+
+	for (i = 0; bands[i] >= 0; ++i)
+		doSystem("iwpriv %s set LanNatSpeedUpEn=%d", get_wifname(0), ctrl);
+}
+#endif	/* !RTCONFIG_RALINK_MT7622 */
+
+static inline void register_hnat_wlifaces(void) { __register_hnat_wlifaces(1); }
+static inline void unregister_hnat_wlifaces(void) { __register_hnat_wlifaces(0); }
+#else	/* !RTCONFIG_WLMODULE_MT7615E_AP */
+static inline void register_hnat_wlifaces(void) { }
+static inline void unregister_hnat_wlifaces(void) { }
+#endif	/* RTCONFIG_WLMODULE_MT7615E_AP */
+
 extern char *__get_wlifname(int band, int subunit, char *buf);
 extern int rtkswitch_ioctl(int val, int val2);
 extern unsigned int rtkswitch_wanPort_phyStatus(int wan_unit);
@@ -2455,6 +2526,7 @@ extern int get_channel_info(const char *ifname, int *channel, int *bw, int *nctr
 extern char *get_wififname(int band);
 extern char *get_staifname(int band);
 extern int get_regular_class(const char* ifname);
+extern int check_trx(char *buf);
 
 #elif defined(RTCONFIG_QCA)
 extern int rtkswitch_ioctl(int val, int *val2);
@@ -2480,6 +2552,7 @@ extern int get_channel_list_via_driver(int unit, char *buffer, int len);
 extern int get_channel_list_via_country(int unit, const char *country_code, char *buffer, int len);
 extern unsigned int __rtkswitch_WanPort_phySpeed(int wan_unit);
 extern void ATE_port_status(phy_info_list *list);
+extern int check_trx(char *fname, char *buf);
 #elif defined(RTCONFIG_ALPINE)
 extern char *wl_vifname_qtn(int unit, int subunit);
 extern char *wif_to_vif(char *wif);
@@ -2763,6 +2836,11 @@ static inline int is_aqr_phy_exist(void)
 #endif
 }
 #endif	/* RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033 */
+#if defined(RTCONFIG_SWITCH_MT7986_MT7531)
+extern int is_2500m_lan_exist(void);
+#else
+static inline int is_2500m_lan_exist(void) { return 0; }
+#endif
 
 /* misc.c */
 extern char *get_unused_brif(unsigned int num, char *ret_buffer, size_t ret_buffer_size);
@@ -2994,6 +3072,7 @@ extern int is_valid_domainname(const char *name);
 extern char *get_ddns_hostname(void);
 extern int get_ispctrl();
 extern unsigned short get_extend_cap();
+extern void wl_vif_to_subnet(const char *ifname, char *net, int len);
 
 #ifdef RTCONFIG_TOR
 /* scripts.c */
@@ -3288,7 +3367,7 @@ extern void set_wifiled(int mode);
 #define RGBLED_AP_MODE_CONNECTED	RGBLED_YELLOW		/* unnecessary */
 #define RGBLED_ETH_BACKHAUL		RGBLED_GREEN
 #define RGBLED_WEAK_BACKHAUL		RGBLED_YELLOW		/* unnecessary */
-#elif defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4) || defined(ETJ) || defined(XD4S)
+#elif defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4) || defined(ETJ) || defined(XD4S) || defined(RTCONFIG_MT798X)
 #define RGBLED_BOOTING			RGBLED_GREEN_3ON3OFF
 #define RGBLED_DEFAULT_STANDBY		RGBLED_BLUE
 #define RGBLED_APPLY_EVENT		RGBLED_BOOTING
@@ -3387,7 +3466,7 @@ static inline int config_usbbus_bled(const char *led_gpio, char *bus_list)
 extern const char *vport_to_iface_name(unsigned int vport);
 extern unsigned int vportmask_to_rportmask(unsigned int vportmask);
 #else
-#if defined(RTCONFIG_SOC_IPQ60XX) || defined(RTCONFIG_SOC_IPQ50XX)
+#if defined(RTCONFIG_SOC_IPQ60XX) || defined(RTCONFIG_SOC_IPQ50XX) || defined(RTCONFIG_MT798X)
 extern const char *vport_to_iface_name(unsigned int vport);
 #else
 static inline const char *vport_to_iface_name(__attribute__ ((unused)) unsigned int vport) { return NULL; }
@@ -3954,4 +4033,5 @@ extern char *server6_table[][2];
 #endif
 #endif
 
+#define SAFE_FREE(x)	if(x) {free(x); x=NULL;}
 #endif	/* !__SHARED_H__ */

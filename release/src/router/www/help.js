@@ -210,7 +210,7 @@ function upated_sim_record(){ //delete the oldest record and save the current da
 var debug_end_time = parseInt("<% nvram_get("dslx_diag_end_uptime"); %>");
 var wans_mode = '<%nvram_get("wans_mode");%>';
 var wans_lanport = '<% nvram_get("wans_lanport"); %>';
-var orig_wnaports_bond = '<% nvram_get("wanports_bond"); %>';
+var orig_wanports_bond = '<% nvram_get("wanports_bond"); %>';
 
 function overHint(itemNum){
 	var statusmenu = "";
@@ -222,7 +222,7 @@ function overHint(itemNum){
 		statusmenu ="<span><#WANAggregation_help_WAN#></span>";
 	}
 	else if(itemNum == 102){
-		statusmenu ="<span><#WANAggregation_help_LAN#></span>".replace(/LAN-*\D* 4/, wanAggr_p2_name(orig_wnaports_bond));
+		statusmenu ="<span><#WANAggregation_help_LAN#></span>".replace(/LAN-*\D* 4/, wanAggr_p2_name(orig_wanports_bond));
 	}
 
 	if(itemNum == 50){
@@ -1064,7 +1064,7 @@ function openHint(hint_array_id, hint_show_id, flag){
 		statusmenu = "<div>";
 		statusmenu += "<#WANAggregation_help_desc#>";
 		statusmenu += "<ol>";
-		statusmenu += "<li><#WANAggregation_help_step1#></li>".replace("LAN 4", wanAggr_p2_name(orig_wnaports_bond));
+		statusmenu += "<li><#WANAggregation_help_step1#></li>".replace("LAN 4", wanAggr_p2_name(orig_wanports_bond));
 		statusmenu += "<li><#WANAggregation_help_step2#></li>";
 		statusmenu += "<li><#WANAggregation_help_step3#></li>";
 		statusmenu += "<li><#WANAggregation_help_step4#></li>";

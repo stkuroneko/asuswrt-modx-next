@@ -42,8 +42,10 @@
 #define ETH_DEVNAME	"eth0"
 #if defined(PANTHERA)
 #define NR_WANLAN_PORT	7
-#elif defined(TUFAX4200)
+#elif defined(TUFAX4200) || defined(TUFAX6000)
 #define NR_WANLAN_PORT	6
+#elif defined(RTAX59U)
+#define NR_WANLAN_PORT	4
 #else
 #define NR_WANLAN_PORT	5
 #endif
@@ -66,10 +68,15 @@ enum {
 	LAN2_PORT,
 	LAN1_PORT,
 	WAN_PORT,
-#elif defined(TUFAX4200)
+#elif defined(TUFAX4200) || defined(TUFAX6000)
 	LAN5_PORT=0,
 	LAN4_PORT,
 	LAN3_PORT,
+	LAN2_PORT,
+	LAN1_PORT,
+	WAN_PORT,
+#elif defined(RTAX59U)
+	LAN3_PORT=0,
 	LAN2_PORT,
 	LAN1_PORT,
 	WAN_PORT,
@@ -84,7 +91,11 @@ enum {
 };
 
 static const char *upstream_iptv_ifaces[16] = {
+#if defined(RTAX59U)
+	[WANS_DUALWAN_IF_WAN] = "wan",
+#else
 	[WANS_DUALWAN_IF_WAN] = "eth1",
+#endif
 };
 
 /* 0:WAN, 1:LAN first index is switch_stb_x nvram variable.
@@ -102,7 +113,7 @@ static const int lan_wan_partition[9][NR_WANLAN_PORT] = {
 	{0,0,1,1,1,1,0}, // IPTV STB port = LAN1 & LAN2
 	{1,1,0,0,1,1,0}, // IPTV STB port = LAN3 & LAN4
 	{1,1,1,1,1,1,1}  // ALL
-#elif defined(TUFAX4200)
+#elif defined(TUFAX4200) || defined(TUFAX6000)
 	/* L1, L2, L3, L4, 2.5G LAN, W1G */
 	{1,1,1,1,1,0}, // Normal
 	{0,1,1,1,1,0}, // IPTV STB port = LAN1
@@ -112,6 +123,15 @@ static const int lan_wan_partition[9][NR_WANLAN_PORT] = {
 	{0,0,1,1,1,0}, // IPTV STB port = LAN1 & LAN2
 	{1,1,0,0,1,0}, // IPTV STB port = LAN3 & LAN4
 	{1,1,1,1,1,1}  // ALL
+#elif defined(RTAX59U)
+	/* L1, L2, L3, W1G */
+	{1,1,1,0}, // Normal
+	{0,1,1,0}, // IPTV STB port = LAN1
+	{1,0,1,0}, // IPTV STB port = LAN2
+	{1,1,0,0}, // IPTV STB port = LAN3
+	{0,0,1,0}, // IPTV STB port = LAN1 & LAN2
+	{1,0,0,0}, // IPTV STB port = LAN2 & LAN3
+	{1,1,1,1}  // ALL
 #else /* PANTHERB */
 	/* L1, L2, L3, L4, W1G */
 	{1,1,1,1,0}, // Normal
@@ -132,10 +152,13 @@ static const int lan_wan_partition[9][NR_WANLAN_PORT] = {
  * 			e.g. LAN1_PORT ~ LAN6_PORT, WAN_PORT, etc.
  */
 static const int bsport_to_vport[MAX_WANLAN_PORT] = {
-	WAN_PORT, LAN1_PORT, LAN2_PORT, LAN3_PORT, LAN4_PORT
+	WAN_PORT, LAN1_PORT, LAN2_PORT, LAN3_PORT
+#if !defined(RTAX59U)
+	, LAN4_PORT
+#endif
 #if defined(PANTHERA)
 	, LAN5_PORT, LAN6_PORT
-#elif defined(TUFAX4200)
+#elif defined(TUFAX4200) || defined(TUFAX6000)
 	, LAN5_PORT
 #endif
 };
@@ -153,6 +176,10 @@ static const int vport_to_phy_addr[MAX_WANLAN_PORT] = {
 	4, 3, 2, 1, 0, 5, 6				/* LAN6~1, WAN */
 #elif defined(TUFAX4200)
 	5, 4, 3, 2, 1, 6				/* LAN5~1, WAN */
+#elif defined(TUFAX6000)
+	5, 1, 2, 3, 4, 6				/* LAN5~1, WAN */
+#elif defined(RTAX59U)
+	4, 3, 2, 1					/* LAN3~1, WAN */
 #else /* PANTHERB */
 	0, 1, 2, 3, 4					/* LAN4~1, WAN */
 #endif
@@ -172,12 +199,18 @@ static const int vport_to_phy_addr[MAX_WANLAN_PORT] = {
 static const char *vport_to_iface[MAX_WANLAN_PORT] = {
 #if defined(PANTHERA)
 	"lan4", "lan3", "lan2", "lan1", "lan0", "lan5",		/* LAN6~1 */
-#elif defined(TUFAX4200)
+#elif defined(TUFAX4200) || defined(TUFAX6000)
 	"lan5", "lan4", "lan3", "lan2", "lan1",			/* LAN5~1 */
+#elif defined(RTAX59U)
+	"lan3", "lan2", "lan1",					/* LAN3~1 */
 #else /* PANTHERB */
 	"lan0", "lan1", "lan2", "lan3",				/* LAN4~1 */
 #endif
+#if defined(RTAX59U)
+	"wan"							/* WAN */
+#else
 	"eth1"							/* WAN */
+#endif
 };
 
 /* array index:		switch_stb_x nvram variable.
@@ -187,17 +220,25 @@ static const unsigned int stb_to_mask[7] = { 0,
 	(1U << LAN1_PORT),
 	(1U << LAN2_PORT),
 	(1U << LAN3_PORT),
+#if !defined(RTAX59U)
 	(1U << LAN4_PORT),
+#endif
 	(1U << LAN1_PORT) | (1U << LAN2_PORT),
+#if !defined(RTAX59U)
 	(1U << LAN3_PORT) | (1U << LAN4_PORT)
+#else
+	(1U << LAN2_PORT) | (1U << LAN3_PORT)
+#endif
 };
 
 /* ALL WAN/LAN virtual port bit-mask */
 static unsigned int wanlanports_mask =
 #if defined(PANTHERA)
 					(1U << WAN_PORT) | (1U << LAN1_PORT) | (1U << LAN2_PORT) | (1U << LAN3_PORT) | (1U << LAN4_PORT) | (1U << LAN5_PORT) | (1U << LAN6_PORT);
-#elif defined(TUFAX4200)
+#elif defined(TUFAX4200) || defined(TUFAX6000)
 					(1U << WAN_PORT) | (1U << LAN1_PORT) | (1U << LAN2_PORT) | (1U << LAN3_PORT) | (1U << LAN4_PORT) | (1U << LAN5_PORT);
+#elif defined(RTAX59U)
+					(1U << WAN_PORT) | (1U << LAN1_PORT) | (1U << LAN2_PORT) | (1U << LAN3_PORT);
 #else /* PANTHERB */
 					(1U << WAN_PORT) | (1U << LAN1_PORT) | (1U << LAN2_PORT) | (1U << LAN3_PORT) | (1U << LAN4_PORT);
 #endif
@@ -217,7 +258,9 @@ int esw_fd;
  * array value:	Model-specific virtual port number
  */
 static int n56u_to_model_port_mapping[] = {
+#if !defined(RTAX59U)
 	LAN4_PORT,	//0000 0000 0001 LAN4
+#endif
 	LAN3_PORT,	//0000 0000 0010 LAN3
 	LAN2_PORT,	//0000 0000 0100 LAN2
 	LAN1_PORT,	//0000 0000 1000 LAN1
@@ -234,11 +277,13 @@ const int lan_id_to_vport[NR_WANLAN_PORT] = {
 	LAN1_PORT,
 	LAN2_PORT,
 	LAN3_PORT,
+#if !defined(RTAX59U)
 	LAN4_PORT,
+#endif
 #if defined(PANTHERA)
 	LAN5_PORT,
 	LAN6_PORT,
-#elif defined(TUFAX4200)
+#elif defined(TUFAX4200) || defined(TUFAX6000)
 	LAN5_PORT,
 #endif
 	WAN_PORT,
@@ -283,6 +328,16 @@ static unsigned int get_lan_port_mask(void)
 		m = wanlanports_mask;
 
 	return m;
+}
+
+/* HwId A: Single 2.5G PHY, two WiFi LED.
+ * HwId B: Two 2.5G PHY, single WiFi LED.
+ */
+int is_2500m_lan_exist(void)
+{
+	if (!iface_exist("lan5") || nvram_match("HwId", "A"))
+		return 0;
+	return 1;
 }
 
 int switch_init(void)
@@ -475,12 +530,35 @@ int mt7986_mt7531_vlan_set(int vtype, char *upstream_if, int vid, int prio, unsi
 		return -1;
 	}
 
-	upstream_vport = iface_name_to_vport(upstream_if);
-	if (upstream_vport < 0 || upstream_vport >= MAX_WANLAN_PORT) {
-		dbg("%s: Can't find vport for upstream iface [%s]\n", __func__, upstream_if);
-		return -1;
+	if (bond_wan_enabled() && !strcmp(upstream_if, "bond1")) {
+		uint32_t wmask = nums_str_to_u32_mask(nvram_safe_get("wanports_bond"));
+		int b;
+		const char *p;
+
+		while ((b = ffs(wmask)) > 0) {
+			b--;
+			if ((p = bs_port_id_to_iface(b)) != NULL) {
+				upstream_vport = iface_name_to_vport(p);
+				if (upstream_vport < 0 || upstream_vport >= MAX_WANLAN_PORT) {
+					dbg("%s: Can't find vport for upstream iface [%s] of bond1\n", __func__, upstream_if);
+					return -1;
+				}
+				upstream_mask |= 1U << upstream_vport;
+			}
+			wmask &= ~(1U << b);
+		}
+		if (!iface_exist("bond1")) {
+			f_write_string("/sys/class/net/bonding_masters", "+bond1", 0, 0);
+			sleep(1);
+		}
+	} else {
+		upstream_vport = iface_name_to_vport(upstream_if);
+		if (upstream_vport < 0 || upstream_vport >= MAX_WANLAN_PORT) {
+			dbg("%s: Can't find vport for upstream iface [%s]\n", __func__, upstream_if);
+			return -1;
+		}
+		upstream_mask = 1U << upstream_vport;
 	}
-	upstream_mask = 1U << upstream_vport;
 
 	if (vtype == VLAN_TYPE_WAN_NO_VLAN) {
 		wan_br = 1;
@@ -662,6 +740,13 @@ static int get_mt7986_mt7531_vport_info(unsigned int vport, unsigned int *link, 
 {
 	int phy;
 
+#if defined(TUFAX4200)
+	if (nvram_match("HwId", "A") && vport == LAN5_PORT) {
+		*link = 0;
+		*speed = 0;
+		return 0;
+	}
+#endif
 	if (vport >= MAX_WANLAN_PORT || (!link && !speed))
 		return -1;
 
@@ -723,7 +808,7 @@ static void build_wan_lan_mask(int stb, int stb_bitmask)
 	if (sw_mode == SW_MODE_AP || sw_mode == SW_MODE_REPEATER)
 		wanscap_lan = 0;
 
-	if (wanscap_lan && (wans_lanport < 0 || wans_lanport > 4)) {
+	if (wanscap_lan && (wans_lanport < 0 || wans_lanport > 5)) {
 		_dprintf("%s: invalid wans_lanport %d!\n", __func__, wans_lanport);
 		wanscap_lan = 0;
 	}
@@ -1219,6 +1304,10 @@ void ATE_port_status(void)
 	len = 0;
 	len += sprintf(buf+len, "W0=%C;", conv_speed(pS.link[WAN_PORT], pS.speed[WAN_PORT]));
 	for (i = 0; i < WAN_PORT; i++) {
+#if defined(TUFAX4200)
+		if (nvram_match("HwId", "A") && i == (WAN_PORT-1))
+			continue;
+#endif
 		len += sprintf(buf+len, "L%d=%C;", i+1, conv_speed(pS.link[i], pS.speed[i]));
 	}
 
@@ -1252,7 +1341,11 @@ void __pre_config_switch(void)
 	const int stb_x = nvram_get_int("switch_stb_x");
 	int i, j, nr_brvx, nr_brif;
 	struct dirent **brvx = NULL, **brif = NULL;
-	char brif_path[sizeof("/sys/class/net/X/brifXXXXX") + IFNAMSIZ];
+	char brif_path[sizeof("/sys/class/net/X/brifXXXXX") + IFNAMSIZ], iface[IFNAMSIZ];
+#if defined(TUFAX4200)
+	int port;
+	char port_str[4];
+#endif
 
 	/* Remove all brvXXX bridge interfaces that are used to bridge WAN and STB/VoIP. */
 	nr_brvx = scandir(SYS_CLASS_NET, &brvx, brvx_filter, alphasort);
@@ -1275,9 +1368,22 @@ void __pre_config_switch(void)
 	/* up lanX before implement STB/VoIP, otherwise lanX will not work */
 	if (!nvram_match("switch_wantag", "none") || stb_x > 0) {
 		//dbg("%s: up lanX/eth1 before implement STB/VoIP!\n", __func__);
-		for (i = 0; i < ARRAY_SIZE(vport_to_iface); ++i)
-			eval("ifconfig", vport_to_iface[i], "0.0.0.0", "up");
+		for (i = 0; i < ARRAY_SIZE(vport_to_iface); ++i) {
+			strlcpy(iface, vport_to_iface[i], sizeof(iface));
+			eval("ifconfig", iface, "0.0.0.0", "up");
+		}
 	}
+
+#if defined(TUFAX4200)
+	/* Fine-tune MT7531 Ethernet ports rise/fall time. */
+	for (port = 1; port <= 4; ++port) {
+		snprintf(port_str, sizeof(port_str), "%d", port);
+		eval("switch", "phy", "cl45", "w", port_str, "0x1e", "0x1", "0x1b7");
+		eval("switch", "phy", "cl45", "w", port_str, "0x1e", "0x7", "0x3ba");
+		eval("switch", "phy", "cl45", "w", port_str, "0x1e", "0x4", "0x200");
+		eval("switch", "phy", "cl45", "w", port_str, "0x1e", "0xA", "0x0");
+	}
+#endif
 }
 
 void __post_config_switch(void)
@@ -1328,7 +1434,12 @@ char *__get_wan_base_if(char *wan_base_if)
 		if (!upstream_iptv_ifaces[wanif_type] || *upstream_iptv_ifaces[wanif_type] == '\0')
 			continue;
 
-		strlcpy(wan_base_if, upstream_iptv_ifaces[wanif_type], IFNAMSIZ);
+#if defined(RTCONFIG_BONDING_WAN)
+		if (wanif_type == WANS_DUALWAN_IF_WAN && sw_mode() == SW_MODE_ROUTER && bond_wan_enabled()) {
+			strlcpy(wan_base_if, "bond1", IFNAMSIZ);
+		} else
+#endif
+			strlcpy(wan_base_if, upstream_iptv_ifaces[wanif_type], IFNAMSIZ);
 	}
 
 	return wan_base_if;
@@ -1362,3 +1473,186 @@ int __get_bonding_port_status(enum bs_port_id bs_port)
 	return link? speed : 0;
 }
 #endif
+
+#if defined(RTCONFIG_BONDING_WAN) || defined(RTCONFIG_LACP)
+/** Convert bs_port_id to interface name.
+ * @bs_port:	enum bs_port_id
+ * @return:	pointer to interface name or NULL.
+ *  NULL:	@bs_port doesn't have interface name or error.
+ *  otherwise:	interface name.
+ */
+const char *bs_port_id_to_iface(enum bs_port_id bs_port)
+{
+	int vport;
+
+	if (bs_port < 0 || bs_port >= ARRAY_SIZE(bsport_to_vport))
+		return NULL;
+
+	vport = bsport_to_vport[bs_port];
+	return vport_to_iface_name(vport);
+}
+#endif
+
+#if defined(TUFAX4200) || defined(TUFAX6000)
+/* Force GPY211 PHY LED on/off
+ * @port:
+ * @mode:	0: OFF, otherwise: ON
+ */
+void force_gpy211_led_onoff(int port, int mode)
+{
+	int inv = 0;
+	pid_t pid;
+	char *nv __attribute__((unused)) = NULL, port_str[4], value_str[8];
+	char *nv_commit[] = { "nvram", "commit", NULL };
+
+#if defined(TUFAX4200)
+	if (port == 5 && !is_2500m_lan_exist())
+		return;
+#endif
+	/* 2.5G WAN LED of TUF-AX4200 is active-low. */
+	if (port == 6) {
+		inv = 1 << 12;	/* inverse */
+		nv = "led_wan_last_state";
+	} else if (port == 5) {
+		nv = "led_lan_last_state";
+	}
+
+	/* GPHY211 LED, Register 0.27
+	 * bit0: direct access of LED0
+	 * bit8: disable(0)/enable(1) LED0 function
+	 */
+	snprintf(port_str, sizeof(port_str), "%d", port);
+	snprintf(value_str, sizeof(value_str), "0x%x", mode | inv);
+	eval("mii_mgr", "-s", "-p", port_str, "-d", "0", "-r", "0x1b", "-v", value_str);
+	if (nv) {
+		nvram_set_int(nv, !!mode);
+		if (!nvram_match("x_Setting", "1"))
+			_eval(nv_commit, NULL, 0, &pid);
+	}
+}
+
+/* Force MT7531 switch LED on/off
+ * @mode:	0: OFF, otherwise: ON
+ */
+void force_mt7531_led_onoff(int mode)
+{
+	pid_t pid;
+	char *nv_commit[] = { "nvram", "commit", NULL };
+
+	if (mode) {
+		/* Make sure LEDs are not controlled by LED_MODE,
+		 * force on link LED (LED0) and turn off activity LED (LED1).
+		 */
+		eval("switch", "phy", "cl45", "w", "0", "0x1f", "0x21", "0x8009");
+		eval("switch", "phy", "cl45", "w", "0", "0x1f", "0x24", "0x8040");
+		eval("switch", "phy", "cl45", "w", "0", "0x1f", "0x26", "0x0");
+	} else {
+		/* Use LED_MODE to control LEDs and disable all LEDs, clock must be sustain. */
+		eval("switch", "phy", "cl45", "w", "0", "0x1f", "0x21", "0x8");
+	}
+	nvram_set_int("led_wan_last_state", !!mode);
+	if (!nvram_match("x_Setting", "1"))
+		_eval(nv_commit, NULL, 0, &pid);
+}
+
+/* Enable/turn oFF GPY211 PHY LED
+ * @port:
+ * @mode:	LED_ON and LED_OFF
+ */
+void set_gpy211_led_onoff(int port, int mode)
+{
+	int value, inv = 0;
+	pid_t pid;
+	char *nv __attribute__((unused)) = NULL, port_str[4], value_str[8];
+	char *nv_commit[] = { "nvram", "commit", NULL };
+
+#if defined(TUFAX4200)
+	if (port == 5 && !is_2500m_lan_exist())
+		return;
+#endif
+	/* 2.5G WAN LED of TUF-AX4200 is active-low. */
+	if (port == 6) {
+		inv = 1 << 12;	/* inverse */
+		nv = "led_wan_last_state";
+	} else if (port == 5) {
+		nv = "led_lan_last_state";
+	}
+
+	snprintf(port_str, sizeof(port_str), "%d", port);
+	if (mode == LED_ON) {
+		/* GPHY211 LED, Register 0.27, enabled LED function.
+		 * bit0: direct access of LED0
+		 * bit8: disable(0)/enable(1) LED0 function
+		 */
+		value = inv | (1U << 8);
+		snprintf(value_str, sizeof(value_str), "0x%x", value);
+		eval("mii_mgr", "-s", "-p", port_str, "-d", "0", "-r", "0x1b", "-v", value_str);
+	} else {
+		/* Disable LED function and use direct-access to turn it off. */
+		value = inv;
+		snprintf(value_str, sizeof(value_str), "0x%x", value);
+		eval("mii_mgr", "-s", "-p", port_str, "-d", "0", "-r", "0x1b", "-v", value_str);
+	}
+
+	if (nv) {
+		nvram_set_int(nv, (mode == LED_ON)? LED_ON : LED_OFF);
+		if (!nvram_match("x_Setting", "1"))
+			_eval(nv_commit, NULL, 0, &pid);
+	}
+}
+
+/* Enable/turn off MT7531 switch LED.
+ * @mode:	LED_ON and LED_OFF
+ */
+void set_mt7531_led_onoff(int mode)
+{
+	pid_t pid;
+	char *nv_commit[] = { "nvram", "commit", NULL };
+
+	if (mode == LED_ON) {
+		/* Make sure LEDs are not controlled by LED_MODE, restore LED0 and LED1 settings. */
+		eval("switch", "phy", "cl45", "w", "0", "0x1f", "0x21", "0x8009");
+		eval("switch", "phy", "cl45", "w", "0", "0x1f", "0x24", "0x8000");
+		eval("switch", "phy", "cl45", "w", "0", "0x1f", "0x26", "0xc007");
+	} else {
+		/* Use LED_MODE to control LEDs and disable all LEDs, clock must be sustain. */
+		eval("switch", "phy", "cl45", "w", "0", "0x1f", "0x21", "0x8");
+	}
+	nvram_set_int("led_lan_last_state", (mode == LED_ON)? LED_ON : LED_OFF);
+	if (!nvram_match("x_Setting", "1"))
+		_eval(nv_commit, NULL, 0, &pid);
+}
+
+/* Platform-specific and managed by hardware.
+ * @which:	enum led_id
+ * @mode:	LED_ON, LED_OFF
+ * @return:
+ * 	0:	@which is not processed.
+ *  otherwise:	@which is processed.
+ */
+int __do_led_control(int which, int mode)
+{
+	int ret = 0;
+
+	switch (which) {
+	case LED_WAN:
+		if (mode != nvram_get_int("led_wan_last_state")) {
+			set_gpy211_led_onoff(6, mode);
+		}
+		nvram_set_int("led_wan_last_state", mode);
+		ret = 1;
+		break;
+	case LED_LAN:
+		if (mode != nvram_get_int("led_lan_last_state")) {
+			set_gpy211_led_onoff(5, mode);
+			set_mt7531_led_onoff(mode);
+		}
+		nvram_set_int("led_lan_last_state", mode);
+		ret = 1;
+		break;
+	}
+
+	return ret;
+}
+
+#endif // end of defined(TUFAX4200) || defined(TUFAX6000)

@@ -14,7 +14,9 @@
 <link rel="stylesheet" type="text/css" href="form_style.css">
 <link rel="stylesheet" type="text/css" href="usp_style.css">
 <link rel="stylesheet" type="text/css" href="pwdmeter.css">
-<link href="other.css"  rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="other.css">
+<link rel="stylesheet" type="text/css" href="css/confirm_block.css">
+<script type="text/javascript" src="/js/confirm_block.js"></script>
 <script type="text/javascript" src="/state.js"></script>
 <script type="text/javascript" src="/help.js"></script>
 <script type="text/javascript" src="/general.js"></script>
@@ -68,6 +70,7 @@ var wl_bw_160 = '<% nvram_get("wl_bw_160"); %>';
 var enable_bw_160 = (wl_bw_160 == 1) ? true : false;
 var wl_wpa_psk_org = decodeURIComponent("<% nvram_char_to_ascii("WLANConfig11b", "wl_wpa_psk"); %>");
 var faq_fref = "https://nw-dlcdnet.asus.com/support/forward.html?model=&type=Faq&lang="+ui_lang+"&kw=&num=150";
+var faq_href_hide_ssid = "https://nw-dlcdnet.asus.com/support/forward.html?model=&type=Faq&lang="+ui_lang+"&kw=&num=162";
 
 function initial(){
 	show_menu();
@@ -245,7 +248,7 @@ function initial(){
 		document.getElementById("dfs_checkbox").style = "";
 	}
 
-	if(Qcawifi_support && document.form.wl_channel.value  == '0'){
+	if((Qcawifi_support || Rawifi_support ) && document.form.wl_channel.value  == '0'){
 		if((wl_unit == '1' && has_dfs_channel(wl_channel_list_5g)) || (wl_unit == '2' && has_dfs_channel(wl_channel_list_5g_2))){
 			document.getElementById('dfs_checkbox').style.display = "";
 			check_DFS_support(document.form.acs_dfs_checkbox);
@@ -538,6 +541,8 @@ function add_options_value(o, arr, orig){
 }
 
 function applyRule(){
+	var confirm_flag = 0;
+	var confirm_content = "";
 	if(lantiq_support && wave_ready != 1){
 		alert("Please wait a minute for wireless ready");
 		return false;
@@ -568,22 +573,23 @@ function applyRule(){
 			var radio_value = (document.form.wl_closed[0].checked) ? 1 : 0;
 			if(document.form.wps_enable.value == 1) {
 				if(radio_value) {
-					if(!AiMesh_confirm_msg("Wireless_Hide_WPS", radio_value))
-						return false;
-					document.form.wps_enable.value = "0";
+					//if(!AiMesh_confirm_msg("Wireless_Hide_WPS", radio_value))
+						//return false;
+					confirm_flag=7;
+					confirm_content="<#AiMesh_confirm_msg7#>";
 				}
 			}
 			else {
-				if(!AiMesh_confirm_msg("Wireless_Hide", radio_value))
-					return false;
+				//if(!AiMesh_confirm_msg("Wireless_Hide", radio_value))
+					//return false;
+				confirm_flag=6;
+				confirm_content="<#AiMesh_confirm_msg6#>";
 			}
 		}
 		else {
 			if(document.form.wl_closed[0].checked && document.form.wps_enable.value == 1 && (isSwMode("rt") || isSwMode("ap"))){
-				if(confirm("<#wireless_JS_Hide_SSID#>"))
-					document.form.wps_enable.value = "0";
-				else
-					return false;
+				confirm_flag=1;
+				confirm_content="<#wireless_JS_Hide_SSID#>";
 			}
 		}
 
@@ -628,7 +634,6 @@ function applyRule(){
 			document.form.wl_bw_160.value = $("#enable_160mhz").prop("checked") ? 1 : 0;
 		}
 
-		showLoading();
 		document.form.wps_config_state.value = "1";		
 		if((auth_mode == "shared" || auth_mode == "wpa" || auth_mode == "wpa2" || auth_mode == "wpawpa2" || auth_mode == "radius" ||
 				((auth_mode == "open") && !(document.form.wl_wep_x.value == "0")))
@@ -699,7 +704,49 @@ function applyRule(){
 			}
 		}
 
-		document.form.submit();
+		if(confirm_flag==1 || confirm_flag==7 || confirm_flag==6){
+			if($(".confirm_block").length > 0){
+				$(".confirm_block").remove();
+			}
+			$("#Loading").css('visibility', 'visible');
+			$("#loadingBlock").css('visibility', 'hidden');
+
+			confirm_asus({
+				title: "<#WLANConfig11b_x_BlockBCSSID_itemname#>",
+				contentA: confirm_content+"<br><br><#AiMesh_confirm_msg13#> <#AiMesh_confirm_msg0#>",
+				contentC: "",
+				left_button: "<#CTL_ok#>",
+				left_button_callback: function(){
+					if(confirm_flag==1 || confirm_flag==7){
+						document.form.wps_enable.value = "0";
+					}
+					confirm_cancel();
+					$("#loadingBlock").css('visibility', 'visible');
+					showLoading();
+					document.form.submit();
+				},
+				left_button_args: {},
+				right_button: "<#CTL_Cancel#>",
+				right_button_callback: function(){
+					confirm_cancel();
+					$("#Loading").css('visibility', 'hidden');
+					return false;
+				},
+				right_button_args: {},
+				iframe: "",
+				margin: "100px 0px 0px 25px",
+				note_display_flag: 0
+			});
+			$(".confirm_block").css( "zIndex", 10001 );
+			$("#ssid_hide_faq").attr('target', '_blank')
+							.attr('style', 'color:#FC0;text-decoration:underline;')
+							.attr("href", faq_href_hide_ssid);
+
+		}
+		else{
+			showLoading();
+			document.form.submit();
+		}
 	}
 }
 
@@ -950,7 +997,7 @@ function enableSmartCon(val){
 			value = ["1"];
 			add_options_x2(document.form.smart_connect_t, desc, value, val);
 		}
-		else if(based_modelid == "RT-AC88U" || based_modelid == "RT-AC86U" || based_modelid == "GT-AC2900" || based_modelid == "RT-AC3100" || based_modelid == "BLUECAVE" || based_modelid == "MAP-AC1750" || based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000" || based_modelid.substring(0,7) == "RT-AC59"){
+		else if(based_modelid == "RT-AC88U" || based_modelid == "RT-AC86U" || based_modelid == "GT-AC2900" || based_modelid == "RT-AC3100" || based_modelid == "BLUECAVE" || based_modelid == "MAP-AC1750" || based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000" || based_modelid.substring(0,7) == "RT-AC59" || based_modelid == "XD4S"){
 			desc = ["<#smart_connect_dual#> (2.4GHz and 5GHz)"];
 			value = ["1"];
 			add_options_x2(document.form.smart_connect_t, desc, value, val);
@@ -970,6 +1017,7 @@ function enableSmartCon(val){
 		based_modelid.substring(0,7) == "RT-AC59" ||
 		based_modelid == "RT-AX89U" ||
 		based_modelid == "GT-AXY16000" ||
+		based_modelid == "XD4S" || 
 		based_modelid == "BLUECAVE"){
 		document.getElementById("smartcon_rule_link").style.display = "none";
 		if(val == 0){
@@ -1055,7 +1103,12 @@ function __regen_auto_option(obj,val){
 }
 
 function regen_auto_option(obj){
-	__regen_auto_option(obj,0);
+	var value = 0;
+	if(obj.name === 'wl_bw' && (Rawifi_support || Qcawifi_support)){
+		value = 1;
+	}
+
+	__regen_auto_option(obj, value);
 }
 
 var wl_unit = <% nvram_get("wl_unit"); %>;

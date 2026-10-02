@@ -1244,24 +1244,14 @@ function check_nodes_support_wireless_scheduler() {
 	}
 	if(isSupport("amas") && show_notice) {
 		var transform_location = function(_node_info, _isReNode){
-			var location_array = [
-			{value:"Home",text:"<#AiMesh_NodeLocation01#>"}, {value:"Living Room",text:"<#AiMesh_NodeLocation02#>"}, {value:"Dining Room",text:"<#AiMesh_NodeLocation03#>"},
-			{value:"Bedroom",text:"<#AiMesh_NodeLocation04#>"}, {value:"Office",text:"<#AiMesh_NodeLocation05#>"}, {value:"Stairwell",text:"<#AiMesh_NodeLocation06#>"},
-			{value:"Hall",text:"<#AiMesh_NodeLocation07#>"}, {value:"Kitchen",text:"<#AiMesh_NodeLocation08#>"}, {value:"Attic",text:"<#AiMesh_NodeLocation09#>"},
-			{value:"Basement",text:"<#AiMesh_NodeLocation10#>"}, {value:"Yard",text:"<#AiMesh_NodeLocation11#>"}, {value:"Master Bedroom",text:"<#AiMesh_NodeLocation12#>"},
-			{value:"Guest Room",text:"<#AiMesh_NodeLocation13#>"}, {value:"Kids Room",text:"<#AiMesh_NodeLocation14#>"}, {value:"Study Room",text:"<#AiMesh_NodeLocation15#>"},
-			{value:"Hallway",text:"<#AiMesh_NodeLocation16#>"}, {value:"Walk-in Closet",text:"<#AiMesh_NodeLocation17#>"}, {value:"Bathroom",text:"<#AiMesh_NodeLocation18#>"},
-			{value:"Second Floor",text:"<#AiMesh_NodeLocation19#>"}, {value:"Third Floor",text:"<#AiMesh_NodeLocation20#>"}, {value:"Storage",text:"<#AiMesh_NodeLocation21#>"},
-			{value:"Balcony",text:"<#AiMesh_NodeLocation22#>"}, {value:"Meeting Room",text:"<#AiMesh_NodeLocation23#>"}, {value:"Garage",text:"<#AiMesh_NodeLocation25#>"},
-			{value:"Custom",text:"<#AiMesh_NodeLocation24#>"}];
 			var result = "<#AiMesh_NodeLocation01#>";
-			var location = "Home";
+			var node_location_text = "Home";
 			if(_isReNode){
 				if("config" in _node_info) {
 					if("misc" in _node_info.config) {
 						if("cfg_alias" in _node_info.config.misc) {
 							if(_node_info.config.misc.cfg_alias != "")
-								location = _node_info.config.misc.cfg_alias;
+								node_location_text = _node_info.config.misc.cfg_alias;
 						}
 					}
 				}
@@ -1269,16 +1259,16 @@ function check_nodes_support_wireless_scheduler() {
 			else{
 				var alias = _node_info.alias;
 				if(alias != _node_info.mac)
-					location = alias;
+					node_location_text = alias;
 			}
-			var specific_location = location_array.filter(function(item, index, _array){
-				return (item.value == location);
+			var specific_location = aimesh_location_arr.filter(function(item, index, _array){
+				return (item.value == node_location_text);
 			})[0];
 			if(specific_location != undefined){
 				result = specific_location.text;
 			}
 			else{
-				result = location;
+				result = node_location_text;
 			}
 			return result;
 		};

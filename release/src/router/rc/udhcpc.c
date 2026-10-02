@@ -1233,13 +1233,23 @@ udhcpc_lan(int argc, char **argv)
 	_dprintf("%s:: %s\n", __FUNCTION__, argv[1] ? : "");
 	if (!argv[1])
 		return EINVAL;
-	else if (strstr(argv[1], "deconfig"))
+	else if (strstr(argv[1], "deconfig")) {
+#if defined(RTCONFIG_AMAS)
+		if (nvram_get_int("re_mode") == 1)
+			logmessage("dhcp client", "deconfig");
+#endif
 		return deconfig_lan();
+	}
 	else if (strstr(argv[1], "bound"))
 		return bound_lan();
 	else if (strstr(argv[1], "renew"))
 		return renew_lan();
-/*	else if (strstr(argv[1], "leasefail")) */
+#if defined(RTCONFIG_AMAS)
+	else if (strstr(argv[1], "leasefail")) {
+		if (nvram_get_int("re_mode") == 1)
+			logmessage("dhcp client", "leasefail");
+	}
+#endif
 /*	else if (strstr(argv[1], "nak")) */
 
 	return EINVAL;

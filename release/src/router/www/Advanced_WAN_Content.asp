@@ -263,7 +263,20 @@ function initial(){
 	}
 
 	if(wan_bonding_support){
-		if(based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000"){
+		if (based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000") {
+			var desc = [ "LAN 1", "LAN 2", "10G base-T" ];
+			var val = [ "0 1", "0 2", "0 30" ];
+
+			add_options_x2(document.form.wanports_bond_menu, desc, val, orig_wanports_bond);
+		}
+		else if(based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000") {
+			var desc = [ "LAN 1", "LAN 2", "LAN 3", "LAN 4", "2.5G LAN" ];
+			var val = [ "0 1", "0 2", "0 3", "0 4", "0 5" ];
+
+			add_options_x2(document.form.wanports_bond_menu, desc, val, orig_wanports_bond);
+		}
+
+		if(based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000" || based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000"){
 			var wan_name = wans_dualwan.split(" ")[<% nvram_get("wan_unit"); %>];
 			if(typeof(wan_name) != 'undefined' && wan_name == "none")
 				wan_name = wans_dualwan.split(" ")[0];
@@ -423,6 +436,9 @@ function genWANSoption(){
 				document.form.wan_unit.options[i] = new Option("10G base-T", i);
 			else if(wans_dualwan_NAME == "SFP+")
 				document.form.wan_unit.options[i] = new Option("10G SFP+", i);
+		} else if (based_modelid == "TUF-AX4200") {
+			if (wans_dualwan_NAME == "WAN")
+				document.form.wan_unit.options[i] = new Option("2.5G WAN", i);
 		}
 	}
 	
@@ -490,11 +506,11 @@ function applyRule(){
 		}
 
 		if(wan_bonding_support){
-			if (orig_bond_wan != document.form.bond_wan_radio.value || ((based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000") && orig_wanports_bond != $("#wanports_bond_menu").val())){
+			if (orig_bond_wan != document.form.bond_wan_radio.value || ((based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000" || based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000") && orig_wanports_bond != $("#wanports_bond_menu").val())){
 				document.form.bond_wan.disabled = false;
 				document.form.bond_wan.value = document.form.bond_wan_radio.value;
 
-				if(based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000"){
+				if(based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000" || based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000"){
 					document.form.wanports_bond.disabled = false;
 				}
 				reboot_confirm=1;
@@ -829,7 +845,7 @@ function validForm(){
 				}
 			}
 
-			if((based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000") &&
+			if((based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000" || based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000") &&
 				(document.form.wanports_bond.value.indexOf("1") != -1 || document.form.wanports_bond.value.indexOf("2") != -1)){
 				// LAN1 or LAN2 is used in WAN aggregation, turn off LAN aggregation
 				document.form.lacp_enabled.disabled = false;

@@ -75,7 +75,7 @@ static int _update_userticket()
 	else
 	{
 		int eid = json_object_get_int(eidObj);
-		char *status = json_object_get_string(stsObj);
+		const char *status = json_object_get_string(stsObj);
 		if ((eid == EID_DDNS_REFRESH_TOKEN) && (!strcmp(status, "0")))
 		{
 			ASUSDDNS_DBG("Success to aae_refresh_ticket\n");

@@ -74,7 +74,7 @@ const char *blver =
 #elif defined(CONFIG_RTAX54)
 	"1001";
 #elif defined(CONFIG_XD4S)
-	"1001";
+	"1002";
 #else
 #error Define bootload version
 #endif

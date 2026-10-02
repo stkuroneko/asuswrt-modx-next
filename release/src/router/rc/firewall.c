@@ -1758,13 +1758,23 @@ void nat_setting(char *wan_if, char *wan_ip, char *wanx_if, char *wanx_ip, char 
 	/* ASUSWRT Parental Control */
 	pc_s *pc_list = NULL;
 	int pc_count;
+	int pc_count2;
 
 	get_all_pc_list(&pc_list);
 	pc_count = count_pc_rules(pc_list, 1);
+	pc_count2 = count_pc_rules(pc_list, 2);
 	free_pc_list(&pc_list);
 	pc_list = NULL;
 
-	if(nvram_get_int("MULTIFILTER_ALL") != 0 && pc_count > 0){
+	/* pc_block - 20220615
+		1. time-scheduling - BLOCK ALL DEVICES
+		2. time-scheduling - BLOCK
+		3. time-scheduling - TIME
+	*/
+	if (nvram_get_int("MULTIFILTER_BLOCK_ALL") == 1
+		|| (nvram_get_int("MULTIFILTER_ALL") != 0 && pc_count2 > 0)
+		|| (nvram_get_int("MULTIFILTER_ALL") != 0 && pc_count > 0)
+		) {
 		config_blocking_redirect(fp);
 	}
 #endif
@@ -2192,13 +2202,23 @@ void nat_setting2(char *lan_if, char *lan_ip, char *logaccept, char *logdrop)	//
 	/* ASUSWRT Parental Control */
 	pc_s *pc_list = NULL;
 	int pc_count;
+	int pc_count2;
 
 	get_all_pc_list(&pc_list);
 	pc_count = count_pc_rules(pc_list, 1);
+	pc_count2 = count_pc_rules(pc_list, 2);
 	free_pc_list(&pc_list);
 	pc_list = NULL;
 
-	if(nvram_get_int("MULTIFILTER_ALL") != 0 && pc_count > 0){
+	/* pc_block - 20220615
+		1. time-scheduling - BLOCK ALL DEVICES
+		2. time-scheduling - BLOCK
+		3. time-scheduling - TIME
+	*/
+	if (nvram_get_int("MULTIFILTER_BLOCK_ALL") == 1
+		|| (nvram_get_int("MULTIFILTER_ALL") != 0 && pc_count2 > 0)
+		|| (nvram_get_int("MULTIFILTER_ALL") != 0 && pc_count > 0)
+		) {
 		config_blocking_redirect(fp);
 	}
 #endif
@@ -4318,7 +4338,7 @@ TRACE_PT("writing Parental Control\n");
 		char wanlan_timematch[2048];
 		char wanlan_buf[2048];
 		char ptr[32], *icmplist;
-		char *ftype, *dtype;
+		char *ftype; //, *dtype;
 		char protoptr[16], flagptr[16], flag[16];
 		char srcipbuf[32], dstipbuf[32];
 		int apply;
@@ -5742,7 +5762,7 @@ TRACE_PT("writing Parental Control\n");
 		char wanlan_timematch[2048];
 		char wanlan_buf[2048];
 		char ptr[32], *icmplist;
-		char *ftype, *dtype;
+		char *ftype; //, *dtype;
 		char protoptr[16], flagptr[16], flag[16];
 		char srcipbuf[32], dstipbuf[32];
 		int apply;
@@ -5754,12 +5774,12 @@ TRACE_PT("writing Parental Control\n");
 
 		if (nvram_match("filter_wl_default_x", "DROP"))
 		{
-			dtype = logdrop;
+//			dtype = logdrop;
 			ftype = logaccept;
 		}
 		else
 		{
-			dtype = logaccept;
+//			dtype = logaccept;
 			ftype = logdrop;
 		}
 
@@ -6720,7 +6740,7 @@ int start_firewall(int wanunit, int lanunit)
 	char wan_if[IFNAMSIZ+1], wan_ip[32], lan_if[IFNAMSIZ+1], lan_ip[32];
 	char wanx_if[IFNAMSIZ+1], wanx_ip[32];
 	char prefix[] = "wanXXXXXXXXXX_", tmp[100];
-	int lock, wan_proto;
+	int lock, wan_proto __attribute__((unused));
 
 	if (!is_routing_enabled())
 		return -1;

@@ -103,6 +103,7 @@ ASUS_eula_desc1_4=Ponadto w celu obsługi funkcji zdalnego sterowania IFTTT™ z
 ASUS_eula_desc2=Firmie ASUS zależy na ochronie i poszanowaniu prywatności użytkownika; Można przejść kolejno do pozycji Advanced Settings (Ustawienia zaawansowane) > Administration (Administracja) > Privacy (Prywatność) w celu włączenia/wyłączenia stałego udostępniania firmie ASUS informacji o produkcie. Więcej informacji na temat ochrony prywatności użytkowników przez firmę ASUS można znaleźć w dokumencie <a id="eula_url" style="font-weight: bolder;text-decoration:underline;cursor:pointer;" target="_blank">Polityka prywatności firmy ASUS</a>.
 ASUS_eula_age=Mam więcej niż 16 lat.
 ASUS_eula_age_confirm=Potwierdź, że masz więcej niż 16 lat.
+ASUS_eula_use_confirm=Potwierdź, że Warunki korzystania ASUS.
 ASUS_eula_withdraw0=W przypadku %1$@ i połączenia zdalnego(aplikacja ASUS Router/Lyra/AiCloud/AiDisk):
 ASUS_eula_withdraw_desc1=Należy pamiętać, że informacje użytkownika, w tym nazwa modelu produktu, wersja oprogramowania sprzętowego, stan połączenia z Internetem, adres IP, adres MAC i nazwa DDNS, będą gromadzone przez firmę ASUS za pośrednictwem powyższych funkcji.
 ASUS_eula_withdraw_desc1_2=Aby wyłączyć udostępnianie informacji użytkownika firmie ASUS za pośrednictwem powyższych funkcji, należy kliknąć pozycję <span style="font-weight: bold;">[Withdraw] (Wycofaj zgodę)</span> poniżej. Należy jednak pamiętać, że po zaprzestaniu udostępniania informacji użytkownika firmie ASUS funkcje te mogą nie działać.
@@ -246,7 +247,7 @@ FIRM_fail_desc=Aktualizacja firmware przerwana. Sprawdź plik źródłowy, poł�
 FIRM_ok_desc=Trwa aktualizacja firmware. Potrwa to około 3 minuty.
 FIRM_ok_aimesh=Aktualizacja oprogramowania sprzętowego została zakończona. Zamknij to okno i uzyskaj ponownie dostęp do routera AiMesh.
 FIRM_reboot_manually=Aktualizacja firmware została wykonana. Uruchom ponownie ZVMODELVZ ręcznie.
-FIRM_trx_valid_fail_desc=To comply with regulatory amendments, we have modified our certification rule to ensure better firmware quality. This version is not compatible with all previously released ASUS firmware and uncertified third party firmware. Please check our official websites for the certified firmware.
+FIRM_trx_valid_fail_desc=To comply with regulatory amendments, we have modified our certificate rule to ensure better firmware quality. This version is not compatible with all previously released ASUS firmware and uncertified third party firmware. Please check our official websites for the certified firmware.
 Five_attempts_logout_hint=5 razy podano niepoprawne hasło. Nastąpi wylogowanie.
 footer_copyright_desc=2022 ASUSTeK Computer Inc. Wszystkie prawa zastrzeżone.
 FW_n1=Parametry konfiguracji będą utrzymają swoje ustawienia podczas aktualizacji firmware.
@@ -1081,13 +1082,14 @@ AiMesh_confirm_msg_ChangeSSID=Zmiana identyfikatora SSID będzie miała wpływ n
 AiMesh_confirm_msg_ChangeKey=Zmiana identyfikatora klucza WPA-PSK będzie miała wpływ na łączność WiFi węzła AiMesh.
 AiMesh_confirm_msg_CountryCode=Zmiana kodu kraju może mieć wpływ na działanie systemu AiMesh.
 AiMesh_confirm_msg5=Wyłączenie funkcji radiowej będzie miało wpływ na łączność WiFi routera AiMesh.
-AiMesh_confirm_msg6=Ukrycie identyfikatora SSID będzie miało wpływ na łączność WiFi routera AiMesh.
+AiMesh_confirm_msg6=Ukrycie identyfikatora SSID nie pomaga zabezpieczyć sieci Wi-Fi i może powodować problemy z nawiązaniem połączenia.
 AiMesh_confirm_msg7=Ukrycie identyfikatora SSID spowoduje wyłączenie funkcji WPS i będzie miało wpływ na łączność WiFi routera AiMesh.
 AiMesh_confirm_msg8=Wyłączenie serwera DHCP będzie miało wpływ na łączność WiFi routera AiMesh.
 AiMesh_confirm_msg9=Ze względu na kompatybilność systemu AiMesh i urządzeń końcowych zalecamy korzystanie z trybu WPA2-Personal. Czy chcesz przełączyć na tryb #AUTHMODE?\n*W razie problemów z połączeniem przełącz na tryb WPA2-Personal lub zapoznaj się z informacjami dostarczonymi przez producenta.
 AiMesh_confirm_msg10=Aby zapewnić bezproblemową łączność systemu AiMesh i urządzeń końcowych, zapoznaj się z tą stroną <a id="wpa3FaqLink">FAQ</a> przed przełączeniem w tryb WPA3-Personal.
 AiMesh_confirm_msg11=Obecnie używasz trybu WPA3-personal. W ramach tworzenia systemu AiMesh metoda uwierzytelniania zostanie zmieniona na WPA2/WPA3-personal. Czy chcesz kontynuować?
 AiMesh_confirm_msg12=You can read this <a id='wpa3FaqLink'>FAQ</a> for more information.
+AiMesh_confirm_msg13=Więcej informacji można znaleźć w witrynie <a style='font-weight: bolder;text-decoration: underline;color:#000000;' href='' target='_blank'>tym FAQ</a>
 AiMesh_Feature_Desc=Zaawansowany system ASUS AiMesh to innowacyjna nowa funkcja routerów, umożliwiająca połączenie wielu routerów ASUS w celu utworzenia sieci WiFi w całym domu.
 AiMesh_FAQ=Dowiedz się więcej o funkcji ASUS AiMesh
 AiMesh_FindNode=Znajdź węzeł AiMesh
@@ -3442,6 +3444,7 @@ TZ17=Atlantic Time (Canada)
 TZ18=La Paz
 TZ18_1=Caracas
 TZ19=Santiago
+TZ19_1=Asunción
 TZ20=Newfoundland
 TZ21=Brasilia
 TZ22=Buenos Aires, Georgetown
@@ -3534,10 +3537,10 @@ Uplink_rate=Dane wysłane/s
 Uplink_traffic=Dane wysłane
 upnp_Desc=Skonfiguruj serwer multimediów iTunes i UPnP.
 [###MODEL_DEP###][RT-AC1200G+][RT-AC1200G][RT-AC82U]upnp_Desc=Skonfiguruj serwer multimediów UPnP.
-UPnPMediaServer_Help=ZVMODELVZ oferuje wsparcie dla UPnP. Możesz je włączyć oraz zezwolić innym urządzeniom UPnP, jak PS3 bądź cyfrowy odtwarzacz audio, by uzyskać dostęp do plików multimedialnych na dysku USB.
-[###MODEL_DEP###][RT-AC1200][RT-N600]UPnPMediaServer_Help=ZVMODELVZ oferuje wsparcie dla UPnP. Możesz je włączyć oraz zezwolić innym urządzeniom UPnP, jak PS3 bądź cyfrowy odtwarzacz audio, by uzyskać dostęp do plików multimedialnych na dysku USB.
-[###MODEL_DEP###][RT-AC1200G][RT-AC82U]UPnPMediaServer_Help=ZVMODELVZ oferuje wsparcie dla UPnP. Możesz je włączyć oraz zezwolić innym urządzeniom UPnP, jak PS3 bądź cyfrowy odtwarzacz audio, by uzyskać dostęp do plików multimedialnych na dysku USB.
-[###MODEL_DEP###][AC2900]UPnPMediaServer_Help=ZVMODELVZ oferuje wsparcie dla UPnP. Możesz je włączyć oraz zezwolić innym urządzeniom UPnP, jak PS3 bądź cyfrowy odtwarzacz audio, by uzyskać dostęp do plików multimedialnych na dysku USB.
+UPnPMediaServer_Help=Skonfiguruj <a id='upnp_link'>UPnP, iTunes</a>, <a id='ftp_link'>FTP</a> i <a id='samba_link'>Miejsce sieciowe (Samba)</a>.
+[###MODEL_DEP###][RT-AC1200][RT-N600]UPnPMediaServer_Help=Skonfiguruj <a id='upnp_link'>UPnP, iTunes</a> i <a id='samba_link'>Miejsce sieciowe (Samba)</a>.
+[###MODEL_DEP###][RT-AC1200G][RT-AC82U]UPnPMediaServer_Help=Skonfiguruj <a id='upnp_link'>UPnP</a>, <a id='ftp_link'>FTP</a> i <a id='samba_link'>Miejsce sieciowe (Samba)</a>.
+[###MODEL_DEP###][AC2900]UPnPMediaServer_Help=Skonfiguruj <a id='upnp_link'>UPnP</a> i <a id='samba_link'>Miejsce sieciowe (Samba)</a>.
 url_keyword_alert=URL Keyword
 USB_Application_check=Sprawdź aplikację USB
 USB_Application_disk_checking=Sprawdzanie dysku
@@ -3626,7 +3629,7 @@ vpn_network_place=Obsługa miejsca sieciowego (Samba)
 vpn_openvpn_AdvDNS=Anonsowanie DNS klientom
 vpn_openvpn_Auth=Tryb autoryzacji
 vpn_openvpn_AuthOnly=Autoryzacja tylko za pomocą nazwy użytkownika / hasła
-vpn_openvpn_AuthOnly_hint=Authorization Mode fixes on TLS
+vpn_openvpn_AuthOnly_hint=Authentication Mode fixes on TLS
 vpn_openvpn_AuthHMAC=Autoryzacja HMAC
 vpn_openvpn_ExtraHMAC=Dodatkowa autoryzacja HMAC
 vpn_openvpn_ClientMutual=Zezwalaj na Klient <-> Klient
@@ -3642,8 +3645,8 @@ vpn_openvpn_desc4=If your WAN IP address is dynamic, please click <a href="http:
 vpn_openvpn_dhcp=Przydziel z serwera DHCP
 vpn_openvpn_Encrypt=Szyfrowanie
 vpn_openvpn_fail1=Konflikt dotyczący routingu! <p>Sprawdź ustawienia adresu IP klienta na stronie Ustawienia Zaawansowane lub sprawdź tabelę routingu w dzienniku systemu.
-vpn_openvpn_fail2=Błąd w polu Certification Authentication (Uwierzytelnianie certyfikatów) / Server certification (Certyfikaty serwera) / Server Key (Klucz serwera)! <p>Sprawdź zawartość pozycji Keys and Certification (Klucze i certyfikacja) na stronie Ustawienia Zaawansowane.
-vpn_openvpn_fail3=Błąd w polu Diffle Hellman parameters (Parametry Diffiego-Hellmana)! <p>Sprawdź zawartość pozycji Keys and Certification (Klucze i certyfikacja) na stronie Ustawienia Zaawansowane.
+vpn_openvpn_fail2=Błąd w polu Certificate Authentication (Uwierzytelnianie certyfikatów) / Server certificate (Certyfikaty serwera) / Server Key (Klucz serwera)! <p>Sprawdź zawartość pozycji Keys and Certificate (Klucze i certyfikacja) na stronie Ustawienia Zaawansowane.
+vpn_openvpn_fail3=Błąd w polu Diffle Hellman parameters (Parametry Diffiego-Hellmana)! <p>Sprawdź zawartość pozycji Keys and Certificate (Klucze i certyfikacja) na stronie Ustawienia Zaawansowane.
 vpn_openvpn_fail4=Uruchomienie demona serwera OpenVPN nie powiodło się.  <p>Sprawdź środowisko działania urządzenia lub zawartość na stronie Ustawienia Zaawansowane.
 vpn_openvpn_hint1=Aby użyć własny klucz, kliknij żółte łącze w celu modyfikacji ustawień.
 vpn_openvpn_hint2=Sprawdź <a style="font-weight: bolder;text-decoration:underline;" class="hyperlink" href="Main_LogStatus_Content.asp">Logi systemowe</a> dla uzyskania komunikatów błędu powiązanych z OpenVPN.

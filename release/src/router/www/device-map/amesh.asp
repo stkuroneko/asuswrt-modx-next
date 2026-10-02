@@ -504,7 +504,7 @@ function gen_current_onboardinglist(_onboardingList, _wclientlist, _wiredclientl
 					}
 				}
 				var location_text = "<#AiMesh_NodeLocation01#>";
-				var specific_location = location_array.filter(function(item, index, _array){
+				var specific_location = aimesh_location_arr.filter(function(item, index, _array){
 					return (item.value == alias);
 				})[0];
 				if(specific_location != undefined)
@@ -572,11 +572,11 @@ function gen_current_onboardinglist(_onboardingList, _wclientlist, _wiredclientl
 							code += "<div class='horizontal_line'></div>";
 							code += "<div style='position:relative;'>";
 								code += "<div class='amesh_router_info_text location' title='" + htmlEnDeCode.htmlEncode(location_text) + "'>";
-								var location = location_text;
+								var node_location_text = location_text;
 								if(location_text.length > 22) {
-									location = location_text.substring(0, 20) + "..";
+									node_location_text = location_text.substring(0, 20) + "..";
 								}
-								code += "<span class='amesh_node_content'>" + htmlEnDeCode.htmlEncode(location) + "</span>";
+								code += "<span class='amesh_node_content'>" + htmlEnDeCode.htmlEncode(node_location_text) + "</span>";
 								code += "</div>";
 								code += "<div class='amesh_router_info_text'><#Full_Clients#>: ";
 								var re_client_num = 0;
@@ -1632,16 +1632,6 @@ function open_AiMesh_node_usb_app(_node_info) {
 	window.open(url, '_new' ,'width=' + window_width + ',height=' + window_height + ', top=' + window_top + ',left=' + window_left + ',menubar=no,scrollbars=yes,toolbar=no,resizable=no,status=no,location=no');
 }
 
-var location_array = [
-	{value:"Home",text:"<#AiMesh_NodeLocation01#>"}, {value:"Living Room",text:"<#AiMesh_NodeLocation02#>"}, {value:"Dining Room",text:"<#AiMesh_NodeLocation03#>"},
-	{value:"Bedroom",text:"<#AiMesh_NodeLocation04#>"}, {value:"Office",text:"<#AiMesh_NodeLocation05#>"}, {value:"Stairwell",text:"<#AiMesh_NodeLocation06#>"},
-	{value:"Hall",text:"<#AiMesh_NodeLocation07#>"}, {value:"Kitchen",text:"<#AiMesh_NodeLocation08#>"}, {value:"Attic",text:"<#AiMesh_NodeLocation09#>"},
-	{value:"Basement",text:"<#AiMesh_NodeLocation10#>"}, {value:"Yard",text:"<#AiMesh_NodeLocation11#>"}, {value:"Master Bedroom",text:"<#AiMesh_NodeLocation12#>"},
-	{value:"Guest Room",text:"<#AiMesh_NodeLocation13#>"}, {value:"Kids Room",text:"<#AiMesh_NodeLocation14#>"}, {value:"Study Room",text:"<#AiMesh_NodeLocation15#>"},
-	{value:"Hallway",text:"<#AiMesh_NodeLocation16#>"}, {value:"Walk-in Closet",text:"<#AiMesh_NodeLocation17#>"}, {value:"Bathroom",text:"<#AiMesh_NodeLocation18#>"},
-	{value:"Second Floor",text:"<#AiMesh_NodeLocation19#>"}, {value:"Third Floor",text:"<#AiMesh_NodeLocation20#>"}, {value:"Storage",text:"<#AiMesh_NodeLocation21#>"},
-	{value:"Balcony",text:"<#AiMesh_NodeLocation22#>"}, {value:"Meeting Room",text:"<#AiMesh_NodeLocation23#>"}, {value:"Garage",text:"<#AiMesh_NodeLocation25#>"},
-	{value:"Custom",text:"<#AiMesh_NodeLocation24#>"}];
 var aimesh_node_hide_flag = false;
 function popAMeshClientListEditTable(event) {
 	aimesh_node_hide_flag = false;
@@ -1776,7 +1766,7 @@ function popAMeshClientListEditTable(event) {
 			}
 		}
 	}
-	var specific_location = location_array.filter(function(item, index, _array){
+	var specific_location = aimesh_location_arr.filter(function(item, index, _array){
 		return (item.value == alias);
 	})[0];
 	var location_text = "<#AiMesh_NodeLocation01#>";
@@ -1800,10 +1790,10 @@ function popAMeshClientListEditTable(event) {
 	);
 	$popupBgHtml.find("#aimesh_node_macaddr").html(labelMac);
 
-	for(var i = 0; i < location_array.length; i += 1) {
+	for(var i = 0; i < aimesh_location_arr.length; i += 1) {
 		$popupBgHtml.find("#aimesh_node_location_select").append($('<option>', {
-			value: location_array[i].value,
-			text: location_array[i].text,
+			value: aimesh_location_arr[i].value,
+			text: aimesh_location_arr[i].text,
 			class: "aimesh_node_input_select_option"
 		}));
 	}
@@ -1898,7 +1888,7 @@ function popAMeshClientListEditTable(event) {
 			var location_value = $(this).val();
 			if(location_value != "Custom"){
 				$popupBgHtml.find('#aimesh_node_location_input').attr("disabled", true);
-				var specific_location = location_array.filter(function(item, index, _array){
+				var specific_location = aimesh_location_arr.filter(function(item, index, _array){
 					return (item.value == location_value);
 				})[0];
 				$popupBgHtml.find('#aimesh_node_location_input').val(specific_location.text);
@@ -1927,15 +1917,15 @@ function popAMeshClientListEditTable(event) {
 	$popupBgHtml.find("#aimesh_node_location_input").blur(
 		function() {
 			var validAiMeshLocation = function() {
-				var location = $.trim($popupBgHtml.find("#aimesh_node_location_input").val());
-				$popupBgHtml.find("#aimesh_node_location_input").val(location);
+				var node_location_text = $.trim($popupBgHtml.find("#aimesh_node_location_input").val());
+				$popupBgHtml.find("#aimesh_node_location_input").val(node_location_text);
 				var show_valid_hint = function(_hint){
 					$popupBgHtml.find("#aimesh_node_location_hint").css("display", "block");
 					$popupBgHtml.find("#aimesh_node_location_hint").html(_hint);
 					$popupBgHtml.find("#aimesh_node_location_input").focus();
 					$popupBgHtml.find("#aimesh_node_location_input").select();
 				};
-				if(location.length == 0){
+				if(node_location_text.length == 0){
 					show_valid_hint("<#JS_fieldblank#>");
 					return false;
 				}
@@ -1943,7 +1933,7 @@ function popAMeshClientListEditTable(event) {
 				var block_chars_array = ["\""];
 				var block_chars_hint = "";
 				for(var i = 0; i < block_chars_array.length; i++) {
-					if(location.indexOf(block_chars_array[i]) >= 0)
+					if(node_location_text.indexOf(block_chars_array[i]) >= 0)
 						block_chars_hint = block_chars_array[i] + " <#JS_invalid_chars#>";
 				}
 				if(block_chars_hint != "") {
@@ -1952,7 +1942,7 @@ function popAMeshClientListEditTable(event) {
 				}
 
 				if(utf8_ssid_support){
-					var len = parent.validator.lengthInUtf8(location);
+					var len = parent.validator.lengthInUtf8(node_location_text);
 					if(len > 32){
 						show_valid_hint("The field cannot be greater than 32 characters.");/* untranslated */
 						return false;
@@ -1969,7 +1959,7 @@ function popAMeshClientListEditTable(event) {
 			if(validAiMeshLocation()) {
 				var location_value = $(this).val();
 				var location_text = "<#AiMesh_NodeLocation01#>";
-				var specific_location = location_array.filter(function(item, index, _array){
+				var specific_location = aimesh_location_arr.filter(function(item, index, _array){
 					return (item.value == location_value);
 				})[0];
 				if(specific_location != undefined){

@@ -27,6 +27,10 @@ LDFLAGS += -L$(TOP)/sqlite/.libs -lsqlite3 -lpthread -L$(TOP)/nt_center/lib -lnt
 LDFLAGS += -L$(TOP)/wlc_nt -lwlc_nt_client
 endif
 
+ifeq ($(MT798X),y)
+CFLAGS	+= -DMT798X
+endif
+
 ifeq ($(RTCONFIG_CFGSYNC),y)
 CFLAGS  += -I$(TOP)/cfg_mnt
 LDFLAGS += -L$(TOP)/cfg_mnt -lcfgmnt

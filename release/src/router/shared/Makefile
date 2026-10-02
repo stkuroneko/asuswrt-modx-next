@@ -182,7 +182,7 @@ ifeq ($(RTCONFIG_AHS),y)
 OBJS += $(if $(wildcard notify_ahs.c),notify_ahs.o,prebuild/notify_ahs.o)
 endif
 ifeq ($(RTCONFIG_AMAS_WGN),y)
-OBJS += amas_wgn_shared.o
+OBJS += $(if $(wildcard amas_wgn_shared.c),amas_wgn_shared.o,prebuild/amas_wgn_shared.o)
 endif
 ifeq ($(RTCONFIG_RGBLED),y)
 OBJS += $(if $(wildcard aura_rgb.c),aura_rgb.o,prebuild/aura_rgb.o)
@@ -422,7 +422,7 @@ OBJS += private.o
 vpath %.c sysdeps/realtek
 else ifeq ($(RTCONFIG_RALINK),y)
 ifneq ($(RTCONFIG_DSL_REMOTE),y)
-CFLAGS += -DTRX_NEW
+CFLAGS += $(if $(MT798X),,-DTRX_NEW)
 endif
 OBJS += private.o
 vpath %.c sysdeps/ralink

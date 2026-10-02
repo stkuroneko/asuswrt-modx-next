@@ -579,7 +579,7 @@ get_pid_by_name(char *name)
 
 	while ((next = readdir(dir)) != NULL) {
 		FILE *fp;
-		char filename[256];
+		char filename[sizeof("/proc/%s/cmdline") + 256];
 		char buffer[256];
 
 		/* If it isn't a number, we don't want it */
@@ -620,7 +620,7 @@ get_pid_by_thrd_name(char *name)
 
         while ((next = readdir(dir)) != NULL) {
                 FILE *fp;
-                char filename[256];
+		char filename[sizeof("/proc/%s/cmdline") + 256];
                 char buffer[256];
 
                 /* If it isn't a number, we don't want it */
@@ -2019,7 +2019,7 @@ wl_ether_etoa(const struct ether_addr *n)
 	for (i = 0; i < ETHER_ADDR_LEN; i++) {
 		if (i)
 			*c++ = ':';
-#if defined(RTCONFIG_LANTIQ)|| defined(RTCONFIG_LANTIQ)|| defined(RTCONFIG_QCA) || defined(RTCONFIG_MT798X)
+#if defined(RTCONFIG_LANTIQ)|| defined(RTCONFIG_LANTIQ)|| defined(RTCONFIG_QCA) || defined(RTCONFIG_MT798X) || defined(RTCONFIG_RALINK)
 		c += sprintf(c, "%02X", n->ether_addr_octet[i] & 0xff);
 #else
 		c += sprintf(c, "%02X", n->octet[i] & 0xff);

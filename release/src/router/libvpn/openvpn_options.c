@@ -62,7 +62,7 @@ char* ovpn_client_option_list[] = {
 	"push-peer-info",
 	"setenv",
 	"setenv-safe",
-	"ignore-unkown-option",
+	"ignore-unknown-option",
 	"script-security",
 	"shaper",
 	"keepalive",

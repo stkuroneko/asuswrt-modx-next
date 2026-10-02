@@ -2930,6 +2930,7 @@ INT RTMPSetInformation(
 	BOOLEAN IEEE8021x_required_keys = FALSE;
 	UCHAR wpa_supplicant_enable = 0;
 #endif /* WPA_SUPPLICANT_SUPPORT */
+	UINT StaKeyLen = 0;
 #ifdef SNMP_SUPPORT
 	TX_RTY_CFG_STRUC tx_rty_cfg;
 	ULONG ShortRetryLimit, LongRetryLimit;
@@ -3037,7 +3038,7 @@ INT RTMPSetInformation(
 
 					if (pSsidString) {
 						NdisZeroMemory(pSsidString, MAX_LEN_OF_SSID + 1);
-						NdisMoveMemory(pSsidString, Ssid.Ssid, Ssid.SsidLength);
+						NdisMoveMemory(pSsidString, Ssid.Ssid, MAX_LEN_OF_SSID);
 						pSsidString[MAX_LEN_OF_SSID] = 0x00;
 						Set_SSID_Proc(pAd, pSsidString);
 						os_free_mem(pSsidString);
@@ -3069,8 +3070,12 @@ INT RTMPSetInformation(
 				} else {
 					/* set key passphrase and length */
 					NdisZeroMemory(pStaCfg->WpaPassPhrase, 64);
-					NdisMoveMemory(pStaCfg->WpaPassPhrase, &ppassphrase->KeyMaterial, ppassphrase->KeyLength);
-					pStaCfg->WpaPassPhraseLen = ppassphrase->KeyLength;
+					if (ppassphrase->KeyLength > ARRAY_SIZE(pStaCfg->WpaPassPhrase))
+						StaKeyLen = ARRAY_SIZE(pStaCfg->WpaPassPhrase);
+					else
+						StaKeyLen = ppassphrase->KeyLength;
+					NdisMoveMemory(pStaCfg->WpaPassPhrase, &ppassphrase->KeyMaterial, StaKeyLen);
+					pStaCfg->WpaPassPhraseLen = StaKeyLen;
 					hex_dump("pStaCfg->WpaPassPhrase", pStaCfg->WpaPassPhrase, 64);
 					MTWF_LOG(DBG_CAT_CFG, DBG_SUBCAT_ALL, DBG_LVL_TRACE, ("WpaPassPhrase=%s\n", pStaCfg->WpaPassPhrase));
 				}
@@ -4522,13 +4527,16 @@ INT RTMPSetInformation(
 		KeyIdx = pKey->KeyIndex & 0x0fffffff;
 		MTWF_LOG(DBG_CAT_CFG, DBG_SUBCAT_ALL, DBG_LVL_TRACE, ("pKey->KeyIndex =%d, pKey->KeyLength=%d\n", pKey->KeyIndex,
 				 pKey->KeyLength));
-
+		if ((UCHAR) pKey->KeyLength > ARRAY_SIZE(pAd->SharedKey[BSS0][pStaCfg->DefaultKeyId].Key))
+			StaKeyLen = ARRAY_SIZE(pAd->SharedKey[BSS0][pStaCfg->DefaultKeyId].Key);
+		else
+			StaKeyLen = (UCHAR) pKey->KeyLength;
 		/* it is a shared key */
 		if (KeyIdx >= 4)
 			Status = -EINVAL;
 		else {
-			pAd->SharedKey[BSS0][pStaCfg->DefaultKeyId].KeyLen = (UCHAR) pKey->KeyLength;
-			NdisMoveMemory(&pAd->SharedKey[BSS0][pStaCfg->DefaultKeyId].Key, &pKey->KeyMaterial, pKey->KeyLength);
+			pAd->SharedKey[BSS0][pStaCfg->DefaultKeyId].KeyLen = StaKeyLen;
+			NdisMoveMemory(&pAd->SharedKey[BSS0][pStaCfg->DefaultKeyId].Key, &pKey->KeyMaterial, StaKeyLen);
 
 			if (pKey->KeyIndex & 0x80000000) {
 				/* Default key for tx (shared key) */

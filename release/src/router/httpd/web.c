@@ -32,6 +32,8 @@
 #define _GNU_SOURCE
 #endif
 
+#include <inttypes.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -494,7 +496,6 @@ static void ASN1_TimeToTM(ASN1_TIME* time, struct tm *t);
 int cfg_changed = 0;
 int is_cfg_server_ready();
 void notify_cfg_server(json_object *cfg_root);
-int save_changed_param(json_object *cfg_root, char *param);
 int check_cfg_changed(json_object *root);
 static int is_wireless_client(char *mac);
 static int is_cfg_client_by_unique_mac(P_CM_CLIENT_TABLE p_client_tbl, char *mac);
@@ -1999,6 +2000,7 @@ websWriteCh(webs_t wp, char *ch, int count)
 const char *syslog_msg_filter[] = {
 	"net_ratelimit",
 	"exist in UDB, can't", "is used by someone else, can't use it", "not mesh client, can't update it", "not mesh client, can't delete it",
+	"ERROR: [send_redir_page",
 	NULL
 };
 #endif
@@ -2800,7 +2802,7 @@ static void do_html_get(char *url, int len, char *boundary){
 	init_cgi(NULL);
 
 	memset(post_buf, 0, sizeof(post_buf));
-	memset(post_buf_backup, 0, sizeof(post_buf));
+	memset(post_buf_backup, 0, sizeof(post_buf_backup));
 	memset(post_json_buf, 0, sizeof(post_json_buf));
 
 	query = url;
@@ -7292,7 +7294,8 @@ ej_lan_ipv6_network(int eid, webs_t wp, int argc, char_t **argv)
 		}
 		/* fall through */
 	default:
-		next = strlcpy(dnsbuf, "", sizeof(dnsbuf));
+		dnsbuf[0] = '\0';
+		next = dnsbuf;
 		for (i = 1; i <= 3; i++) {
 			char tmp[sizeof("ipv6_dnsXXX")];
 			snprintf(tmp, sizeof(tmp), "ipv6_dns%d", i);
@@ -11913,7 +11916,11 @@ apply_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 #endif
 #endif
 #endif
+
 			strncpy(SystemCmd, system_cmd, sizeof(SystemCmd));
+#if defined(XD4S)
+			strcat(SystemCmd," -b");
+#endif			
 			sys_script("syscmd.sh");
 
 		}
@@ -14216,6 +14223,8 @@ do_upgrade_post(char *url, FILE *stream, int len, char *boundary)
 	{
 		if (!fgets(buf, MIN(len + 1, sizeof(buf)), stream))
 		{
+			if(errno == EINTR)
+				continue;
 			goto err;
 		}
 
@@ -14230,6 +14239,8 @@ do_upgrade_post(char *url, FILE *stream, int len, char *boundary)
 	while (len > 0) {
 		if (!fgets(buf, MIN(len + 1, sizeof(buf)), stream))
 		{
+			if(errno == EINTR)
+				continue;
 			goto err;
 		}
 		len -= strlen(buf);
@@ -14281,7 +14292,7 @@ do_upgrade_post(char *url, FILE *stream, int len, char *boundary)
 
 #else	// RTCONFIG_PIPEFW
 
-#if defined(RTCONFIG_QCA)
+#if defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
 	if (!(fifo = fopen(upload_fifo, "w"))) goto err;
 #else
 	if (!(fifo = fopen(upload_fifo, "a+"))) goto err;
@@ -14304,24 +14315,22 @@ do_upgrade_post(char *url, FILE *stream, int len, char *boundary)
 	/* Pipe the rest to the FIFO */
 	while (len>0 && filelen>0)
 	{
-
+		int ret;
 #ifdef RTCONFIG_HTTPS
 		if(do_ssl){
-			if (waitfor(ssl_stream_fd, (len >= 0x4000)? 3 : 1) <= 0)
-				break;
+			ret = waitfor(ssl_stream_fd, (len >= 0x4000)? 3 : 1);
 		}
-		else{
-			if (waitfor (fileno(stream), 10) <= 0)
-			{
-				break;
-			}
-		}
-#else
-		if (waitfor (fileno(stream), 10) <= 0)
+		else
+#endif
+			ret = waitfor (fileno(stream), 10);
+
+		if (ret <= 0)
 		{
+			if(ret < 0 && errno == EINTR)
+				continue;
+			_dprintf("waitfor() fail errno: %d (%s)\n", errno, strerror(errno));
 			break;
 		}
-#endif
 
 		count = fread(buf + offset, 1, MIN(len, sizeof(buf)-offset), stream);
 
@@ -14351,8 +14360,13 @@ do_upgrade_post(char *url, FILE *stream, int len, char *boundary)
 				goto err;
 			}
 		}
-		filelen-=count;
-		fwrite(buf, 1, count, fifo);
+		if(filelen > 0) {
+			if(count > filelen)
+				count = filelen; //only write the length byte to the file
+
+			filelen-=count;
+			fwrite(buf, 1, count, fifo);
+		}
 	}
 
 #ifdef HND_ROUTER
@@ -14360,8 +14374,9 @@ do_upgrade_post(char *url, FILE *stream, int len, char *boundary)
 #endif
 
 	/* Slurp anything remaining in the request */
-	while (len-- > 0)
+	while (len > 0)
 	{
+		len--;
 		if((ch = fgetc(stream)) == EOF)
 			break;
 
@@ -14411,9 +14426,11 @@ err:
 
 	/* Slurp anything remaining in the request */
 	_dprintf("\nSlurp remaining %d bytes\n", len);
-	while (len-- > 0)
+	while (len > 0) {
+		len--;
 		if((ch = fgetc(stream)) == EOF)
 			break;
+	}
 }
 #endif
 
@@ -16665,6 +16682,7 @@ do_diag_log_file(char *url, FILE *stream)
 }
 #endif
 
+#ifdef RTCONFIG_IG_S2S_WIREGUARD
 static void
 deleteOfflineClient(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg, char_t *url, char_t *path, char_t *query)
 {
@@ -16742,6 +16760,7 @@ do_deleteOfflineClient_cgi(char *url, FILE *stream)
 	deleteOfflineClient(stream, NULL, NULL, 0, url, NULL, NULL);
 
 }
+#endif	/* RTCONFIG_IG_S2S_WIREGUARD */
 
 #ifdef RTCONFIG_NETOOL
 static void
@@ -21170,7 +21189,7 @@ struct mime_handler mime_handlers[] = {
 #endif
 #ifdef RTCONFIG_WIREGUARD
 	{ "wgs_client.png", "image/png", no_cache_IE7, NULL, do_wgs_client_png, NULL },
-	{ "wgs_client.conf", "application/force-download", NULL, NULL, do_wgs_client_conf, do_auth },
+	{ "wgs_client.conf", "application/octet-stream", NULL, NULL, do_wgs_client_conf, do_auth },
 #endif
 	{ "Nologin.asp", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
 	{ "error_page.htm*", "text/html", no_cache_IE7, do_html_post_and_get, do_ej, NULL },
@@ -21266,14 +21285,14 @@ struct mime_handler mime_handlers[] = {
 	{ "**.js", "text/javascript", no_cache_IE7, do_html_post_and_get, do_ej, do_auth },
 	{ "**.json", "application/json", no_cache_IE7, do_html_post_and_get, do_ej, do_auth },
 	{ "**.cab", "text/txt", NULL, NULL, do_file, do_auth },
-	{ "**.CFG", "application/force-download", NULL, do_html_post_and_get, do_prf_file, do_auth },
-	{ "uploadIconFile.tar", "application/force-download", NULL, NULL, do_uploadIconFile_file, do_auth },
-	{ "networkmap.tar", "application/force-download", NULL, NULL, do_networkmap_file, do_auth },
-	{ "upnp.log", "application/force-download", NULL, NULL, do_upnp_file, do_auth },
-	{ "upnpc_xml.log", "application/force-download", NULL, NULL, do_upnpc_xml_file, do_auth },
-	{ "mDNSNetMonitor.log", "application/force-download", NULL, NULL, do_dnsnet_file, do_auth },
+	{ "**.CFG", "application/octet-stream", NULL, do_html_post_and_get, do_prf_file, do_auth },
+	{ "uploadIconFile.tar", "application/x-tar", NULL, NULL, do_uploadIconFile_file, do_auth },
+	{ "networkmap.tar", "application/x-tar", NULL, NULL, do_networkmap_file, do_auth },
+	{ "upnp.log", "application/octet-stream", NULL, NULL, do_upnp_file, do_auth },
+	{ "upnpc_xml.log", "application/octet-stream", NULL, NULL, do_upnpc_xml_file, do_auth },
+	{ "mDNSNetMonitor.log", "application/octet-stream", NULL, NULL, do_dnsnet_file, do_auth },
 	{ "ftpServerTree.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_ftpServerTree_cgi, do_auth },//andi
-	{ "**.ovpn", "application/force-download", NULL, NULL, do_prf_ovpn_file, do_auth },
+	{ "**.ovpn", "application/x-openvpn-profile", NULL, NULL, do_prf_ovpn_file, do_auth },
 	{ "QIS_default.cgi", "text/html", no_cache_IE7, do_html_post_and_get, do_qis_default, do_auth },
 	{ "page_default.cgi", "text/html", no_cache_IE7, do_html_post_and_get, do_page_default, do_auth },
 	{ "apply.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_apply_cgi, do_auth },
@@ -21292,8 +21311,8 @@ struct mime_handler mime_handlers[] = {
 #ifdef RTCONFIG_HTTPS
 	{ "upload_cert_key.cgi*", "text/html", no_cache_IE7, do_upload_cert_key, do_upload_cert_key_cgi, do_auth },
 #endif
-	{ "cert_key.tar", "application/force-download", NULL, do_html_post_and_get, do_download_cert_key_cgi, do_auth },
-	{ "cert.tar", "application/force-download", NULL, do_html_post_and_get, do_download_cert_cgi, do_auth },
+	{ "cert_key.tar", "application/x-tar", NULL, do_html_post_and_get, do_download_cert_key_cgi, do_auth },
+	{ "cert.tar", "application/x-tar", NULL, do_html_post_and_get, do_download_cert_cgi, do_auth },
 #if defined(RTCONFIG_IFTTT) || defined(RTCONFIG_ALEXA) || defined(RTCONFIG_GOOGLE_ASST)
 	{ "get_IFTTTPincode.cgi", "text/html", no_cache_IE7, do_html_post_and_get, do_get_IFTTTPincode_cgi, do_auth },
 	{ "send_IFTTTPincode.cgi", "text/html", no_cache_IE7, do_html_post_and_get, do_send_IFTTTPincode_cgi, do_auth },
@@ -21308,19 +21327,19 @@ struct mime_handler mime_handlers[] = {
 	{ "enable_remote_control.cgi", "text/html", no_cache_IE7, do_html_post_and_get, do_enable_remote_control_cgi, do_auth },
 	{ "check_Auth.cgi", "text/html", no_cache_IE7, do_html_post_and_get, do_check_Auth_cgi, do_auth },
 	{ "auto_guestnetwork.cgi", "text/html", no_cache_IE7, do_html_post_and_get, do_auto_guestnetwork_cgi, do_auth },
-	{ "syslog.txt*", "application/force-download", syslog_txt, do_html_post_and_get, do_log_cgi, do_auth },
+	{ "syslog.txt*", "text/plain", syslog_txt, do_html_post_and_get, do_log_cgi, do_auth },
 #ifdef RTCONFIG_QTN  //RT-AC87U
-	{ "tmp/qtn_diagnostics.cgi*", "application/force-download", NULL, NULL, do_qtn_diagnostics, do_auth },
+	{ "tmp/qtn_diagnostics.cgi*", "application/octet-stream", NULL, NULL, do_qtn_diagnostics, do_auth },
 #endif
 #ifdef RTCONFIG_USB_MODEM
-	{ "modemlog.txt*", "application/force-download", modemlog_txt, do_html_post_and_get, do_modemlog_cgi, do_auth },
+	{ "modemlog.txt*", "text/plain", modemlog_txt, do_html_post_and_get, do_modemlog_cgi, do_auth },
 #endif
 #ifdef RTCONFIG_TCPDUMP
-	{ "udhcpc.pcap*", "application/force-download", NULL, NULL, do_file, NULL },
-	{ "**.pcap*", "application/force-download", NULL, NULL, do_file, NULL },
+	{ "udhcpc.pcap*", "application/octet-stream", NULL, NULL, do_file, NULL },
+	{ "**.pcap*", "application/octet-stream", NULL, NULL, do_file, NULL },
 #endif
 #ifdef RTCONFIG_DUMP4000
-	{ "**.pcap*", "application/force-download", NULL, NULL, do_file, NULL },
+	{ "**.pcap*", "application/octet-stream", NULL, NULL, do_file, NULL },
 #endif
 #ifdef RTCONFIG_DSL
 	{ "dsllog.cgi*", "text/txt", no_cache_IE7, do_html_post_and_get, do_adsllog_cgi, do_auth },
@@ -21335,7 +21354,7 @@ struct mime_handler mime_handlers[] = {
 #endif //TRANSLATE_ON_FLY
 #ifdef RTCONFIG_OPENVPN
 	{ "vpnupload.cgi*", "text/html", no_cache_IE7, do_vpnupload_post, do_vpnupload_cgi, do_auth },
-	{ "server_ovpn.cert", "application/force-download", NULL, do_html_post_and_get, do_server_ovpn_file, do_auth },
+	{ "server_ovpn.cert", "application/x-x509-ca-cert", NULL, do_html_post_and_get, do_server_ovpn_file, do_auth },
 	{ "upload_server_ovpn_cert.cgi*", "text/html", no_cache_IE7, do_upload_server_ovpn_cert_post, do_upload_server_ovpn_cert_cgi, do_auth },
 #endif
 #ifdef RTCONFIG_CAPTIVE_PORTAL
@@ -21344,15 +21363,15 @@ struct mime_handler mime_handlers[] = {
 	{ "splash_page_del.cgi*", "text/html", no_cache_IE7, do_splash_page_del, do_splash_page_cgi, do_auth },
 #endif
 #ifdef RTCONFIG_IPSEC
-	{ "ipsec.log", "application/force-download", NULL, NULL, do_ipsec_file, do_auth },
+	{ "ipsec.log", "application/octet-stream", NULL, NULL, do_ipsec_file, do_auth },
 	{ "clear_file.cgi*", "text/javascript", no_cache_IE7, do_html_post_and_get, do_clear_file_cgi, do_auth },
 	{ "ipsecupload.cgi*", "text/html", no_cache_IE7, do_ipsecupload_post, do_ipsecupload_cgi, do_auth },
 	{ "caupload.cgi*", "text/html", no_cache_IE7, do_caupload_post, NULL, do_auth },
 	{ "renew_ikev2_cert_key.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_renew_ikev2_cert_key, do_auth },
-	{ "renew_ikev2_cert_mobile.pem", "application/force-download", NULL, NULL, do_renew_ikev2_cert_pem, do_auth },
-	{ "renew_ikev2_cert_windows.der", "application/force-download", NULL, NULL, do_renew_ikev2_cert_der, do_auth },
-	{ "ikev2_cert_mobile.pem", "application/force-download", NULL, NULL, do_ikev2_cert_pem, do_auth },
-	{ "ikev2_cert_windows.der", "application/force-download", NULL, NULL, do_ikev2_cert_der, do_auth },
+	{ "renew_ikev2_cert_mobile.pem", "application/x-pem-file", NULL, NULL, do_renew_ikev2_cert_pem, do_auth },
+	{ "renew_ikev2_cert_windows.der", "application/x-x509-ca-cert", NULL, NULL, do_renew_ikev2_cert_der, do_auth },
+	{ "ikev2_cert_mobile.pem", "application/x-pem-file", NULL, NULL, do_ikev2_cert_pem, do_auth },
+	{ "ikev2_cert_windows.der", "application/x-x509-ca-cert", NULL, NULL, do_ikev2_cert_der, do_auth },
 	{ "get_ipsec_clientlist.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_get_ipsec_clientlist_cgi, do_auth },
 	{ "set_ipsec_clientlist.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_set_ipsec_clientlist_cgi, do_auth },
 	{ "ipsec_cert_info.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_ipsec_cert_info_cgi, do_auth },
@@ -21364,7 +21383,9 @@ struct mime_handler mime_handlers[] = {
 	{ "set_ig_config.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_set_ig_config_cgi, do_auth },
 #endif
 #endif
+#ifdef RTCONFIG_IG_S2S_WIREGUARD
 	{ "deleteOfflineClient.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_deleteOfflineClient_cgi, do_auth },
+#endif
 #ifdef RTCONFIG_QCA_PLC_UTILS
 	{ "plc.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_plc_cgi, do_auth },
 #endif
@@ -21380,7 +21401,7 @@ struct mime_handler mime_handlers[] = {
 #endif
 #if defined(HND_ROUTER) && defined(RTCONFIG_VISUALIZATION)
 	{ "json.cgi*", "application/json", no_cache_IE7, (void *) vis_do_json_set, vis_do_json_get, do_auth },
-	{ "visdata.db*", "application/force-download", NULL, (void *) vis_do_visdbdwnld_cgi, NULL, do_auth },
+	{ "visdata.db*", "application/octet-stream", NULL, (void *) vis_do_visdbdwnld_cgi, NULL, do_auth },
 #endif
 #if 0 // obsoleted, RTCONFIG_RGBLED
 	{ "aurargb.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_aurargb_cgi, do_auth },
@@ -21394,7 +21415,7 @@ struct mime_handler mime_handlers[] = {
 	{ "update_wlanlog.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_update_wlanlog_cgi, do_auth },
 	{ "rog_first_qos.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_rog_first_qos_cgi, do_auth },
 	{ "feedback_mail.cgi*", "text/html", no_cache_IE7, do_html_post_and_get, do_feedback_mail_cgi, do_auth },
-	{ "dfb_log.cgi", "application/force-download", NULL, do_html_post_and_get, do_dfb_log_file, do_auth },
+	{ "dfb_log.cgi", "application/octet-stream", NULL, do_html_post_and_get, do_dfb_log_file, do_auth },
 	{ "clean_offline_clientlist.cgi", "text/html", no_cache_IE7, do_html_post_and_get, do_clean_offline_clientlist_cgi, do_auth },
 	{ "set_fw_path.cgi", "text/html", no_cache_IE7, do_html_post_and_get, do_set_fw_path_cgi, do_auth },
 #ifdef RTCONFIG_IPERF3
@@ -24723,7 +24744,7 @@ static int ej_netdev(int eid, webs_t wp, int argc, char_t **argv)
 	char buf[256];
 	unsigned long long rx = 0, tx = 0, curr_rx = 0, curr_tx = 0;
 	unsigned long long rx2 = 0, tx2 = 0;
-#if !defined(RTCONFIG_QCA) && defined(RTCONFIG_LACP)
+#if !defined(RTCONFIG_QCA) && !defined(RTCONFIG_SWITCH_MT7986_MT7531) && defined(RTCONFIG_LACP)
 	unsigned long long rx_lacp1=0, tx_lacp1=0;
 	unsigned long long rx_lacp2=0, tx_lacp2=0;
 #ifdef RTCONFIG_BCM5301X_TRAFFIC_MONITOR
@@ -24982,7 +25003,7 @@ loopagain:
 			}
 #endif
 
-#if !defined(RTCONFIG_QCA) && defined(RTCONFIG_LACP)
+#if !defined(RTCONFIG_QCA) && !defined(RTCONFIG_SWITCH_MT7986_MT7531) && defined(RTCONFIG_LACP)
 	if(nvram_get_int("lacp_enabled") == 1){
 		if(from_app == 0){
 			ret += websWrite(wp, "%c'%s':{rx:0x%llx,tx:0x%llx}\n", comma, LACP_PORT1, rx_lacp1, tx_lacp1);
@@ -26651,7 +26672,7 @@ ej_check_passwd_strength(int eid, webs_t wp, int argc, char **argv){
 				memset(sFwd, 0, sizeof(sFwd));
 				memset(sFwd_t, 0, sizeof(sFwd_t));
 				memset(sRev, 0, sizeof(sRev));
-				if(sAlphas+s != '\0'){
+				if(*(sAlphas + s) != '\0'){
 					strncpy(sFwd, sAlphas+s, 3);
 					strncpy(sFwd_t, sFwd, 3);
 				}
@@ -26667,7 +26688,7 @@ ej_check_passwd_strength(int eid, webs_t wp, int argc, char **argv){
 				memset(sFwd, 0, sizeof(sFwd));
 				memset(sFwd_t, 0, sizeof(sFwd_t));
 				memset(sRev, 0, sizeof(sRev));
-				if(sNumerics+s != '\0'){
+				if(*(sNumerics + s) != '\0'){
 					strncpy(sFwd, sNumerics+s, 3);
 					strncpy(sFwd_t, sFwd, 3);
 				}
@@ -26682,7 +26703,7 @@ ej_check_passwd_strength(int eid, webs_t wp, int argc, char **argv){
 				memset(sFwd, 0, sizeof(sFwd));
 				memset(sFwd_t, 0, sizeof(sFwd_t));
 				memset(sRev, 0, sizeof(sRev));
-				if(sSymbols+s != '\0'){
+				if(*(sSymbols + s) != '\0'){
 					strncpy(sFwd, sSymbols+s, 3);
 					strncpy(sFwd_t, sFwd, 3);
 				}
@@ -28333,8 +28354,8 @@ void covert_bitmap_describe(json_object *capabilityObj) {
     if (verObj == NULL || json_object_get_int(verObj) <= 0)
         return;
 
-	if (portsObj == NULL)
-		return;
+    if (portsObj == NULL)
+	return;
 
     version = json_object_get_int(verObj);
 
@@ -30359,6 +30380,7 @@ ej_get_vpnc_status(int eid, webs_t wp, int argc, char **argv)
 				snprintf(tmp, sizeof(tmp), i? "<%d>%d>%d": "%d>%d>%d", state_t, sb_state_t, prof[i].vpnc_idx);
 				websWrite(wp, "%s", tmp);
 			}
+#if defined(RTCONFIG_WIREGUARD)
 			else if(prof[i].protocol == VPNC_PROTO_WG)
 			{
 				if (_is_wgc_connected(prof[i].config.wg.wg_idx))
@@ -30369,6 +30391,7 @@ ej_get_vpnc_status(int eid, webs_t wp, int argc, char **argv)
 				snprintf(tmp, sizeof(tmp), i? "<%d>%d>%d": "%d>%d>%d", state_t, sb_state_t, prof[i].vpnc_idx);
 				websWrite(wp, "%s", tmp);
 			}
+#endif
 		}
 	}
 	if(check_user_agent(user_agent) != FROM_BROWSER || hook_get_json == 1)
@@ -30491,11 +30514,16 @@ static const struct ate_id_alias_s wan_aliases[] = {
 	{ "W0", "WAN" },
 	{ "W1", "10G base-T" },
 	{ "W2", "10G SFP+" },
+#elif defined(TUFAX4200) || defined(TUFAX6000)
+	{ "W0", "2.5G WAN" },
 #endif
 	{ NULL, NULL }
 };
 
 static const struct ate_id_alias_s lan_aliases[] = {
+#if defined(TUFAX4200) || defined(TUFAX6000)
+	{ "L5", "2.5G LAN" },
+#endif
 	{ NULL, NULL }
 };
 
@@ -30670,7 +30698,9 @@ ej_generate_trans_id(int eid, webs_t wp, int argc, char **argv) {
 }
 #endif
 
-static int filter_5g_channel_by_bw(struct json_object *output_channel_array, struct json_object *channel_array, int bw){
+#if defined(CONFIG_BCMWL5)
+static int filter_5g_channel_by_bw(struct json_object *output_channel_array, struct json_object *channel_array, int bw)
+{
 
 	int i=0, j=0;
 	int del=0, d=0, nr_ch=0, cn_len=0, channel_tmp_int=0;
@@ -30728,7 +30758,8 @@ static int filter_5g_channel_by_bw(struct json_object *output_channel_array, str
 	return 0;
 }
 
-static int is_avaiable_channel(struct json_object *filter_channel, struct json_object *chan_compare_tmp){
+static int is_avaiable_channel(struct json_object *filter_channel, struct json_object *chan_compare_tmp)
+{
 
 	int i=0, ret=0;
 	struct json_object *avaiable_channel=NULL;
@@ -30743,19 +30774,23 @@ static int is_avaiable_channel(struct json_object *filter_channel, struct json_o
 
 	return ret;
 }
+#endif	/* CONFIG_BCMWL5 */
 
 static int
 ej_get_wl_channel_list(int eid, webs_t wp, int argc, char **argv, int unit) {
 
-	int i=0, j=0;
+	int i=0;
 #ifdef RTCONFIG_CFGSYNC
 	int avlbl_bw=1;
 #endif
-	int avlbl_bw20=1, avlbl_bw40=1, avlbl_bw80=1, avlbl_bw160=1;
+	int avlbl_bw20 __attribute__((unused)) = 1, avlbl_bw40 __attribute__((unused)) = 1, avlbl_bw80 __attribute__((unused)) = 1, avlbl_bw160 __attribute__((unused)) = 1;
+#if defined(CONFIG_BCMWL5)
+	int j = 0;
 	char word[256]={0}, *next=NULL;
 	char chanspec_buf[8]={0},  chanspec_auto_buf[8]={0}, *chanspec=NULL;
 	char *wl_chansps = NULL;
 	char tmp[1024], prefix[] = "wlXXXXXXXXXX_";
+#endif
 #ifdef RTCONFIG_CFGSYNC
 	AVBL_CHANSPEC_T avbl_chanspec;
 	int cfg_rejoin = 0;
@@ -30771,7 +30806,7 @@ ej_get_wl_channel_list(int eid, webs_t wp, int argc, char **argv, int unit) {
 	}
 #endif
 
-	struct json_object *chan_tmp=NULL, *chan_compare_tmp=NULL;
+	struct json_object *chan_tmp __attribute__((unused)) = NULL, *chan_compare_tmp __attribute__((unused)) = NULL;
 	struct json_object *chan_above_array = json_object_new_array();
 	struct json_object *chan_below_array = json_object_new_array();
 	struct json_object *chan_80m_tmp = json_object_new_array();
@@ -30780,11 +30815,11 @@ ej_get_wl_channel_list(int eid, webs_t wp, int argc, char **argv, int unit) {
 	struct json_object *chan_40m_array = json_object_new_array();
 	struct json_object *chan_80m_array = json_object_new_array();
 	struct json_object *chan_160m_array = json_object_new_array();
-	struct json_object *chan_auto_array = json_object_new_array();
+	struct json_object *chan_auto_array __attribute__((unused)) = json_object_new_array();
 	struct json_object *chanspec_40m_array = json_object_new_array();
 	struct json_object *chanspec_80m_array = json_object_new_array();
 	struct json_object *chanspec_160m_array = json_object_new_array();
-	struct json_object *chanspec_auto_array = json_object_new_array();
+	struct json_object *chanspec_auto_array __attribute__((unused)) = json_object_new_array();
 	struct json_object *chan_160m_cfg_tmp = json_object_new_array();
 	struct json_object *filter_channel_40 = json_object_new_array();
 	struct json_object *filter_channel_80 = json_object_new_array();
@@ -31165,7 +31200,8 @@ static int ej_wan_bonding_p1_status(int eid, webs_t wp, int argc, char **argv)
 {
 	int p1_port = BS_WAN_PORT_ID;
 
-#if defined(RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033)
+#if defined(RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033) \
+ || defined(RTCONFIG_SWITCH_MT7986_MT7531)
 	int i = 0;
 	char *next, port[4], ports_str[32];
 
@@ -31197,7 +31233,8 @@ static int ej_wan_bonding_p2_status(int eid, webs_t wp, int argc, char **argv)
 	int p2_port = BS_LAN4_PORT_ID;
 #endif
 
-#if defined(RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033)
+#if defined(RTCONFIG_SWITCH_QCA8075_QCA8337_PHY_AQR107_AR8035_QCA8033) \
+ || defined(RTCONFIG_SWITCH_MT7986_MT7531)
 	int i = 0;
 	char *next, port[4], ports_str[32];
 

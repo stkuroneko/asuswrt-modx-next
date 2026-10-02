@@ -9779,6 +9779,94 @@ int reset_exclbase(int unit)
 #endif
 
 #ifdef RTCONFIG_BCMWL6
+
+#ifdef XT8PRO
+int  acs_excl_list_eu_10min(int wl_unit)
+{
+	int bw_idx = 0 , chan_idx = 0;
+	chanspec_t chanspec;
+	char chanspec_str[10] = {0};
+	char tmp[128], prefix[] = "wlXXXXXXXXXX_";
+	char *(excl_list_10min[4][10]) = {
+		{"120", "124", "128", NULL},
+		{"116l", "120u", "124l", "128u", NULL},
+		{"116/80", "120/80", "124/80", "128/80", NULL},
+		{"100/160", "104/160", "108/160", "112/160", "116/160", "120/160", "124/160", "128/160", NULL}};
+	char acs_excl_chans_orig[1000] = {0};
+	int first_chanspec = 0;
+	int wl_bw_tmp = 0 , wl_bw_160_tmp = 0, bw_max = 0;
+	char acs_excl_list_result[1000] = {0};
+
+	snprintf(prefix, sizeof(prefix), "wl%d_", wl_unit);
+
+	bw_idx = 0;
+	wl_bw_tmp = nvram_get_int(strcat_r(prefix, "bw", tmp));
+	wl_bw_160_tmp = nvram_get_int(strcat_r(prefix, "bw_160", tmp));
+
+	snprintf(acs_excl_chans_orig, sizeof(acs_excl_chans_orig),
+			"%s", nvram_safe_get(strcat_r(prefix, "acs_excl_chans", tmp)));
+
+	if(strlen(acs_excl_chans_orig) == 0) first_chanspec = 1;
+
+	if(wl_bw_tmp == 1){ /* exclude 20M, 10min. channel */
+		bw_idx = 0;
+		bw_max = 1;
+	}else if(wl_bw_tmp == 2){ /* exclude 40M, 10min. channel */
+		bw_idx = 1;
+		bw_max = 2;
+	}else if(wl_bw_tmp == 3){ /* exclude 80M, 10min. channel */
+		bw_idx = 2;
+		bw_max = 3;
+	}else if(wl_bw_tmp == 5){ /* exclude 160M, 10min. channel */
+		bw_idx = 3;
+		bw_max = 4;
+	}else if(wl_bw_tmp == 0){
+		if(wl_bw_160_tmp == 0){
+			/* exclude 80M, 10min. channel */
+			bw_idx = 2;
+			bw_max = 3;
+		}else{
+			/* exclude 80M and 160M 10min. channel */
+			bw_idx = 2;
+			bw_max = 4;
+		}
+	}
+
+	snprintf(acs_excl_list_result, sizeof(acs_excl_list_result),
+			"[%d] orig [%s]=[%s]",
+				__LINE__, strcat_r(prefix, "acs_excl_chans", tmp), acs_excl_chans_orig);
+	logmessage("set_acsd", acs_excl_list_result);
+	for(; bw_idx < bw_max ; bw_idx++){
+		for(chan_idx = 0; excl_list_10min[bw_idx][chan_idx] != NULL ; chan_idx++){
+
+			/* get chanspec string */
+			chanspec = wf_chspec_aton(excl_list_10min[bw_idx][chan_idx]);
+			snprintf(chanspec_str, sizeof(chanspec_str), "0x%x", chanspec);
+
+			if(strstr(acs_excl_chans_orig, chanspec_str) == NULL){
+				if(first_chanspec == 1){
+					strncat(acs_excl_chans_orig, chanspec_str,
+						sizeof(acs_excl_chans_orig)-strlen(acs_excl_chans_orig)-1);
+					first_chanspec = 0;
+				}else{
+					strncat(acs_excl_chans_orig, ",",
+						sizeof(acs_excl_chans_orig)-strlen(acs_excl_chans_orig)-1);
+					strncat(acs_excl_chans_orig, chanspec_str,
+						sizeof(acs_excl_chans_orig)-strlen(acs_excl_chans_orig)-1);
+				}
+			}
+		}	/* channel */
+	}	/* bw */
+
+	nvram_set(strcat_r(prefix, "acs_excl_chans", tmp), acs_excl_chans_orig);
+
+	snprintf(acs_excl_list_result, sizeof(acs_excl_list_result), "new [%d] [%s]=[%s]",
+		__LINE__, strcat_r(prefix, "acs_excl_chans", tmp), acs_excl_chans_orig);
+	logmessage("set_acsd", acs_excl_list_result);
+	return 1;
+}
+#endif
+
 void set_acs_ifnames()
 {
 	char acs_ifnames[64];
@@ -9814,6 +9902,9 @@ void set_acs_ifnames()
 #ifdef RTCONFIG_HAS_5G_2
 	snprintf(prefix_5g2, sizeof(prefix_5g2), "wl2_");
 #endif
+#endif
+#ifdef XT8PRO
+	int acs_5g_unit = 2;
 #endif
 
 	wl_check_5g_band_group();
@@ -10028,6 +10119,17 @@ void set_acs_ifnames()
 	nvram_set_int(strcat_r(prefix_5g, "acs_dfs", tmp), nvram_match(strcat_r(prefix_5g, "reg_mode", tmp2), "h") ? 1 : 0);
 #ifdef RTCONFIG_HAS_5G_2
 	nvram_set_int(strcat_r(prefix_5g2, "acs_dfs", tmp), nvram_match(strcat_r(prefix_5g2, "reg_mode", tmp2), "h") ? 1 : 0);
+#endif
+
+#ifdef XT8PRO
+	if(nvram_match("location_code", "EU")){
+		acs_excl_list_eu_10min(acs_5g_unit);
+	}else{
+		/* without location_code */
+		if(nvram_match("territory_code", "EU/01")){
+			acs_excl_list_eu_10min(acs_5g_unit);
+		}
+	}
 #endif
 }
 #endif

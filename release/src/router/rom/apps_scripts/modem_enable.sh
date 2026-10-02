@@ -452,7 +452,7 @@ if [ "$modem_type" == "tty" -o "$modem_type" == "qmi" -o "$modem_type" == "mbim"
 				nvram unset ${prefix}act_reboot
 				nvram commit
 			fi
-		elif [ "$modem_model" == "1" ]; then
+		elif [ "$modem_model" == "1" ] || [ "$modem_model" == "2" ]; then
 			ret=`echo -n $at_ret |grep "+CFUN: 4" 2>/dev/null`
 			if [ -z "$ret" ]; then
 				echo "Quectel: let the modem unregister the network."

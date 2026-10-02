@@ -1155,7 +1155,6 @@ void rc_ipsec_psk_xauth_rw_init()
 void rc_ipsec_secrets_set()
 {
 	char ipsec_client_list_name[SZ_MIN] = {0}, buf[SZ_MAX] = {0}, s_tmp[SZ_MAX] = {0};
-	char auth2meth[SZ_MIN] = {0};
 #ifdef RTCONFIG_INSTANT_GUARD
 	char ig_client_list[1024] = {0}, ig_client_buf[128] = {0};
 	char *desc = NULL, *ts = NULL, *active = NULL;

@@ -877,6 +877,7 @@ struct GNU_PACKED wnm_command {
 #define OFFSET_HW_VERSION	(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xFE04)	// 8 bytes
 #define OFFSET_HW_BOM		(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xFE0C)	// 32 bytes
 #define OFFSET_HW_DATE_CODE	(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xFE3E)	// 8 bytes
+#define OFFSET_HW_COBRAND	(OFFSET_MTD_FACTORY + FTRY_PARM_SHIFT + 0xFE46)	// 1 bytes
 #endif
 
 #ifdef RTCONFIG_AMAS
@@ -977,12 +978,6 @@ int ra_gpio_read_int(int *value);
 int ra_gpio_write_bit(int idx, int value);
 
 extern int wl_ioctl(const char *ifname, int cmd, struct iwreq *pwrq);
-
-#if defined(RTCONFIG_RALINK_MT7622)  || defined(RTCONFIG_RALINK_MT7629) || (defined(RTCONFIG_RALINK_MT7621) && defined (RTCONFIG_WLMODULE_MT7915D_AP)) || defined(RTCONFIG_MT798X)
-#define MTK_HNAT_MOD "mtkhnat"
-#else
-#define MTK_HNAT_MOD "hw_nat"
-#endif
 
 /* for ATE Get_WanLanStatus command */
 #if defined(RTCONFIG_RALINK_MT7621)

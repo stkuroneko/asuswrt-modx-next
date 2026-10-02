@@ -208,16 +208,6 @@ function control_category_block(_category){
 			break;
 	}
 }
-var location_array = [
-	{value:"Home",text:"<#AiMesh_NodeLocation01#>"}, {value:"Living Room",text:"<#AiMesh_NodeLocation02#>"}, {value:"Dining Room",text:"<#AiMesh_NodeLocation03#>"},
-	{value:"Bedroom",text:"<#AiMesh_NodeLocation04#>"}, {value:"Office",text:"<#AiMesh_NodeLocation05#>"}, {value:"Stairwell",text:"<#AiMesh_NodeLocation06#>"},
-	{value:"Hall",text:"<#AiMesh_NodeLocation07#>"}, {value:"Kitchen",text:"<#AiMesh_NodeLocation08#>"}, {value:"Attic",text:"<#AiMesh_NodeLocation09#>"},
-	{value:"Basement",text:"<#AiMesh_NodeLocation10#>"}, {value:"Yard",text:"<#AiMesh_NodeLocation11#>"}, {value:"Master Bedroom",text:"<#AiMesh_NodeLocation12#>"},
-	{value:"Guest Room",text:"<#AiMesh_NodeLocation13#>"}, {value:"Kids Room",text:"<#AiMesh_NodeLocation14#>"}, {value:"Study Room",text:"<#AiMesh_NodeLocation15#>"},
-	{value:"Hallway",text:"<#AiMesh_NodeLocation16#>"}, {value:"Walk-in Closet",text:"<#AiMesh_NodeLocation17#>"}, {value:"Bathroom",text:"<#AiMesh_NodeLocation18#>"},
-	{value:"Second Floor",text:"<#AiMesh_NodeLocation19#>"}, {value:"Third Floor",text:"<#AiMesh_NodeLocation20#>"}, {value:"Storage",text:"<#AiMesh_NodeLocation21#>"},
-	{value:"Balcony",text:"<#AiMesh_NodeLocation22#>"}, {value:"Meeting Room",text:"<#AiMesh_NodeLocation23#>"}, {value:"Garage",text:"<#AiMesh_NodeLocation25#>"},
-	{value:"Custom",text:"<#AiMesh_NodeLocation24#>"}];
 
 function gen_custom_select(_location){
 	$(".custom_select .custom_select_selected").remove();
@@ -225,16 +215,16 @@ function gen_custom_select(_location){
 	$(".custom_select #sel_location").find("option").remove();
 	$(".location_info_bg .location_hint").hide();
 
-	for(var i = 0; i < location_array.length; i += 1) {
+	for(var i = 0; i < aimesh_location_arr.length; i += 1) {
 		$("#sel_location").append($('<option>', {
-			value: location_array[i].value,
-			text: location_array[i].text,
+			value: aimesh_location_arr[i].value,
+			text: aimesh_location_arr[i].text,
 		}));
 	}
 
 	var location_text = "<#AiMesh_NodeLocation01#>";
 	var location_active = "Home";
-	var specific_location = location_array.filter(function(item, index, _array){
+	var specific_location = aimesh_location_arr.filter(function(item, index, _array){
 		return (item.value == _location);
 	})[0];
 	if(specific_location != undefined){
@@ -255,13 +245,13 @@ function gen_custom_select(_location){
 		e.stopPropagation();
 		var validAiMeshLocation = function($obj) {
 			var valid_hint = "";
-			var location = $.trim($obj.val());
-			$obj.val(location);
+			var node_location_text = $.trim($obj.val());
+			$obj.val(node_location_text);
 			var show_valid_hint = function(_hint){
 				$(".location_info_bg .location_hint").show();
 				$(".location_info_bg .location_hint").html(_hint);
 			};
-			if(location.length == 0){
+			if(node_location_text.length == 0){
 				show_valid_hint("<#JS_fieldblank#>");
 				return false;
 			}
@@ -269,7 +259,7 @@ function gen_custom_select(_location){
 			var block_chars_array = ["\""];
 			var block_chars_hint = "";
 			for(var i = 0; i < block_chars_array.length; i++) {
-				if(location.indexOf(block_chars_array[i]) >= 0)
+				if(node_location_text.indexOf(block_chars_array[i]) >= 0)
 					block_chars_hint = block_chars_array[i] + " <#JS_invalid_chars#>";
 			}
 			if(block_chars_hint != "") {
@@ -278,7 +268,7 @@ function gen_custom_select(_location){
 			}
 
 			if(utf8_ssid_support){
-				var len = validator.lengthInUtf8(location);
+				var len = validator.lengthInUtf8(node_location_text);
 				if(len > 32){
 					show_valid_hint("The field cannot be greater than 32 characters.");/* untranslated */
 					return false;
@@ -342,7 +332,7 @@ function gen_custom_select(_location){
 	var $selectListHide = $("<div>");
 	$selectListHide.addClass("custom_select_items custom_select_hide");
 	$selectListHide.appendTo($(".custom_select"));
-	location_array.forEach(function(item) {
+	aimesh_location_arr.forEach(function(item) {
 		var each_location = item;
 		var $selectItem = $("<div>");
 		var each_css = each_location.value.replace(/\s/g,'_');
@@ -416,7 +406,7 @@ function set_custom_select_value(_location){
 	var location_text = "<#AiMesh_NodeLocation01#>";
 	var location_active = "Home";
 
-	var specific_location = location_array.filter(function(item, index, _array){
+	var specific_location = aimesh_location_arr.filter(function(item, index, _array){
 		return (item.value == _location);
 	})[0];
 	if(specific_location != undefined){
@@ -729,8 +719,8 @@ function client_gen_client_component(_dataArray, _node_info){
 						})[0];
 						var hint = "";
 						if(specific_node_data != undefined){
-							var location = transform_location(specific_node_data.mac, specific_node_data);
-							var node_name_location = handle_ui_model_name(specific_node_data.model_name, specific_node_data.ui_model_name) + "(" + location.location_text + ")";
+							var node_location_info = transform_location(specific_node_data.mac, specific_node_data);
+							var node_name_location = handle_ui_model_name(specific_node_data.model_name, specific_node_data.ui_model_name) + "(" + node_location_info.location_text + ")";
 							hint += "<#AiMesh_Device_Bound_To_Specific_Node01#>".replace("#MODELNAME", node_name_location);
 							parm_node = specific_node_data;
 						}
@@ -814,8 +804,8 @@ function client_reconnect(parm){
 				return (item.mac == specific_client.amesh_papMac);
 			})[0];
 			if(specific_node_data != undefined){
-				var location = transform_location(specific_client.amesh_papMac, specific_node_data);
-				var hint = "<#AiMesh_Client_Reconnect_Result#>".replace("#CLIENTNAME", client_info.name).replace("#MODELNAME", handle_ui_model_name(specific_node_data.model_name, specific_node_data.ui_model_name)).replace("#LOCATION", location.location_text);
+				var node_location_info = transform_location(specific_client.amesh_papMac, specific_node_data);
+				var hint = "<#AiMesh_Client_Reconnect_Result#>".replace("#CLIENTNAME", client_info.name).replace("#MODELNAME", handle_ui_model_name(specific_node_data.model_name, specific_node_data.ui_model_name)).replace("#LOCATION", node_location_info.location_text);
 				$("#aimesh_hint_msg .hint_text").append($("<div>").addClass("notice_text").html(htmlEnDeCode.htmlEncode(hint)));
 			}
 			else
@@ -854,7 +844,7 @@ function client_bind(parm){
 		$("#aimesh_hint_msg .hint_text").append($("<div>").addClass("notice_text").html(htmlEnDeCode.htmlEncode("<#AiMesh_Client_Select_Node_Bind#>".replace("#CLIENTNAME", client_info.name))));
 		$("#aimesh_hint_msg .hint_text").append($("<div>").attr("id","not_support_bind_hint").addClass("notice_text hint").html("* <#AiMesh_Device_Not_Support_Binding01#> <#AiMesh_Device_Not_Support_Binding02#>"));
 		var gen_bind_node_component = function(_bind_support, _each_node_info){
-			var location = transform_location(_each_node_info.mac, _each_node_info);
+			var node_location_info = transform_location(_each_node_info.mac, _each_node_info);
 			var $model_info = $("<div>");
 			$model_info.addClass("notice_text horizontal_line")
 			if(_bind_support)
@@ -873,7 +863,7 @@ function client_bind(parm){
 				$model_name.addClass("gray");
 			$model_info.append($model_name);
 			$model_info.append("<br>");
-			var $model_location = $("<span>").addClass("notice_text_location model_info").html(location.location_text);
+			var $model_location = $("<span>").addClass("notice_text_location model_info").html(node_location_info.location_text);
 			if(!_bind_support)
 				$model_location.addClass("gray");
 			$model_info.append($model_location);
@@ -953,8 +943,8 @@ function client_bind(parm){
 				var specific_target_data = aimesh_data.cfg_clientlist.filter(function(item, index, _array){
 					return (item.mac == _parm.target_mac);
 				})[0];
-				var location = transform_location(_parm.target_mac, specific_target_data);
-				var result_text = "<#AiMesh_Client_Bind_Success#>".replace("#CLIENTNAME", specific_client.name).replace("#MODELNAME", handle_ui_model_name(specific_target_data.model_name, specific_target_data.ui_model_name)).replace("#LOCATION", location.location_text);
+				var node_location_info = transform_location(_parm.target_mac, specific_target_data);
+				var result_text = "<#AiMesh_Client_Bind_Success#>".replace("#CLIENTNAME", specific_client.name).replace("#MODELNAME", handle_ui_model_name(specific_target_data.model_name, specific_target_data.ui_model_name)).replace("#LOCATION", node_location_info.location_text);
 				$("#aimesh_hint_msg .hint_text").empty();
 				$("#aimesh_hint_msg .hint_text").append($("<div>").addClass("notice_text").html(htmlEnDeCode.htmlEncode(result_text)));
 				remove_sta_binding_list_json(_parm.client_mac);
@@ -981,7 +971,7 @@ function client_bind(parm){
 				var specific_target_data = aimesh_data.cfg_clientlist.filter(function(item, index, _array){
 					return (item.mac == _parm.target_mac);
 				})[0];
-				var location = transform_location(_parm.target_mac, specific_target_data);
+				var node_location_info = transform_location(_parm.target_mac, specific_target_data);
 				$("#aimesh_hint_msg .hint_text").empty();
 				var result_text = "";
 				result_text += htmlEnDeCode.htmlEncode("<#AiMesh_Client_Bind_Fail01#>".replace("#CLIENTNAME", specific_client.name).replace("#MODELNAME", handle_ui_model_name(specific_target_data.model_name, specific_target_data.ui_model_name)));
@@ -1127,8 +1117,8 @@ function client_bind(parm){
 		})[0];
 		var hint  = "";
 		if(specific_node_data != undefined){
-			var location = transform_location(clientList[client_info.mac].amesh_bind_mac, specific_node_data);
-			hint = "<#AiMesh_Client_Unbind#> <#AiMesh_confirm_msg0#>".replace("#CLIENTNAME", client_name).replace("#MODELNAME", handle_ui_model_name(click_node_info.model_name, click_node_info.ui_model_name)).replace("#LOCATION", location.location_text);
+			var node_location_info = transform_location(clientList[client_info.mac].amesh_bind_mac, specific_node_data);
+			hint = "<#AiMesh_Client_Unbind#> <#AiMesh_confirm_msg0#>".replace("#CLIENTNAME", client_name).replace("#MODELNAME", handle_ui_model_name(click_node_info.model_name, click_node_info.ui_model_name)).replace("#LOCATION", node_location_info.location_text);
 		}
 		else
 			hint = "<#AiMesh_Client_Unbind#> <#AiMesh_confirm_msg0#>".replace("#CLIENTNAME", client_name).replace("#MODELNAME", clientList[client_info.mac].amesh_bind_mac).replace("(#LOCATION)", "");
@@ -2749,8 +2739,8 @@ function manage_set_preferable_backhaul(_node_info, _pref_info){
 	$("#aimesh_hint_msg").append(popup_hint_api.get_component_text());
 	$("#aimesh_hint_msg").append(popup_hint_api.get_component_action());
 
-	var location = transform_location(_node_info.mac, _node_info);
-	var node_name_location = handle_ui_model_name(_node_info.model_name, _node_info.ui_model_name) + " (" + location.location_text + ")";
+	var node_location_info = transform_location(_node_info.mac, _node_info);
+	var node_name_location = handle_ui_model_name(_node_info.model_name, _node_info.ui_model_name) + " (" + node_location_info.location_text + ")";
 
 	if(isSupport("amas_eap")){
 		var amas_eap_bhmode = httpApi.nvramGet(["amas_eap_bhmode"]).amas_eap_bhmode;
@@ -2797,7 +2787,7 @@ function manage_set_preferable_backhaul(_node_info, _pref_info){
 	$("#aimesh_hint_msg .hint_text").append($auto_info);
 
 	var gen_node_component = function(_each_node_info, _each_node_pref_info){
-		var location = transform_location(_each_node_info.mac, _each_node_info);
+		var node_location_info = transform_location(_each_node_info.mac, _each_node_info);
 		var $model_info = $("<div>");
 		$model_info.addClass("notice_text horizontal_line")
 		$model_info.css("cursor", "pointer");
@@ -2816,7 +2806,7 @@ function manage_set_preferable_backhaul(_node_info, _pref_info){
 
 		$model_info.append($model_name);
 		$model_info.append("<br>");
-		var $model_location = $("<span>").addClass("notice_text_location model_info").html(location.location_text);
+		var $model_location = $("<span>").addClass("notice_text_location model_info").html(node_location_info.location_text);
 		$model_info.append($model_location);
 
 		var $model_check = $("<div>").addClass("custom_radio_bg").append($("<span>").addClass("custom_radio_label"));
@@ -2957,7 +2947,7 @@ function set_primary_info(_node_info){
 	var model_name = _node_info.model_name;
 	var ui_model_name = _node_info.ui_model_name;
 	var mac = _node_info.mac;
-	var location = "Home";
+	var node_location_text = "Home";
 	var fwver = _node_info.fwver;
 	var newfwver = _node_info.newfwver;
 	var re_path = _node_info.re_path;
@@ -3064,17 +3054,17 @@ function set_primary_info(_node_info){
 			if("misc" in _node_info.config) {
 				if("cfg_alias" in _node_info.config.misc) {
 					if(_node_info.config.misc.cfg_alias != "")
-						location = _node_info.config.misc.cfg_alias;
+						node_location_text = _node_info.config.misc.cfg_alias;
 				}
 			}
 		}
-		set_custom_select_value(location);
+		set_custom_select_value(node_location_text);
 	}
 	else{
 		$(".primary_info_bg").find(".item_bg.signal").hide();
 		if(alias != mac)
-			location = alias;
-		set_custom_select_value(location);
+			node_location_text = alias;
+		set_custom_select_value(node_location_text);
 	}
 
 	if(_node_info.online == "1"){
@@ -3477,10 +3467,10 @@ function initial_AiMesh(){
 						all_node_is_eth_backhaul = false;
 				}
 
-				var location = transform_location(node_mac, specific_node_data);
+				var node_location_info = transform_location(node_mac, specific_node_data);
 				$node_icon.addClass("topology_icon");
 
-				$node_icon.addClass(location.location_active_css);//node location icon
+				$node_icon.addClass(node_location_info.location_active_css);//node location icon
 				if(node.parent != "#" && re_reconnect_flag != "" && node_online == "0" && (re_reconnect_flag == "all" || re_reconnect_flag == node_mac)){
 					$node_icon.append(popup_hint_api.get_component_loading());
 					$node_icon.find(".cssload-bellContainer").addClass("topology_node");
@@ -3537,7 +3527,7 @@ function initial_AiMesh(){
 
 				var $location_bg = $("<div>");
 				$location_bg.appendTo($node_info_bg);
-				$location_bg.html(htmlEnDeCode.htmlEncode(location.location_text));
+				$location_bg.html(htmlEnDeCode.htmlEncode(node_location_info.location_text));
 				if($(el).attr('aria-level') > 3)
 					$location_bg.css("width", "120px");
 
@@ -3721,14 +3711,14 @@ function optimization_node(){
 }
 function transform_location(_nodeMac, _node_info){
 	var result = {"location_text":"<#AiMesh_NodeLocation01#>", "location_active_css":"Home"};
-	var location = "Home";
+	var node_location_text = "Home";
 	var isReNode = (_nodeMac != cap_mac) ? true : false;
 	if(isReNode){
 		if("config" in _node_info) {
 			if("misc" in _node_info.config) {
 				if("cfg_alias" in _node_info.config.misc) {
 					if(_node_info.config.misc.cfg_alias != "")
-						location = _node_info.config.misc.cfg_alias;
+						node_location_text = _node_info.config.misc.cfg_alias;
 				}
 			}
 		}
@@ -3736,10 +3726,10 @@ function transform_location(_nodeMac, _node_info){
 	else{
 		var alias = _node_info.alias;
 		if(alias != _nodeMac)
-			location = alias;
+			node_location_text = alias;
 	}
-	var specific_location = location_array.filter(function(item, index, _array){
-		return (item.value == location);
+	var specific_location = aimesh_location_arr.filter(function(item, index, _array){
+		return (item.value == node_location_text);
 	})[0];
 	if(specific_location != undefined){
 		result.location_active_css = specific_location.value.replace(/\s/g,'_');
@@ -3747,7 +3737,7 @@ function transform_location(_nodeMac, _node_info){
 	}
 	else{
 		result.location_active_css = "Custom";
-		result.location_text = location;
+		result.location_text = node_location_text;
 	}
 	return result;
 }

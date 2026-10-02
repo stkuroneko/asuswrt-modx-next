@@ -417,9 +417,8 @@ static void wan_led_control(int sig) {
 		update_wan_leds(unit, link_wan[unit]);
 #endif
 	}
-#endif // RTCONFIG_HND_ROUTER_AX
-
-#if defined(RTCONFIG_QCA) && (defined(RTCONFIG_LED_BTN) || defined(RTCONFIG_TURBO_BTN))
+#elif (defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)) \
+   && (defined(RTCONFIG_LED_BTN) || defined(RTCONFIG_TURBO_BTN) || defined(RTCONFIG_WPS_ALLLED_BTN))
 	if (!inhibit_led_on()) {
 		int unit;
 
@@ -432,7 +431,7 @@ static void wan_led_control(int sig) {
 #endif
 		}
 	}
-#endif
+#endif // RTCONFIG_HND_ROUTER_AX
 }
 
 static void safe_leave(int signo){
@@ -843,7 +842,7 @@ static void getaddrinfo_alarm(int sig)
 }
 
 /* Return values:
-    -1: dns probe is disabled
+    -1: error or disable
      0: dns probe has failed
      1: dns probe ok
 */
@@ -1107,11 +1106,11 @@ int detect_internet(int wan_unit)
 #ifdef DETECT_INTERNET_MORE
 	else if(!get_packets_of_net_dev(wan_ifname, &rx_packets, &tx_packets) || rx_packets <= RX_THRESHOLD)
 		link_internet = DISCONN;
-	else if(!isFirstUse && (dns_ret <= 0 && !do_tcp_dns_detect(wan_unit) && !wanduck_ping_detect(wan_unit)))
+	else if(!isFirstUse && (!dns_ret && !do_tcp_dns_detect(wan_unit) && !wanduck_ping_detect(wan_unit)))
 		link_internet = DISCONN;
 #endif
 #if defined(RTCONFIG_IPV6) && defined(RTCONFIG_INTERNAL_GOBI)
-	else if(dualwan_unit__usbif(wan_unit) && modem_pdp == 2 && ping_ret <= 0)
+	else if(dualwan_unit__usbif(wan_unit) && modem_pdp == 2 && !ping_ret)
 		link_internet = DISCONN;
 #endif
 #ifdef RTCONFIG_DUALWAN
@@ -1125,9 +1124,9 @@ int detect_internet(int wan_unit)
 			nat_state = stop_nat_rules();
 	}
 #else
-	else if((wandog_enable && ping_ret <= 0 && !dnsprobe_enable)
-			|| (dnsprobe_enable && dns_ret <= 0 && !wandog_enable)
-			|| (wandog_enable && ping_ret <= 0 && dnsprobe_enable && dns_ret <= 0)
+	else if((wandog_enable && !ping_ret && !dnsprobe_enable)
+			|| (dnsprobe_enable && !dns_ret && !wandog_enable)
+			|| (wandog_enable && !ping_ret && dnsprobe_enable && !dns_ret)
 			){
 		link_internet = DISCONN;
 
@@ -1137,14 +1136,14 @@ int detect_internet(int wan_unit)
 	}
 #endif
 #endif
-	else if(dns_ret <= 0 && /* PPP connections with DNS detection */
+	else if(!dns_ret && /* PPP connections with DNS detection */
 			wan_ppp && nvram_get_int(strcat_r(prefix, "ppp_echo", tmp)) == 2)
 		link_internet = DISCONN;
 	else
 		link_internet = CONNED;
 
 	/* Set no DNS state even if connected for WEB UI */
-	if(link_internet == DISCONN || dns_ret <= 0){
+	if(link_internet == DISCONN){
 		if(nvram_get_int("web_redirect") & WEBREDIRECT_FLAG_NOINTERNET)
 			set_link_internet(wan_unit, 1);
 		else{
@@ -1693,7 +1692,6 @@ _dprintf("# wanduck: if_wan_phyconnected: x_Setting=%d, link_modem=%d, sim_state
 
 	if(dualwan_unit__usbif(wan_unit)){
 		snprintf(prefix, sizeof(prefix), "wan%d_", wan_unit);
-
 		wan_state = nvram_get_int(nvram_state[wan_unit]);
 		modem_unit = get_modemunit_by_type(get_dualwan_by_unit(wan_unit));
 
@@ -1839,7 +1837,7 @@ _dprintf("# wanduck: if_wan_phyconnected: x_Setting=%d, link_modem=%d, sim_state
 
 					if(is_wan_connect(wan_unit))
 #if 1 // +CGCELLI seems to cause the Input/Output errors of ttyACM.
-#if defined(RT4GAC86U)
+#if defined(RT4GAC86U) || defined(RT4GAX56)
 						eval("/usr/sbin/modem_status.sh", "operation");
 #endif
 #if defined(RT4GAC86U) || defined(RT4GAX56)
@@ -3494,6 +3492,15 @@ int wanduck_main(int argc, char *argv[]){
 
 		current_wan_unit = wan_primary_ifunit();
 		other_wan_unit = get_next_unit(current_wan_unit);
+
+		/* [Vocus]: set modem_stop(cfun=4) when wans_mode=fb/fo at start-up */
+		if(!strcmp(nvram_safe_get("startup_cfun4"), "1")) {
+			if(!strcmp(get_wan_ifname(other_wan_unit), "usb0") && conn_state[other_wan_unit] == PHY_RECONN){
+				char *const modem_argv[] = {"/usr/sbin/modem_stop.sh", NULL};
+				_eval(modem_argv, ">>/tmp/usb.log", 0, NULL);
+			}
+		}
+
 if(test_log)
 _dprintf("wanduck(%d)(first detect start): state %d, state_old %d, changed %d, wan_state %d.\n"
 		, current_wan_unit, conn_state[current_wan_unit], conn_state_old[current_wan_unit], conn_changed_state[current_wan_unit], current_state[current_wan_unit]);

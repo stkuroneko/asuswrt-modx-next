@@ -2986,6 +2986,9 @@ assoc_post:
 			MWDSAPPeerEnable(pAd, pEntry);
 #endif
 #ifdef CONFIG_MAP_SUPPORT
+#ifdef CONFIG_ASUS_FORCE4 /* force4 workaround, depend on CONFIG_MAP_SUPPORT & A4_CONN */
+		        if (!wdev->is_force4) // if force4, left for later mapping
+#endif
 			map_a4_peer_enable(pAd, pEntry, TRUE);
 #endif /* CONFIG_MAP_SUPPORT */
 #ifdef WAPP_SUPPORT

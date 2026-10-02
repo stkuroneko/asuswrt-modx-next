@@ -47,7 +47,7 @@ const char APCLI_5G[]	= "apcli0";
 const char APCLI_2G[]	= "apclii0";
 #endif
 
-typedef struct channel_info {
+struct channel_info {
 	unsigned char channel;
 	unsigned char bandwidth;
 	unsigned char extrach;
@@ -190,6 +190,13 @@ uint32_t set_phy_ctrl(uint32_t portmask, int ctrl)
 	// TODO
 	return 1;
 }
+
+#if defined(RTCONFIG_FITFDT)
+int get_imageheader_size(void)
+{
+	return sizeof(image_header_t);
+}
+#endif	/* RTCONFIG_FITFDT */
 
 #define SWAP_LONG(x) \
 	((__u32)( \
@@ -1368,4 +1375,3 @@ int get_bonding_port_status(int port)
 	return ret;
 }
 #endif /* RTCONFIG_BONDING_WAN */
-

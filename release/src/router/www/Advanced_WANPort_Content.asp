@@ -128,13 +128,15 @@ function initial(){
 	show_menu();
 	wans_flag = (wans_dualwan_orig.search("none") != -1 || !parent.dualWAN_support) ? 0 : 1;
 	if(wan_bonding_support){
-		if(orig_bond_wan == 1 && (based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000")){
-			// Remove 10G base-T if it's aggregated w/ WAN port
-			var i = wans_caps.split(" ").indexOf("wan2");
-			if(i != -1 && wanports_bond.split(" ").indexOf("30") != -1){
-				var new_wans_cap = wans_caps.split(" ");
-				new_wans_cap.splice(i, 1);
-				wans_caps = new_wans_cap.toString().replace(/,/g," ");
+		if(orig_bond_wan == 1) {
+			if (based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000"){
+				// Remove 10G base-T if it's aggregated w/ WAN port
+				var i = wans_caps.split(" ").indexOf("wan2");
+				if(i != -1 && wanports_bond.split(" ").indexOf("30") != -1){
+					var new_wans_cap = wans_caps.split(" ");
+					new_wans_cap.splice(i, 1);
+					wans_caps = new_wans_cap.toString().replace(/,/g," ");
+				}
 			}
 		}
 	}
@@ -210,6 +212,13 @@ function initial(){
 
 		add_options_x2(document.form.wans_lanport1, name, value, <% nvram_get("wans_lanport"); %>);
 		add_options_x2(document.form.wans_lanport2, name, value, <% nvram_get("wans_lanport"); %>);
+	}
+
+	if (based_modelid == "TUF-AX4200") {
+		var desc = [ "LAN Port 1", "LAN Port 2", "LAN Port 3", "LAN Port 4", "2.5G LAN" ];
+		var value = [ "1", "2", "3", "4", "5" ];
+		add_options_x2(document.form.wans_lanport1, desc, value, <% nvram_get("wans_lanport"); %>);
+		add_options_x2(document.form.wans_lanport2, desc, value, <% nvram_get("wans_lanport"); %>);
 	}
 
 	if(wan_bonding_support)
@@ -473,8 +482,14 @@ function applyRule(){
 		document.form.wandog_enable.value = "0";
 	}
 
-	if(document.form.wandog_enable_chk.checked)
+	if(document.form.wandog_enable_chk.checked){
+		if(document.form.wandog_target.value == "" || document.form.wandog_target.value.trim().length==0){
+			alert("<#JS_fieldblank#>");
+			document.form.wandog_target.focus();
+			return false;
+		}
 		document.form.wandog_enable.value = "1";
+	}
 	else
 		document.form.wandog_enable.value = "0";
 
@@ -663,6 +678,9 @@ function addWANOption(obj, wanscapItem){
 					wanscapName = "10G base-T";
 				else if(wanscapName == "SFP+")
 					wanscapName = "10G SFP+";
+			} else if (based_modelid == "TUF-AX4200") {
+				if (wanscapName == "WAN")
+					wanscapName = "2.5G WAN";
 			}
 
 			obj.options[i] = new Option(wanscapName, wanscapItem[i]);

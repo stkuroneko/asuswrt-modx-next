@@ -103,6 +103,7 @@ ASUS_eula_desc1_4=นอกจากนี้เพื่อเปิดใช�
 ASUS_eula_desc2=ASUS มุ่งมั่นที่จะปกป้องและเคารพความเป็นส่วนตัวของคุณ; คุณสามารถไปที่ Advanced Settings (การตั้งค่าขั้นสูง) > Administration (การดูแลระบบ) > Privacy (ความเป็นส่วนตัว) เพื่อเปิด/ปิดการแบ่งปันข้อมูลผลิตภัณฑ์ของคุณกับ ASUS ได้ตลอดเวลา. เพื่อเรียนรู้เพิ่มเติมเกี่ยวกับวิธีการที่ ASUS ปกป้องความเป็นส่วนตัวของคุณ โปรดดูที่ <a id="eula_url" style="font-weight: bolder;text-decoration:underline;cursor:pointer;" target="_blank">ASUS Privacy Policy (นโยบายความเป็นส่วนตัวของ ASUS)</a>.
 ASUS_eula_age=ฉันอายุมากกว่า 16 ปี
 ASUS_eula_age_confirm=โปรดยืนยันว่าคุณอายุมากกว่า 16 ปี
+ASUS_eula_use_confirm=โปรดยืนยันว่าค ข้อกำหนดการใช้งานของ ASUS
 ASUS_eula_withdraw0=สำหรับ %1$@ และการเชื่อมต่อระยะไกล(แอปเราเตอร์ ASUS/แอป Lyra/ AiCloud/AiDisk):
 ASUS_eula_withdraw_desc1=โปรดทราบข้อมูลของคุณ รวมถึงชื่อรุ่นผลิตภัณฑ์, เวอร์ชันเฟิร์มแวร์, สถานะอินเทอร์เน็ต, ที่อยู่ IP, ที่อยู่ MAC และชื่อ DDNS จะถูกเก็บรวบรวมโดย ASUS ผ่านฟังก์ชันดังกล่าวข้างต้น
 ASUS_eula_withdraw_desc1_2=หากคุณต้องการปิดใช้งานการแบ่งปันข้อมูลของคุณกับ ASUS ผ่านฟังก์ชันดังกล่าวข้างต้น โปรดคลิกที่ <span style="font-weight: bold;">[Withdraw (เพิกถอน)]</span> ด้านล่าง. อย่างไรก็ตาม โปรดทราบคุณสมบัติ/ฟังก์ชันดังกล่าวอาจไม่สามารถใช้งานได้หากคุณหยุดการแบ่งปันข้อมูลของคุณกับ ASUS.
@@ -246,7 +247,7 @@ FIRM_fail_desc=การอัปเกรดเฟิร์มแวร์ล�
 FIRM_ok_desc=กำลังอัปเกรดเฟิร์มแวร์ โปรดรอประมาณ 3 นาที
 FIRM_ok_aimesh=การอัปเดตเฟิร์มแวร์สิ้นสุดแล้ว ปิดหน้าต่างนี้และเข้าถึงเราเตอร์ AiMesh อีกครั้ง
 FIRM_reboot_manually=อัปเกรดเฟิร์มแวร์เสร็จ โปรดบูต ZVMODELVZ ใหม่ด้วยตัวเอง
-FIRM_trx_valid_fail_desc=To comply with regulatory amendments, we have modified our certification rule to ensure better firmware quality. This version is not compatible with all previously released ASUS firmware and uncertified third party firmware. Please check our official websites for the certified firmware.
+FIRM_trx_valid_fail_desc=To comply with regulatory amendments, we have modified our certificate rule to ensure better firmware quality. This version is not compatible with all previously released ASUS firmware and uncertified third party firmware. Please check our official websites for the certified firmware.
 Five_attempts_logout_hint=คุณได้ป้อนรหัสผ่านไม่ถูกต้อง 5 ครั้งแล้ว คุณจะถูกนำออกจากระบบ
 footer_copyright_desc=2022 ASUSTeK Computer Inc. สงวนลิขสิทธิ์
 FW_n1=พารามิเตอร์การกำหนดค่าจะเก็บการตั้งค่าไว้ในระหว่างกระบวนการอัปเดตเฟิร์มแวร์
@@ -1081,13 +1082,14 @@ AiMesh_confirm_msg_ChangeSSID=หากคุณเปลี่ยน SSID ก�
 AiMesh_confirm_msg_ChangeKey=หากคุณเปลี่ยน WPA Pre-Shared Key การเชื่อมต่อ WiFi ของเราเตอร์ AiMesh จะได้รับผลกระทบ
 AiMesh_confirm_msg_CountryCode=การเปลี่ยนรหัสประเทศอาจส่งผลกระทบต่อระบบ AiMesh
 AiMesh_confirm_msg5=หากคุณปิดใช้งานฟังก์ชันวิทยุ การเชื่อมต่อ WiFi ของเราเตอร์ AiMesh จะได้รับผลกระทบ
-AiMesh_confirm_msg6=หากคุณซ่อน SSID การเชื่อมต่อ WiFi ของเราเตอร์ AiMesh จะได้รับผลกระทบ
+AiMesh_confirm_msg6=SSID ที่ซ่อนไว้ไม่ได้ช่วยป้องกันความปลอดภัยให้กับเครือข่าย Wi-Fi ของคุณ และอาจทำให้เกิดปัญหาการเชื่อมต่อได้
 AiMesh_confirm_msg7=หากคุณซ่อน SSID ฟังก์ชัน WPS จะปิดใช้งาน และการเชื่อมต่อ WiFi ของเราเตอร์ AiMesh จะได้รับผลกระทบ
 AiMesh_confirm_msg8=หากคุณปิดใช้งานเซิร์ฟเวอร์ DHCP การเชื่อมต่อ WiFi ของเราเตอร์ AiMesh จะได้รับผลกระทบ
 AiMesh_confirm_msg9=เมื่อพิจารณาจากความเข้ากันได้ของระบบ AiMesh และอุปกรณ์ของผู้ใช้งานปลายทาง เราขอแนะนำให้คุณใช้ WPA2-ส่วนบุคคล คุณต้องการเปลี่ยนไปใช้ #AUTHMODE หรือไม่?\n*ถ้าคุณพบปัญหาเรื่องการเชื่อมต่อ กรุณาเปลี่ยนไปใช้ WPA2-ส่วนบุคคล หรือตรวจสอบกับผู้ผลิต เพื่อขอข้อมูลเพิ่มเติม
 AiMesh_confirm_msg10=เพื่อให้แน่ใจในการเชื่อมต่อของระบบ AiMesh และอุปกรณ์ของผู้ใช้งานปลายทาง กรุณาอ่าน<a id="wpa3FaqLink">คำถามที่ถามบ่อย</a> ก่อนที่จะเปลี่ยนไปใช้ WPA3-ส่วนบุคคล
 AiMesh_confirm_msg11=คุณกำลังใช้งาน WPA3-ส่วนบุคคลอยู่ในขณะนี้ หากคุณสร้างระบบ AiMesh วิธีการรับรองความถูกต้องของคุณจะถูกเปลี่ยนเป็น WPA2/WPA3-ส่วนบุคคล คุณต้องการดำเนินการต่อหรือไม่?
 AiMesh_confirm_msg12=You can read this <a id='wpa3FaqLink'>FAQ</a> for more information.
+AiMesh_confirm_msg13=สำหรับรายละเอียดเพิ่มเติม โปรดเยี่ยมชมที่ <a style='font-weight: bolder;text-decoration: underline;color:#000000;' href='' target='_blank'>คำถามที่ถามบ่อยนี้</a>
 AiMesh_Feature_Desc=ASUS AiMesh ขั้นสูงคือคุณสมบัติเราเตอร์ใหม่ที่เป็นนวัตกรรมซึ่งเชื่อมต่อเราเตอร์ ASUS หลายตัวเข้าด้วยกันโดยการสร้างเครือข่าย WiFi ทั่วทั้งบ้าน
 AiMesh_FAQ=ค้นหาข้อมูลเพิ่มเติมเกี่ยวกับ ASUS AiMesh
 AiMesh_FindNode=ค้นหาโหนด AiMesh
@@ -3442,6 +3444,7 @@ TZ17=เวลาแอตแลนติก (แคนาดา)
 TZ18=ลาปาซ
 TZ18_1=คารากัส
 TZ19=ซานติอาโก้
+TZ19_1=อาซุนซิออน
 TZ20=นิวฟาวนด์แลนด์
 TZ21=บราซิเลีย
 TZ22=บัวโนส ไอเรส, จอร์จทาวน์
@@ -3534,10 +3537,10 @@ Uplink_rate=ข้อมูลที่ส่ง/วินาที
 Uplink_traffic=ข้อมูลที่ส่ง
 upnp_Desc=ตั้งค่า iTunes และ UPnP มีเดียเซิร์ฟเวอร์
 [###MODEL_DEP###][RT-AC1200G+][RT-AC1200G][RT-AC82U]upnp_Desc=ตั้งค่า UPnP มีเดียเซิร์ฟเวอร์
-UPnPMediaServer_Help=ZVMODELVZ สนับสนุนมาตรฐาน UPnP คุณสามารถเปิดทำงาน และอนุญาตให้อุปกรณ์ UPnP อื่น เช่น PS3 หรือเครื่องเล่นดิจิตอลมีเดีย สามารถใช้ไฟล์มัลติมีเดียใน USB ดิสก์ได้
-[###MODEL_DEP###][RT-AC1200][RT-N600]UPnPMediaServer_Help=ZVMODELVZ สนับสนุนมาตรฐาน UPnP คุณสามารถเปิดทำงาน และอนุญาตให้อุปกรณ์ UPnP อื่น เช่น PS3 หรือเครื่องเล่นดิจิตอลมีเดีย สามารถใช้ไฟล์มัลติมีเดียใน USB ดิสก์ได้
-[###MODEL_DEP###][RT-AC1200G][RT-AC82U]UPnPMediaServer_Help=ZVMODELVZ สนับสนุนมาตรฐาน UPnP คุณสามารถเปิดทำงาน และอนุญาตให้อุปกรณ์ UPnP อื่น เช่น PS3 หรือเครื่องเล่นดิจิตอลมีเดีย สามารถใช้ไฟล์มัลติมีเดียใน USB ดิสก์ได้
-[###MODEL_DEP###][AC2900]UPnPMediaServer_Help=ZVMODELVZ สนับสนุนมาตรฐาน UPnP คุณสามารถเปิดทำงาน และอนุญาตให้อุปกรณ์ UPnP อื่น เช่น PS3 หรือเครื่องเล่นดิจิตอลมีเดีย สามารถใช้ไฟล์มัลติมีเดียใน USB ดิสก์ได้
+UPnPMediaServer_Help=เซ็ตอัพ <a id='upnp_link'>UPnP, iTunes</a> <a id='ftp_link'>FTP</a> และ <a id='samba_link'>เน็ตเวิร์กเพลส (แซมบ้า)</a>
+[###MODEL_DEP###][RT-AC1200][RT-N600]UPnPMediaServer_Help=เซ็ตอัพ <a id='upnp_link'>UPnP, iTunes</a> และ <a id='samba_link'>เน็ตเวิร์กเพลส (แซมบ้า)</a>
+[###MODEL_DEP###][RT-AC1200G][RT-AC82U]UPnPMediaServer_Help=เซ็ตอัพ <a id='upnp_link'>UPnP</a> <a id='ftp_link'>FTP</a> และ <a id='samba_link'>เน็ตเวิร์กเพลส (แซมบ้า)</a>
+[###MODEL_DEP###][AC2900]UPnPMediaServer_Help=เซ็ตอัพ <a id='upnp_link'>UPnP</a> และ <a id='samba_link'>เน็ตเวิร์กเพลส (แซมบ้า)</a>
 url_keyword_alert=คำสำคัญที่ใช้ URL
 USB_Application_check=โปรดตรวจสอบแอปพลิเคชั่น USB
 USB_Application_disk_checking=กำลังตรวจสอบดิสก์
@@ -3626,7 +3629,7 @@ vpn_network_place=สนับสนุน เน็ตเวิร์กเพ�
 vpn_openvpn_AdvDNS=แจ้ง DNS ไปไคลเอ็นต์
 vpn_openvpn_Auth=โหมดการอนุญาต
 vpn_openvpn_AuthOnly=ยืนยันตัวบุคคลด้วยชื่อผู้ใช้ / รหัสผ่านเท่านั้น
-vpn_openvpn_AuthOnly_hint=Authorization Mode fixes on TLS
+vpn_openvpn_AuthOnly_hint=Authentication Mode fixes on TLS
 vpn_openvpn_AuthHMAC=การอนุญาต HMAC พิเศษ
 vpn_openvpn_ExtraHMAC=การอนุญาต HMAC พิเศษ
 vpn_openvpn_ClientMutual=อนุญาตไคลเอ็นต์ <-> ไคลเอ็นต์

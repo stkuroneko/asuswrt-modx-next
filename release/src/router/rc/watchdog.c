@@ -109,6 +109,10 @@
 #include <plc_utils.h>
 #endif
 
+#if defined(RTCONFIG_SW_CTRL_ALLLED)
+extern int send_cfgmnt_event(char *msg);
+#endif
+
 #define BCM47XX_SOFTWARE_RESET	0x40		/* GPIO 6 */
 #define RESET_WAIT		2		/* seconds */
 #define RESET_WAIT_COUNT	RESET_WAIT * 10 /* 10 times a second */
@@ -4742,7 +4746,7 @@ end_of_wl_sched:
 			if (expire)
 			{
 #if defined(RTCONFIG_AMAS_WGN) && defined(RTCONFIG_QCA)
-				clear_wgn_wloff_vifs(word);
+				clear_wgn_wloff_vifs(wif_to_vif(word));
 #endif				
 				if (expire <= 30)
 				{
@@ -4774,7 +4778,7 @@ end_of_wl_sched:
 					}
 #endif
 #ifdef RTCONFIG_AMAS_WGN
-					p_vifs += snprintf(p_vifs, sizeof(wloff_vifs) - (p_vifs - wloff_vifs), "%s ", word);
+					p_vifs += snprintf(p_vifs, sizeof(wloff_vifs) - (p_vifs - wloff_vifs), "%s ", wif_to_vif(word));
 #endif						
 				}
 				else
@@ -4795,12 +4799,14 @@ end_of_wl_sched:
 #ifdef RTCONFIG_AMAS_WGN
 		if (strlen(wloff_vifs) > 0)
 		{
+			if (wloff_vifs[strlen(wloff_vifs)-1] == ' ')
+				wloff_vifs[strlen(wloff_vifs)-1] = '\0';
 			nvram_set("wgn_wloff_vifs", wloff_vifs);
-	        	/* update cfg_ver info */
-	        	srand(time(NULL));
-	        	snprintf(cfgVer, sizeof(cfgVer), "%d%d", rand(), rand());
-	        	nvram_set("cfg_ver", cfgVer);
-	        	nvram_commit();
+	        /* update cfg_ver info */
+	        srand(time(NULL));
+	        snprintf(cfgVer, sizeof(cfgVer), "%d%d", rand(), rand());
+	        nvram_set("cfg_ver", cfgVer);
+	        nvram_commit();
 			kill_pidfile_s("/var/run/cfg_server.pid", SIGUSR2);			
 		}		
 #endif

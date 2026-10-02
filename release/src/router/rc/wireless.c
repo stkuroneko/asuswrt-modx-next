@@ -11,6 +11,9 @@
 */
 
 #include "rc.h"
+#if defined(RTCONFIG_RALINK)
+#include "ate.h"
+#endif
 
 #include <sys/sysinfo.h>
 #include <sys/ioctl.h>

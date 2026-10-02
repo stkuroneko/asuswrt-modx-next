@@ -103,6 +103,7 @@ ASUS_eula_desc1_4=Кроме того, для включения функции 
 ASUS_eula_desc2=Компания ASUS уважает Вашу личную информацию. В любое время можно перейти в Дополнительные настройки > Администрирование > Приватность для включения / отключения обмена информацией о продукте с ASUS. Для получения дополнительной информации о защите конфиденциальности, посетите страницу <a id="eula_url" style="font-weight: bolder;text-decoration:underline;cursor:pointer;" target="_blank">Политика конфиденциальности ASUS</a>.
 ASUS_eula_age=Я старше 16 лет.
 ASUS_eula_age_confirm=Пожалуйста, подтвердите, что Вы старше 16 лет.
+ASUS_eula_use_confirm=Пожалуйста, подтвердите, что Условия использования ASUS.
 ASUS_eula_withdraw0=Для %1$@ и удаленного подключения (ASUS Router APP/Lyra APP/AiCloud/AiDisk):
 ASUS_eula_withdraw_desc1=Обратите внимание, что ваша информация, включая модель продукта, версию микропрограммы, состояние Интернета, IP-адрес, MAC-адрес и имя DDNS, будет собрана ASUS с помощью вышеуказанных функций.
 ASUS_eula_withdraw_desc1_2=Если требуется отключить обмен информацией с ASUS с помощью вышеуказанных функций, нажмите <span style="font-weight: bold;">[Отказаться]</span> ниже. Тем не менее, имейте в виду, что такие функции могут не работать при отключении обмена информацией с ASUS.
@@ -1081,13 +1082,14 @@ AiMesh_confirm_msg_ChangeSSID=Изменение SSID и повлияет на �
 AiMesh_confirm_msg_ChangeKey=Изменение WPA Pre-Shared ключ повлияет на подключение WiFi узла AiMesh.
 AiMesh_confirm_msg_CountryCode=Изменение кода страны может повлиять на систему AiMesh.
 AiMesh_confirm_msg5=Отключение радиосвязи повлияет на работу Aimesh WiFi роутера.
-AiMesh_confirm_msg6=Скрытие SSID повлияет на работу AiMesh WiFi роутера.
+AiMesh_confirm_msg6=Скрытый SSID не помогает обеспечить безопасность сети Wi-Fi и может привести к проблемам с подключением.
 AiMesh_confirm_msg7=Скрытие SSID приведет к отключению функции WPS и повлияет на работу AiMesh WiFi роутера.
 AiMesh_confirm_msg8=Отключение сервера DHCP повлияет на работу AiMesh WiFi роутера.
 AiMesh_confirm_msg9=Учитывая совместимость системы AiMesh и конечных устройств, мы рекомендуем вам использовать WPA2-Personal. Вы хотите переключиться на #AUTHMODE ?\n*если у вас возникли проблемы с подключением, пожалуйста, переключитесь на WPA2-Personal или обратитесь к производителю(ям) для получения дополнительной информации.
 AiMesh_confirm_msg10=Чтобы обеспечить подключение вашей системы AiMesh и конечного устройства(ов), пожалуйста, прочтите этот <a id="wpa3FaqLink">FAQ</a> перед переключением на WPA3-Personal.
 AiMesh_confirm_msg11=В настоящее время вы используете WPA3-Personal. Чтобы создать систему AiMesh, ваш метод аутентификации будет изменен на WPA2/WPA3-Personal. Вы хотите продолжить?
 AiMesh_confirm_msg12=Вы можете прочитать этот <a id='wpa3FaqLink'>FAQ</a> для получения дополнительной информации.
+AiMesh_confirm_msg13=Для получения подробной информации посетите <a style='font-weight: bolder;text-decoration: underline;color:#000000;' href='' target='_blank'>Вопросы и ответы</a>
 AiMesh_Feature_Desc=Advanced ASUS AiMesh - это инновационная новая возможность роутера, позволяющая объединять несколько роутеров ASUS вместе, создавая сеть WiFi для всего дома.
 AiMesh_FAQ=Дополнительная информация о ASUS AiMesh
 AiMesh_FindNode=Найти узел AiMesh
@@ -3442,6 +3444,7 @@ TZ17=Атлантическое время (Канада)
 TZ18=Ла-Пас
 TZ18_1=Каракас
 TZ19=Сантьяго
+TZ19_1=Асунсьон
 TZ20=Ньюфаундленд
 TZ21=Бразилия
 TZ22=Буэнос-Айрес, Джорджтаун
@@ -3534,10 +3537,10 @@ Uplink_rate=Отправлено данных/сек
 Uplink_traffic=Отправленные данные
 upnp_Desc=Установка iTunes и UPnP media сервера.
 [###MODEL_DEP###][RT-AC1200G+][RT-AC1200G][RT-AC82U]upnp_Desc=Установка UPnP media сервера.
-UPnPMediaServer_Help=ZVMODELVZ поддерживает стандарты UPnP. Вы можете включить этот протокол и разрешить доступ к мультимедийным файлам на USB-диске другим UPnP-устройствам, таким как PS3 или цифровой мультимедийный проигрыватель.
-[###MODEL_DEP###][RT-AC1200][RT-N600]UPnPMediaServer_Help=ZVMODELVZ поддерживает стандарты UPnP. Вы можете включить этот протокол и разрешить доступ к мультимедийным файлам на USB-диске другим UPnP-устройствам, таким как PS3 или цифровой мультимедийный проигрыватель.
-[###MODEL_DEP###][RT-AC1200G][RT-AC82U]UPnPMediaServer_Help=ZVMODELVZ поддерживает стандарты UPnP. Вы можете включить этот протокол и разрешить доступ к мультимедийным файлам на USB-диске другим UPnP-устройствам, таким как PS3 или цифровой мультимедийный проигрыватель.
-[###MODEL_DEP###][AC2900]UPnPMediaServer_Help=ZVMODELVZ поддерживает стандарты UPnP. Вы можете включить этот протокол и разрешить доступ к мультимедийным файлам на USB-диске другим UPnP-устройствам, таким как PS3 или цифровой мультимедийный проигрыватель.
+UPnPMediaServer_Help=Настройте <a id='upnp_link'>UPnP, iTunes</a>, <a id='ftp_link'>FTP</a> и <a id='samba_link'>Сетевое окружение (Samba)</a>.
+[###MODEL_DEP###][RT-AC1200][RT-N600]UPnPMediaServer_Help=Настройте <a id='upnp_link'>UPnP, iTunes</a> и <a id='samba_link'>Сетевое окружение (Samba)</a>.
+[###MODEL_DEP###][RT-AC1200G][RT-AC82U]UPnPMediaServer_Help=Настройте <a id='upnp_link'>UPnP</a>, <a id='ftp_link'>FTP</a> и <a id='samba_link'>Сетевое окружение (Samba)</a>.
+[###MODEL_DEP###][AC2900]UPnPMediaServer_Help=Настройте <a id='upnp_link'>UPnP</a> и <a id='samba_link'>Сетевое окружение (Samba)</a>.
 url_keyword_alert=URL ключевых слов
 USB_Application_check=Пожалуйста, проверьте USB-приложение
 USB_Application_disk_checking=Проверка диска
@@ -3626,7 +3629,7 @@ vpn_network_place=Поддержка Сетевого окружения (Samba)
 vpn_openvpn_AdvDNS=Объявление DNS клиентам
 vpn_openvpn_Auth=Режим авторизации
 vpn_openvpn_AuthOnly=Только имя пользователя / пароль0
-vpn_openvpn_AuthOnly_hint=Authorization Mode fixes on TLS
+vpn_openvpn_AuthOnly_hint=Authentication Mode fixes on TLS
 vpn_openvpn_AuthHMAC=авторизация HMAC
 vpn_openvpn_ExtraHMAC=Дополнительная авторизация HMAC
 vpn_openvpn_ClientMutual=Разрешить клиент <-> клиент

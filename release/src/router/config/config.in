@@ -2268,12 +2268,16 @@ config RTCONFIG_QCA_LBD
 	bool "qca lbd support"
 	default n
 
-config RTCONFIG_AMAS_QCA_WDS
-	bool "qca amas wds support"
+config RTCONFIG_AMAS_WDS
+	bool "amas wds support"
 	default n
 
 config RTCONFIG_AMAS_MTK_EZWDS
 	bool "mtk ezmesh's wds support"
+	default n
+
+config RTCONFIG_MTK_BSD
+	bool "mtk smart-connect support"
 	default n
 
 config RTCONFIG_COBRAND

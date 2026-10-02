@@ -447,3 +447,7 @@ config MLME_MULTI_QUEUE_SUPPORT
 #config GNAX_ONLY_SUPPORT
 #	bool "GNAX Only mode, 11B not allowed"
 #	default n
+
+config ASUS_FORCE4
+	bool "4-addr workaround support"
+	default n

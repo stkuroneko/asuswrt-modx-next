@@ -393,7 +393,7 @@ function change_common_radio(o, s, v, r){
 						showhide("WPS_hideSSID_hint",0);
 			}
 	}
-	else if(v=="bond_wan" && (based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000")){
+	else if(v=="bond_wan" && (based_modelid == "RT-AX89U" || based_modelid == "GT-AXY16000" || based_modelid == "TUF-AX4200" || based_modelid == "TUF-AX6000")){
 		if(r==1){
 			document.getElementById("wanports_bond_menu").style.display = "";
 			document.form.wanports_bond.disabled = false;
