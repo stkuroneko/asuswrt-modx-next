@@ -4245,7 +4245,13 @@ libusb10-clean:
 	[ ! -f libusb10/Makefile ] || $(MAKE) -C libusb10 distclean
 	@rm -f libusb10/Makefile
 
-libusb/Makefile:
+.PHONY: check-libusb-config
+check-libusb-config:
+
+libusb/Makefile: check-libusb-config
+	@if [ -f libusb/Makefile ] && \
+	    grep -Fqx "ac_pwd='$(realpath libusb)'" libusb/config.status; then exit 0; fi; \
+	if [ -f libusb/Makefile ]; then $(MAKE) -C libusb clean || exit $$?; fi; \
 	cd libusb && \
 	$(CONFIGURE) --enable-shared --prefix=/usr \
 		CFLAGS="-Os -Wall -DASUS_U2EC $(EXTRACFLAGS)" \
@@ -4290,7 +4296,12 @@ usb-modeswitch-install: usb-modeswitch
 	@mkdir -p $(TARGETDIR)/rom/$(EX_ROM)/etc
 	@sed 's/#.*//g;s/[ \t]\+/ /g;s/^[ \t]*//;s/[ \t]*$$//;/^$$/d' < $(TOP)/usb-modeswitch/usb_modeswitch.conf > $(TARGETDIR)/rom/$(EX_ROM)/etc/usb_modeswitch.conf
 
-usbmode/stamp-h1:
+.PHONY: check-usbmode-config
+check-usbmode-config:
+
+usbmode/stamp-h1: check-usbmode-config
+	@if [ -f "$@" ] && grep -Fqx "CMAKE_HOME_DIRECTORY:INTERNAL=$(realpath usbmode)" usbmode/CMakeCache.txt; then exit 0; fi; \
+	 rm -f usbmode/CMakeCache.txt; rm -rf usbmode/CMakeFiles
 	@rm -f usbmode/crosscompiled.cmake
 	$(call CMAKE_CrossOptions, usbmode/crosscompiled.cmake)
 	cd usbmode && cmake -DCMAKE_TOOLCHAIN_FILE=crosscompiled.cmake .
@@ -5580,7 +5591,12 @@ ifneq ($(MEDIA_SERVER_STATIC),y)
 	$(STRIP) $(INSTALLDIR)/libogg/usr/lib/libogg.so.0
 endif
 
-flac/stamp-h1: libogg
+.PHONY: check-flac-config
+check-flac-config:
+
+flac/stamp-h1: libogg check-flac-config
+	@if [ -f "$@" ] && grep -Fqx "ac_pwd='$(realpath flac)'" flac/config.status; then exit 0; fi; \
+	if [ -f flac/Makefile ]; then $(MAKE) -C flac clean || exit $$?; fi; \
 	cd flac && \
 	CFLAGS="-Os $(EXTRACFLAGS) -fPIC -ffunction-sections -fdata-sections" \
 	CPPFLAGS="-I$(TOP)/libogg/include" \
@@ -5696,7 +5712,12 @@ ifneq ($(MEDIA_SERVER_STATIC),y)
 endif
 
 
-libvorbis/stamp-h1: libogg
+.PHONY: check-libvorbis-config
+check-libvorbis-config:
+
+libvorbis/stamp-h1: libogg check-libvorbis-config
+	@if [ -f "$@" ] && grep -Fqx "ac_pwd='$(realpath libvorbis)'" libvorbis/config.status; then exit 0; fi; \
+	if [ -f libvorbis/Makefile ]; then $(MAKE) -C libvorbis clean || exit $$?; fi; \
 	cd libvorbis && \
 	CFLAGS="-Os -Wall $(EXTRACFLAGS) -fPIC -ffunction-sections -fdata-sections" \
 	CPPFLAGS="-I$(TOP)/libogg/include" \
@@ -9471,7 +9492,13 @@ libplist-2.2.0-configure:
 		$(CONFIGURE) --without-cython \
 		--disable-shared
 
-libplist-2.2.0/Makefile:
+.PHONY: check-libplist-2.2.0-config
+check-libplist-2.2.0-config:
+
+libplist-2.2.0/Makefile: check-libplist-2.2.0-config
+	@if [ -f libplist-2.2.0/Makefile ] && \
+	    grep -Fqx "ac_pwd='$(realpath libplist-2.2.0)'" libplist-2.2.0/config.status; then exit 0; fi; \
+	if [ -f libplist-2.2.0/Makefile ]; then $(MAKE) -C libplist-2.2.0 clean || exit $$?; fi; \
 	$(MAKE) libplist-2.2.0-configure
 
 libplist-2.2.0: libplist-2.2.0/Makefile
@@ -9503,7 +9530,13 @@ libusbmuxd-2.0.2-configure:
 		libplist_CFLAGS="-I$(TOP)/libplist-2.2.0/include" \
 		libplist_LIBS="-L$(TOP)/libplist-2.2.0/src/.libs -lplist-2.0"
 
-libusbmuxd-2.0.2/Makefile:
+.PHONY: check-libusbmuxd-2.0.2-config
+check-libusbmuxd-2.0.2-config:
+
+libusbmuxd-2.0.2/Makefile: check-libusbmuxd-2.0.2-config
+	@if [ -f libusbmuxd-2.0.2/Makefile ] && \
+	    grep -Fqx "ac_pwd='$(realpath libusbmuxd-2.0.2)'" libusbmuxd-2.0.2/config.status; then exit 0; fi; \
+	if [ -f libusbmuxd-2.0.2/Makefile ]; then $(MAKE) -C libusbmuxd-2.0.2 clean || exit $$?; fi; \
 	$(MAKE) libusbmuxd-2.0.2-configure
 
 libusbmuxd-2.0.2: libusbmuxd-2.0.2/Makefile
@@ -9535,7 +9568,13 @@ libimobiledevice-1.3.0-configure:
 		openssl_CFLAGS="-I$(TOP)/openssl/include" \
 		openssl_LIBS="-L$(TOP)/openssl -lssl -lcrypto"
 
-libimobiledevice-1.3.0/Makefile:
+.PHONY: check-libimobiledevice-1.3.0-config
+check-libimobiledevice-1.3.0-config:
+
+libimobiledevice-1.3.0/Makefile: check-libimobiledevice-1.3.0-config
+	@if [ -f libimobiledevice-1.3.0/Makefile ] && \
+	    grep -Fqx "ac_pwd='$(realpath libimobiledevice-1.3.0)'" libimobiledevice-1.3.0/config.status; then exit 0; fi; \
+	if [ -f libimobiledevice-1.3.0/Makefile ]; then $(MAKE) -C libimobiledevice-1.3.0 clean || exit $$?; fi; \
 	$(MAKE) libimobiledevice-1.3.0-configure
 
 libimobiledevice-1.3.0: libimobiledevice-1.3.0/Makefile
@@ -9602,7 +9641,13 @@ usbmuxd-1.1.1-configure:
 		libimobiledevice_CFLAGS="-I$(TOP)/libimobiledevice-1.3.0/include" \
 		libimobiledevice_LIBS="-L$(TOP)/libimobiledevice-1.3.0/src/.libs -limobiledevice-1.0"
 
-usbmuxd-1.1.1/Makefile:
+.PHONY: check-usbmuxd-1.1.1-config
+check-usbmuxd-1.1.1-config:
+
+usbmuxd-1.1.1/Makefile: check-usbmuxd-1.1.1-config
+	@if [ -f usbmuxd-1.1.1/Makefile ] && \
+	    grep -Fqx "ac_pwd='$(realpath usbmuxd-1.1.1)'" usbmuxd-1.1.1/config.status; then exit 0; fi; \
+	if [ -f usbmuxd-1.1.1/Makefile ]; then $(MAKE) -C usbmuxd-1.1.1 clean || exit $$?; fi; \
 	$(MAKE) usbmuxd-1.1.1-configure
 
 usbmuxd-1.1.1: usbmuxd-1.1.1/Makefile

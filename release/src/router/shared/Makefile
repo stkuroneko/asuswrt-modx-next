@@ -524,11 +524,15 @@ endif
 sw_auth.o:
 ifeq ($(wildcard $(SRCBASE)/router/sw-hw-auth/*.c),)
 	cp -f $(TOP)/sw-hw-auth/prebuild/sw_auth.o ./
+else
+	$(CC) $(CFLAGS) -fPIC -c $(TOP)/sw-hw-auth/sw_auth.c -o $@
 endif
 
 hw_auth.o:
 ifeq ($(wildcard $(SRCBASE)/router/sw-hw-auth/*.c),)
 	cp -f $(TOP)/sw-hw-auth/prebuild/hw_auth.o ./
+else
+	$(CC) $(CFLAGS) -fPIC -c $(TOP)/sw-hw-auth/hw_auth.c -o $@
 endif
 
 nvpriv.o:

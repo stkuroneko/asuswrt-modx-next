@@ -1,5 +1,5 @@
 SET(CMAKE_CROSSCOMPILING "TRUE")
-SET(TOP /repo/Pass_GPL/asuswrt/release/src-ra-openwrt-4210/router)
+SET(TOP /home/akito/asuswrt-7621-mesh/release/src-ra-openwrt-4210/router)
 SET(CMAKE_SYSTEM_NAME Linux)
 SET(CMAKE_SYSTEM_VERSION 4.4.198)
 SET(CMAKE_SYSTEM mipsel-musl)

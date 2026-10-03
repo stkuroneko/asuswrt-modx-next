@@ -14,7 +14,7 @@ our %config = (
   AR => "/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-musl-ar",
   ARFLAGS => [ "r" ],
   CC => "/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-musl-gcc",
-  CFLAGS => [ "-DRTAX53U -DRTAX53U -DMUSL_LIBC -DRTAX53U -DBCM_EVENTD -DEXT_ACS -D__CONFIG_EMF__ -D__CONFIG_WPS__", "-O2", "-ffunction-sections", "-fdata-sections" ],
+  CFLAGS => [ "-DRTAX54 -DRTAX54 -DRTAX54 -DMUSL_LIBC -DRTAX54 -DBCM_EVENTD -DEXT_ACS -D__CONFIG_EMF__ -D__CONFIG_WPS__", "-O2", "-ffunction-sections", "-fdata-sections" ],
   CPPDEFINES => [ "OPENSSL_PREFER_CHACHA_OVER_GCM" ],
   CPPFLAGS => [  ],
   CPPINCLUDES => [  ],
@@ -65,13 +65,13 @@ our %config = (
   options => "--prefix=/usr --openssldir=/etc --cross-compile-prefix=  -O2 -ffunction-sections -fdata-sections -Wl,--gc-sections enable-shared enable-rc5 --api=1.0.0 -DOPENSSL_PREFER_CHACHA_OVER_GCM no-afalgeng no-aria no-asan no-async no-buildtest-c++ no-crypto-mdebug no-crypto-mdebug-backtrace no-devcryptoeng no-ec_nistp_64_gcc_128 no-egd no-err no-external-tests no-fuzz-afl no-fuzz-libfuzzer no-gost no-heartbeats no-md2 no-msan no-sctp no-sm2 no-sm3 no-sm4 no-ssl-trace no-ssl3 no-ssl3-method no-ubsan no-unit-test no-weak-ssl-ciphers no-zlib no-zlib-dynamic",
   perl_archname => "x86_64-linux-gnu-thread-multi",
   perl_cmd => "/usr/bin/perl",
-  perl_version => "5.26.1",
+  perl_version => "5.30.0",
   perlargv => [ "linux-mipsel", "--prefix=/usr", "--openssldir=/etc", "--cross-compile-prefix= ", "-O2", "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections", "shared", "no-ssl2", "no-gost", "no-heartbeats", "no-err", "no-unit-test", "enable-rc5", "no-async", "--api=1.0.0", "no-aria", "no-sm2", "no-sm3", "no-sm4", "-DOPENSSL_PREFER_CHACHA_OVER_GCM" ],
   perlenv => {
       "AR" => "/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-musl-ar",
       "BUILDFILE" => undef,
       "CC" => "/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-musl-gcc",
-      "CFLAGS" => "-DRTAX53U -DRTAX53U -DMUSL_LIBC -DRTAX53U -DBCM_EVENTD -DEXT_ACS -D__CONFIG_EMF__ -D__CONFIG_WPS__",
+      "CFLAGS" => "-DRTAX54 -DRTAX54 -DRTAX54 -DMUSL_LIBC -DRTAX54 -DBCM_EVENTD -DEXT_ACS -D__CONFIG_EMF__ -D__CONFIG_WPS__",
       "CPPFLAGS" => undef,
       "CROSS_COMPILE" => "/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-musl-",
       "CXX" => "/opt/lede-toolchain-ramips-mt7621_gcc-5.4.0_musl-1.1.24.Linux-x86_64/toolchain-mipsel_24kc_gcc-5.4.0_musl-1.1.24/bin/mipsel-openwrt-linux-musl-g++",
@@ -3147,6 +3147,8 @@ our %unified_info = (
                 {
                     "deps" =>
                         [
+                            "ssl/packet.o",
+                            "ssl/tls13_enc.o",
                             "ssl/bio_ssl.o",
                             "ssl/d1_lib.o",
                             "ssl/d1_msg.o",
@@ -3176,8 +3178,6 @@ our %unified_info = (
                             "ssl/t1_trce.o",
                             "ssl/tls13_enc.o",
                             "ssl/tls_srp.o",
-                            "ssl/packet.o",
-                            "ssl/tls13_enc.o",
                         ],
                     "products" =>
                         {

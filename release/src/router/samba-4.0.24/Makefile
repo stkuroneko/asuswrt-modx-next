@@ -132,7 +132,12 @@ CONFIGURE_ARGS = \
 all: $(PKG_BUILD_DIR)/source3/Makefile
 	$(MAKE) -C $(PKG_BUILD_DIR)/source3 include/proto.h && $(MAKE) -j 8 -C $(PKG_BUILD_DIR)/source3 $(MAKE_FLAGS)
 
-$(PKG_BUILD_DIR)/source3/Makefile:
+.PHONY: check-build-directory
+check-build-directory:
+
+$(PKG_BUILD_DIR)/source3/Makefile: check-build-directory
+	@if [ -f "$@" ] && \
+	    grep -Fqx "ac_pwd='$(realpath $(PKG_BUILD_DIR)/source3)'" $(PKG_BUILD_DIR)/source3/config.status; then exit 0; fi; \
 	( cd $(PKG_BUILD_DIR)/source3 && \
 		$(CONFIGURE_VARS) \
 		CPPFLAGS="-DNDEBUG $(DEF_FCNTL)" \
@@ -169,4 +174,3 @@ distclean: clean
 	@find $(PKG_BUILD_DIR)/source3 -name Makefile | xargs rm -f
 	@find $(PKG_BUILD_DIR)/source3 -name config.status | xargs rm -f
 	@find $(PKG_BUILD_DIR)/source3 -name config.cache | xargs rm -f
-

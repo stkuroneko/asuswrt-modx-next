@@ -146,8 +146,8 @@ UNINSTALLLIBCMD_SH=rm -f
 UNINSTALLLIBCMD_A=:
 
 
-srcdir=/repo/Pass_GPL/asuswrt/release/src/router/samba-4.0.24/source/source3
-builddir=/repo/Pass_GPL/asuswrt/release/src/router/samba-4.0.24/source/source3
+srcdir=/home/akito/asuswrt-7621-mesh/release/src/router/samba-4.0.24/source/source3
+builddir=/home/akito/asuswrt-7621-mesh/release/src/router/samba-4.0.24/source/source3
 # XXX: Perhaps this should be /bin/sh instead -- apparently autoconf
 # will search for a POSIX-compliant shell, and that might not be
 # /bin/sh on some platforms.  I guess it's not a big problem -- mbp

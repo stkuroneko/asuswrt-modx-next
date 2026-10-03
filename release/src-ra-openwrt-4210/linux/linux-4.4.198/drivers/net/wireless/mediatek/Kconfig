@@ -103,9 +103,7 @@ config  RT_THIRD_IF_RF_OFFSET
         depends on ! THIRD_IF_NONE
         default 0xd0000
 
-if CHIP_MT7915
 source "drivers/net/wireless/mediatek/mt_wifi_7915_v7400/mt_wifi/embedded/Kconfig"
-endif
 
 endif # WIFI_DRIVER
 endif # WL_MEDIATEK

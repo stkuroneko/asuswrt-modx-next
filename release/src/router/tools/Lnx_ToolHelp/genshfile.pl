@@ -88,7 +88,9 @@ sub addcommand {
 	 }
 	 printf $FH $ToolHelp."/rmvcomments.pl"." ".$fn."\n";
 	 printf $FH $ToolHelp."/LnxRmvTabs"." ".$fn."\n";
-	 printf $FH $ToolHelp."/LnxHtmlEnumDict"." ".$fn." ".$DictEnum." ".$DictNoFound."\n";
+	 # Files without dictionary markers need no enumeration. The legacy binary
+	 # cannot safely process the long lines in captive portal templates.
+	 printf $FH "if grep -q '<#' ".$fn."; then ".$ToolHelp."/LnxHtmlEnumDict"." ".$fn." ".$DictEnum." ".$DictNoFound." || exit \$?; fi\n";
 }
 
 sub readsub {
@@ -127,4 +129,3 @@ sub readsub {
      }
   }
 }
-
