@@ -168,15 +168,7 @@ EXSTRING:=$(LBSTRING)-$(EXTENDTYPE)
 else
 EXSTRING:=$(LBSTRING)
 endif
-ifneq ($(FW_JUMP),)
-export EXTENDNO := $(FW_JUMP)-g$(shell git log --pretty=format:'%h' -n 1|sed -e "s,\([0-9a-z]\{7\}\)[0-9a-z]*,\1,")$(EXSTRING)
-else
-export EXTENDNO := $(shell expr $(EXTENDNO1) + $(RC_EXT_NO))-g$(shell git log --pretty=format:'%h' -n 1|sed -e "s,\([0-9a-z]\{7\}\)[0-9a-z]*,\1,")$(EXSTRING)
-endif
-endif
-
-ifeq ($(EXTENDNO),)
-export EXTENDNO := 0-g$(shell git log --pretty=format:'%h' -n 1|sed -e "s,\([0-9a-z]\{7\}\)[0-9a-z]*,\1,")
+export EXTENDNO := $(shell cat ./router/extendno.conf | sed 's/EXTENDNO=//g' | sed 's/-[0-9]*$$//')-$(shell date +%Y%m%d)
 endif
 
 export SWPJNAME := $(shell git branch | grep "*" | grep "swpj-" | sed 's/.*swpj-//g')
@@ -642,7 +634,7 @@ else
 endif
 endif
 	@echo '$(BUILD_NAME)_$(KERNEL_VER).$(FS_VER) $(BUILD_TIME)' > router/shared/version
-	@echo 'EXTENDNO=$(EXTENDNO)' > router/extendno.conf
+	# router/extendno.conf is the user-specified version input.
 	@-$(MAKE) -f model-desc.mak
 
 rt_ver_ntools:
