@@ -25,6 +25,8 @@
 #include "includes.h"
 #include "dbutil.h"
 
+int scp_main(int argc, char **argv);
+
 static int runprog(const char *multipath,
 		const char *progname, int argc, char ** argv, int *match) {
 	*match = DROPBEAR_SUCCESS;
@@ -50,7 +52,7 @@ static int runprog(const char *multipath,
 			return dropbearconvert_main(argc, argv);
 		}
 #endif
-#if 0//def DBMULTI_scp
+#ifdef DBMULTI_scp
 		if (strcmp(progname, "scp") == 0) {
 			return scp_main(argc, argv);
 		}
@@ -93,7 +95,7 @@ int main(int argc, char ** argv) {
 #ifdef DBMULTI_dropbearconvert
 			"'dropbearconvert' - the key converter\n"
 #endif
-#if 0//def DBMULTI_scp
+#ifdef DBMULTI_scp
 			"'scp' - secure copy\n"
 #endif
 			,

@@ -224,7 +224,7 @@
 #define HAVE_PUTUTXLINE 1
 
 /* Define to 1 if you have the <security/pam_appl.h> header file. */
-/* #undef HAVE_SECURITY_PAM_APPL_H */
+#define HAVE_SECURITY_PAM_APPL_H 1
 
 /* Define to 1 if you have the `setutent' function. */
 #define HAVE_SETUTENT 1

@@ -10490,6 +10490,9 @@ start_aura_rgb_sw(void)
 int
 start_services(void)
 {
+#ifdef RTCONFIG_UUPLUGIN
+	if (nvram_match("ntp_ready", "1")) exec_uu();
+#endif
 #ifdef HND_ROUTER
 	start_jitterentropy();
 #endif /* HND_ROUTER */
@@ -10891,6 +10894,9 @@ start_services(void)
 void
 stop_services(void)
 {
+#ifdef RTCONFIG_UUPLUGIN
+	stop_uu();
+#endif
 #ifdef RTCONFIG_FSMD
 	killall_tk("fsmd");
 #endif
@@ -14832,6 +14838,12 @@ check_ddr_done:
 	else if(strcmp(script, "wtfast_rule") == 0){
 		//_dprintf("send SIGHUP to wtfast_rule SIGHUP = %d\n", SIGHUP);
 		killall("wtfslhd", SIGHUP);
+	}
+#endif
+#ifdef RTCONFIG_UUPLUGIN
+	else if (!strcmp(script, "uu") || !strcmp(script, "uuacc")) {
+		if (action & RC_SERVICE_STOP) stop_uu();
+		if (action & RC_SERVICE_START) start_uu();
 	}
 #endif
 #ifdef RTCONFIG_TCPLUGIN

@@ -18138,6 +18138,9 @@ NO_USB_CAP:
 	/* QCA: SPF5+ */
 	add_rc_support("dis11b");
 #endif
+#ifdef RTCONFIG_UUPLUGIN
+	add_rc_support("uu_accel");
+#endif
 #if defined(RTCONFIG_BCMBSD_V2)
 	add_rc_support("smart_connect_v2");
 #endif

@@ -3268,7 +3268,11 @@ extern void asm1042_upgrade(int);
 #endif
 
 // private.c
-extern void exec_uu();
+#ifdef RTCONFIG_UUPLUGIN
+extern void exec_uu(void);
+extern void start_uu(void);
+extern void stop_uu(void);
+#endif
 #if defined(RTCONFIG_MTK_BSD)
 #define BSD_LOG "/tmp/mtk_mapd.log"
 #define BSD_PATH "/etc/mapd_strng.conf"

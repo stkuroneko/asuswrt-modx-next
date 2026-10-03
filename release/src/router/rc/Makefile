@@ -303,6 +303,9 @@ OBJS := rc.o init.o interface.o lan.o wireless.o $(if $(RTCONFIG_SOFTWIRE46), s4
 OBJS += firewall.o ppp.o services.o common.o
 OBJS += watchdog.o check_watchdog.o ntp.o $(if $(RTCONFIG_MULTIWAN_CFG),qos_multiwan.o,qos.o) udhcpc.o ate.o
 OBJS += format.o
+ifeq ($(RTCONFIG_UUPLUGIN),y)
+OBJS += uu.o
+endif
 ifeq ($(RTCONFIG_CONNTRACK),y)
 OBJS += pctime.o
 endif

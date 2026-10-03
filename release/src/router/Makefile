@@ -1758,6 +1758,7 @@ obj-$(RTCONFIG_FRS_LIVE_UPDATE) += curl
 obj-$(RTCONFIG_FRS_LIVE_UPDATE) += openssl
 
 obj-$(RTCONFIG_URLFW) += curl
+obj-$(RTCONFIG_UUPLUGIN) += uuplugin curl
 
 ifeq ($(RTAX86U),y)
 obj-y += nuc029ctrl
@@ -5391,7 +5392,13 @@ rstats-install:
 
 dropbear/config.h.in: $(if $(RTCONFIG_PROTECTION_SERVER),protect_srv-stage,)
 
-dropbear/config.h: dropbear/config.h.in
+.PHONY: check-dropbear-config
+check-dropbear-config:
+
+dropbear/config.h: dropbear/config.h.in check-dropbear-config
+	@if [ -f dropbear/config.h ] && \
+		grep -Fqx "ac_pwd='$(realpath dropbear)'" dropbear/config.status; then exit 0; fi; \
+	rm -f dropbear/Makefile dropbear/config.h dropbear/config.status dropbear/config.log; \
 	cd dropbear && \
 		CPPFLAGS="-Os -Wall $(EXTRACFLAGS) -DARGTYPE=3 -ffunction-sections -fdata-sections -I$(STAGEDIR)/usr/include \
 			$(if $(RTCONFIG_PROTECTION_SERVER),-DSECURITY_NOTIFY,)" \
@@ -5415,7 +5422,8 @@ dropbear-install:
 	cd $(INSTALLDIR)/dropbear/usr/bin && \
 	ln -sf dropbearmulti dropbearkey && \
 	ln -sf dropbearmulti dbclient && \
-	ln -sf dropbearmulti ssh
+	ln -sf dropbearmulti ssh && \
+	ln -sf dropbearmulti scp
 	install -d $(INSTALLDIR)/dropbear/usr/sbin
 	cd $(INSTALLDIR)/dropbear/usr/sbin && \
 	ln -sf ../bin/dropbearmulti dropbear
@@ -9474,6 +9482,15 @@ endif
 lite-auth-3rd-install:
 	cd lite-auth-3rd && CC=$(CC) && AR=$(AR) && $(MAKE) all
 	tar -jcvf `date +%Y%m%d-%H%M`-lite-auth-3rd.tar.bz2 --exclude="*.o" --exclude="auth.c" lite-auth-3rd
+
+uuplugin:
+
+uuplugin-install:
+	install -D -m 755 uuplugin/uu-bootstrap.sh $(INSTALLDIR)/uuplugin/usr/sbin/uu-bootstrap.sh
+
+uuplugin-clean:
+
+.PHONY: uuplugin uuplugin-install uuplugin-clean
 
 dhcpfwd:
 	$(MAKE) -C $@

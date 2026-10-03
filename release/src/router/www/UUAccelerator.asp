@@ -22,6 +22,12 @@ function initial(){
 	show_menu();
 
 }
+function applyUU(){
+	document.form.action_mode.value = "apply";
+	document.form.action_script.value = "restart_uu";
+	document.form.action_wait.value = "3";
+	document.form.submit();
+}
 function uuRegister(mac){
 	var _mac = mac.toLowerCase();
 	window.open('https://router.uu.163.com/asus/pc.html#/acce?gwSn=' + _mac + '&type=asuswrt', '_blank');
@@ -39,7 +45,6 @@ function uuRegister(mac){
 <input type="hidden" name="action_mode" value="">
 <input type="hidden" name="action_script" value="">
 <input type="hidden" name="action_wait" value="">
-</form>
 
 <div>
 	<table class="content" align="center" cellspacing="0" style="margin:auto;">
@@ -73,7 +78,15 @@ function uuRegister(mac){
 							<td><div class="splitLine"></div></td>
 						</tr> 
 					</table>
-					<div style="display:flex;border: 2px solid #41484a;padding: 18px 6px;align-items: center;border-radius:4px;margin: 12px 6px;">
+					<div style="margin:12px;">
+<label for="uu_enable"><#UU_Accelerator#></label>
+<select name="uu_enable" id="uu_enable">
+<option value="0" <% nvram_match("uu_enable", "0", "selected"); %>><#checkbox_No#></option>
+<option value="1" <% nvram_match("uu_enable", "1", "selected"); %>><#checkbox_Yes#></option>
+</select>
+<input type="button" class="button_gen" value="<#CTL_apply#>" onclick="applyUU();">
+</div>
+										<div style="display:flex;border: 2px solid #41484a;padding: 18px 6px;align-items: center;border-radius:4px;margin: 12px 6px;">
 						<div style="margin: 0 12px;">
 							<img src="/images/uu_accelerator.png" alt="">
 						</div>
@@ -99,6 +112,7 @@ function uuRegister(mac){
 	</table>
 </div>
 
+</form>
 <div id="footer"></div>
 </body>
 </html>

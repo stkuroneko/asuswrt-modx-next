@@ -959,3 +959,7 @@ export BLUECAVE := IPV6SUPP=y HTTPS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y SAMBA3=y
 
 # Select one legacy hardware profile while retaining its original firmware base.
 include $(dir $(realpath $(lastword $(MAKEFILE_LIST))))board-profiles/profiles.mak
+
+# UU game accelerator is available on both MT7621 firmware bases.
+export RT-AX53U += UUPLUGIN=y
+export RT-AX54 += UUPLUGIN=y

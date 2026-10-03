@@ -2257,7 +2257,7 @@ define RouterOptions
 		sed -i "/RTCONFIG_HTTPS/d" $(1); \
 		echo "RTCONFIG_HTTPS=y" >>$(1); \
 		sed -i "/RTCONFIG_FORCE_AUTO_UPGRADE/d" $(1); \
-		echo "RTCONFIG_FORCE_AUTO_UPGRADE=y" >>$(1); \
+		echo "# RTCONFIG_FORCE_AUTO_UPGRADE is not set" >>$(1); \
 		sed -i "/RTCONFIG_CAPTCHA/d" $(1); \
 		echo "RTCONFIG_CAPTCHA=y" >>$(1); \
 		if [ "$(ECC256)" = "y" ]; then \

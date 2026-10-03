@@ -1662,6 +1662,12 @@ TRACE_PT("3g begin with %s.\n", wan_ifname);
 			}
 
 			wan_mtu = nvram_get_int(strcat_r(prefix, "mtu", tmp));
+#if defined(RTAX53U) || defined(RTAX54)
+			/* DHCP/static WANs use the detected 1492-byte uplink by default. */
+			if (!wan_mtu)
+				wan_mtu = (nvram_match(strcat_r(prefix, "proto", tmp), "dhcp") ||
+					   nvram_match(strcat_r(prefix, "proto", tmp), "static")) ? 1492 : 1500;
+#endif
 
 			/* Bring up i/f */
 			_ifconfig(wan_ifname, IFUP, NULL, NULL, NULL, wan_mtu);

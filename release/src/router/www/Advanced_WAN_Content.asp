@@ -663,6 +663,9 @@ function valid_IP(obj_name, obj_flag){
 
 function validForm(){
 	var wan_type = document.form.wan_proto.value;
+	var wan_mtu = document.form.wan_mtu.value;
+	if(wan_mtu !== "" && !validator.numberRange(document.form.wan_mtu, 1280, 1500))
+		return false;
 
 	if(!document.form.wan_dhcpenable_x[0].checked &&
 	   !(Softwire46_support && (wan_type == "lw4o6" || wan_type == "map-e" || wan_type == "v6plus" || wan_type == "ocnvc"))){// Set IP address by userself
@@ -752,7 +755,12 @@ function validForm(){
 		if(!validator.numberRange(document.form.wan_pppoe_mtu, 576, 1492)
 				|| !validator.numberRange(document.form.wan_pppoe_mru, 576, 1492))
 			return false;
-		
+		if(wan_mtu !== "" && parseInt(document.form.wan_pppoe_mtu.value, 10) > parseInt(wan_mtu, 10) - 8){
+			alert("PPPoE MTU must be at least 8 bytes below WAN MTU.");
+			document.form.wan_pppoe_mtu.focus();
+			return false;
+		}
+
 		if(!validator.string(document.form.wan_pppoe_service)
 				|| !validator.string(document.form.wan_pppoe_ac))
 			return false;
@@ -881,6 +889,9 @@ function done_validating(action){
 }
 
 function change_wan_type(wan_type, flag){
+	var default_wan_mtu = (wan_type == "dhcp" || wan_type == "static") ? "1492" : "1500";
+	document.form.wan_mtu.placeholder = default_wan_mtu;
+	document.getElementById("wan_mtu_default").innerHTML = default_wan_mtu;
 	if(typeof(flag) != "undefined")
 		change_wan_dhcp_enable(flag);
 	else
@@ -2000,11 +2011,15 @@ function update_map(){
 											</div>
 										</div>
 									</div>
-								</td>
-							</tr>
+												</td>
+										</tr>
+										<tr>
+												<th>WAN MTU</th>
+								<td><input type="text" maxlength="4" name="wan_mtu" class="input_6_table" value="<% nvram_get("wan_mtu"); %>" placeholder="1492" onKeyPress="return validator.isNumber(this,event);" autocorrect="off" autocapitalize="off"/> 1280 - 1500 (<#Auto#>: <span id="wan_mtu_default">1492</span>)</td>
+										</tr>
 
-							<tr>
-								<th><#Enable_WAN#></th>
+										<tr>
+												<th><#Enable_WAN#></th>
 								<td>
 									<input type="radio" name="wan_enable" class="input" value="1" <% nvram_match("wan_enable", "1", "checked"); %>><#checkbox_Yes#>
 									<input type="radio" name="wan_enable" class="input" value="0" <% nvram_match("wan_enable", "0", "checked"); %>><#checkbox_No#>
