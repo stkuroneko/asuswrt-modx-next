@@ -28,7 +28,7 @@ sbindir=@sbindir@
 sysconfdir=@sysconfdir@
 
 OBJS=auth.o debug.o dgram.o main.o md5.o network.o options.o peer.o session.o tunnel.o utils.o
-EXTRA_LIBS=@LIBEVENT@/*.o -ldl
+EXTRA_LIBS=@LIBEVENT@/libevent.a -ldl
 
 SRCS=$(OBJS:.o=.c)
 CFLAGS=@CFLAGS@ -I.. -I@LIBEVENT@ -Wall -Wstrict-prototypes -ansi -pedantic -D_GNU_SOURCE -DVERSION=\"$(VERSION)\" -DPREFIX=\"$(prefix)\" -DSYSCONFDIR=\"$(sysconfdir)\"
