@@ -4473,8 +4473,13 @@ odhcp6c-clean:
 e2fsprogs: e2fsprogs/Makefile
 	$(MAKE) -C e2fsprogs && $(MAKE) $@-stage
 
-e2fsprogs/Makefile:
-	$(MAKE) e2fsprogs-configure
+.PHONY: check-e2fsprogs-config e2fsprogs-configure
+check-e2fsprogs-config:
+
+e2fsprogs/Makefile: check-e2fsprogs-config
+	@if [ ! -f e2fsprogs/config.status ]; then \
+		$(MAKE) e2fsprogs-configure; \
+	fi
 
 e2fsprogs-configure: e2fsprogs/Makefile.in
 ifeq ($(HND_ROUTER_AX_6756),y)
