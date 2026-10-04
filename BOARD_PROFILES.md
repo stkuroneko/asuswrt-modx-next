@@ -1,6 +1,6 @@
 # MT7621 board profiles
 
-Build all adapted boards from the `port/mt7621-board-profiles` branch. Run `make` from
+Build all adapted boards from the `69196` branch. Run `make` from
 `release/src-ra-openwrt-4210` and select one `BOARD_PROFILE`. Do not combine
 builds for different profiles in the same command; the build tree is shared.
 

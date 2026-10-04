@@ -3,7 +3,7 @@ name: Build RT-AX54 firmware
 on:
   push:
     branches:
-      - master
+      - "69196"
   workflow_dispatch:
     inputs:
       board:
