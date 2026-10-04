@@ -4828,6 +4828,7 @@ inadyn/Makefile: inadyn/configure check-inadyn-config
 		exit 0; \
 	fi; \
 	if [ -f inadyn/Makefile ]; then $(MAKE) -C inadyn clean || exit $$?; fi; \
+	touch inadyn/aclocal.m4 inadyn/configure inadyn/Makefile.in; \
 	cd inadyn && $(CONFIGURE) --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
 		--enable-openssl \
 		confuse_CFLAGS="-I$(STAGEDIR)/usr/include" \
