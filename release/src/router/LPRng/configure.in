@@ -439,7 +439,7 @@ AC_ARG_ENABLE( werror,
 if test "$enableval" = "yes" ; then
 	v=yes;  werror=" -Werror ";
 else
-	v=no; werror ="";
+	v=no; werror="";
 fi
 ],
 [

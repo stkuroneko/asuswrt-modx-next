@@ -9686,7 +9686,7 @@ endif
 check-LPRng-config:
 
 LPRng-configure:
-	cd LPRng && $(CONFIGURE) \
+	cd LPRng && STRIP="$(CROSS_COMPILE)strip" $(CONFIGURE) \
 		--disable-werror \
 		--prefix=/usr \
 		--bindir=/usr/sbin \
