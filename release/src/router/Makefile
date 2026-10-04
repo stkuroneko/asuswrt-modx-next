@@ -9679,6 +9679,26 @@ usbmuxd-1.1.1-clean:
 	@rm -rf usbmuxd-1.1.1/Makefile usbmuxd-1.1.1/*/.deps
 endif
 
+# LPRng ships a generated Makefile, while its host-specific libtool script is
+# intentionally not tracked.  A clean checkout must therefore be configured
+# even though LPRng/Makefile already exists.
+.PHONY: check-LPRng-config LPRng-configure
+check-LPRng-config:
+
+LPRng-configure:
+	cd LPRng && $(CONFIGURE) \
+		--prefix=/usr \
+		--bindir=/usr/sbin \
+		--libdir=/usr/lib
+
+LPRng/Makefile: check-LPRng-config
+	@if [ -x LPRng/libtool ]; then exit 0; fi; \
+	$(MAKE) LPRng-configure
+
+LPRng: LPRng/Makefile
+	@$(SEP)
+	$(MAKE) -C $@
+
 
 #
 # Generic rules
