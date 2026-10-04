@@ -85,6 +85,10 @@ jobs:
             libtool libtool-bin msmtp p7zip-full patch qemu-utils sharutils shtool \
             subversion texinfo uglifyjs unzip upx-ucl uuid-dev wget xmlto xsltproc \
             zlib1g-dev
+          sudo ln -sfn "$(command -v aclocal)" /usr/local/bin/aclocal-1.15
+          sudo ln -sfn "$(command -v automake)" /usr/local/bin/automake-1.15
+          aclocal-1.15 --version | head -n 1
+          automake-1.15 --version | head -n 1
 
       - name: Install MIPS toolchain
         shell: bash
