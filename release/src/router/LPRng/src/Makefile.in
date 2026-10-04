@@ -193,8 +193,8 @@ LINK =  $(LIBTOOL) --mode=link $(LDCC) $(LDFLAGS) -o $@
 
 TARGET= \
 	lprng_certs lprng_index_certs \
-	lpc lpd lpq lpr lprm lpf checkpc lp lpstat \
-	lpbanner monitor ./lpd.conf
+	lpd \
+	./lpd.conf
 
 NONTARGET = sserver sclient
 
@@ -210,20 +210,18 @@ MONITOR_OBJS= monitor.o getopt.o
 LPBANNER_OBJS= lpbanner.o plp_snprintf.o
 
 LIBLPR_OBJS = \
-	accounting.lo child.lo controlword.lo copyright.lo \
+	child.lo controlword.lo \
 	debug.lo errormsg.lo fileopen.lo gethostinfo.lo \
 	getopt.lo getprinter.lo getqueue.lo globmatch.lo \
-	initialize.lo krb5_auth.lo \
+	initialize.lo \
 	linelist.lo linksupport.lo lockfile.lo \
-	lpd_control.lo lpd_dispatch.lo lpd_jobs.lo lpd_logger.lo lpd_rcvjob.lo \
-	lpd_remove.lo sendauth.lo lpd_secure.lo lpd_status.lo \
-	merge.lo permission.lo plp_snprintf.lo printjob.lo \
-	proctitle.lo  sendjob.lo sendmail.lo sendreq.lo ssl_auth.lo \
-	stty.lo user_auth.lo utilities.lo vars.lo md5.lo $(USER_OBJS)
+	lpd_control.lo lpd_dispatch.lo lpd_jobs.lo lpd_rcvjob.lo \
+	lpd_remove.lo lpd_status.lo \
+	permission.lo plp_snprintf.lo printjob.lo \
+	proctitle.lo utilities.lo vars.lo $(USER_OBJS)
 
 ALL_OBJS = $(LIBLPR_OBJS) \
-	$(LPR_OBJS) $(LPQ_OBJS) $(LPC_OBJS) $(LPRM_OBJS) $(LPD_OBJS) \
-	$(CHECKPC_OBJS) $(LPF_OBJS) $(LPRACCNT_OBJS) $(MONITOR_OBJS) $(LPBANNER_OBJS)
+	$(LPD_OBJS)
 
 all: $(TARGET)
 
