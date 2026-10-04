@@ -292,6 +292,7 @@ $(XZUTILSDIR)/configure:
 
 xzutils-configure:
 	( cd $(XZUTILSDIR) ; \
+		touch aclocal.m4 configure Makefile.in ; \
 		./configure \
 		--prefix=/usr/local \
 	)
