@@ -7663,6 +7663,7 @@ wget/Makefile.in: wget/Makefile.am
 	cd wget && autoreconf -fi
 
 wget/Makefile: wget/Makefile.in
+	touch wget/aclocal.m4 wget/configure wget/Makefile.in
 	cd wget && $(CONFIGURE) \
 		--prefix=/usr --sysconfdir=/etc --with-ssl=openssl --with-openssl \
 		--disable-opie --disable-ntlm --disable-debug --disable-nls --disable-xattr \
