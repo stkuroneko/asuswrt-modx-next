@@ -105,7 +105,16 @@ jobs:
       - name: Build firmware
         shell: bash
         working-directory: ${{ env.BUILD_ROOT }}/release/src-ra-openwrt-4210
-        run: make BOARD_PROFILE="$BOARD_PROFILE" rt-ax53u
+        run: |
+          set -o pipefail
+          iptables_dir="$BUILD_ROOT/release/src/router/iptables-1.4.x"
+          touch "$iptables_dir/aclocal.m4" "$iptables_dir/configure"
+          find "$iptables_dir" -name Makefile.in -exec touch {} +
+          build_log="$RUNNER_TEMP/build-${BOARD_PROFILE}.log"
+          if ! make BOARD_PROFILE="$BOARD_PROFILE" rt-ax53u 2>&1 | tee "$build_log"; then
+            tail -n 100 "$build_log" | sed 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g; s/^/::error::/'
+            exit 2
+          fi
 
       - name: Collect firmware
         shell: bash
