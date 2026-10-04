@@ -98,7 +98,7 @@ MAKE_CMD = $(CC) $(SRC_FILES) $(CFLAGS) -o $(APP_NAME) $(LDFLAGS)  $(LIBS)
 
 
 $(IPCLIB): $(IPC_LIB_OBJS)
-	$(LD) -shared -o $@ $^ $(LDFLAGS) $(LIBS)
+	$(CC) -shared -o $@ $^ $(LDFLAGS) $(LIBS)
 
 $(IPC_LIB_OBJS): $(OUTPUT)/%.o: %.c
 	mkdir -p $(dir $@)	
