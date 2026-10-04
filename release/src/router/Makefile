@@ -4932,7 +4932,10 @@ bpalogin-install:
 	install -D bpalogin/bpalogin $(INSTALLDIR)/bpalogin/usr/sbin/bpalogin
 	$(STRIP) $(INSTALLDIR)/bpalogin/usr/sbin/bpalogin
 
-wpa_supplicant:
+wpa_supplicant/wpa_supplicant/.config: wpa_supplicant/wpa_supplicant/config.asus
+	cp $< $@
+
+wpa_supplicant: wpa_supplicant/wpa_supplicant/.config
 	$(MAKE) -C $@/wpa_supplicant EXTRACFLAGS="-Os $(EXTRACFLAGS)"
 
 wpa_supplicant-install: wpa_supplicant
