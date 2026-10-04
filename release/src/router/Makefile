@@ -9687,6 +9687,7 @@ check-LPRng-config:
 
 LPRng-configure:
 	cd LPRng && $(CONFIGURE) \
+		--disable-werror \
 		--prefix=/usr \
 		--bindir=/usr/sbin \
 		--libdir=/usr/lib

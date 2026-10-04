@@ -17,6 +17,7 @@
 *.a
 *.so
 *.so.*
+!/release/src/router/amas-utils/prebuild/RT-AX54/libamas-utils.so
 *.la
 *.lo
 *.d
