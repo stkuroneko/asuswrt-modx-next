@@ -6852,6 +6852,7 @@ strongswan/Makefile: strongswan/configure check-strongswan-config
 		exit 0; \
 	fi; \
 	if [ -f strongswan/Makefile ]; then $(MAKE) -C strongswan clean || exit $$?; fi; \
+	touch strongswan/aclocal.m4 strongswan/configure strongswan/Makefile.in; \
 	cd strongswan && \
 	ac_cv_prog_cc_c99=no $(CONFIGURE) CC=$(CC) \
 	--prefix=/usr/ --bindir=/usr/sbin --sysconfdir=/etc/ --localstatedir=/var/ --libexecdir=/usr/lib \
