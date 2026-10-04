@@ -85,10 +85,6 @@ jobs:
             libtool libtool-bin msmtp p7zip-full patch qemu-utils sharutils shtool \
             subversion texinfo uglifyjs unzip upx-ucl uuid-dev wget xmlto xsltproc \
             zlib1g-dev
-          sudo ln -sfn "$(command -v aclocal)" /usr/local/bin/aclocal-1.15
-          sudo ln -sfn "$(command -v automake)" /usr/local/bin/automake-1.15
-          aclocal-1.15 --version | head -n 1
-          automake-1.15 --version | head -n 1
 
       - name: Install MIPS toolchain
         shell: bash
@@ -107,9 +103,6 @@ jobs:
         working-directory: ${{ env.BUILD_ROOT }}/release/src-ra-openwrt-4210
         run: |
           set -o pipefail
-          iptables_dir="$BUILD_ROOT/release/src/router/iptables-1.4.x"
-          touch "$iptables_dir/aclocal.m4" "$iptables_dir/configure"
-          find "$iptables_dir" -name Makefile.in -exec touch {} +
           build_log="$RUNNER_TEMP/build-${BOARD_PROFILE}.log"
           if ! make BOARD_PROFILE="$BOARD_PROFILE" rt-ax53u 2>&1 | tee "$build_log"; then
             tail -n 100 "$build_log" | sed 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g; s/^/::error::/'
