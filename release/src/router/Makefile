@@ -9711,6 +9711,10 @@ LPRng: LPRng/Makefile
 	@$(SEP)
 	$(MAKE) -C $@
 
+LPRng-install: LPRng
+	install -D LPRng/src/lpd $(INSTALLDIR)/LPRng/usr/sbin/lpd
+	$(STRIP) $(INSTALLDIR)/LPRng/usr/sbin/lpd
+
 
 #
 # Generic rules

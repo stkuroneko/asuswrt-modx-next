@@ -5853,23 +5853,29 @@ define save_src_config
 			echo "Clean old model configuration"; \
 			while read line ; do \
 				var=`echo "$${line}"|sed -e "s,^export[       ]*,," -e "s,=.*$$,,"` ; \
-				unset "$${var}" ; \
+				if echo "$${var}" | grep -Eq '^[A-Za-z_][A-Za-z0-9_]*$$'; then unset "$${var}"; fi ; \
 			done < .config; \
 			echo "Update model configuration" ; \
 			rm -f .config ; \
 	fi ;
 	@for var in $($(shell echo GENERAL_BASE | tr a-z A-Z)) ; do \
-		echo "export $${var}" >> .config ; \
-		export $${var} ; \
+		name=`echo "$${var}" | sed -e 's,=.*$$,,'` ; \
+		if echo "$${name}" | grep -Eq '^[A-Za-z_][A-Za-z0-9_]*$$'; then \
+			echo "export $${var}" >> .config; export $${var}; \
+		else echo "$${var}" >> .config; fi ; \
 	done ;
 	@for var in $($(shell echo $(1)$(2) | tr a-z A-Z)) ; do \
-		echo "export $${var}" >> .config ; \
-		export $${var} ; \
+		name=`echo "$${var}" | sed -e 's,=.*$$,,'` ; \
+		if echo "$${name}" | grep -Eq '^[A-Za-z_][A-Za-z0-9_]*$$'; then \
+			echo "export $${var}" >> .config; export $${var}; \
+		else echo "$${var}" >> .config; fi ; \
 	done ;
 	@if [ -n "$(FW_JUMP)" ] ; then \
 		for var in $(FW_JUMP_TARGET) ; do \
-			echo "export $${var}" >> .config ; \
-			export $${var} ; \
+			name=`echo "$${var}" | sed -e 's,=.*$$,,'` ; \
+			if echo "$${name}" | grep -Eq '^[A-Za-z_][A-Za-z0-9_]*$$'; then \
+				echo "export $${var}" >> .config; export $${var}; \
+			else echo "$${var}" >> .config; fi ; \
 		done ; \
 	fi ;
 	@chmod 666 .config;
