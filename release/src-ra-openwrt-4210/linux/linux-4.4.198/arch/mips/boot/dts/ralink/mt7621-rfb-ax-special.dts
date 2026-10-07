@@ -1,0 +1,16 @@
+/*
+ * MT7621 AX special variant: writable bootloader MTD and no input buttons.
+ */
+#include "mt7621-rfb-ax-nmbm.dts"
+
+/ {
+	/delete-node/ gpio-keys-polled;
+
+	nmbm {
+		partitions {
+			partition@0 {
+				/delete-property/ read-only;
+			};
+		};
+	};
+};

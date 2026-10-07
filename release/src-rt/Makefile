@@ -817,7 +817,7 @@ else ifeq ($(CONFIG_RALINK),y)
 		#asustools/lzma -9 -f -c $(PLATFORMDIR)/vmlinus > $(PLATFORMDIR)/zImage.lzma ; \
 		asustools/lzma_9k e $(PLATFORMDIR)/vmlinus $(PLATFORMDIR)/zImage.lzma -lc2 -lp2 -pb2 -mfbt2 ; \
 	elif [ "$(BUILD_NAME)" = "RT-AX53U" ] || [ "$(BUILD_NAME)" = "RT-AX54" ] || [ "$(BUILD_NAME)" = "4G-AX56" ] || [ "$(BUILD_NAME)" = "XD4S" ]  ; then \
-		$(CROSS_COMPILE)cpp -nostdinc -x assembler-with-cpp -I$(DTS_DIR) -I$(DTS_DIR)/include -undef -D__DTS__ -o $(DTS_DIR)/ralink/$(DTB).tmp $(DTS_DIR)/ralink/mt7621-rfb-ax-nmbm.dts ; \
+		$(CROSS_COMPILE)cpp -nostdinc -x assembler-with-cpp -I$(DTS_DIR) -I$(DTS_DIR)/include -undef -D__DTS__ -o $(DTS_DIR)/ralink/$(DTB).tmp $(DTS_DIR)/ralink/$(patsubst %.dtb,%.dts,$(DTB)) ; \
 		$(LINUXDIR)/scripts/dtc/dtc -O dtb -i$(DTS_DIR)/ralink -o $(DTS_DIR)/ralink/$(DTB) $(DTS_DIR)/ralink/$(DTB).tmp ; \
 		rm $(DTS_DIR)/ralink/$(DTB).tmp ; \
 		$(CROSS_COMPILE)objcopy -O binary -R .reginfo -R .note -R .comment -R .mdebug -S $(LINUXDIR)/vmlinux $(PLATFORMDIR)/vmlinus ; \

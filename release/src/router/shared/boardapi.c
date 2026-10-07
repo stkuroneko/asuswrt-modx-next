@@ -830,6 +830,11 @@ int button_pressed(int which)
 	int use_gpio;
 	int gpio_value;
 
+#if defined(RTCONFIG_BOARD_AX54_SPECIAL) || defined(RTCONFIG_BOARD_AX53U_SPECIAL)
+	/* This hardware profile intentionally exposes no front-panel buttons. */
+	return 0;
+#endif
+
 	if (which < 0 || which >= BTN_ID_MAX)
 		return -1;
 
