@@ -18,6 +18,7 @@ on:
           - XY-C3N
           - SIM-AX18
           - G-AX1800
+          - AX53U-SPECIAL
 
 permissions:
   contents: read
@@ -35,7 +36,7 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        board: ${{ fromJSON((github.event_name == 'push' || inputs.board == 'ALL') && '[ "C-Life-XG1", "CR660X", "XY-C3N", "SIM-AX18", "G-AX1800" ]' || format('["{0}"]', inputs.board)) }}
+        board: ${{ fromJSON((github.event_name == 'push' || inputs.board == 'ALL') && '[ "C-Life-XG1", "CR660X", "XY-C3N", "SIM-AX18", "G-AX1800", "AX53U-SPECIAL" ]' || format('["{0}"]', inputs.board)) }}
     env:
       BUILD_ROOT: /build
       BOARD_PROFILE: ${{ matrix.board }}
